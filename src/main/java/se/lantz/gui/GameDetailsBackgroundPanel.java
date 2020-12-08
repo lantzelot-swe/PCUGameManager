@@ -104,7 +104,7 @@ public class GameDetailsBackgroundPanel extends JPanel
   {
     if (systemPanel == null)
     {
-      systemPanel = new SystemPanel();
+      systemPanel = new SystemPanel(model.getSystemModel());
       systemPanel
         .setBorder(new TitledBorder(null, "System Settings", TitledBorder.LEADING, TitledBorder.TOP, null, null));
     }
