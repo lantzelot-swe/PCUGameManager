@@ -163,7 +163,7 @@ public class ImportManager
         gamefile = line.substring(2);
         if (gamefile.lastIndexOf("/") > -1)
         {
-          gamefile = gamefile.substring(gamefile.lastIndexOf("/")+1);
+          gamefile = gamefile.substring(gamefile.lastIndexOf("/") + 1);
         }
       }
       else if (line.startsWith("C:"))
@@ -171,7 +171,7 @@ public class ImportManager
         coverfile = line.substring(2);
         if (coverfile.lastIndexOf("/") > -1)
         {
-          coverfile = coverfile.substring(coverfile.lastIndexOf("/")+1);
+          coverfile = coverfile.substring(coverfile.lastIndexOf("/") + 1);
         }
       }
       else if (line.startsWith("G:"))
@@ -181,7 +181,7 @@ public class ImportManager
           screen1file = line.substring(2);
           if (screen1file.lastIndexOf("/") > -1)
           {
-            screen1file = screen1file.substring(screen1file.lastIndexOf("/")+1);
+            screen1file = screen1file.substring(screen1file.lastIndexOf("/") + 1);
           }
         }
         else
@@ -189,7 +189,7 @@ public class ImportManager
           screen2file = line.substring(2);
           if (screen2file.lastIndexOf("/") > -1)
           {
-            screen2file = screen2file.substring(screen2file.lastIndexOf("/")+1);
+            screen2file = screen2file.substring(screen2file.lastIndexOf("/") + 1);
           }
         }
       }
@@ -204,6 +204,12 @@ public class ImportManager
       else if (line.startsWith("X:"))
       {
         advanced = line.substring(2);
+        //The maxi game tool sets the flag for accurate disk to "truedrive". This is not correct according
+        //to the The64 manual. Convert to the correct "accuratedisk"
+        if (advanced.contains("truedrive"))
+        {
+          advanced = advanced.replace("truedrive", "accuratedisk");
+        }
       }
     }
     // Construct a data row
@@ -230,12 +236,11 @@ public class ImportManager
     List<String> lines = Collections.emptyList();
     try
     {
-      lines = Files.readAllLines(filePath, StandardCharsets.UTF_8);
+      lines = Files.readAllLines(filePath, StandardCharsets.ISO_8859_1);
     }
-
     catch (IOException e)
     {
-      ExceptionHandler.handleException(e, "Could not read files in list");
+      ExceptionHandler.handleException(e, "Could not read file: filepath=" + filePath.toString());
     }
     return lines;
   }
@@ -250,59 +255,59 @@ public class ImportManager
 
   public void copyFiles(String dbRowData, StringBuilder infoBuilder)
   {
-      String coverName = "";
-      String screen1Name = "";
-      String screen2Name = "";
-      String gameName = "";
-      
-      String[] splittedForPaths = dbRowData.split("\",\"");
-    
-      gameName = splittedForPaths[6];
-      coverName = splittedForPaths[7];
-      screen1Name = splittedForPaths[8];
-      screen2Name = splittedForPaths[9];
-      //Copy!
-      Path coverPath = srcCoversFolder.resolve(coverName);
-      Path targetPath = Paths.get("./covers/" + coverName);
-      
-      Path screens1Path = srcScreensFolder.resolve(screen1Name);
-      Path targetScreen1Path = Paths.get("./screens/" + screen1Name);
-      
-      Path screens2Path = srcScreensFolder.resolve(screen2Name);
-      Path targetScreen2Path = Paths.get("./screens/" + screen2Name);
-      
-      Path gamePath = srcGamesFolder.resolve(gameName);
-      Path targetGamePath = Paths.get("./games/" + gameName);
-      
-      try
-      {
-        infoBuilder.append("Copying cover from ");
-        infoBuilder.append(coverPath.toString());
-        infoBuilder.append("\n");
-        logger.debug("RowData = {}", dbRowData);
-        Files.copy(coverPath, targetPath, StandardCopyOption.REPLACE_EXISTING);
-        
-        infoBuilder.append("Copying screenshot from ");
-        infoBuilder.append(screens1Path.toString());
-        infoBuilder.append("\n");
-        Files.copy(screens1Path, targetScreen1Path, StandardCopyOption.REPLACE_EXISTING);
-        
-        infoBuilder.append("Copying screenshot from ");
-        infoBuilder.append(screens2Path.toString());
-        infoBuilder.append("\n");
-        Files.copy(screens2Path, targetScreen2Path, StandardCopyOption.REPLACE_EXISTING);
-        
-        infoBuilder.append("Copying game file from ");
-        infoBuilder.append(gamePath.toString());
-        infoBuilder.append("\n");
-        Files.copy(gamePath, targetGamePath, StandardCopyOption.REPLACE_EXISTING);
-      }
-      catch (IOException e)
-      {
-        ExceptionHandler.handleException(e, "Could not copy files");
-      }
+    String coverName = "";
+    String screen1Name = "";
+    String screen2Name = "";
+    String gameName = "";
+
+    String[] splittedForPaths = dbRowData.split("\",\"");
+
+    gameName = splittedForPaths[6];
+    coverName = splittedForPaths[7];
+    screen1Name = splittedForPaths[8];
+    screen2Name = splittedForPaths[9];
+    //Copy!
+    Path coverPath = srcCoversFolder.resolve(coverName);
+    Path targetPath = Paths.get("./covers/" + coverName);
+
+    Path screens1Path = srcScreensFolder.resolve(screen1Name);
+    Path targetScreen1Path = Paths.get("./screens/" + screen1Name);
+
+    Path screens2Path = srcScreensFolder.resolve(screen2Name);
+    Path targetScreen2Path = Paths.get("./screens/" + screen2Name);
+
+    Path gamePath = srcGamesFolder.resolve(gameName);
+    Path targetGamePath = Paths.get("./games/" + gameName);
+
+    try
+    {
+      infoBuilder.append("Copying cover from ");
+      infoBuilder.append(coverPath.toString());
+      infoBuilder.append("\n");
+      logger.debug("RowData = {}", dbRowData);
+      Files.copy(coverPath, targetPath, StandardCopyOption.REPLACE_EXISTING);
+
+      infoBuilder.append("Copying screenshot from ");
+      infoBuilder.append(screens1Path.toString());
+      infoBuilder.append("\n");
+      Files.copy(screens1Path, targetScreen1Path, StandardCopyOption.REPLACE_EXISTING);
+
+      infoBuilder.append("Copying screenshot from ");
+      infoBuilder.append(screens2Path.toString());
+      infoBuilder.append("\n");
+      Files.copy(screens2Path, targetScreen2Path, StandardCopyOption.REPLACE_EXISTING);
+
+      infoBuilder.append("Copying game file from ");
+      infoBuilder.append(gamePath.toString());
+      infoBuilder.append("\n");
+      Files.copy(gamePath, targetGamePath, StandardCopyOption.REPLACE_EXISTING);
+    }
+    catch (IOException e)
+    {
+      ExceptionHandler.handleException(e, "Could NOT copy files for: " + gameName);
+    }
   }
-  
+
   public void clearAfterImport()
   {
     dbRowDataList.clear();

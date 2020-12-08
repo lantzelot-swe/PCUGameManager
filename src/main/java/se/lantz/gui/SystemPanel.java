@@ -130,7 +130,7 @@ public class SystemPanel extends JPanel
     getPalRadioButton().setSelected(model.isPal());
     getNtscRadioButton().setSelected(model.isNtsc());
     getDriveIconCheckBox().setSelected(model.isDriveIcon());
-    getAccurateDiskCheckBox().setSelected(model.isTrueDrive());
+    getAccurateDiskCheckBox().setSelected(model.isAccurateDisk());
     getFullHeightCheckBox().setSelected(model.isFullHeight());
     getSid6581RadioButton().setSelected(model.isSid6581());
     getSid8580RadioButton().setSelected(model.isSid8580());
@@ -541,7 +541,7 @@ public class SystemPanel extends JPanel
         {
           public void actionPerformed(ActionEvent e)
           {
-            model.setTrueDrive(accurateDiskCheckBox.isSelected());
+            model.setAccurateDisk(accurateDiskCheckBox.isSelected());
           }
         });
     }

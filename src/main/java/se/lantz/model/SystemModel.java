@@ -9,7 +9,7 @@ public class SystemModel extends AbstractModel
   private final static String PAL = "pal";
   private final static String NTSC = "ntsc";
   private final static String DRIVEICON = "driveicon";
-  private final static String TRUEDRIVE = "truedrive";
+  private final static String ACCURATEDISK = "accuratedisk";
   private final static String FULLHEIGHT = "fullheight";
   private final static String SID6581 = "sid6581";
   private final static String SID8580 = "sid8580";
@@ -29,7 +29,7 @@ public class SystemModel extends AbstractModel
   private boolean pal = false;
   private boolean ntsc = false;
   private boolean driveIcon = false;
-  private boolean trueDrive = false;
+  private boolean accurateDisk = false;
   private boolean fullHeight = false;
   private boolean sid6581 = false;
   private boolean sid8580 = false;
@@ -68,9 +68,9 @@ public class SystemModel extends AbstractModel
     {
       list.add(DRIVEICON);
     }
-    if (isTrueDrive())
+    if (isAccurateDisk())
     {
-      list.add(TRUEDRIVE);
+      list.add(ACCURATEDISK);
     }
     if (isFullHeight())
     {
@@ -146,7 +146,7 @@ public class SystemModel extends AbstractModel
   {
     setC64(true);
     setPal(true);
-    setTrueDrive(false);
+    setAccurateDisk(false);
     setDriveIcon(false);
     setNoAudioScale(false);
     setFullHeight(false);
@@ -185,9 +185,9 @@ public class SystemModel extends AbstractModel
       {
         setDriveIcon(true);
       }
-      else if (flag.equals(TRUEDRIVE))
+      else if (flag.equals(ACCURATEDISK))
       {
-        setTrueDrive(true);
+        setAccurateDisk(true);
       }
       else if (flag.equals(FULLHEIGHT))
       {
@@ -329,15 +329,15 @@ public class SystemModel extends AbstractModel
     }
   }
   
-  public boolean isTrueDrive()
+  public boolean isAccurateDisk()
   {
-    return trueDrive;
+    return accurateDisk;
   }
 
-  public void setTrueDrive(boolean trueDrive)
+  public void setAccurateDisk(boolean trueDrive)
   {    
-    boolean old = isTrueDrive();
-    this.trueDrive = trueDrive;
+    boolean old = isAccurateDisk();
+    this.accurateDisk = trueDrive;
     if (!(Boolean.compare(old, trueDrive) == 0))
     {
       notifyChange();
