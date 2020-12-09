@@ -1,5 +1,7 @@
 package se.lantz.gui.imports;
 
+import java.awt.Frame;
+
 import javax.swing.ImageIcon;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
@@ -9,23 +11,20 @@ public class ImportProgressDialog extends JDialog
   private static final long serialVersionUID = 1L;
 
   private ImportProgressPanel panel;
-  private JFrame frame;
 
-  public ImportProgressDialog(JFrame frame)
+  public ImportProgressDialog(Frame frame)
   {
-    this.setModal(true);
-    this.setIconImage(new ImageIcon(getClass().getResource("/se/lantz/FrameIcon.png")).getImage());
-    this.frame = frame;
-    this.setTitle("Import games");
+    super(frame,"Import games", true);
+//    this.setIconImage(new ImageIcon(getClass().getResource("/se/lantz/FrameIcon.png")).getImage());
     this.add(getImportProgressPanel());
     setSize(900, 600);
     setAlwaysOnTop(true);
     setLocationRelativeTo(frame);
   }
 
-  public void updateProgress(String progressText, String infoText)
+  public void updateProgress(String infoText)
   {
-    getImportProgressPanel().updateProgress(progressText, infoText);
+    getImportProgressPanel().updateProgress(infoText);
     this.repaint();
   }
   

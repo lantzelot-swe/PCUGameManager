@@ -15,11 +15,11 @@ public class JoystickModel extends AbstractModel
 
   private List<String> configList = new ArrayList<>();
   private ActionListener primaryListener;
-  
+
   public JoystickModel(boolean port1)
   {
     this.port1 = port1;
-    
+
   }
 
   public String getConfigString()
@@ -344,7 +344,7 @@ public class JoystickModel extends AbstractModel
   {
     boolean old = isPrimary();
     this.primary = primary;
-    if (!(Boolean.compare(old, primary) == 0))
+    if ((Boolean.compare(old, primary) != 0))
     {
       notifyChange();
       if (primaryListener != null)
@@ -358,7 +358,7 @@ public class JoystickModel extends AbstractModel
   {
     boolean old = isPrimary();
     this.primary = primary;
-    if (!(Boolean.compare(old, primary) == 0))
+    if ((Boolean.compare(old, primary) != 0))
     {
       notifyChange();
     }

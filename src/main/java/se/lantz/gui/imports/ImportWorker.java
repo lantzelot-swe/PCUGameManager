@@ -21,19 +21,10 @@ public class ImportWorker extends SwingWorker<Void, String>
   @Override
   protected Void doInBackground() throws Exception
   {
-    //TODO: These are the steps to perform:
-    //-Read gameinfo files
-    //-Convert into db rows
-    //-Check which rows (games) are to be updated/added
-    //-Update db
-    //-Copy screenshots/covers/games for all that has been updated
-    //-Cleanup
-    
     publish("Reading game info files...");
     StringBuilder infoBuilder = new StringBuilder();
     importManager.readGameInfoFiles(infoBuilder);
     publish(infoBuilder.toString());
-    
     importManager.convertIntoDbRows();
     publish("Importing to db...");
     publish(importManager.insertRowsIntoDb().toString());
@@ -49,7 +40,7 @@ public class ImportWorker extends SwingWorker<Void, String>
   {
     for (String value : chunks)
     {
-      dialog.updateProgress(value, value + "\n");
+      dialog.updateProgress(value + "\n");
     }
   }
 

@@ -5,7 +5,6 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 
 import javax.swing.JButton;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
@@ -84,7 +83,7 @@ public class ImportProgressPanel extends JPanel
     return closeButton;
   }
   
-  void updateProgress(String progressText, String infoText)
+  void updateProgress(String infoText)
   {
     getTextArea().append(infoText);
   }

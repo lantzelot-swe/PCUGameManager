@@ -29,39 +29,38 @@ public class FileManager
   {
     this.model = model;
   }
-  
+
   public void saveFiles()
   {
     //Check if title is different that in db, then rename existing files!
     if (model.isTitleChanged())
     {
       //Rename existing covers and screens and game file
-      renameFiles();     
+      renameFiles();
     }
-    
+
     //Fetch images that has been added
     BufferedImage cover = model.getCoverImage();
     BufferedImage screen1 = model.getScreen1Image();
     BufferedImage screen2 = model.getScreen2Image();
-    //TODO: game file
     String coverFileName = model.getCoverFile();
     String screen1FileName = model.getScreens1File();
     String screen2FileName = model.getScreens2File();
-    
+
     //Store on disk with the name in the models. The UI must make sure the names is according to the Maxi format.
-    
+
     //Resize the files, cover size = 122x175
     if (cover != null)
     {
       try
-      {      
+      {
         Image coverToSave = cover.getScaledInstance(122, 175, Image.SCALE_DEFAULT);
         BufferedImage copyOfImage =
           new BufferedImage(coverToSave.getWidth(null), coverToSave.getHeight(null), BufferedImage.TYPE_INT_RGB);
         Graphics g = copyOfImage.createGraphics();
         g.drawImage(coverToSave, 0, 0, null);
         g.dispose();
-        
+
         File outputfile = new File(COVERS + coverFileName);
         ImageIO.write(copyOfImage, "png", outputfile);
       }
@@ -70,11 +69,11 @@ public class FileManager
         logger.error("Could not store cover", e);
       }
     }
-    
+
     if (screen1 != null)
     {
       try
-      {  
+      {
         File outputfile = new File(SCREENS + screen1FileName);
         ImageIO.write(screen1, "png", outputfile);
       }
@@ -83,11 +82,11 @@ public class FileManager
         logger.error("Could not store screen1", e);
       }
     }
-    
+
     if (screen2 != null)
     {
       try
-      {  
+      {
         File outputfile = new File(SCREENS + screen2FileName);
         ImageIO.write(screen2, "png", outputfile);
       }
@@ -98,7 +97,7 @@ public class FileManager
     }
     //TODO: game file
   }
-  
+
   private void renameFiles()
   {
     String oldTitle = generateFileNameFromTitle(model.getTitleInDb());
@@ -154,10 +153,11 @@ public class FileManager
       {
         logger.debug("Could NOT rename game {} to {}", oldGame.getName(), newGame.getName());
       }
-    }  
+    }
   }
-  
-  public static String generateFileNameFromTitle(String title) {
+
+  public static String generateFileNameFromTitle(String title)
+  {
     // All uppercase letters
     // No spaces or special characters
     //The maxi game tool seems to work like this: truncate to 23 characters and then remove all special characters.
@@ -166,14 +166,13 @@ public class FileManager
       title = title.substring(0, 23);
       logger.debug("FileName: truncating to : {}", title);
     }
-    // System.out.println("Game title: " + fileNameList.get(0));
     // Do the conversion
-    List<Character> forbiddenCharsList = " ,:'’-.!+*<>()".chars().mapToObj(item -> (char) item)
-        .collect(Collectors.toList());
+    List<Character> forbiddenCharsList =
+      " ,:'’-.!+*<>()".chars().mapToObj(item -> (char) item).collect(Collectors.toList());
 
-    List<Character> newName = title.chars().mapToObj(item -> (char) item)
-        .filter(character -> !forbiddenCharsList.contains(character))
-        .map(character -> Character.toUpperCase(character)).collect(Collectors.toList());
+    List<Character> newName =
+      title.chars().mapToObj(item -> (char) item).filter(character -> !forbiddenCharsList.contains(character))
+        .map(Character::toUpperCase).collect(Collectors.toList());
     String newNameString = newName.stream().map(String::valueOf).collect(Collectors.joining());
     logger.debug("Game title: \"{}\" ---- New fileName: \"{}\"", title, newNameString);
     return newNameString;

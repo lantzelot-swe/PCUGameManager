@@ -37,7 +37,7 @@ public class MainViewModel extends AbstractModel
   private String currentGameId = "";
 
   private PropertyChangeListener duplicateListener;
-  
+
   private PropertyChangeListener requiredFieldsListener;
 
   private GameListData selectedData;
@@ -57,13 +57,11 @@ public class MainViewModel extends AbstractModel
       gameViewModel.addElement(gameView);
     }
 
-    joy1Model.setPrimaryChangeListener(e -> {
-      joy2Model.setPrimaryWithoutListenerNotification(!Boolean.valueOf(e.getActionCommand()));
-    });
+    joy1Model.setPrimaryChangeListener(e -> joy2Model
+      .setPrimaryWithoutListenerNotification(!Boolean.valueOf(e.getActionCommand())));
 
-    joy2Model.setPrimaryChangeListener(e -> {
-      joy1Model.setPrimaryWithoutListenerNotification(!Boolean.valueOf(e.getActionCommand()));
-    });
+    joy2Model.setPrimaryChangeListener(e -> joy1Model
+      .setPrimaryWithoutListenerNotification(!Boolean.valueOf(e.getActionCommand())));
   }
 
   public ListModel<GameListData> getGameListModel()
@@ -102,7 +100,7 @@ public class MainViewModel extends AbstractModel
     infoModel.setScreens2File(details.getScreen2());
     //Reset and images that where added previously
     infoModel.resetImages();
-    
+
     infoModel.resetDataChanged();
 
     joy1Model.setConfigStringFromDb(details.getJoy1());
@@ -191,7 +189,7 @@ public class MainViewModel extends AbstractModel
   {
     this.duplicateListener = duplicateListener;
   }
-  
+
   public void addRequireFieldsListener(PropertyChangeListener requiredFieldsListener)
   {
     this.requiredFieldsListener = requiredFieldsListener;
@@ -217,24 +215,24 @@ public class MainViewModel extends AbstractModel
         duplicateListener.propertyChange(new PropertyChangeEvent(this, "duplicate", null, infoModel.getTitle()));
         return false;
       }
-      
-      if (validateRequiredFields().size() > 0)
+
+      if (!validateRequiredFields().isEmpty())
       {
         //Validate that all required fields are set here!!
         requiredFieldsListener.propertyChange(new PropertyChangeEvent(this, "missing", null, validateRequiredFields()));
         return false;
       }
-      
+
       //Update all file names to match title
       infoModel.updateFileNames();
       //Create game details
       GameDetails updatedGame = new GameDetails();
-      updatedGame.setTitle(infoModel.getTitle().replaceAll("\"", "\"\""));
-      updatedGame.setAuthor(infoModel.getAuthor().replaceAll("\"", "\"\""));
+      updatedGame.setTitle(infoModel.getTitle().replace("\"", "\"\""));
+      updatedGame.setAuthor(infoModel.getAuthor().replace("\"", "\"\""));
       updatedGame.setYear(infoModel.getYear());
-      updatedGame.setComposer(infoModel.getComposer().replaceAll("\"", "\"\""));
+      updatedGame.setComposer(infoModel.getComposer().replace("\"", "\"\""));
       updatedGame.setGenre(infoModel.getGenre());
-      updatedGame.setDescription(infoModel.getDescription().replaceAll("\"", "\"\""));
+      updatedGame.setDescription(infoModel.getDescription().replace("\"", "\"\""));
       updatedGame.setGame(infoModel.getGamesFile());
       updatedGame.setCover(infoModel.getCoverFile());
       updatedGame.setScreen1(infoModel.getScreens1File());
@@ -242,7 +240,7 @@ public class MainViewModel extends AbstractModel
       updatedGame.setJoy1(joy1Model.getConfigString());
       updatedGame.setJoy2(joy2Model.getConfigString());
       updatedGame.setSystem(systemModel.getConfigString());
-      
+
       if (currentGameId.isEmpty())
       {
         //Create new entry in Db
@@ -273,8 +271,7 @@ public class MainViewModel extends AbstractModel
     }
     return false;
   }
-  
-  
+
   private List<String> validateRequiredFields()
   {
     List<String> missingFields = new ArrayList<>();

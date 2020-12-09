@@ -18,6 +18,10 @@ import javax.swing.ImageIcon;
  */
 public class ImageResizer
 {
+  private ImageResizer()
+  {
+    //Empty
+  }
 
   public static BufferedImage scale(BufferedImage before, double scale)
   {

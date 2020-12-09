@@ -17,10 +17,13 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.nodes.TextNode;
 import org.jsoup.select.Elements;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class MobyGamesScraper
 {
-
+  private static final Logger logger = LoggerFactory.getLogger(MobyGamesScraper.class);
+  
   private String mobyGamesBaseUrl = "https://www.mobygames.com/game/c64/*";
   
   private String game = "rushn-attack";
@@ -54,7 +57,7 @@ public class MobyGamesScraper
   public void scrapeMobyGames()
   {
     startTime = System.currentTimeMillis();
-    System.out.println("Scraping  " + mobyGamesBaseUrl + " ...");
+    logger.debug("Scraping  {} ...", mobyGamesBaseUrl);
     
     scrapeDescription();
    

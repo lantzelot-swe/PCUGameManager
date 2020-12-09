@@ -8,6 +8,8 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.io.Reader;
 
+import se.lantz.util.FileDrop.TransferableObject;
+
 /**
  * This class makes it easy to drag and drop files from the operating system to a Java program. Any
  * <tt>java.awt.Component</tt> can be dropped onto, but only <tt>javax.swing.JComponent</tt>s will indicate the drop
@@ -50,14 +52,13 @@ import java.io.Reader;
  */
 public class FileDrop
 {
-  private transient javax.swing.border.Border normalBorder;
-  private transient java.awt.dnd.DropTargetListener dropListener;
+  private javax.swing.border.Border normalBorder;
+  private java.awt.dnd.DropTargetListener dropListener;
 
   /** Discover if the running JVM is modern enough to have drag and drop. */
   private static Boolean supportsDnD;
 
   // Default border color
-  //    private static java.awt.Color defaultBorderColor = new java.awt.Color( 0f, 0f, 1f, 0.25f );
   private static java.awt.Color defaultBorderColor = Color.RED;
 
   /**
@@ -256,7 +257,7 @@ public class FileDrop
 
           public void dragOver(java.awt.dnd.DropTargetDragEvent evt)
           {   // This is called continually as long as the mouse is
-           // over the drag target.
+            // over the drag target.
           }   // end dragOver
 
           public void drop(java.awt.dnd.DropTargetDropEvent evt)

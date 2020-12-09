@@ -43,6 +43,7 @@ public class SystemModel extends AbstractModel
   
   public SystemModel()
   {
+    //Empty
   }
  
   public String getConfigString()
@@ -251,7 +252,7 @@ public class SystemModel extends AbstractModel
     {
       this.vic = false;
     }
-    if (!(Boolean.compare(old, c64) == 0))
+    if ((Boolean.compare(old, c64) != 0))
     {
       notifyChange();
     }
@@ -270,7 +271,7 @@ public class SystemModel extends AbstractModel
     {
       this.c64 = false;
     }
-    if (!(Boolean.compare(old, vic) == 0))
+    if ((Boolean.compare(old, vic) != 0))
     {
       notifyChange();
     }
@@ -289,7 +290,7 @@ public class SystemModel extends AbstractModel
     {
       this.ntsc = false;
     }
-    if (!(Boolean.compare(old, pal) == 0))
+    if ((Boolean.compare(old, pal) != 0))
     {
       notifyChange();
     }
@@ -308,7 +309,7 @@ public class SystemModel extends AbstractModel
     {
       this.pal = false;
     }
-    if (!(Boolean.compare(old, ntsc) == 0))
+    if ((Boolean.compare(old, ntsc) != 0))
     {
       notifyChange();
     }
@@ -323,7 +324,7 @@ public class SystemModel extends AbstractModel
   {
     boolean old = isDriveIcon();
     this.driveIcon = driveIcon;
-    if (!(Boolean.compare(old, driveIcon) == 0))
+    if ((Boolean.compare(old, driveIcon) != 0))
     {
       notifyChange();
     }
@@ -338,7 +339,7 @@ public class SystemModel extends AbstractModel
   {    
     boolean old = isAccurateDisk();
     this.accurateDisk = trueDrive;
-    if (!(Boolean.compare(old, trueDrive) == 0))
+    if ((Boolean.compare(old, trueDrive) != 0))
     {
       notifyChange();
     }
@@ -353,7 +354,7 @@ public class SystemModel extends AbstractModel
   {
     boolean old = isFullHeight();
     this.fullHeight = fullHeight;
-    if (!(Boolean.compare(old, fullHeight) == 0))
+    if ((Boolean.compare(old, fullHeight) != 0))
     {
       notifyChange();
     }
@@ -368,7 +369,7 @@ public class SystemModel extends AbstractModel
   {
     boolean old = isNoAudioScale();
     this.noAudioScale = noAudioScale;
-    if (!(Boolean.compare(old, noAudioScale) == 0))
+    if ((Boolean.compare(old, noAudioScale) != 0))
     {
       notifyChange();
     }
@@ -388,7 +389,7 @@ public class SystemModel extends AbstractModel
       this.sid8580 = false;
       this.sid8580D = false;
     }
-    if (!(Boolean.compare(old, sid6581) == 0))
+    if ((Boolean.compare(old, sid6581) != 0))
     {
       notifyChange();
     }
@@ -408,7 +409,7 @@ public class SystemModel extends AbstractModel
       this.sid6581 = false;
       this.sid8580D = false;
     }
-    if (!(Boolean.compare(old, sid8580) == 0))
+    if ((Boolean.compare(old, sid8580) != 0))
     {
       notifyChange();
     }
@@ -428,7 +429,7 @@ public class SystemModel extends AbstractModel
       this.sid6581 = false;
       this.sid8580 = false;
     }
-    if (!(Boolean.compare(old, sid8580d) == 0))
+    if ((Boolean.compare(old, sid8580d) != 0))
     {
       notifyChange();
     }
@@ -443,7 +444,7 @@ public class SystemModel extends AbstractModel
   {  
     boolean old = isBank0();
     this.bank0 = bank0;
-    if (!(Boolean.compare(old, bank0) == 0))
+    if ((Boolean.compare(old, bank0) != 0))
     {
       notifyChange();
     }
@@ -458,7 +459,7 @@ public class SystemModel extends AbstractModel
   {
     boolean old = isBank1();
     this.bank1 = bank1;
-    if (!(Boolean.compare(old, bank1) == 0))
+    if ((Boolean.compare(old, bank1) != 0))
     {
       notifyChange();
     }
@@ -473,7 +474,7 @@ public class SystemModel extends AbstractModel
   {
     boolean old = isBank2();
     this.bank2 = bank2;
-    if (!(Boolean.compare(old, bank2) == 0))
+    if ((Boolean.compare(old, bank2) != 0))
     {
       notifyChange();
     }
@@ -488,7 +489,7 @@ public class SystemModel extends AbstractModel
   {
     boolean old = isBank3();
     this.bank3 = bank3;
-    if (!(Boolean.compare(old, bank3) == 0))
+    if ((Boolean.compare(old, bank3) != 0))
     {
       notifyChange();
     }
@@ -503,7 +504,7 @@ public class SystemModel extends AbstractModel
   {
     boolean old = isBank5();
     this.bank5 = bank5;
-    if (!(Boolean.compare(old, bank5) == 0))
+    if ((Boolean.compare(old, bank5) != 0))
     {
       notifyChange();
     }

@@ -66,7 +66,6 @@ public class GameView
   public void setViewFilters(List<ViewFilter> viewFilters)
   {
     this.viewFilters = viewFilters;
-    //TODO Create SQL queries from the filters. TODO: Handle AND and OR
     StringBuilder builder = new StringBuilder();
     builder.append("WHERE ");
     int index = 0;
@@ -113,57 +112,9 @@ public class GameView
        builder.append(viewFilter.getFilterData());
        break;
       default:
-        logger.debug("Unexpected value: " + viewFilter.getOperator());
+        logger.debug("Unexpected value: {}", viewFilter.getOperator());
         break;
       }
-      
-      
-//      switch (viewFilter.getOperator())
-//      {
-//      case ViewFilter.BEGINS_WITH_TEXT ->
-//      {
-//        builder.append(" LIKE '");
-//        builder.append(viewFilter.getFilterData());
-//        builder.append("%'");
-//      }
-//      case ViewFilter.ENDS_WITH_TEXT ->
-//      {
-//        builder.append(" LIKE '%");
-//        builder.append(viewFilter.getFilterData());
-//        builder.append("'");
-//      }
-//      case ViewFilter.CONTAINS_TEXT ->
-//      {
-//        builder.append(" LIKE '%");
-//        builder.append(viewFilter.getFilterData());
-//        builder.append("%'");
-//      }
-//      case ViewFilter.EQUALS_TEXT ->
-//      {
-//        builder.append(" LIKE '");
-//        builder.append(viewFilter.getFilterData());
-//        builder.append("'");
-//      }
-//      case ViewFilter.IS ->
-//      {
-//        builder.append(" = ");
-//        builder.append(viewFilter.getFilterData());
-//      }
-//      case ViewFilter.BEFORE ->
-//      {
-//        builder.append(" < ");
-//        builder.append(viewFilter.getFilterData());
-//      }
-//      case ViewFilter.AFTER ->
-//      {
-//        builder.append(" > ");
-//        builder.append(viewFilter.getFilterData());
-//      }
-//      default ->
-//      {
-//        logger.debug("Unexpected value: " + viewFilter.getOperator());
-//      }
-//      }
     }
     this.sqlQuery = builder.toString();
   }

@@ -253,8 +253,6 @@ public class InfoModel extends AbstractModel
       String fileEnding = getGamesFile().substring(getGamesFile().indexOf("."));
       setGamesFile(fileName + fileEnding);
     }
-    
-    //todo for screens, game file
     disableChangeNotification(false);
   }
   

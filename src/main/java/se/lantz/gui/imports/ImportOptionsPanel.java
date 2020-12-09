@@ -52,7 +52,6 @@ public class ImportOptionsPanel extends JPanel
     gbc_matchLabel.gridx = 0;
     gbc_matchLabel.gridy = 3;
     add(getMatchLabel(), gbc_matchLabel);
-    // TODO Auto-generated constructor stub
   }
 
   private JLabel getInfoLabel()

@@ -9,8 +9,6 @@ public class ViewFilter
   public static final String IS = "Is";
   public static final String BEFORE = "Before";
   public static final String AFTER = "After";
-  
- 
   private String filterData;
   private String operator;
   private String field;

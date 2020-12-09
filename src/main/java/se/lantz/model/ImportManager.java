@@ -2,7 +2,6 @@ package se.lantz.model;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.CopyOption;
 import java.nio.file.Files;
 import java.nio.file.LinkOption;
 import java.nio.file.Path;
@@ -26,7 +25,7 @@ public class ImportManager
   public enum Options
   {
     SKIP, OVERWRITE;
-  };
+  }
 
   private static final Logger logger = LoggerFactory.getLogger(ImportManager.class);
 
@@ -54,17 +53,17 @@ public class ImportManager
   public boolean checkSelectedFolder(Path folder)
   {
 
-    logger.debug("Selected folder: {}", folder.toString());
+    logger.debug("Selected folder: {}", folder);
 
     srcParentFolder = folder.resolve("games");
     srcCoversFolder = srcParentFolder.resolve("covers");
     srcGamesFolder = srcParentFolder.resolve("games");
     srcScreensFolder = srcParentFolder.resolve("screens");
 
-    logger.debug("parent folder: " + srcParentFolder);
-    logger.debug("covers folder: " + srcCoversFolder);
-    logger.debug("games folder: " + srcGamesFolder);
-    logger.debug("screens folder: " + srcScreensFolder);
+    logger.debug("parent folder: {}", srcParentFolder);
+    logger.debug("covers folder: {}", srcCoversFolder);
+    logger.debug("games folder: {}", srcGamesFolder);
+    logger.debug("screens folder: {}", srcScreensFolder);
 
     // Verify that subfolders are available
     if (Files.exists(srcParentFolder, LinkOption.NOFOLLOW_LINKS) &&
@@ -108,7 +107,7 @@ public class ImportManager
   public void convertIntoDbRows()
   {
     // Construct a List of comma separated strings with all info correctly added.
-    gameInfoFilesMap.values().stream().forEach(fileLines -> extractInfoIntoRowString(fileLines));
+    gameInfoFilesMap.values().stream().forEach(this::extractInfoIntoRowString);
   }
 
   public StringBuilder insertRowsIntoDb()
@@ -156,7 +155,7 @@ public class ImportManager
       }
       else if (line.startsWith("D:en"))
       {
-        description = line.replaceAll("\"", "\"\"").substring(5);
+        description = line.replace("\"", "\"\"").substring(5);
       }
       else if (line.startsWith("F:"))
       {

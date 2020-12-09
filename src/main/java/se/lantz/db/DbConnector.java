@@ -24,6 +24,7 @@ import se.lantz.util.ExceptionHandler;
 public class DbConnector
 {
 
+  private static final String COMMA = "\",\"";
   private static final Logger logger = LoggerFactory.getLogger(DbConnector.class);
   private List<String> columnList = new ArrayList<>();
 
@@ -101,7 +102,7 @@ public class DbConnector
     sqlBuilder.append(view.getSqlQuery());
     sqlBuilder.append(" ORDER BY title ASC");
 
-    logger.debug("Generated View SQL: " + sqlBuilder.toString());
+    logger.debug("Generated View SQL: {}", sqlBuilder);
     try (Connection conn = this.connect(); Statement stmt = conn.createStatement();
       ResultSet rs = stmt.executeQuery(sqlBuilder.toString()))
     {
@@ -209,9 +210,9 @@ public class DbConnector
       insertFilterBuilder.append(" ? ");
       insertFilterBuilder.append(",\"");
       insertFilterBuilder.append(filter.getField());
-      insertFilterBuilder.append("\",\"");
+      insertFilterBuilder.append(COMMA);
       insertFilterBuilder.append(filter.getOperator());
-      insertFilterBuilder.append("\",\"");
+      insertFilterBuilder.append(COMMA);
       insertFilterBuilder.append(filter.getFilterData());
       insertFilterBuilder.append("\")");
       if (filterIndex < view.getViewFilters().size())
@@ -286,7 +287,7 @@ public class DbConnector
     //Check which are already available and sort them out of rowValues
     for (String rowValue : rowValues)
     {
-      String[] splittedRowValue = rowValue.split("\",\"");
+      String[] splittedRowValue = rowValue.split(COMMA);
       StringBuilder sqlBuilder = new StringBuilder();
       sqlBuilder.append("SELECT COUNT(*) FROM gameinfo WHERE title = ");
       sqlBuilder.append(splittedRowValue[0]);
@@ -338,7 +339,7 @@ public class DbConnector
     //Check which are already available and sort them out of rowValues
     for (String rowValue : rowValues)
     {
-      String[] splittedRowValue = rowValue.split("\",\"");
+      String[] splittedRowValue = rowValue.split(COMMA);
       StringBuilder sqlBuilder = new StringBuilder();
       sqlBuilder.append("SELECT COUNT(*) FROM gameinfo WHERE title = ");
       sqlBuilder.append(splittedRowValue[0]);
@@ -423,7 +424,7 @@ public class DbConnector
   {
     for (String rowValue : rowValues)
     {
-      List<String> splittedRowValueList = Arrays.asList(rowValue.split("\",\""));
+      List<String> splittedRowValueList = Arrays.asList(rowValue.split(COMMA));
       String title = splittedRowValueList.get(0);
       StringBuilder sqlBuilder = new StringBuilder();
       sqlBuilder.append("UPDATE gameinfo SET ");
@@ -542,25 +543,25 @@ public class DbConnector
     st.append(details.getYear());
     st.append(",\"");
     st.append(details.getAuthor());
-    st.append("\",\"");
+    st.append(COMMA);
     st.append(details.getComposer());
-    st.append("\",\"");
+    st.append(COMMA);
     st.append(details.getGenre());
-    st.append("\",\"");
+    st.append(COMMA);
     st.append(details.getDescription());
-    st.append("\",\"");
+    st.append(COMMA);
     st.append(details.getGame());
-    st.append("\",\"");
+    st.append(COMMA);
     st.append(details.getCover());
-    st.append("\",\"");
+    st.append(COMMA);
     st.append(details.getScreen1());
-    st.append("\",\"");
+    st.append(COMMA);
     st.append(details.getScreen2());
-    st.append("\",\"");
+    st.append(COMMA);
     st.append(details.getJoy1());
-    st.append("\",\"");
+    st.append(COMMA);
     st.append(details.getJoy2());
-    st.append("\",\"");
+    st.append(COMMA);
     st.append(details.getSystem());
     st.append("\");");
 
