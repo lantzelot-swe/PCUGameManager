@@ -59,7 +59,9 @@ public class InfoModel extends AbstractModel
   public void setDescription(String description)
   {
     String old = getDescription();
-    this.description = description;
+    //Replace all double spaces, tabs and newlines
+    this.description = description.replaceAll("\\s\\s+", " ");
+    this.description = this.description.replace("\t", " ");
     if (!Objects.equals(old, description))
     {
       notifyChange();
