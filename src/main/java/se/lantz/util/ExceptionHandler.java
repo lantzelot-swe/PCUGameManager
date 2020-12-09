@@ -10,6 +10,7 @@ import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.awt.event.WindowEvent;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
@@ -19,6 +20,7 @@ import javax.swing.JDialog;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.KeyStroke;
+import javax.swing.SwingUtilities;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,6 +36,8 @@ public class ExceptionHandler extends JDialog
   private JButton copyButton;
   private Window owner;
 
+  private static boolean dialogIsOpen = false;
+
   public ExceptionHandler(Window owner)
   {
     super(owner);
@@ -46,7 +50,7 @@ public class ExceptionHandler extends JDialog
     setTitle("Unexpected error");
     setMinimumSize(new Dimension(250, 200));
     setSize(new Dimension(700, 700));
-    setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+    setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
 
     GridBagLayout gridBagLayout = new GridBagLayout();
     getContentPane().setLayout(gridBagLayout);
@@ -75,6 +79,16 @@ public class ExceptionHandler extends JDialog
       .registerKeyboardAction(escapeAction, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_FOCUSED);
     setLocationRelativeTo(owner);
     stacktraceArea.setEditable(false);
+  }
+  
+  @Override
+  protected void processWindowEvent(WindowEvent event)
+  {
+    if (event.getID() == WindowEvent.WINDOW_CLOSING)
+    {
+      copyToClipboardAndClose();
+    }
+    super.processWindowEvent(event);
   }
 
   private JTextArea getStacktraceArea()
@@ -115,31 +129,57 @@ public class ExceptionHandler extends JDialog
     final Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
     clipboard.setContents(selection, selection);
     setVisible(false);
+    dispose();
+  }
+
+  @Override
+  public void setVisible(boolean visible)
+  {
+    ExceptionHandler.dialogIsOpen = visible;
+    super.setVisible(visible);
   }
 
   public static void handleException(final Throwable ex, final String message)
   {
-    logger.error("message", ex);
-    Window owner = null;
-    if (MainWindow.isInitialized())
-    {
-      owner = MainWindow.getInstance();
-    }
-    ExceptionHandler dialog = new ExceptionHandler(owner);
-    if (owner != null)
-    {
-      dialog.setLocationRelativeTo(owner);
-    }
-    StringBuilder builder = new StringBuilder();
-    if (message != null)
-    {
-      builder.append(message + "\n\n");
-    }
-    builder.append(getStackTraceAsString(ex));
+    //Always log
+    logger.error(message, ex);
 
-    dialog.stacktraceArea.setText(builder.toString());
-    dialog.stacktraceArea.setCaretPosition(0);
-    dialog.setVisible(true);
+    if (ExceptionHandler.dialogIsOpen)
+    {
+      //Do not show another dialog
+      return;
+    }
+    ExceptionHandler.dialogIsOpen = true;
+    Runnable showDialogRunnable = () -> {
+      Window owner = null;
+      if (MainWindow.isInitialized())
+      {
+        owner = MainWindow.getInstance();
+      }
+      ExceptionHandler dialog = new ExceptionHandler(owner);
+      if (owner != null)
+      {
+        dialog.setLocationRelativeTo(owner);
+      }
+      StringBuilder builder = new StringBuilder();
+      if (message != null)
+      {
+        builder.append(message + "\n\n");
+      }
+      builder.append(getStackTraceAsString(ex));
+
+      dialog.stacktraceArea.setText(builder.toString());
+      dialog.stacktraceArea.setCaretPosition(0);
+      dialog.setVisible(true);
+    };
+    if (SwingUtilities.isEventDispatchThread())
+    {
+      showDialogRunnable.run();
+    }
+    else
+    {
+      SwingUtilities.invokeLater(showDialogRunnable);
+    }
   }
 
   private static String getStackTraceAsString(Throwable throwable)
