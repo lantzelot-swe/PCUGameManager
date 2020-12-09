@@ -24,6 +24,7 @@ public class GameDetails
   private String joy1 = "";
   private String joy2 = "";
   private String system = "";
+  private int verticalshift = 0;
 
   public GameDetails()
   {
@@ -160,5 +161,15 @@ public class GameDetails
   public void setSystem(String system)
   {
     this.system = system == null ? "" : system;
+  }
+  
+  public int getVerticalShift()
+  {
+    return verticalshift;
+  }
+
+  public void setVerticalShift(int shift)
+  {
+    this.verticalshift = shift;
   }
 }

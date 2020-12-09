@@ -93,5 +93,16 @@ public class ImportProgressPanel extends JPanel
     getCloseButton().setEnabled(true);
     getProgressBar().setIndeterminate(false);
     getProgressBar().setValue(getProgressBar().getMaximum());
+    //Check for errors
+    String text = getTextArea().getText();
+    int count = text.length() - text.replace("ERROR:", "").length();
+    if (count > 0)
+    {
+      getTextArea().append("\nImport ended with " + count + " errors. See log file for details.");
+    }
+    else
+    {
+      getTextArea().append("\nImport completed without errors.");
+    }
   }
 }

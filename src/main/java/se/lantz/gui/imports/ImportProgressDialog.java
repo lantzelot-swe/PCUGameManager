@@ -2,9 +2,7 @@ package se.lantz.gui.imports;
 
 import java.awt.Frame;
 
-import javax.swing.ImageIcon;
 import javax.swing.JDialog;
-import javax.swing.JFrame;
 
 public class ImportProgressDialog extends JDialog
 {
@@ -15,7 +13,6 @@ public class ImportProgressDialog extends JDialog
   public ImportProgressDialog(Frame frame)
   {
     super(frame,"Import games", true);
-//    this.setIconImage(new ImageIcon(getClass().getResource("/se/lantz/FrameIcon.png")).getImage());
     this.add(getImportProgressPanel());
     setSize(900, 600);
     setAlwaysOnTop(true);

@@ -94,7 +94,15 @@ public class ImportManager
           infoBuilder.append("Reading game info from ");
           infoBuilder.append(filePath);
           infoBuilder.append("\n");
-          gameInfoFilesMap.put(filePath, readFileInList(filePath));
+          List<String> result = readFileInList(filePath, infoBuilder);
+          if (result.size() > 0)
+          {
+            gameInfoFilesMap.put(filePath, result);
+          }
+          else
+          {
+            infoBuilder.append("Skipping file " + filePath.toString() + "\n");
+          }
         }
       });
     }
@@ -130,6 +138,7 @@ public class ImportManager
     String joy1config = "";
     String joy2config = "";
     String advanced = "";
+    String verticalShift = "";
 
     for (String line : fileLines)
     {
@@ -210,6 +219,10 @@ public class ImportManager
           advanced = advanced.replace("truedrive", "accuratedisk");
         }
       }
+      else if (line.startsWith("V:"))
+      {
+        verticalShift = line.substring(2);
+      }
     }
     // Construct a data row
     List<String> list = Arrays.asList(title,
@@ -224,13 +237,14 @@ public class ImportManager
                                       screen2file,
                                       joy1config,
                                       joy2config,
-                                      advanced);
+                                      advanced,
+                                      verticalShift);
     String result = String.join("\",\"", list);
     result = "\"" + result + "\"";
     dbRowDataList.add(result);
   }
 
-  private List<String> readFileInList(Path filePath)
+  private List<String> readFileInList(Path filePath, StringBuilder infoBuilder)
   {
     List<String> lines = Collections.emptyList();
     try
@@ -239,6 +253,7 @@ public class ImportManager
     }
     catch (IOException e)
     {
+      infoBuilder.append("ERROR: Could not read file: filepath=" + filePath.toString() + ", " + e.getMessage() + "\n");
       ExceptionHandler.handleException(e, "Could not read file: filepath=" + filePath.toString());
     }
     return lines;
@@ -266,6 +281,7 @@ public class ImportManager
     screen1Name = splittedForPaths[8];
     screen2Name = splittedForPaths[9];
     //Copy!
+
     Path coverPath = srcCoversFolder.resolve(coverName);
     Path targetPath = Paths.get("./covers/" + coverName);
 
@@ -280,29 +296,40 @@ public class ImportManager
 
     try
     {
-      infoBuilder.append("Copying cover from ");
-      infoBuilder.append(coverPath.toString());
-      infoBuilder.append("\n");
       logger.debug("RowData = {}", dbRowData);
-      Files.copy(coverPath, targetPath, StandardCopyOption.REPLACE_EXISTING);
 
-      infoBuilder.append("Copying screenshot from ");
-      infoBuilder.append(screens1Path.toString());
-      infoBuilder.append("\n");
-      Files.copy(screens1Path, targetScreen1Path, StandardCopyOption.REPLACE_EXISTING);
-
-      infoBuilder.append("Copying screenshot from ");
-      infoBuilder.append(screens2Path.toString());
-      infoBuilder.append("\n");
-      Files.copy(screens2Path, targetScreen2Path, StandardCopyOption.REPLACE_EXISTING);
-
-      infoBuilder.append("Copying game file from ");
-      infoBuilder.append(gamePath.toString());
-      infoBuilder.append("\n");
-      Files.copy(gamePath, targetGamePath, StandardCopyOption.REPLACE_EXISTING);
+      if (!coverName.isEmpty())
+      {
+        infoBuilder.append("Copying cover from ");
+        infoBuilder.append(coverPath.toString());
+        infoBuilder.append("\n");
+        Files.copy(coverPath, targetPath, StandardCopyOption.REPLACE_EXISTING);
+      }
+      if (!screen1Name.isEmpty())
+      {
+        infoBuilder.append("Copying screenshot from ");
+        infoBuilder.append(screens1Path.toString());
+        infoBuilder.append("\n");
+        Files.copy(screens1Path, targetScreen1Path, StandardCopyOption.REPLACE_EXISTING);
+      }
+      if (!screen2Name.isEmpty())
+      {
+        infoBuilder.append("Copying screenshot from ");
+        infoBuilder.append(screens2Path.toString());
+        infoBuilder.append("\n");
+        Files.copy(screens2Path, targetScreen2Path, StandardCopyOption.REPLACE_EXISTING);
+      }
+      if (!gameName.isEmpty())
+      {
+        infoBuilder.append("Copying game file from ");
+        infoBuilder.append(gamePath.toString());
+        infoBuilder.append("\n");
+        Files.copy(gamePath, targetGamePath, StandardCopyOption.REPLACE_EXISTING);
+      }
     }
     catch (IOException e)
     {
+      infoBuilder.append("ERROR: Could not copy files for " + gameName + ", " + e.getMessage() + "\n");
       ExceptionHandler.handleException(e, "Could NOT copy files for: " + gameName);
     }
   }

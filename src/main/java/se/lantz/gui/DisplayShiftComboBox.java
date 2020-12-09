@@ -59,4 +59,14 @@ public class DisplayShiftComboBox extends JComboBox<String>
       setSelectedItem("0");
     }
   }
+  
+  void setupVicNtscItems()
+  {
+    this.removeAllItems();
+    for (int i = -13; i < 1; i++)
+    {
+      this.addItem(Integer.toString(i));
+    }  
+    setSelectedItem("0");
+  }
 }

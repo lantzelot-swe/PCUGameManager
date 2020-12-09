@@ -2,7 +2,6 @@ package se.lantz.util;
 
 public class DbConstants
 {
-
   public static final String TITLE = "Title";
   public static final String YEAR = "Year";
   public static final String AUTHOR = "Author";
@@ -16,6 +15,7 @@ public class DbConstants
   public static final String JOY1 = "Joy1config";
   public static final String JOY2 = "Joy2config";
   public static final String SYSTEM = "System";
+  public static final String VERTICALSHIFT = "VerticalShift";
 
   private DbConstants()
   {

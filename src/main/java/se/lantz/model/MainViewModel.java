@@ -108,6 +108,7 @@ public class MainViewModel extends AbstractModel
     joy2Model.setConfigStringFromDb(details.getJoy2());
     joy2Model.resetDataChanged();
     systemModel.setConfigStringFromDb(details.getSystem());
+    systemModel.setVerticalShift(details.getVerticalShift());
     systemModel.resetDataChanged();
     //Set empty title to trigger a change
     if (selectedData.getGameId().isEmpty())
@@ -240,6 +241,7 @@ public class MainViewModel extends AbstractModel
       updatedGame.setJoy1(joy1Model.getConfigString());
       updatedGame.setJoy2(joy2Model.getConfigString());
       updatedGame.setSystem(systemModel.getConfigString());
+      updatedGame.setVerticalShift(systemModel.getVerticalShift());
 
       if (currentGameId.isEmpty())
       {

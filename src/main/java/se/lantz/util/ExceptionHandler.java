@@ -55,7 +55,7 @@ public class ExceptionHandler extends JDialog
     GridBagLayout gridBagLayout = new GridBagLayout();
     getContentPane().setLayout(gridBagLayout);
     GridBagConstraints scrollPaneConstraints = new GridBagConstraints();
-    scrollPaneConstraints.insets = new Insets(5, 5, 5, 0);
+    scrollPaneConstraints.insets = new Insets(5, 10, 5, 10);
     scrollPaneConstraints.weighty = 1.0;
     scrollPaneConstraints.weightx = 1.0;
     scrollPaneConstraints.fill = GridBagConstraints.BOTH;

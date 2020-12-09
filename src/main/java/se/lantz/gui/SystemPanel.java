@@ -64,6 +64,8 @@ public class SystemPanel extends JPanel
   private CardLayout cardLayout = new CardLayout(0, 0);
   private final ButtonGroup audioGroup = new ButtonGroup();
   private SystemModel model;
+  private JCheckBox readOnlyCheckBox;
+  private JLabel displayShiftValueLabel;
 
   public SystemPanel(SystemModel model)
   {
@@ -131,19 +133,20 @@ public class SystemPanel extends JPanel
     getNtscRadioButton().setSelected(model.isNtsc());
     getDriveIconCheckBox().setSelected(model.isDriveIcon());
     getAccurateDiskCheckBox().setSelected(model.isAccurateDisk());
+    getReadOnlyCheckBox().setSelected(model.isReadOnly());
     getFullHeightCheckBox().setSelected(model.isFullHeight());
     getSid6581RadioButton().setSelected(model.isSid6581());
     getSid8580RadioButton().setSelected(model.isSid8580());
     getSid8580dRadioButton().setSelected(model.isSid8580D());
-    getNoAudioScaleCheckBox().setSelected(model.isNoAudioScale()); 
+    getNoAudioScaleCheckBox().setSelected(model.isNoAudioScale());
     getBank0CheckBox().setSelected(model.isBank0());
     getBank1CheckBox().setSelected(model.isBank1());
     getBank2CheckBox().setSelected(model.isBank2());
     getBank3CheckBox().setSelected(model.isBank3());
     getBank5CheckBox().setSelected(model.isBank5());
-    
+
     getConfigTextField().setText(model.getConfigString());
-    //TODO vertical display shift
+    getDisplayShiftComboBox().setSelectedItem(Integer.toString(model.getVerticalShift()));
   }
 
   private JPanel getRadioPanel()
@@ -244,8 +247,9 @@ public class SystemPanel extends JPanel
       gbc_palRadioButton.gridy = 0;
       typePanel.add(getPalRadioButton(), gbc_palRadioButton);
       GridBagConstraints gbc_ntscRadioButton = new GridBagConstraints();
+      gbc_ntscRadioButton.weighty = 1.0;
       gbc_ntscRadioButton.weightx = 1.0;
-      gbc_ntscRadioButton.anchor = GridBagConstraints.WEST;
+      gbc_ntscRadioButton.anchor = GridBagConstraints.NORTHWEST;
       gbc_ntscRadioButton.gridx = 0;
       gbc_ntscRadioButton.gridy = 1;
       typePanel.add(getNtscRadioButton(), gbc_ntscRadioButton);
@@ -274,6 +278,12 @@ public class SystemPanel extends JPanel
       gbc_accurateDiskCheckBox.gridx = 0;
       gbc_accurateDiskCheckBox.gridy = 1;
       drivePanel.add(getAccurateDiskCheckBox(), gbc_accurateDiskCheckBox);
+      GridBagConstraints gbc_readOnlyCheckBox = new GridBagConstraints();
+      gbc_readOnlyCheckBox.insets = new Insets(0, 0, 5, 0);
+      gbc_readOnlyCheckBox.anchor = GridBagConstraints.NORTHWEST;
+      gbc_readOnlyCheckBox.gridx = 0;
+      gbc_readOnlyCheckBox.gridy = 2;
+      drivePanel.add(getReadOnlyCheckBox(), gbc_readOnlyCheckBox);
     }
     return drivePanel;
   }
@@ -418,7 +428,15 @@ public class SystemPanel extends JPanel
       configPanel = new JPanel();
       GridBagLayout gbl_configPanel = new GridBagLayout();
       configPanel.setLayout(gbl_configPanel);
+      GridBagConstraints gbc_displayShiftValueLabel = new GridBagConstraints();
+      gbc_displayShiftValueLabel.weighty = 1.0;
+      gbc_displayShiftValueLabel.anchor = GridBagConstraints.SOUTHWEST;
+      gbc_displayShiftValueLabel.insets = new Insets(0, 0, 0, 5);
+      gbc_displayShiftValueLabel.gridx = 1;
+      gbc_displayShiftValueLabel.gridy = 0;
+      configPanel.add(getDisplayShiftValueLabel(), gbc_displayShiftValueLabel);
       GridBagConstraints gbc_configLabel = new GridBagConstraints();
+      gbc_configLabel.gridheight = 2;
       gbc_configLabel.weighty = 1.0;
       gbc_configLabel.anchor = GridBagConstraints.SOUTHWEST;
       gbc_configLabel.insets = new Insets(5, 5, 16, 5);
@@ -428,11 +446,10 @@ public class SystemPanel extends JPanel
       GridBagConstraints gbc_configTextField = new GridBagConstraints();
       gbc_configTextField.fill = GridBagConstraints.HORIZONTAL;
       gbc_configTextField.weightx = 1.0;
-      gbc_configTextField.insets = new Insets(5, 0, 14, 5);
-      gbc_configTextField.weighty = 1.0;
+      gbc_configTextField.insets = new Insets(5, 0, 14, 0);
       gbc_configTextField.anchor = GridBagConstraints.SOUTHWEST;
       gbc_configTextField.gridx = 1;
-      gbc_configTextField.gridy = 0;
+      gbc_configTextField.gridy = 1;
       configPanel.add(getConfigTextField(), gbc_configTextField);
     }
     return configPanel;
@@ -493,6 +510,24 @@ public class SystemPanel extends JPanel
             model.setPal(true);
           }
         });
+      palRadioButton.addItemListener(new ItemListener()
+        {
+          public void itemStateChanged(ItemEvent e)
+          {
+            if (e.getStateChange() == ItemEvent.SELECTED)
+            {
+              if (getVic20Button().isSelected())
+              {
+                getDisplayShiftComboBox().setupVic20Items();
+              }
+              else
+              {
+                getDisplayShiftComboBox().setup64Items();
+              }
+            }
+          }
+        });
+
       palRadioButton.setSelected(true);
       typeGroup.add(palRadioButton);
     }
@@ -509,6 +544,19 @@ public class SystemPanel extends JPanel
           public void actionPerformed(ActionEvent e)
           {
             model.setNtsc(true);
+          }
+        });
+      ntscRadioButton.addItemListener(new ItemListener()
+        {
+          public void itemStateChanged(ItemEvent e)
+          {
+            if (e.getStateChange() == ItemEvent.SELECTED)
+            {
+              if (getVic20Button().isSelected())
+              {
+                getDisplayShiftComboBox().setupVicNtscItems();
+              }
+            }
           }
         });
       typeGroup.add(ntscRadioButton);
@@ -548,6 +596,22 @@ public class SystemPanel extends JPanel
     return accurateDiskCheckBox;
   }
 
+  private JCheckBox getReadOnlyCheckBox()
+  {
+    if (readOnlyCheckBox == null)
+    {
+      readOnlyCheckBox = new JCheckBox("Read-only");
+      readOnlyCheckBox.addActionListener(new ActionListener()
+        {
+          public void actionPerformed(ActionEvent e)
+          {
+            model.setReadOnly(readOnlyCheckBox.isSelected());
+          }
+        });
+    }
+    return readOnlyCheckBox;
+  }
+
   private JCheckBox getFullHeightCheckBox()
   {
     if (fullHeightCheckBox == null)
@@ -569,6 +633,21 @@ public class SystemPanel extends JPanel
     if (displayShiftComboBox == null)
     {
       displayShiftComboBox = new DisplayShiftComboBox();
+      displayShiftComboBox.addActionListener((e) -> {
+        if (displayShiftComboBox.getSelectedItem() != null)
+        {
+          int value = Integer.parseInt((String) displayShiftComboBox.getSelectedItem());
+          model.setVerticalShift(value);
+          if (value != 0)
+          {
+            getDisplayShiftValueLabel().setText("Vertical display shift:" + value);
+          }
+          else
+          {
+            getDisplayShiftValueLabel().setText("");
+          }
+        }
+      });
     }
     return displayShiftComboBox;
   }
@@ -770,5 +849,14 @@ public class SystemPanel extends JPanel
       totalRam = totalRam + 8;
     }
     getRamLabel().setText("Ram Expansion: " + totalRam + "K");
+  }
+
+  private JLabel getDisplayShiftValueLabel()
+  {
+    if (displayShiftValueLabel == null)
+    {
+      displayShiftValueLabel = new JLabel("");
+    }
+    return displayShiftValueLabel;
   }
 }

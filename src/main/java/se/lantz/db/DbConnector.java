@@ -43,6 +43,7 @@ public class DbConnector
     columnList.add(DbConstants.JOY1);
     columnList.add(DbConstants.JOY2);
     columnList.add(DbConstants.SYSTEM);
+    columnList.add(DbConstants.VERTICALSHIFT);
   }
 
   /**
@@ -494,6 +495,7 @@ public class DbConnector
       returnValue.setJoy1(rs.getString(DbConstants.JOY1));
       returnValue.setJoy2(rs.getString(DbConstants.JOY2));
       returnValue.setSystem(rs.getString(DbConstants.SYSTEM));
+      returnValue.setVerticalShift(rs.getInt(DbConstants.VERTICALSHIFT));
       logger.debug("SELECT Executed successfully");
     }
     catch (SQLException e)
@@ -563,7 +565,9 @@ public class DbConnector
     st.append(details.getJoy2());
     st.append(COMMA);
     st.append(details.getSystem());
-    st.append("\");");
+    st.append("\",");
+    st.append(details.getVerticalShift());
+    st.append(");");
 
     String sql = st.toString();
     logger.debug("Generated INSERT String:\n{}", sql);
@@ -604,6 +608,7 @@ public class DbConnector
     columnList.add(DbConstants.JOY1);
     columnList.add(DbConstants.JOY2);
     columnList.add(DbConstants.SYSTEM);
+    columnList.add(DbConstants.VERTICALSHIFT);
 
     StringBuilder sqlBuilder = new StringBuilder();
     sqlBuilder.append("UPDATE gameinfo SET ");
@@ -659,7 +664,11 @@ public class DbConnector
     sqlBuilder.append(DbConstants.SYSTEM);
     sqlBuilder.append("=\"");
     sqlBuilder.append(details.getSystem());
-    sqlBuilder.append("\" WHERE rowId = ");
+    sqlBuilder.append("\",");
+    sqlBuilder.append(DbConstants.VERTICALSHIFT);
+    sqlBuilder.append("=");
+    sqlBuilder.append(details.getVerticalShift());
+    sqlBuilder.append(" WHERE rowId = ");
     sqlBuilder.append(rowId);
     sqlBuilder.append(";");
 

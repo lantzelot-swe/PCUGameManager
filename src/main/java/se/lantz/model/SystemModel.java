@@ -10,6 +10,7 @@ public class SystemModel extends AbstractModel
   private final static String NTSC = "ntsc";
   private final static String DRIVEICON = "driveicon";
   private final static String ACCURATEDISK = "accuratedisk";
+  private final static String READONLY = "readonly";
   private final static String FULLHEIGHT = "fullheight";
   private final static String SID6581 = "sid6581";
   private final static String SID8580 = "sid8580";
@@ -20,7 +21,7 @@ public class SystemModel extends AbstractModel
   private final static String BANK2 = "bank2";
   private final static String BANK3 = "bank3";
   private final static String BANK5 = "bank5";
-  
+  //TODO Support for 3K, 4K etc as aliases for Banks
  
   //TODO vertical shift
   
@@ -30,6 +31,7 @@ public class SystemModel extends AbstractModel
   private boolean ntsc = false;
   private boolean driveIcon = false;
   private boolean accurateDisk = false;
+  private boolean readonly = false;
   private boolean fullHeight = false;
   private boolean sid6581 = false;
   private boolean sid8580 = false;
@@ -40,6 +42,7 @@ public class SystemModel extends AbstractModel
   private boolean bank2 = false;
   private boolean bank3 = false;
   private boolean bank5 = false;
+  private int verticalShift = 0;
   
   public SystemModel()
   {
@@ -72,6 +75,10 @@ public class SystemModel extends AbstractModel
     if (isAccurateDisk())
     {
       list.add(ACCURATEDISK);
+    }
+    if (isReadOnly())
+    {
+      list.add(READONLY);
     }
     if (isFullHeight())
     {
@@ -149,6 +156,7 @@ public class SystemModel extends AbstractModel
     setPal(true);
     setAccurateDisk(false);
     setDriveIcon(false);
+    setReadOnly(false);
     setNoAudioScale(false);
     setFullHeight(false);
     setSid6581(true);
@@ -189,6 +197,10 @@ public class SystemModel extends AbstractModel
       else if (flag.equals(ACCURATEDISK))
       {
         setAccurateDisk(true);
+      }
+      else if (flag.equals(READONLY))
+      {
+        setReadOnly(true);
       }
       else if (flag.equals(FULLHEIGHT))
       {
@@ -340,6 +352,21 @@ public class SystemModel extends AbstractModel
     boolean old = isAccurateDisk();
     this.accurateDisk = trueDrive;
     if ((Boolean.compare(old, trueDrive) != 0))
+    {
+      notifyChange();
+    }
+  }
+  
+  public boolean isReadOnly()
+  {
+    return readonly;
+  }
+
+  public void setReadOnly(boolean readOnly)
+  {    
+    boolean old = isReadOnly();
+    this.readonly = readOnly;
+    if ((Boolean.compare(old, readOnly) != 0))
     {
       notifyChange();
     }
@@ -505,6 +532,21 @@ public class SystemModel extends AbstractModel
     boolean old = isBank5();
     this.bank5 = bank5;
     if ((Boolean.compare(old, bank5) != 0))
+    {
+      notifyChange();
+    }
+  }
+  
+  public int getVerticalShift()
+  {
+    return verticalShift;
+  }
+  
+  public void setVerticalShift(int shift)
+  {
+    int old = getVerticalShift();
+    this.verticalShift = shift;
+    if (old != shift)
     {
       notifyChange();
     }
