@@ -18,16 +18,23 @@ import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
+import javax.swing.JFileChooser;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.border.TitledBorder;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import se.lantz.gui.imports.ImportOptionsDialog;
+import se.lantz.gui.imports.ImportProgressDialog;
+import se.lantz.gui.imports.ImportWorker;
 import se.lantz.model.InfoModel;
+import se.lantz.util.ExceptionHandler;
 import se.lantz.util.FileDrop;
 
 public class ScreenshotsPanel extends JPanel
@@ -412,6 +419,7 @@ public class ScreenshotsPanel extends JPanel
     if (gameTextField == null)
     {
       gameTextField = new JTextField();
+      gameTextField.setEditable(false);
       gameTextField.setPreferredSize(new Dimension(160, 20));
     }
     return gameTextField;
@@ -422,6 +430,11 @@ public class ScreenshotsPanel extends JPanel
     if (gameButton == null)
     {
       gameButton = new JButton("...");
+      gameButton.addActionListener(new ActionListener() {
+        public void actionPerformed(ActionEvent e) {
+          selectGameFile();
+        }
+      });
       gameButton.setMargin(new Insets(1, 3, 1, 3));
     }
     return gameButton;
@@ -535,5 +548,28 @@ public class ScreenshotsPanel extends JPanel
     g.drawImage(newImage, 0, 0, null);
     screenLabel.setIcon(new ImageIcon(newImage));
     return newImage;
+  }
+  
+  private void selectGameFile()
+  {
+    final JFileChooser fileChooser = new JFileChooser();
+    fileChooser.setDialogTitle("Select a valid game file for " + model.getTitle());
+    fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+    try
+    {
+      fileChooser.setSelectedFile(new File(new File(".").getCanonicalPath()));
+    }
+    catch (IOException e)
+    {
+      ExceptionHandler.handleException(e, "Could not set current directory");
+    }
+    FileNameExtensionFilter vicefilter = new FileNameExtensionFilter("Vice runnable files", "d64","t64","VSF", "GZ");
+    fileChooser.addChoosableFileFilter(vicefilter);
+    fileChooser.setFileFilter(vicefilter);   
+    int value = fileChooser.showOpenDialog(MainWindow.getInstance());
+    if (value == JFileChooser.APPROVE_OPTION)
+    {
+      model.setGamesPath(fileChooser.getSelectedFile());
+    }
   }
 }

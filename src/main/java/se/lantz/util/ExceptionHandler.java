@@ -79,6 +79,7 @@ public class ExceptionHandler extends JDialog
       .registerKeyboardAction(escapeAction, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_FOCUSED);
     setLocationRelativeTo(owner);
     stacktraceArea.setEditable(false);
+    getRootPane().setDefaultButton(getCopyButton());
   }
   
   @Override

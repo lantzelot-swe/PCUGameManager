@@ -4,9 +4,15 @@ import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.zip.GZIPOutputStream;
 
 import javax.imageio.ImageIO;
 
@@ -46,6 +52,9 @@ public class FileManager
     String coverFileName = model.getCoverFile();
     String screen1FileName = model.getScreens1File();
     String screen2FileName = model.getScreens2File();
+    
+    String gameName = model.getGamesFile();
+    Path gamePath = model.getGamesPath();
 
     //Store on disk with the name in the models. The UI must make sure the names is according to the Maxi format.
 
@@ -95,8 +104,40 @@ public class FileManager
         logger.error("Could not store screen2", e);
       }
     }
-    //TODO: game file
+
+    if (gamePath != null)
+    {
+      Path source = gamePath;
+      Path target = new File(GAMES + gameName).toPath();
+
+      if (Files.notExists(source)) {
+          System.err.printf("The path %s doesn't exist!", source);
+          return;
+      }
+
+      try {
+
+          compressGzip(source, target);
+
+      } catch (IOException e) {
+          e.printStackTrace();
+      }
+    }
   }
+  
+  private void compressGzip(Path source, Path target) throws IOException {
+
+    try (GZIPOutputStream gos = new GZIPOutputStream(
+                                  new FileOutputStream(target.toFile()));
+         FileInputStream fis = new FileInputStream(source.toFile())) {
+        // copy file
+        byte[] buffer = new byte[1024];
+        int len;
+        while ((len = fis.read(buffer)) > 0) {
+            gos.write(buffer, 0, len);
+        }
+    }
+}
 
   private void renameFiles()
   {

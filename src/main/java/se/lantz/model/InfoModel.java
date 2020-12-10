@@ -1,6 +1,8 @@
 package se.lantz.model;
 
 import java.awt.image.BufferedImage;
+import java.io.File;
+import java.nio.file.Path;
 import java.util.Objects;
 
 import se.lantz.util.FileManager;
@@ -24,6 +26,8 @@ public class InfoModel extends AbstractModel
   private BufferedImage coverImage;
   private BufferedImage screen1Image;
   private BufferedImage screen2Image;
+  
+  private Path gamesPath;
 
   public String getTitle()
   {
@@ -229,6 +233,25 @@ public class InfoModel extends AbstractModel
     BufferedImage old = getScreen2Image();
     this.screen2Image = newScreen2Image;
     if (!Objects.equals(old, newScreen2Image))
+    {
+      notifyChange();
+    }
+  }
+  
+  public Path getGamesPath()
+  {
+    return gamesPath;
+  }
+  
+  public void setGamesPath(File file)
+  {
+    Path old = getGamesPath();
+    this.gamesPath = file.toPath();
+    //Set games name, always add ".gz"??
+    String fileName = FileManager.generateFileNameFromTitle(this.title);
+    String fileEnding = file.getName().substring(file.getName().indexOf("."));
+    setGamesFile(fileName + fileEnding +".gz"); 
+    if (!Objects.equals(old, gamesPath))
     {
       notifyChange();
     }
