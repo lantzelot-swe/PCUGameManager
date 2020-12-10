@@ -4,7 +4,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 public class JoystickModel extends AbstractModel
@@ -16,10 +18,98 @@ public class JoystickModel extends AbstractModel
   private List<String> configList = new ArrayList<>();
   private ActionListener primaryListener;
 
+  private Map<String, String> keyCodeMap = new HashMap<>();
+  private List<String> keyCodeList = new ArrayList<>();
+
   public JoystickModel(boolean port1)
   {
     this.port1 = port1;
+    setupKeyKodes();
+  }
 
+  private void setupKeyKodes()
+  {
+    keyCodeList.add("F1");
+    keyCodeList.add("F2");
+    keyCodeList.add("F3");
+    keyCodeList.add("F4");
+    keyCodeList.add("F5");
+    keyCodeList.add("F6");
+    keyCodeList.add("F7");
+    keyCodeList.add("F8");
+    keyCodeList.add("A");
+    keyCodeList.add("B");
+    keyCodeList.add("C");
+    keyCodeList.add("D");
+    keyCodeList.add("E");
+    keyCodeList.add("F");
+    keyCodeList.add("G");
+    keyCodeList.add("H");
+    keyCodeList.add("I");
+    keyCodeList.add("J");
+    keyCodeList.add("K");
+    keyCodeList.add("L");
+    keyCodeList.add("M");
+    keyCodeList.add("N");
+    keyCodeList.add("O");
+    keyCodeList.add("P");
+    keyCodeList.add("Q");
+    keyCodeList.add("R");
+    keyCodeList.add("S");
+    keyCodeList.add("T");
+    keyCodeList.add("U");
+    keyCodeList.add("V");
+    keyCodeList.add("W");
+    keyCodeList.add("X");
+    keyCodeList.add("Y");
+    keyCodeList.add("Z");
+    keyCodeList.add("1");
+    keyCodeList.add("2");
+    keyCodeList.add("3");
+    keyCodeList.add("4");
+    keyCodeList.add("5");
+    keyCodeList.add("6");
+    keyCodeList.add("7");
+    keyCodeList.add("8");
+    keyCodeList.add("9");
+    keyCodeList.add("0");
+
+    // Codes not matching the text
+    keyCodeMap.put("", "----");
+    keyCodeMap.put("JU", "Up");
+    keyCodeMap.put("JD", "Down");
+    keyCodeMap.put("JL", "Left");
+    keyCodeMap.put("JR", "Right");
+    keyCodeMap.put("JF", "Fire");
+    keyCodeMap.put("AL", "ARROW LEFT");
+    keyCodeMap.put("AU", "ARROW UP");
+    keyCodeMap.put("CM", "THEC64");
+    keyCodeMap.put("CO", ", (Comma)");
+    keyCodeMap.put("CT", "CTRL");
+    keyCodeMap.put("CU", "Cursor Up");
+    keyCodeMap.put("CD", "Cursor Down");
+    keyCodeMap.put("CL", "Cursor Left");
+    keyCodeMap.put("CR", "Cursor Right");
+    keyCodeMap.put("DL", "INST/DEL");
+    keyCodeMap.put("EN", "RETURN");
+    keyCodeMap.put("HM", "CLR/HOME");
+    keyCodeMap.put("RS", "RUN/STOP");
+    keyCodeMap.put("RE", "RESTORE");
+    keyCodeMap.put("SL", "Left SHIFT");
+    keyCodeMap.put("SR", "Right SHIFT");
+    keyCodeMap.put("SS", "SHIFT LOCK");
+    keyCodeMap.put("SP", "SPACE");
+    keyCodeMap.put("PO", "£ (Pound)");
+  }
+
+  public List<String> getKeyCodeList()
+  {
+    return keyCodeList;
+  }
+
+  public Map<String, String> getKeyCodeMap()
+  {
+    return keyCodeMap;
   }
 
   public String getConfigString()
@@ -75,37 +165,46 @@ public class JoystickModel extends AbstractModel
 
   public void setConfigString(String configString)
   {
+    disableChangeNotification(true);
+    String definitions = configString;
     // Set all other fields based on configString
     String[] colonSplit = configString.split(":");
-    if (colonSplit.length != 3)
+    if (colonSplit.length == 3)
     {
-      throw new IllegalStateException("Invalid config string");
+      definitions = colonSplit[2];
+      setPrimary(colonSplit[1].contains("*"));
     }
-    configList.clear();
 
-    configList = new ArrayList<>(Arrays.asList(colonSplit[2].split(",")));
-    while (configList.size() < 15)
+    ArrayList<String> newConfigList = new ArrayList<>(Arrays.asList(definitions.split(",")));
+    while (newConfigList.size() < 15)
     {
-      configList.add("");
+      newConfigList.add("");
     }
-    disableChangeNotification(true);
-    setUp(configList.get(0));
-    setDown(configList.get(1));
-    setLeft(configList.get(2));
-    setRight(configList.get(3));
-    setLeftFire(configList.get(4));
-    setRightFire(configList.get(5));
-    setTl(configList.get(6));
-    setTr(configList.get(7));
-    setUnused1(configList.get(8));
-    setA(configList.get(9));
-    setB(configList.get(10));
-    setC(configList.get(11));
-    setUnused2(configList.get(12));
-    setUnused3(configList.get(13));
-    setUnused4(configList.get(14));
+    //Validate all entries
+    for (int i = 0; i < newConfigList.size(); i++)
+    {
+      String value = newConfigList.get(i);
+      if (!keyCodeList.contains(value) && !keyCodeMap.keySet().contains(value))
+      {
+        newConfigList.set(i, "");
+      }
+    }
+    setUp(newConfigList.get(0));
+    setDown(newConfigList.get(1));
+    setLeft(newConfigList.get(2));
+    setRight(newConfigList.get(3));
+    setLeftFire(newConfigList.get(4));
+    setRightFire(newConfigList.get(5));
+    setTl(newConfigList.get(6));
+    setTr(newConfigList.get(7));
+    setUnused1(newConfigList.get(8));
+    setA(newConfigList.get(9));
+    setB(newConfigList.get(10));
+    setC(newConfigList.get(11));
+    setUnused2(newConfigList.get(12));
+    setUnused3(newConfigList.get(13));
+    setUnused4(newConfigList.get(14));
 
-    setPrimary(colonSplit[1].contains("*"));
     disableChangeNotification(false);
     notifyChange();
   }

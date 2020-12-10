@@ -69,7 +69,7 @@ public class JoystickStickPanel extends JPanel
   {
     if (upComboBox == null)
     {
-      upComboBox = new KeySelectionComboBox();
+      upComboBox = new KeySelectionComboBox(this.model);
       upComboBox.addActionListener(new ActionListener()
         {
           public void actionPerformed(ActionEvent arg0)
@@ -85,7 +85,7 @@ public class JoystickStickPanel extends JPanel
   {
     if (leftComboBox == null)
     {
-      leftComboBox = new KeySelectionComboBox();
+      leftComboBox = new KeySelectionComboBox(this.model);
       leftComboBox.addActionListener(new ActionListener()
         {
           public void actionPerformed(ActionEvent arg0)
@@ -101,7 +101,7 @@ public class JoystickStickPanel extends JPanel
   {
     if (rightComboBox == null)
     {
-      rightComboBox = new KeySelectionComboBox();
+      rightComboBox = new KeySelectionComboBox(this.model);
       rightComboBox.addActionListener(new ActionListener()
         {
           public void actionPerformed(ActionEvent arg0)
@@ -117,7 +117,7 @@ public class JoystickStickPanel extends JPanel
   {
     if (downComboBox == null)
     {
-      downComboBox = new KeySelectionComboBox();
+      downComboBox = new KeySelectionComboBox(this.model);
       downComboBox.addActionListener(new ActionListener()
         {
           public void actionPerformed(ActionEvent arg0)

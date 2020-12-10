@@ -36,6 +36,7 @@ public class JoystickPanel extends JPanel
   private JTextField configTextField;
 
   private JoystickModel model;
+  private JPanel configPanel;
 
   public JoystickPanel(int portnumber, JoystickModel model)
   {
@@ -102,18 +103,13 @@ public class JoystickPanel extends JPanel
     gbc_joystickBottomPanel.gridx = 0;
     gbc_joystickBottomPanel.gridy = 5;
     add(getJoystickBottomPanel(), gbc_joystickBottomPanel);
-    GridBagConstraints gbc_configLabel = new GridBagConstraints();
-    gbc_configLabel.anchor = GridBagConstraints.EAST;
-    gbc_configLabel.insets = new Insets(0, 0, 0, 5);
-    gbc_configLabel.gridx = 0;
-    gbc_configLabel.gridy = 6;
-    add(getConfigLabel(), gbc_configLabel);
-    GridBagConstraints gbc_configTextField = new GridBagConstraints();
-    gbc_configTextField.insets = new Insets(0, 0, 0, 5);
-    gbc_configTextField.fill = GridBagConstraints.HORIZONTAL;
-    gbc_configTextField.gridx = 1;
-    gbc_configTextField.gridy = 6;
-    add(getConfigTextField(), gbc_configTextField);
+    GridBagConstraints gbc_configPanel = new GridBagConstraints();
+    gbc_configPanel.fill = GridBagConstraints.HORIZONTAL;
+    gbc_configPanel.insets = new Insets(0, 0, 0, 5);
+    gbc_configPanel.gridx = 0;
+    gbc_configPanel.gridwidth = 3;
+    gbc_configPanel.gridy = 6;
+    add(getConfigPanel(), gbc_configPanel);
     if (!Beans.isDesignTime())
     {
       model.addPropertyChangeListener((e) -> modelChanged());
@@ -161,7 +157,7 @@ public class JoystickPanel extends JPanel
   {
     if (leftFireComboBox == null)
     {
-      leftFireComboBox = new KeySelectionComboBox();
+      leftFireComboBox = new KeySelectionComboBox(this.model);
       leftFireComboBox.addActionListener(new ActionListener()
         {
           public void actionPerformed(ActionEvent arg0)
@@ -189,7 +185,7 @@ public class JoystickPanel extends JPanel
   {
     if (rightFireComboBox == null)
     {
-      rightFireComboBox = new KeySelectionComboBox();
+      rightFireComboBox = new KeySelectionComboBox(this.model);
       rightFireComboBox.addActionListener(new ActionListener()
         {
           public void actionPerformed(ActionEvent arg0)
@@ -205,7 +201,7 @@ public class JoystickPanel extends JPanel
   {
     if (tlComboBox == null)
     {
-      tlComboBox = new KeySelectionComboBox();
+      tlComboBox = new KeySelectionComboBox(this.model);
       tlComboBox.addActionListener(new ActionListener()
         {
           public void actionPerformed(ActionEvent arg0)
@@ -221,7 +217,7 @@ public class JoystickPanel extends JPanel
   {
     if (trComboBox == null)
     {
-      trComboBox = new KeySelectionComboBox();
+      trComboBox = new KeySelectionComboBox(this.model);
       trComboBox.addActionListener(new ActionListener()
         {
           public void actionPerformed(ActionEvent arg0)
@@ -282,5 +278,27 @@ public class JoystickPanel extends JPanel
         });
     }
     return configTextField;
+  }
+  private JPanel getConfigPanel() {
+    if (configPanel == null) {
+    	configPanel = new JPanel();
+    	GridBagLayout gbl_configPanel = new GridBagLayout();
+    	configPanel.setLayout(gbl_configPanel);
+    	GridBagConstraints gbc_configLabel = new GridBagConstraints();
+    	gbc_configLabel.anchor = GridBagConstraints.WEST;
+    	gbc_configLabel.insets = new Insets(0, 10, 0, 5);
+    	gbc_configLabel.gridx = 0;
+    	gbc_configLabel.gridy = 0;
+    	configPanel.add(getConfigLabel(), gbc_configLabel);
+    	GridBagConstraints gbc_configTextField = new GridBagConstraints();
+    	gbc_configTextField.insets = new Insets(0, 0, 0, 20);
+    	gbc_configTextField.fill = GridBagConstraints.HORIZONTAL;
+    	gbc_configTextField.weightx = 1.0;
+    	gbc_configTextField.anchor = GridBagConstraints.NORTHWEST;
+    	gbc_configTextField.gridx = 1;
+    	gbc_configTextField.gridy = 0;
+    	configPanel.add(getConfigTextField(), gbc_configTextField);
+    }
+    return configPanel;
   }
 }

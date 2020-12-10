@@ -74,7 +74,7 @@ public class JoystickBottomPanel extends JPanel
   {
     if (aComboBox == null)
     {
-      aComboBox = new KeySelectionComboBox();
+      aComboBox = new KeySelectionComboBox(this.model);
       aComboBox.addActionListener(new ActionListener()
         {
           public void actionPerformed(ActionEvent arg0)
@@ -90,7 +90,7 @@ public class JoystickBottomPanel extends JPanel
   {
     if (bComboBox == null)
     {
-      bComboBox = new KeySelectionComboBox();
+      bComboBox = new KeySelectionComboBox(this.model);
       bComboBox.addActionListener(new ActionListener()
         {
           public void actionPerformed(ActionEvent arg0)
@@ -106,7 +106,7 @@ public class JoystickBottomPanel extends JPanel
   {
     if (cComboBox == null)
     {
-      cComboBox = new KeySelectionComboBox();
+      cComboBox = new KeySelectionComboBox(this.model);
       cComboBox.addActionListener(new ActionListener()
         {
           public void actionPerformed(ActionEvent arg0)

@@ -20,6 +20,7 @@ import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.ListSelectionModel;
+import javax.swing.SwingUtilities;
 
 import se.lantz.gui.gameview.GameViewManager;
 import se.lantz.model.MainViewModel;
@@ -157,10 +158,10 @@ public class MainPanel extends JPanel
         };
       list.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
 
-      list.addListSelectionListener((e) -> {
-        if (e.getValueIsAdjusting() == false)
+      list.addListSelectionListener(e -> {
+        if (!e.getValueIsAdjusting())
         {
-          getGameDetailsBackgroundPanel().updateSelectedGame(list.getSelectedValue());
+          SwingUtilities.invokeLater(() -> getGameDetailsBackgroundPanel().updateSelectedGame(list.getSelectedValue()));
         }
       });
       list.setModel(uiModel.getGameListModel());
