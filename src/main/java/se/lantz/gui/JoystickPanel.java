@@ -14,12 +14,11 @@ import javax.swing.ImageIcon;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JTextField;
+import javax.swing.SwingConstants;
 import javax.swing.border.TitledBorder;
 
 import se.lantz.model.JoystickModel;
-
-import javax.swing.SwingConstants;
-import javax.swing.JTextField;
 
 public class JoystickPanel extends JPanel
 {
@@ -124,9 +123,7 @@ public class JoystickPanel extends JPanel
     getRightFireComboBox().setSelectedCode(model.getRightFire());
     getTlComboBox().setSelectedCode(model.getTl());
     getTrComboBox().setSelectedCode(model.getTr());
-
     getConfigTextField().setText(model.getConfigString());
-    System.out.println("modelChanged in JoystickStickPanel");
   }
 
   private JCheckBox getPrimaryJoyCheckBox()
@@ -273,31 +270,34 @@ public class JoystickPanel extends JPanel
             catch (Exception e)
             {
               configTextField.setText(model.getConfigString());
-            }  
+            }
           }
         });
     }
     return configTextField;
   }
-  private JPanel getConfigPanel() {
-    if (configPanel == null) {
-    	configPanel = new JPanel();
-    	GridBagLayout gbl_configPanel = new GridBagLayout();
-    	configPanel.setLayout(gbl_configPanel);
-    	GridBagConstraints gbc_configLabel = new GridBagConstraints();
-    	gbc_configLabel.anchor = GridBagConstraints.WEST;
-    	gbc_configLabel.insets = new Insets(0, 10, 0, 5);
-    	gbc_configLabel.gridx = 0;
-    	gbc_configLabel.gridy = 0;
-    	configPanel.add(getConfigLabel(), gbc_configLabel);
-    	GridBagConstraints gbc_configTextField = new GridBagConstraints();
-    	gbc_configTextField.insets = new Insets(0, 0, 0, 20);
-    	gbc_configTextField.fill = GridBagConstraints.HORIZONTAL;
-    	gbc_configTextField.weightx = 1.0;
-    	gbc_configTextField.anchor = GridBagConstraints.NORTHWEST;
-    	gbc_configTextField.gridx = 1;
-    	gbc_configTextField.gridy = 0;
-    	configPanel.add(getConfigTextField(), gbc_configTextField);
+
+  private JPanel getConfigPanel()
+  {
+    if (configPanel == null)
+    {
+      configPanel = new JPanel();
+      GridBagLayout gbl_configPanel = new GridBagLayout();
+      configPanel.setLayout(gbl_configPanel);
+      GridBagConstraints gbc_configLabel = new GridBagConstraints();
+      gbc_configLabel.anchor = GridBagConstraints.WEST;
+      gbc_configLabel.insets = new Insets(0, 10, 0, 5);
+      gbc_configLabel.gridx = 0;
+      gbc_configLabel.gridy = 0;
+      configPanel.add(getConfigLabel(), gbc_configLabel);
+      GridBagConstraints gbc_configTextField = new GridBagConstraints();
+      gbc_configTextField.insets = new Insets(0, 0, 0, 20);
+      gbc_configTextField.fill = GridBagConstraints.HORIZONTAL;
+      gbc_configTextField.weightx = 1.0;
+      gbc_configTextField.anchor = GridBagConstraints.NORTHWEST;
+      gbc_configTextField.gridx = 1;
+      gbc_configTextField.gridy = 0;
+      configPanel.add(getConfigTextField(), gbc_configTextField);
     }
     return configPanel;
   }

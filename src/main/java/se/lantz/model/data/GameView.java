@@ -16,6 +16,8 @@ public class GameView
   private String sqlQuery = "";
   
   private int gameViewId;
+  
+  private int gameCount = -1;
 
   public GameView(int gameViewId)
   {
@@ -45,6 +47,10 @@ public class GameView
   @Override
   public String toString()
   {
+    if (gameCount > -1)
+    {
+      return name + " (" + gameCount + ")";
+    }
     return name;
   }
 
@@ -127,5 +133,10 @@ public class GameView
   public void setGameViewId(int gameViewId)
   {
     this.gameViewId = gameViewId;
+  }
+  
+  public void setGameCount(int count)
+  {
+    this.gameCount = count;
   }
 }

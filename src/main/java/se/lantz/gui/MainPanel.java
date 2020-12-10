@@ -49,7 +49,7 @@ public class MainPanel extends JPanel
     this.uiModel = uiModel;
     setLayout(new BorderLayout(0, 0));
     add(getSplitPane(), BorderLayout.CENTER);
-    gameViewManager = new GameViewManager(getListViewComboBox(), uiModel);
+    gameViewManager = new GameViewManager(this, uiModel);
 
     uiModel.addSaveChangeListener(e -> {
       getListViewComboBox().setEnabled(!uiModel.isDataChanged());
@@ -278,7 +278,7 @@ public class MainPanel extends JPanel
     return listViewEditButton;
   }
 
-  private JComboBox<GameView> getListViewComboBox()
+  public JComboBox<GameView> getListViewComboBox()
   {
     if (listViewComboBox == null)
     {
@@ -290,11 +290,17 @@ public class MainPanel extends JPanel
             uiModel.setSelectedGameView((GameView) listViewComboBox.getSelectedItem());
             //TODO: keep track of selected index for the view and select it once data is updated
             getList().setSelectedIndex(0);
+            updateViewInfoLabel();
           }
         });
       listViewComboBox.setModel(uiModel.getGameViewModel());
     }
     return listViewComboBox;
+  }
+  
+  public void updateViewInfoLabel()
+  {
+    getViewInfoLabel().setText(uiModel.getGameListModel().getSize() + " of " + uiModel.getAllGamesCount());
   }
 
   private JPanel getViewInfoPanel()
@@ -302,7 +308,15 @@ public class MainPanel extends JPanel
     if (viewInfoPanel == null)
     {
       viewInfoPanel = new JPanel();
-      viewInfoPanel.add(getViewInfoLabel());
+      GridBagLayout gbl_viewInfoPanel = new GridBagLayout();
+      viewInfoPanel.setLayout(gbl_viewInfoPanel);
+      GridBagConstraints gbc_viewInfoLabel = new GridBagConstraints();
+      gbc_viewInfoLabel.weightx = 1.0;
+      gbc_viewInfoLabel.insets = new Insets(0, 0, 5, 5);
+      gbc_viewInfoLabel.anchor = GridBagConstraints.EAST;
+      gbc_viewInfoLabel.gridx = 1;
+      gbc_viewInfoLabel.gridy = 0;
+      viewInfoPanel.add(getViewInfoLabel(), gbc_viewInfoLabel);
     }
     return viewInfoPanel;
   }

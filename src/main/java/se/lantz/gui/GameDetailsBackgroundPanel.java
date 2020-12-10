@@ -139,7 +139,6 @@ public class GameDetailsBackgroundPanel extends JPanel
     if (saveButton == null)
     {
       model.addSaveChangeListener(e -> {
-        logger.debug("SaveButton isDataChanged = {}", model.isDataChanged());
         saveButton.setEnabled(model.isDataChanged());
       });
       saveButton = new JButton("Save");

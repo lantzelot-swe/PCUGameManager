@@ -67,7 +67,6 @@ public class JoystickBottomPanel extends JPanel
     getAComboBox().setSelectedCode(model.getA());
     getBComboBox().setSelectedCode(model.getB());
     getCComboBox().setSelectedCode(model.getC());
-    System.out.println("modelChanged in JoystickBottomPanel");
   }
 
   private KeySelectionComboBox getAComboBox()

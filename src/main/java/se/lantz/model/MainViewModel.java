@@ -26,6 +26,7 @@ public class MainViewModel extends AbstractModel
   GameListModel gameListModel = new GameListModel();
 
   private GameView selectedGameView;
+  private int allGamesCount = 0;
 
   private InfoModel infoModel = new InfoModel();
   private JoystickModel joy1Model = new JoystickModel(true);
@@ -66,7 +67,6 @@ public class MainViewModel extends AbstractModel
 
   public ListModel<GameListData> getGameListModel()
   {
-
     return gameListModel;
   }
 
@@ -159,8 +159,18 @@ public class MainViewModel extends AbstractModel
       {
         gameListModel.addElement(gameListData);
       }
+      gameView.setGameCount(gamesList.size());
+      if (gameView.getGameViewId() == GameView.ALL_GAMES_ID)
+      {
+       this.allGamesCount = gamesList.size();
+      }
       logger.debug("...done.");
     }
+  }
+  
+  public int getAllGamesCount()
+  {
+    return allGamesCount;
   }
 
   public GameView getSelectedGameView()

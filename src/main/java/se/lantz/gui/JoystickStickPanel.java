@@ -62,7 +62,6 @@ public class JoystickStickPanel extends JPanel
     getDownComboBox().setSelectedCode(model.getDown());
     getLeftComboBox().setSelectedCode(model.getLeft());
     getRightComboBox().setSelectedCode(model.getRight());
-    System.out.println("modelChanged in JoystickStickPanel");
   }
 
   private KeySelectionComboBox getUpComboBox()

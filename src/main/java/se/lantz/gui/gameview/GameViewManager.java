@@ -1,23 +1,24 @@
 package se.lantz.gui.gameview;
 
 import javax.swing.JComboBox;
-import javax.swing.JComponent;
 import javax.swing.SwingUtilities;
 
+import se.lantz.gui.MainPanel;
 import se.lantz.gui.MainWindow;
 import se.lantz.model.MainViewModel;
 import se.lantz.model.data.GameView;
 
 public class GameViewManager
 {
-
-  private JComboBox viewCombobox;
+  private JComboBox<GameView> viewCombobox;
   private MainWindow mainWindow;
   private final MainViewModel uiModel;
+  private MainPanel mainPanel;
   
-  public GameViewManager(JComboBox viewCombobox, MainViewModel uiModel)
+  public GameViewManager(MainPanel mainPanel, MainViewModel uiModel)
   {
-    this.viewCombobox = viewCombobox;
+    this.mainPanel = mainPanel;
+    this.viewCombobox = mainPanel.getListViewComboBox();
     this.uiModel = uiModel;
   }
 
@@ -54,8 +55,8 @@ public class GameViewManager
         uiModel.setSelectedGameView(gameView);
         viewCombobox.invalidate();
         viewCombobox.repaint();
+        mainPanel.updateViewInfoLabel();
       }
     }
-    
   }
 }
