@@ -3,6 +3,7 @@ package se.lantz.gui.gameview;
 import javax.swing.JComboBox;
 import javax.swing.SwingUtilities;
 
+import se.lantz.gui.ListPanel;
 import se.lantz.gui.MainPanel;
 import se.lantz.gui.MainWindow;
 import se.lantz.model.MainViewModel;
@@ -13,9 +14,9 @@ public class GameViewManager
   private JComboBox<GameView> viewCombobox;
   private MainWindow mainWindow;
   private final MainViewModel uiModel;
-  private MainPanel mainPanel;
+  private ListPanel mainPanel;
   
-  public GameViewManager(MainPanel mainPanel, MainViewModel uiModel)
+  public GameViewManager(ListPanel mainPanel, MainViewModel uiModel)
   {
     this.mainPanel = mainPanel;
     this.viewCombobox = mainPanel.getListViewComboBox();
