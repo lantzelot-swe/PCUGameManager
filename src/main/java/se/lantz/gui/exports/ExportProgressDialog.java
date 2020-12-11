@@ -1,0 +1,42 @@
+package se.lantz.gui.exports;
+
+import java.awt.Frame;
+
+import javax.swing.JDialog;
+
+public class ExportProgressDialog extends JDialog
+{
+  private static final long serialVersionUID = 1L;
+
+  private ExportProgressPanel panel;
+
+  public ExportProgressDialog(Frame frame)
+  {
+    super(frame,"Export games", true);
+    this.add(getImportProgressPanel());
+    setSize(900, 600);
+    setAlwaysOnTop(true);
+    setLocationRelativeTo(frame);
+  }
+
+  public void updateProgress(String infoText)
+  {
+    getImportProgressPanel().updateProgress(infoText);
+    this.repaint();
+  }
+  
+  public void finish()
+  {
+    getImportProgressPanel().finish();
+  }
+
+  public ExportProgressPanel getImportProgressPanel()
+  {
+    if (panel == null)
+    {
+      panel = new ExportProgressPanel();
+      panel.getCloseButton().addActionListener(e -> setVisible(false));
+    }
+    return panel;
+  }
+}

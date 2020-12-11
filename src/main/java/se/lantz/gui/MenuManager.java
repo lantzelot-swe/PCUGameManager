@@ -15,9 +15,13 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
 
+import se.lantz.gui.exports.ExportGamesDialog;
+import se.lantz.gui.exports.ExportProgressDialog;
+import se.lantz.gui.exports.ExportWorker;
 import se.lantz.gui.imports.ImportOptionsDialog;
 import se.lantz.gui.imports.ImportProgressDialog;
 import se.lantz.gui.imports.ImportWorker;
+import se.lantz.model.ExportManager;
 import se.lantz.model.ImportManager;
 import se.lantz.model.MainViewModel;
 
@@ -42,6 +46,7 @@ public class MenuManager
   
   private MainViewModel uiModel;
   private ImportManager importManager;
+  private ExportManager exportManager;
   private MainWindow mainWindow;
   
   public MenuManager(final MainViewModel uiModel, MainWindow mainWindow)
@@ -131,7 +136,7 @@ public class MenuManager
     exportItem.setAccelerator(keyStrokeToExportGames);
     exportItem.setMnemonic('E');
     exportItem.addActionListener((e) -> {
-
+      exportGames();
     });
     return exportItem;
   }
@@ -216,7 +221,7 @@ public class MenuManager
     fileChooser.setDialogTitle("Select directory containing a Carousel");
     fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
     fileChooser.setSelectedFile(new File("F:\\C64\\GameManagerTest"));
-    int value = fileChooser.showOpenDialog(this.mainWindow);
+    int value = fileChooser.showDialog(this.mainWindow, "Import");
     if (value == JFileChooser.APPROVE_OPTION)
     {
       if (importManager.checkSelectedFolder(fileChooser.getSelectedFile().toPath()))
@@ -242,6 +247,29 @@ public class MenuManager
                                       "The selected directory doesn't contain a valid carousel structure.",
                                       "Import games",
                                       JOptionPane.ERROR_MESSAGE);
+      }
+    }
+  }
+  
+  private void exportGames()
+  {
+    final ExportGamesDialog exportSelectionDialog = new ExportGamesDialog(MainWindow.getInstance());
+    exportSelectionDialog.pack();
+    exportSelectionDialog.setLocationRelativeTo(this.mainWindow);
+    if (exportSelectionDialog.showDialog())
+    {
+      final JFileChooser fileChooser = new JFileChooser();
+      fileChooser.setDialogTitle("Select a directory to export to");
+      fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+      fileChooser.setSelectedFile(new File("F:\\C64\\GameManagerTest"));
+      fileChooser.setApproveButtonText("Export");
+      int value = fileChooser.showDialog(this.mainWindow, "Export");
+      if (value == JFileChooser.APPROVE_OPTION)
+      {
+        ExportProgressDialog dialog = new ExportProgressDialog(this.mainWindow);
+        ExportWorker worker = new ExportWorker(exportManager, dialog);
+        worker.execute();
+        dialog.setVisible(true);
       }
     }
   }

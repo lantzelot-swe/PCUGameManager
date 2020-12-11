@@ -1,6 +1,6 @@
 package se.lantz.model.data;
 
-public class GameListData
+public class GameListData implements Comparable
 {
 
   public GameListData(String title, String gameId)
@@ -74,5 +74,11 @@ public class GameListData
     else if (!title.equals(other.title))
       return false;
     return true;
+  }
+
+  @Override
+  public int compareTo(Object o)
+  {
+    return title.compareTo(o.toString());
   }
 }
