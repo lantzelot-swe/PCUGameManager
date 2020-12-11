@@ -250,7 +250,14 @@ public class InfoModel extends AbstractModel
     //Set games name, always add ".gz"??
     String fileName = FileManager.generateFileNameFromTitle(this.title);
     String fileEnding = file.getName().substring(file.getName().indexOf("."));
-    setGamesFile(fileName + fileEnding +".gz"); 
+    if (fileEnding.endsWith(".gz") || fileEnding.endsWith(".GZ"))
+    {
+      setGamesFile(fileName + fileEnding); 
+    }
+    else
+    {
+      setGamesFile(fileName + fileEnding +".gz"); 
+    }
     if (!Objects.equals(old, gamesPath))
     {
       notifyChange();

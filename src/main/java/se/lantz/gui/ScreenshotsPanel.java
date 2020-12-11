@@ -66,6 +66,7 @@ public class ScreenshotsPanel extends JPanel
   private ImageIcon warningIcon = new ImageIcon(getClass().getResource("/se/lantz/warning-icon.png"));
   private String cropTooltip =
     "<html>Optimal resolution for the carousel is 320x200.<br>Press to automatically crop the image to this size.</html>";
+  private boolean gamesFileUpdated = false;
 
   public ScreenshotsPanel(InfoModel model)
   {
@@ -103,9 +104,23 @@ public class ScreenshotsPanel extends JPanel
 
   private void modelChanged()
   {
+    if (!model.isDataChanged())
+    {
+      gamesFileUpdated = false;
+    }
     // Read from model
-    getGameTextField().setText(model.getGamesFile());
+    getGameTextField().setText(getGameFileName());
     reloadScreens();
+  }
+  
+  private String getGameFileName()
+  {
+    String returnValue = model.getGamesFile();
+    if (gamesFileUpdated)
+    {
+      returnValue = returnValue + " (updated)";
+    }
+   return returnValue;
   }
 
   private void reloadScreens()
@@ -246,6 +261,11 @@ public class ScreenshotsPanel extends JPanel
     if (changeCoverButton == null)
     {
       changeCoverButton = new JButton("...");
+      changeCoverButton.addActionListener(new ActionListener() {
+        public void actionPerformed(ActionEvent e) {
+          selectCoverFile();
+        }
+      });
       changeCoverButton.setMargin(new Insets(1, 3, 1, 3));
     }
     return changeCoverButton;
@@ -319,7 +339,6 @@ public class ScreenshotsPanel extends JPanel
         {
           public void filesDropped(java.io.File[] files)
           {
-            logger.debug("File dropped for screen 1!");
             model.setScreen1Image(handleScreenFileDrop(files, screen1ImageLabel, crop1Button));
           }
         });
@@ -337,7 +356,7 @@ public class ScreenshotsPanel extends JPanel
         {
           public void actionPerformed(ActionEvent arg0)
           {
-            showEditPanel(screen1Button);
+            selectCoverFile(true);
           }
         });
     }
@@ -353,7 +372,6 @@ public class ScreenshotsPanel extends JPanel
         {
           public void filesDropped(java.io.File[] files)
           {
-            logger.debug("File dropped for screen 2!");
             model.setScreen2Image(handleScreenFileDrop(files, screen2ImageLabel, crop2Button));
           }
         });
@@ -367,6 +385,13 @@ public class ScreenshotsPanel extends JPanel
     {
       screen2Button = new JButton("...");
       screen2Button.setMargin(new Insets(1, 3, 1, 3));
+      screen2Button.addActionListener(new ActionListener()
+      {
+        public void actionPerformed(ActionEvent arg0)
+        {
+          selectCoverFile(false);
+        }
+      });
     }
     return screen2Button;
   }
@@ -421,6 +446,17 @@ public class ScreenshotsPanel extends JPanel
       gameTextField = new JTextField();
       gameTextField.setEditable(false);
       gameTextField.setPreferredSize(new Dimension(160, 20));
+      new FileDrop(gameTextField, new FileDrop.Listener()
+      {
+        public void filesDropped(java.io.File[] files)
+        {
+          if (files.length > 0)
+          {
+            gamesFileUpdated = true;
+            model.setGamesPath(files[0]);            
+          }
+        }
+      });
     }
     return gameTextField;
   }
@@ -438,15 +474,6 @@ public class ScreenshotsPanel extends JPanel
       gameButton.setMargin(new Insets(1, 3, 1, 3));
     }
     return gameButton;
-  }
-
-  private void showEditPanel(JComponent centerOver)
-  {
-    ScreenshotEditDialog dialog =
-      new ScreenshotEditDialog((Frame) SwingUtilities.getAncestorOfClass(Frame.class, this));
-    dialog.pack();
-    dialog.setLocationRelativeTo(centerOver);
-    dialog.setVisible(true);
   }
 
   private JButton getCrop1Button()
@@ -569,7 +596,63 @@ public class ScreenshotsPanel extends JPanel
     int value = fileChooser.showOpenDialog(MainWindow.getInstance());
     if (value == JFileChooser.APPROVE_OPTION)
     {
-      model.setGamesPath(fileChooser.getSelectedFile());
+      gamesFileUpdated = true;
+      model.setGamesPath(fileChooser.getSelectedFile());  
+    }
+  }
+  
+  private void selectCoverFile()
+  {
+    final JFileChooser fileChooser = new JFileChooser();
+    fileChooser.setDialogTitle("Select a cover image for " + model.getTitle());
+    fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+    try
+    {
+      fileChooser.setSelectedFile(new File(new File(".").getCanonicalPath()));
+    }
+    catch (IOException e)
+    {
+      ExceptionHandler.handleException(e, "Could not set current directory");
+    }
+    FileNameExtensionFilter vicefilter = new FileNameExtensionFilter("png,gif,jpeg,bmp", "png","gif","jpg", "jpeg", "bmp");
+    fileChooser.addChoosableFileFilter(vicefilter);
+    fileChooser.setFileFilter(vicefilter);   
+    int value = fileChooser.showOpenDialog(MainWindow.getInstance());
+    if (value == JFileChooser.APPROVE_OPTION)
+    {
+      File selectedFile = fileChooser.getSelectedFile();
+      model.setCoverImage(handleCoverFileDrop(new File[] {selectedFile}, coverImageLabel));
+    }
+  }
+  
+  private void selectCoverFile(boolean first)
+  {
+    final JFileChooser fileChooser = new JFileChooser();
+    fileChooser.setDialogTitle("Select screenshot image for " + model.getTitle());
+    fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+    try
+    {
+      fileChooser.setSelectedFile(new File(new File(".").getCanonicalPath()));
+    }
+    catch (IOException e)
+    {
+      ExceptionHandler.handleException(e, "Could not set current directory");
+    }
+    FileNameExtensionFilter vicefilter = new FileNameExtensionFilter("png,gif,jpeg,bmp", "png","gif","jpg", "jpeg", "bmp");
+    fileChooser.addChoosableFileFilter(vicefilter);
+    fileChooser.setFileFilter(vicefilter);   
+    int value = fileChooser.showOpenDialog(MainWindow.getInstance());
+    if (value == JFileChooser.APPROVE_OPTION)
+    {
+      File selectedFile = fileChooser.getSelectedFile();
+      if (first)
+      {
+        model.setScreen1Image(handleScreenFileDrop(new File[]{selectedFile}, screen1ImageLabel, crop1Button));
+      }
+      else
+      {
+        model.setScreen2Image(handleScreenFileDrop(new File[]{selectedFile}, screen2ImageLabel, crop2Button));
+      }
     }
   }
 }

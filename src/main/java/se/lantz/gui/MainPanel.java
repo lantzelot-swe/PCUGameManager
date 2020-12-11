@@ -7,6 +7,8 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.util.List;
 
 import javax.swing.JButton;
@@ -41,6 +43,8 @@ public class MainPanel extends JPanel
   private JComboBox<GameView> listViewComboBox;
   private JPanel viewInfoPanel;
   private JLabel viewInfoLabel;
+  
+  private boolean delayDetailsUpdate;
 
   private GameViewManager gameViewManager;
 
@@ -158,10 +162,34 @@ public class MainPanel extends JPanel
         };
       list.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
 
+      //If the user holds down "down" or "up" (scrolling in the list) the details is not
+      //updated until the key is released
+      list.addKeyListener(new KeyAdapter() {
+        
+        public void keyPressed(KeyEvent e) {
+          if (e.getKeyCode() == KeyEvent.VK_DOWN || e.getKeyCode() == KeyEvent.VK_UP)
+          {
+            delayDetailsUpdate = true;
+          }
+        }
+
+        public void keyReleased(KeyEvent e) {
+          if (e.getKeyCode() == KeyEvent.VK_DOWN || e.getKeyCode() == KeyEvent.VK_UP)
+          {
+            delayDetailsUpdate = false;
+            updateSelectedGame();
+          }
+        }     
+      });
+     
+      
       list.addListSelectionListener(e -> {
         if (!e.getValueIsAdjusting())
         {
-          SwingUtilities.invokeLater(() -> getGameDetailsBackgroundPanel().updateSelectedGame(list.getSelectedValue()));
+          if (!delayDetailsUpdate)
+          {
+            updateSelectedGame();
+          }
         }
       });
       list.setModel(uiModel.getGameListModel());
@@ -169,6 +197,10 @@ public class MainPanel extends JPanel
     return list;
   }
 
+  private void updateSelectedGame()
+  {
+    SwingUtilities.invokeLater(() -> getGameDetailsBackgroundPanel().updateSelectedGame(list.getSelectedValue()));
+  }
   int showUnsavedChangesDialog()
   {
     return JOptionPane.showConfirmDialog(MainPanel.this,
