@@ -105,4 +105,11 @@ public class MainPanel extends JPanel
   {
     getListPanel().addNewGame();
   }
+  
+  public void repaintAfterImport()
+  {
+    this.invalidate();
+    this.repaint();
+    getListPanel().updateViewInfoLabel();
+  }
 }

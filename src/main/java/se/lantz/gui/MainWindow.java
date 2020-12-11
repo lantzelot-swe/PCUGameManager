@@ -83,5 +83,10 @@ public class MainWindow extends JFrame
       }
     }
     return menuBar;
-  }  
+  }
+  
+  public void repaintAfterImport()
+  {
+    getMainPanel().repaintAfterImport();
+  }
 }

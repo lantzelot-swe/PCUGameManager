@@ -294,9 +294,9 @@ public class DbConnector
       sqlBuilder.append(splittedRowValue[0]);
       sqlBuilder.append("\";");
       String sql = sqlBuilder.toString();
-      infoBuilder.append("Checking game: ");
+      infoBuilder.append("Checking game ");
       infoBuilder.append(splittedRowValue[0].substring(1));
-      infoBuilder.append("\n");
+      infoBuilder.append(": ");
       logger.debug("Checking game: {}", sql);
 
       try (Connection conn = this.connect(); PreparedStatement pstmt = conn.prepareStatement(sql))
@@ -346,9 +346,9 @@ public class DbConnector
       sqlBuilder.append(splittedRowValue[0]);
       sqlBuilder.append("\";");
       String sql = sqlBuilder.toString();
-      infoBuilder.append("Checking game: ");
+      infoBuilder.append("Checking game ");
       infoBuilder.append(splittedRowValue[0].substring(1));
-      infoBuilder.append("\n");
+      infoBuilder.append(": ");
       logger.debug("Checking game: {}", sql);
 
       try (Connection conn = this.connect(); PreparedStatement pstmt = conn.prepareStatement(sql))
@@ -357,7 +357,7 @@ public class DbConnector
         rs.next();
         if (rs.getInt(1) == 0)
         {
-          infoBuilder.append("Not available adding to db\n");
+          infoBuilder.append("Not available, adding to db\n");
           logger.debug("Game: {} is not available, adding to db", splittedRowValue[0]);
           newRowValues.add(rowValue);
         }

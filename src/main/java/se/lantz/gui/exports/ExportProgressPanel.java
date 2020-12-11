@@ -102,7 +102,7 @@ public class ExportProgressPanel extends JPanel
     }
     else
     {
-      getTextArea().append("\nExport completed without errors.");
+      getTextArea().append("\nExport completed successfully.");
     }
   }
 }

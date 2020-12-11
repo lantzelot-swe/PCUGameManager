@@ -102,7 +102,7 @@ public class ImportProgressPanel extends JPanel
     }
     else
     {
-      getTextArea().append("\nImport completed without errors.");
+      getTextArea().append("\nImport completed successfully.");
     }
   }
 }

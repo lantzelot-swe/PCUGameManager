@@ -239,6 +239,7 @@ public class MenuManager
           dialog.setVisible(true);
           //Refresh current game view after import
           uiModel.reloadCurrentGameView();
+          MainWindow.getInstance().repaintAfterImport();
         }
       }
       else
