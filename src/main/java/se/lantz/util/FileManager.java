@@ -6,6 +6,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -20,6 +21,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import se.lantz.model.InfoModel;
+import se.lantz.model.data.GameDetails;
 
 public class FileManager
 {
@@ -52,7 +54,7 @@ public class FileManager
     String coverFileName = model.getCoverFile();
     String screen1FileName = model.getScreens1File();
     String screen2FileName = model.getScreens2File();
-    
+
     String gameName = model.getGamesFile();
     Path gamePath = model.getGamesPath();
 
@@ -110,34 +112,40 @@ public class FileManager
       Path source = gamePath;
       Path target = new File(GAMES + gameName).toPath();
 
-      if (Files.notExists(source)) {
-          System.err.printf("The path %s doesn't exist!", source);
-          return;
+      if (Files.notExists(source))
+      {
+        System.err.printf("The path %s doesn't exist!", source);
+        return;
       }
 
-      try {
+      try
+      {
 
-          compressGzip(source, target);
+        compressGzip(source, target);
 
-      } catch (IOException e) {
-          e.printStackTrace();
+      }
+      catch (IOException e)
+      {
+        e.printStackTrace();
       }
     }
   }
-  
-  private void compressGzip(Path source, Path target) throws IOException {
 
-    try (GZIPOutputStream gos = new GZIPOutputStream(
-                                  new FileOutputStream(target.toFile()));
-         FileInputStream fis = new FileInputStream(source.toFile())) {
-        // copy file
-        byte[] buffer = new byte[1024];
-        int len;
-        while ((len = fis.read(buffer)) > 0) {
-            gos.write(buffer, 0, len);
-        }
+  private void compressGzip(Path source, Path target) throws IOException
+  {
+
+    try (GZIPOutputStream gos = new GZIPOutputStream(new FileOutputStream(target.toFile()));
+      FileInputStream fis = new FileInputStream(source.toFile()))
+    {
+      // copy file
+      byte[] buffer = new byte[1024];
+      int len;
+      while ((len = fis.read(buffer)) > 0)
+      {
+        gos.write(buffer, 0, len);
+      }
     }
-}
+  }
 
   private void renameFiles()
   {
@@ -217,5 +225,49 @@ public class FileManager
     String newNameString = newName.stream().map(String::valueOf).collect(Collectors.joining());
     logger.debug("Game title: \"{}\" ---- New fileName: \"{}\"", title, newNameString);
     return newNameString;
+  }
+
+  public void exportGame(GameDetails gameDetails, File targetDir, StringBuilder infoBuilder)
+  {
+    try
+    {
+      String fileName = generateFileNameFromTitle(gameDetails.getTitle());
+
+      infoBuilder.append("Creating game info file for " + gameDetails.getTitle() + "\n");
+      //Add -ms to comply with the maxi game tool.
+      writeGameInfoFile(fileName + "-ms.tsg", targetDir, gameDetails);
+    }
+    catch (Exception e)
+    {
+      String message = "Could not create file for: " + gameDetails.getTitle();
+      logger.error(message, e);
+      infoBuilder.append(message);
+    }
+
+    //TODO copy the other files into the right location
+
+  }
+
+  public static void writeGameInfoFile(String fileName, File targetDir, GameDetails gameDetails) throws IOException
+  {
+    Path outDirPath = targetDir.toPath();
+    Path filePath = outDirPath.resolve(fileName);
+    filePath.toFile().createNewFile();
+    FileWriter fw = new FileWriter(filePath.toFile());
+
+    fw.write("T:" + gameDetails.getTitle() + "\n");
+    fw.write("X:" + gameDetails.getSystem() + "\n");
+    fw.write("D:en:" + gameDetails.getDescription() + "\n");
+    fw.write("A:" + gameDetails.getAuthor() + "\n");
+    fw.write("M:" + gameDetails.getComposer() + "\n");
+    fw.write("E:" + gameDetails.getGenre() + "\n");
+    fw.write("F:" + gameDetails.getGame() + "\n");
+    fw.write("C:" + gameDetails.getCover() + "\n");
+    fw.write("G:" + gameDetails.getScreen1() + "\n");
+    fw.write("G:" + gameDetails.getScreen2() + "\n");
+    fw.write(gameDetails.getJoy1() + "\n");
+    fw.write(gameDetails.getJoy2() + "\n");
+    fw.write("V:" + gameDetails.getVerticalShift() + "\n");
+    fw.close();
   }
 }

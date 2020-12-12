@@ -8,7 +8,8 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 
-import se.lantz.model.ImportManager;
+import se.lantz.manager.ImportManager;
+
 import javax.swing.ButtonGroup;
 
 public class ImportOptionsPanel extends JPanel

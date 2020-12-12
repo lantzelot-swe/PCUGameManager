@@ -4,7 +4,7 @@ import java.util.List;
 
 import javax.swing.SwingWorker;
 
-import se.lantz.model.ImportManager;
+import se.lantz.manager.ImportManager;
 
 public class ImportWorker extends SwingWorker<Void, String>
 {

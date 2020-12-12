@@ -21,9 +21,10 @@ import se.lantz.gui.exports.ExportWorker;
 import se.lantz.gui.imports.ImportOptionsDialog;
 import se.lantz.gui.imports.ImportProgressDialog;
 import se.lantz.gui.imports.ImportWorker;
-import se.lantz.model.ExportManager;
-import se.lantz.model.ImportManager;
+import se.lantz.manager.ExportManager;
+import se.lantz.manager.ImportManager;
 import se.lantz.model.MainViewModel;
+import se.lantz.model.data.GameListData;
 
 public class MenuManager
 {
@@ -54,6 +55,7 @@ public class MenuManager
     this.uiModel = uiModel;
     this.mainWindow = mainWindow;
     this.importManager = new ImportManager(uiModel);
+    this.exportManager = new ExportManager(uiModel);
     setupMenues();
   }
   
@@ -259,18 +261,24 @@ public class MenuManager
     exportSelectionDialog.setLocationRelativeTo(this.mainWindow);
     if (exportSelectionDialog.showDialog())
     {
-      final JFileChooser fileChooser = new JFileChooser();
-      fileChooser.setDialogTitle("Select a directory to export to");
-      fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-      fileChooser.setSelectedFile(new File("F:\\C64\\GameManagerTest"));
-      fileChooser.setApproveButtonText("Export");
-      int value = fileChooser.showDialog(this.mainWindow, "Export");
-      if (value == JFileChooser.APPROVE_OPTION)
+      List<GameListData> gamesList = exportSelectionDialog.getSelectedGames();
+      if (!gamesList.isEmpty())
       {
-        ExportProgressDialog dialog = new ExportProgressDialog(this.mainWindow);
-        ExportWorker worker = new ExportWorker(exportManager, dialog);
-        worker.execute();
-        dialog.setVisible(true);
+        exportManager.setGamesToExport(gamesList);
+        final JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setDialogTitle("Select a directory to export to");
+        fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+        fileChooser.setSelectedFile(new File("F:\\C64\\GameManagerTest"));
+        fileChooser.setApproveButtonText("Export");
+        int value = fileChooser.showDialog(this.mainWindow, "Export");
+        if (value == JFileChooser.APPROVE_OPTION)
+        {
+          exportManager.setTargerDirectory(fileChooser.getSelectedFile());
+          ExportProgressDialog dialog = new ExportProgressDialog(this.mainWindow);
+          ExportWorker worker = new ExportWorker(exportManager, dialog);
+          worker.execute();
+          dialog.setVisible(true);
+        }
       }
     }
   }

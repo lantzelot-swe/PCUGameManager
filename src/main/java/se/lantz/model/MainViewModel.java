@@ -2,6 +2,7 @@ package se.lantz.model;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import se.lantz.db.DbConnector;
+import se.lantz.manager.ImportManager;
 import se.lantz.model.data.GameDetails;
 import se.lantz.model.data.GameListData;
 import se.lantz.model.data.GameView;
@@ -120,6 +122,22 @@ public class MainViewModel extends AbstractModel
   public StringBuilder importGameInfo(List<String> rowValues, ImportManager.Options option)
   {
     return dbConnector.importRowsInGameInfoTable(rowValues, option);
+  }
+  
+  public List<GameDetails> readGameDetailsForExport(StringBuilder infoBuilder, List<GameListData> gamesList)
+  {
+    List<GameDetails> returnList = new ArrayList<>();
+    for (GameListData game : gamesList)
+    {
+      infoBuilder.append("Fetching information for " + game.getTitle() + "\n");
+      returnList.add(dbConnector.getGameDetails(game.getGameId()));
+    }
+    return returnList;
+  }
+  
+  public void exportGame(GameDetails gameDetails, File targetDir, StringBuilder infoBuilder)
+  {
+    fileManager.exportGame(gameDetails, targetDir, infoBuilder);
   }
 
   public InfoModel getInfoModel()

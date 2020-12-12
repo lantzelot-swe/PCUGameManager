@@ -233,7 +233,7 @@ public class ListPanel extends JPanel
             }
           }
         };
-      list.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
+      list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
       //If the user holds down "down" or "up" (scrolling in the list) the details is not
       //updated until the key is released

@@ -1,4 +1,4 @@
-package se.lantz.model;
+package se.lantz.manager;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -18,6 +18,7 @@ import java.util.stream.Stream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import se.lantz.model.MainViewModel;
 import se.lantz.util.ExceptionHandler;
 
 public class ImportManager
