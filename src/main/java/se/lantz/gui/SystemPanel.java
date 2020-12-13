@@ -111,9 +111,10 @@ public class SystemPanel extends JPanel
     gbc_cardPanel.gridy = 3;
     add(getCardPanel(), gbc_cardPanel);
     GridBagConstraints gbc_configPanel = new GridBagConstraints();
+    gbc_configPanel.weighty = 1.0;
+    gbc_configPanel.anchor = GridBagConstraints.NORTH;
     gbc_configPanel.gridwidth = 2;
     gbc_configPanel.weightx = 1.0;
-    gbc_configPanel.weighty = 1.0;
     gbc_configPanel.insets = new Insets(0, 0, 0, 5);
     gbc_configPanel.fill = GridBagConstraints.BOTH;
     gbc_configPanel.gridx = 0;
@@ -429,7 +430,7 @@ public class SystemPanel extends JPanel
       GridBagLayout gbl_configPanel = new GridBagLayout();
       configPanel.setLayout(gbl_configPanel);
       GridBagConstraints gbc_displayShiftValueLabel = new GridBagConstraints();
-      gbc_displayShiftValueLabel.weighty = 1.0;
+      gbc_displayShiftValueLabel.weightx = 1.0;
       gbc_displayShiftValueLabel.anchor = GridBagConstraints.SOUTHWEST;
       gbc_displayShiftValueLabel.insets = new Insets(0, 0, 0, 5);
       gbc_displayShiftValueLabel.gridx = 1;
@@ -438,16 +439,17 @@ public class SystemPanel extends JPanel
       GridBagConstraints gbc_configLabel = new GridBagConstraints();
       gbc_configLabel.gridheight = 2;
       gbc_configLabel.weighty = 1.0;
-      gbc_configLabel.anchor = GridBagConstraints.SOUTHWEST;
-      gbc_configLabel.insets = new Insets(5, 5, 16, 5);
+      gbc_configLabel.anchor = GridBagConstraints.NORTHWEST;
+      gbc_configLabel.insets = new Insets(59, 5, 5, 5);
       gbc_configLabel.gridx = 0;
       gbc_configLabel.gridy = 0;
       configPanel.add(getConfigLabel(), gbc_configLabel);
       GridBagConstraints gbc_configTextField = new GridBagConstraints();
+      gbc_configTextField.weighty = 1.0;
       gbc_configTextField.fill = GridBagConstraints.HORIZONTAL;
       gbc_configTextField.weightx = 1.0;
-      gbc_configTextField.insets = new Insets(5, 0, 14, 0);
-      gbc_configTextField.anchor = GridBagConstraints.SOUTHWEST;
+      gbc_configTextField.insets = new Insets(42, 0, 5, 0);
+      gbc_configTextField.anchor = GridBagConstraints.NORTHWEST;
       gbc_configTextField.gridx = 1;
       gbc_configTextField.gridy = 1;
       configPanel.add(getConfigTextField(), gbc_configTextField);
@@ -644,7 +646,7 @@ public class SystemPanel extends JPanel
           }
           else
           {
-            getDisplayShiftValueLabel().setText("");
+            getDisplayShiftValueLabel().setText(" ");
           }
         }
       });
@@ -855,7 +857,7 @@ public class SystemPanel extends JPanel
   {
     if (displayShiftValueLabel == null)
     {
-      displayShiftValueLabel = new JLabel("");
+      displayShiftValueLabel = new JLabel(" ");
     }
     return displayShiftValueLabel;
   }

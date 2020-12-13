@@ -41,8 +41,8 @@ public class JoystickPanel extends JPanel
   {
     this.portnumber = portnumber;
     this.model = model;
-    this.setPreferredSize(new Dimension(455, 510));
-    this.setMinimumSize(new Dimension(455, 510));
+    this.setPreferredSize(new Dimension(460, 510));
+    this.setMinimumSize(new Dimension(460, 510));
     setBorder(new TitledBorder(null, "Port " + portnumber, TitledBorder.LEADING, TitledBorder.TOP, null, null));
     GridBagLayout gridBagLayout = new GridBagLayout();
     gridBagLayout.columnWeights = new double[] { 0.0, 1.0, 0.0 };

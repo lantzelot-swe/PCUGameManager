@@ -11,4 +11,5 @@
   <classpathentry kind="var" path="M2_REPO/org/slf4j/slf4j-api/1.7.30/slf4j-api-1.7.30.jar" sourcepath="M2_REPO/org/slf4j/slf4j-api/1.7.30/slf4j-api-1.7.30-sources.jar"/>
   <classpathentry kind="var" path="M2_REPO/ch/qos/logback/logback-classic/1.2.3/logback-classic-1.2.3.jar" sourcepath="M2_REPO/ch/qos/logback/logback-classic/1.2.3/logback-classic-1.2.3-sources.jar"/>
   <classpathentry kind="var" path="M2_REPO/org/jsoup/jsoup/1.11.3/jsoup-1.11.3.jar" sourcepath="M2_REPO/org/jsoup/jsoup/1.11.3/jsoup-1.11.3-sources.jar"/>
+  <classpathentry kind="var" path="M2_REPO/com/jtattoo/JTattoo/1.6.7/JTattoo-1.6.7.jar"/>
 </classpath>

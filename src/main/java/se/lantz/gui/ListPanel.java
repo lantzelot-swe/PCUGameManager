@@ -147,8 +147,11 @@ public class ListPanel extends JPanel
           {
             uiModel.setSelectedGameView((GameView) listViewComboBox.getSelectedItem());
             //TODO: keep track of selected index for the view and select it once data is updated
-            getList().setSelectedIndex(0);
             updateViewInfoLabel();
+            SwingUtilities.invokeLater(() -> {
+              getList().setSelectedIndex(0);
+              getList().ensureIndexIsVisible(0);
+            });
           }
         });
       listViewComboBox.setModel(uiModel.getGameViewModel());

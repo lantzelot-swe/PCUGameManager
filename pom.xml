@@ -32,6 +32,11 @@
 			<artifactId>jsoup</artifactId>
 			<version>1.11.3</version>
 		</dependency>
+		<dependency>
+			<groupId>com.jtattoo</groupId>
+			<artifactId>JTattoo</artifactId>
+			<version>1.6.7</version>
+		</dependency>
 	</dependencies>
 	<build>
 		<plugins>

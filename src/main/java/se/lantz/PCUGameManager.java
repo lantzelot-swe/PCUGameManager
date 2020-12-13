@@ -22,6 +22,8 @@ public class PCUGameManager
     {
       //Set Exceptionhandler
       Thread.setDefaultUncaughtExceptionHandler(new TopLevelExceptionHandler());
+      
+//      UIManager.setLookAndFeel("com.jtattoo.plaf.graphite.GraphiteLookAndFeel");
       // Set System L&F
       UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
     }
@@ -33,8 +35,8 @@ public class PCUGameManager
     SwingUtilities.invokeLater(() -> {
 
       MainWindow mainWindow = MainWindow.getInstance();
-      mainWindow.setSize(1500, 950);
-      mainWindow.setMinimumSize(new Dimension(1400, 950));
+      mainWindow.setSize(1500, 960);
+      mainWindow.setMinimumSize(new Dimension(1400, 960));
       mainWindow.setVisible(true);
       mainWindow.setLocationRelativeTo(null);
       mainWindow.initialize();
