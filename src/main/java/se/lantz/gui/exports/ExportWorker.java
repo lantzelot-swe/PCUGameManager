@@ -5,7 +5,6 @@ import java.util.List;
 import javax.swing.SwingWorker;
 
 import se.lantz.manager.ExportManager;
-import se.lantz.manager.ImportManager;
 
 public class ExportWorker extends SwingWorker<Void, String>
 {
@@ -30,10 +29,11 @@ public class ExportWorker extends SwingWorker<Void, String>
     infoBuilder = new StringBuilder();
     exportManager.createGameInfoFiles(infoBuilder);
     publish(infoBuilder.toString());
-//    publish(exportManager.insertRowsIntoDb().toString());
     publish("Copy screenshots, covers and game files...");
-//    publish(exportManager.copyFiles().toString());
-//    exportManager.clearAfterImport();
+    infoBuilder = new StringBuilder();
+    exportManager.copyFiles(infoBuilder);
+    publish(infoBuilder.toString());
+    exportManager.clearAfterImport();
     publish("Done!");
     return null;
   }

@@ -135,9 +135,9 @@ public class MainViewModel extends AbstractModel
     return returnList;
   }
   
-  public void exportGame(GameDetails gameDetails, File targetDir, StringBuilder infoBuilder)
+  public void exportGame(GameDetails gameDetails, File targetDir, boolean favFormat, StringBuilder infoBuilder)
   {
-    fileManager.exportGame(gameDetails, targetDir, infoBuilder);
+    fileManager.exportGame(gameDetails, targetDir, favFormat, infoBuilder);
   }
 
   public InfoModel getInfoModel()

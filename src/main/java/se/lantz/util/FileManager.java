@@ -227,15 +227,25 @@ public class FileManager
     return newNameString;
   }
 
-  public void exportGame(GameDetails gameDetails, File targetDir, StringBuilder infoBuilder)
+  public void exportGame(GameDetails gameDetails, File targetDir, boolean favFormat, StringBuilder infoBuilder)
   {
     try
     {
       String fileName = generateFileNameFromTitle(gameDetails.getTitle());
 
       infoBuilder.append("Creating game info file for " + gameDetails.getTitle() + "\n");
-      //Add -ms to comply with the maxi game tool.
-      writeGameInfoFile(fileName + "-ms.tsg", targetDir, gameDetails);
+      
+      String filename = fileName;
+      if (favFormat)
+      {     
+        filename = fileName + ".tsg";
+      }
+      else
+      {
+        //Add -ms to comply with the maxi game tool.
+        filename = fileName + "-ms.tsg";
+      }
+      writeGameInfoFile(filename, targetDir, gameDetails, favFormat);
     }
     catch (Exception e)
     {
@@ -248,7 +258,8 @@ public class FileManager
 
   }
 
-  public static void writeGameInfoFile(String fileName, File targetDir, GameDetails gameDetails) throws IOException
+  public static void writeGameInfoFile(String fileName, File targetDir, GameDetails gameDetails, boolean favFormat)
+    throws IOException
   {
     Path outDirPath = targetDir.toPath();
     Path filePath = outDirPath.resolve(fileName);
@@ -258,16 +269,44 @@ public class FileManager
     fw.write("T:" + gameDetails.getTitle() + "\n");
     fw.write("X:" + gameDetails.getSystem() + "\n");
     fw.write("D:en:" + gameDetails.getDescription() + "\n");
-    fw.write("A:" + gameDetails.getAuthor() + "\n");
-    fw.write("M:" + gameDetails.getComposer() + "\n");
+    if (!gameDetails.getAuthor().isEmpty())
+    {
+      fw.write("A:" + gameDetails.getAuthor() + "\n");
+    }
+    if (!gameDetails.getComposer().isEmpty())
+    {
+      fw.write("M:" + gameDetails.getComposer() + "\n");
+    }
     fw.write("E:" + gameDetails.getGenre() + "\n");
-    fw.write("F:" + gameDetails.getGame() + "\n");
-    fw.write("C:" + gameDetails.getCover() + "\n");
-    fw.write("G:" + gameDetails.getScreen1() + "\n");
-    fw.write("G:" + gameDetails.getScreen2() + "\n");
-    fw.write(gameDetails.getJoy1() + "\n");
-    fw.write(gameDetails.getJoy2() + "\n");
-    fw.write("V:" + gameDetails.getVerticalShift() + "\n");
+    if (favFormat)
+    {
+      String folderName = generateFileNameFromTitle(gameDetails.getTitle());
+      Path gamesfolderPath = outDirPath.resolve(folderName);
+      Files.createDirectories(gamesfolderPath);
+      fw.write("F:" + folderName + "/" + gameDetails.getGame() + "\n");
+      fw.write("C:" + folderName + "/" + gameDetails.getCover() + "\n");
+      fw.write("G:" + folderName + "/" + gameDetails.getScreen1() + "\n");
+      fw.write("G:" + folderName + "/" + gameDetails.getScreen2() + "\n");
+    }
+    else
+    {
+      fw.write("F:" + "games/" + gameDetails.getGame() + "\n");
+      fw.write("C:" + "covers/" + gameDetails.getCover() + "\n");
+      fw.write("G:" + "screens/" + gameDetails.getScreen1() + "\n");
+      fw.write("G:" + "screens/" + gameDetails.getScreen2() + "\n");
+    }
+    if (!gameDetails.getJoy1().isEmpty())
+    {
+      fw.write(gameDetails.getJoy1() + "\n");
+    }
+    if (!gameDetails.getJoy2().isEmpty())
+    {
+      fw.write(gameDetails.getJoy2() + "\n");
+    }
+    if (gameDetails.getVerticalShift() != 0)
+    {
+      fw.write("V:" + gameDetails.getVerticalShift() + "\n");
+    }
     fw.close();
   }
 }

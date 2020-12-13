@@ -265,6 +265,7 @@ public class MenuManager
       if (!gamesList.isEmpty())
       {
         exportManager.setGamesToExport(gamesList);
+        exportManager.setExportFormat(exportSelectionDialog.isFavFormat());
         final JFileChooser fileChooser = new JFileChooser();
         fileChooser.setDialogTitle("Select a directory to export to");
         fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
