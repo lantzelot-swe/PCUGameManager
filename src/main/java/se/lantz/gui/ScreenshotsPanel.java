@@ -1,7 +1,6 @@
 package se.lantz.gui;
 
 import java.awt.Dimension;
-import java.awt.Frame;
 import java.awt.Graphics;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -17,29 +16,26 @@ import java.io.IOException;
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
-import javax.swing.SwingUtilities;
 import javax.swing.border.TitledBorder;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import se.lantz.gui.imports.ImportOptionsDialog;
-import se.lantz.gui.imports.ImportProgressDialog;
-import se.lantz.gui.imports.ImportWorker;
 import se.lantz.model.InfoModel;
-import se.lantz.util.ExceptionHandler;
 import se.lantz.util.FileDrop;
+import se.lantz.util.FileManager;
 
 public class ScreenshotsPanel extends JPanel
 {
   private static final Logger logger = LoggerFactory.getLogger(ScreenshotsPanel.class);
+  private static final String GAME_DIR_PROPERTY = "gamesDir";
+  private static final String COVER_DIR_PROPERTY = "coversDir";
+  private static final String SCREENS_DIR_PROPERTY = "screensDir";
   private JPanel coverPanel;
   private JLabel coverImageLabel;
   private JButton changeCoverButton;
@@ -68,6 +64,9 @@ public class ScreenshotsPanel extends JPanel
     "<html>Optimal resolution for the carousel is 320x200.<br>Press to automatically crop the image to this size.</html>";
   private boolean gamesFileUpdated = false;
 
+  FileNameExtensionFilter imagefilter =
+    new FileNameExtensionFilter("png, gif, jpeg, bmp", "png", "gif", "jpg", "jpeg", "bmp");
+  
   public ScreenshotsPanel(InfoModel model)
   {
     this.model = model;
@@ -112,7 +111,7 @@ public class ScreenshotsPanel extends JPanel
     getGameTextField().setText(getGameFileName());
     reloadScreens();
   }
-  
+
   private String getGameFileName()
   {
     String returnValue = model.getGamesFile();
@@ -120,7 +119,7 @@ public class ScreenshotsPanel extends JPanel
     {
       returnValue = returnValue + " (updated)";
     }
-   return returnValue;
+    return returnValue;
   }
 
   private void reloadScreens()
@@ -261,11 +260,13 @@ public class ScreenshotsPanel extends JPanel
     if (changeCoverButton == null)
     {
       changeCoverButton = new JButton("...");
-      changeCoverButton.addActionListener(new ActionListener() {
-        public void actionPerformed(ActionEvent e) {
-          selectCoverFile();
-        }
-      });
+      changeCoverButton.addActionListener(new ActionListener()
+        {
+          public void actionPerformed(ActionEvent e)
+          {
+            selectCoverFile();
+          }
+        });
       changeCoverButton.setMargin(new Insets(1, 3, 1, 3));
     }
     return changeCoverButton;
@@ -356,7 +357,7 @@ public class ScreenshotsPanel extends JPanel
         {
           public void actionPerformed(ActionEvent arg0)
           {
-            selectCoverFile(true);
+            selectScreenshotFile(true);
           }
         });
     }
@@ -386,12 +387,12 @@ public class ScreenshotsPanel extends JPanel
       screen2Button = new JButton("...");
       screen2Button.setMargin(new Insets(1, 3, 1, 3));
       screen2Button.addActionListener(new ActionListener()
-      {
-        public void actionPerformed(ActionEvent arg0)
         {
-          selectCoverFile(false);
-        }
-      });
+          public void actionPerformed(ActionEvent arg0)
+          {
+            selectScreenshotFile(false);
+          }
+        });
     }
     return screen2Button;
   }
@@ -447,16 +448,16 @@ public class ScreenshotsPanel extends JPanel
       gameTextField.setEditable(false);
       gameTextField.setPreferredSize(new Dimension(160, 20));
       new FileDrop(gameTextField, new FileDrop.Listener()
-      {
-        public void filesDropped(java.io.File[] files)
         {
-          if (files.length > 0)
+          public void filesDropped(java.io.File[] files)
           {
-            gamesFileUpdated = true;
-            model.setGamesPath(files[0]);            
+            if (files.length > 0)
+            {
+              gamesFileUpdated = true;
+              model.setGamesPath(files[0]);
+            }
           }
-        }
-      });
+        });
     }
     return gameTextField;
   }
@@ -466,11 +467,13 @@ public class ScreenshotsPanel extends JPanel
     if (gameButton == null)
     {
       gameButton = new JButton("...");
-      gameButton.addActionListener(new ActionListener() {
-        public void actionPerformed(ActionEvent e) {
-          selectGameFile();
-        }
-      });
+      gameButton.addActionListener(new ActionListener()
+        {
+          public void actionPerformed(ActionEvent e)
+          {
+            selectGameFile();
+          }
+        });
       gameButton.setMargin(new Insets(1, 3, 1, 3));
     }
     return gameButton;
@@ -576,82 +579,79 @@ public class ScreenshotsPanel extends JPanel
     screenLabel.setIcon(new ImageIcon(newImage));
     return newImage;
   }
-  
+
   private void selectGameFile()
   {
     final JFileChooser fileChooser = new JFileChooser();
     fileChooser.setDialogTitle("Select a valid game file for " + model.getTitle());
     fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-    try
+    String gameDir = FileManager.getConfiguredProperties().getProperty(GAME_DIR_PROPERTY);
+    if (gameDir == null)
     {
-      fileChooser.setSelectedFile(new File(new File(".").getCanonicalPath()));
+      gameDir = ".";
     }
-    catch (IOException e)
-    {
-      ExceptionHandler.handleException(e, "Could not set current directory");
-    }
-    FileNameExtensionFilter vicefilter = new FileNameExtensionFilter("Vice runnable files", "d64","t64","VSF", "GZ");
+    fileChooser.setCurrentDirectory(new File(gameDir));
+
+    FileNameExtensionFilter vicefilter = new FileNameExtensionFilter("Vice runnable files", "d64", "t64", "VSF", "GZ");
     fileChooser.addChoosableFileFilter(vicefilter);
-    fileChooser.setFileFilter(vicefilter);   
+    fileChooser.setFileFilter(vicefilter);
     int value = fileChooser.showOpenDialog(MainWindow.getInstance());
     if (value == JFileChooser.APPROVE_OPTION)
     {
+      File selectedFile = fileChooser.getSelectedFile();
+      FileManager.getConfiguredProperties().put(GAME_DIR_PROPERTY, selectedFile.toPath().getParent().toString());
       gamesFileUpdated = true;
-      model.setGamesPath(fileChooser.getSelectedFile());  
+      model.setGamesPath(selectedFile);
     }
   }
-  
+
   private void selectCoverFile()
   {
     final JFileChooser fileChooser = new JFileChooser();
     fileChooser.setDialogTitle("Select a cover image for " + model.getTitle());
     fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-    try
+    String coverDir = FileManager.getConfiguredProperties().getProperty(COVER_DIR_PROPERTY);
+    if (coverDir == null)
     {
-      fileChooser.setSelectedFile(new File(new File(".").getCanonicalPath()));
-    }
-    catch (IOException e)
-    {
-      ExceptionHandler.handleException(e, "Could not set current directory");
-    }
-    FileNameExtensionFilter vicefilter = new FileNameExtensionFilter("png,gif,jpeg,bmp", "png","gif","jpg", "jpeg", "bmp");
-    fileChooser.addChoosableFileFilter(vicefilter);
-    fileChooser.setFileFilter(vicefilter);   
+      coverDir = ".";
+    }  
+    fileChooser.setCurrentDirectory(new File(coverDir));   
+    fileChooser.addChoosableFileFilter(imagefilter);
+    fileChooser.setFileFilter(imagefilter);
     int value = fileChooser.showOpenDialog(MainWindow.getInstance());
     if (value == JFileChooser.APPROVE_OPTION)
     {
       File selectedFile = fileChooser.getSelectedFile();
-      model.setCoverImage(handleCoverFileDrop(new File[] {selectedFile}, coverImageLabel));
+      FileManager.getConfiguredProperties().put(COVER_DIR_PROPERTY, selectedFile.toPath().getParent().toString());
+      model.setCoverImage(handleCoverFileDrop(new File[] { selectedFile }, coverImageLabel));
     }
   }
-  
-  private void selectCoverFile(boolean first)
+
+  private void selectScreenshotFile(boolean first)
   {
     final JFileChooser fileChooser = new JFileChooser();
     fileChooser.setDialogTitle("Select screenshot image for " + model.getTitle());
     fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-    try
+    String screensDir = FileManager.getConfiguredProperties().getProperty(SCREENS_DIR_PROPERTY);
+    if (screensDir == null)
     {
-      fileChooser.setSelectedFile(new File(new File(".").getCanonicalPath()));
+      screensDir = ".";
     }
-    catch (IOException e)
-    {
-      ExceptionHandler.handleException(e, "Could not set current directory");
-    }
-    FileNameExtensionFilter vicefilter = new FileNameExtensionFilter("png,gif,jpeg,bmp", "png","gif","jpg", "jpeg", "bmp");
-    fileChooser.addChoosableFileFilter(vicefilter);
-    fileChooser.setFileFilter(vicefilter);   
+    fileChooser.setCurrentDirectory(new File(screensDir));
+    fileChooser.addChoosableFileFilter(imagefilter);
+    fileChooser.setFileFilter(imagefilter);
     int value = fileChooser.showOpenDialog(MainWindow.getInstance());
     if (value == JFileChooser.APPROVE_OPTION)
     {
       File selectedFile = fileChooser.getSelectedFile();
+      FileManager.getConfiguredProperties().put(SCREENS_DIR_PROPERTY, selectedFile.toPath().getParent().toString());
       if (first)
       {
-        model.setScreen1Image(handleScreenFileDrop(new File[]{selectedFile}, screen1ImageLabel, crop1Button));
+        model.setScreen1Image(handleScreenFileDrop(new File[] { selectedFile }, screen1ImageLabel, crop1Button));
       }
       else
       {
-        model.setScreen2Image(handleScreenFileDrop(new File[]{selectedFile}, screen2ImageLabel, crop2Button));
+        model.setScreen2Image(handleScreenFileDrop(new File[] { selectedFile }, screen2ImageLabel, crop2Button));
       }
     }
   }

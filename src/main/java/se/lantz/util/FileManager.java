@@ -8,10 +8,12 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
+import java.util.Properties;
 import java.util.stream.Collectors;
 import java.util.zip.GZIPOutputStream;
 
@@ -30,6 +32,8 @@ public class FileManager
   private static final String COVERS = "./covers/";
 
   private static final Logger logger = LoggerFactory.getLogger(FileManager.class);
+
+  private static Properties fileProperties;
 
   private InfoModel model;
 
@@ -234,10 +238,10 @@ public class FileManager
       String fileName = generateFileNameFromTitle(gameDetails.getTitle());
 
       infoBuilder.append("Creating game info file for " + gameDetails.getTitle() + "\n");
-      
+
       String filename = fileName;
       if (favFormat)
-      {     
+      {
         filename = fileName + ".tsg";
       }
       else
@@ -258,7 +262,7 @@ public class FileManager
 
   }
 
-  public static void writeGameInfoFile(String fileName, File targetDir, GameDetails gameDetails, boolean favFormat)
+  public void writeGameInfoFile(String fileName, File targetDir, GameDetails gameDetails, boolean favFormat)
     throws IOException
   {
     Path outDirPath = targetDir.toPath();
@@ -308,5 +312,41 @@ public class FileManager
       fw.write("V:" + gameDetails.getVerticalShift() + "\n");
     }
     fw.close();
+  }
+
+  public static void storeProperties()
+  {
+    if (fileProperties != null)
+    {
+      try (OutputStream output = new FileOutputStream("./pcu.properties"))
+      {
+        // save properties to project root folder
+        fileProperties.store(output, null);
+      }
+      catch (IOException ex)
+      {
+        logger.error("Could not save pcu.properties", ex);
+      }
+    }
+  }
+
+  public static Properties getConfiguredProperties()
+  {
+    if (fileProperties == null)
+    {
+      fileProperties = new Properties();
+      try (InputStream input = new FileInputStream("./pcu.properties"))
+      {
+
+        // load a properties file
+        fileProperties.load(input);
+
+      }
+      catch (IOException ex)
+      {
+        logger.error("Could not load pcu.properties", ex);
+      }
+    }
+    return fileProperties;
   }
 }

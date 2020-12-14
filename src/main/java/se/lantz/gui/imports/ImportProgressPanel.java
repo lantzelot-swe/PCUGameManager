@@ -98,7 +98,7 @@ public class ImportProgressPanel extends JPanel
     int count = text.length() - text.replace("ERROR:", "").length();
     if (count > 0)
     {
-      getTextArea().append("\nImport ended with " + count + " errors. See log file for details.");
+      getTextArea().append("\nImport ended with " + count/6 + " errors. See log file for details.");
     }
     else
     {

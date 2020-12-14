@@ -13,7 +13,7 @@ public class ExportProgressDialog extends JDialog
   public ExportProgressDialog(Frame frame)
   {
     super(frame,"Export games", true);
-    this.add(getImportProgressPanel());
+    this.add(getExportProgressPanel());
     setSize(900, 600);
     setAlwaysOnTop(true);
     setLocationRelativeTo(frame);
@@ -21,16 +21,16 @@ public class ExportProgressDialog extends JDialog
 
   public void updateProgress(String infoText)
   {
-    getImportProgressPanel().updateProgress(infoText);
+    getExportProgressPanel().updateProgress(infoText);
     this.repaint();
   }
   
   public void finish()
   {
-    getImportProgressPanel().finish();
+    getExportProgressPanel().finish();
   }
 
-  public ExportProgressPanel getImportProgressPanel()
+  public ExportProgressPanel getExportProgressPanel()
   {
     if (panel == null)
     {

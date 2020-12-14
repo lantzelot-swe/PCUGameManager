@@ -106,6 +106,11 @@ public class MainPanel extends JPanel
     getListPanel().addNewGame();
   }
   
+  public void deleteCurrentGame()
+  {
+    //TODO
+  }
+  
   public void repaintAfterImport()
   {
     this.invalidate();
