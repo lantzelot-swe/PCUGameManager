@@ -292,7 +292,7 @@ public class DbConnector
       StringBuilder sqlBuilder = new StringBuilder();
       sqlBuilder.append("SELECT COUNT(*) FROM gameinfo WHERE title = ");
       sqlBuilder.append(splittedRowValue[0]);
-      sqlBuilder.append("\";");
+      sqlBuilder.append("\" COLLATE NOCASE;");
       String sql = sqlBuilder.toString();
       infoBuilder.append("Checking game ");
       infoBuilder.append(splittedRowValue[0].substring(1));
@@ -344,7 +344,7 @@ public class DbConnector
       StringBuilder sqlBuilder = new StringBuilder();
       sqlBuilder.append("SELECT COUNT(*) FROM gameinfo WHERE title = ");
       sqlBuilder.append(splittedRowValue[0]);
-      sqlBuilder.append("\";");
+      sqlBuilder.append("\" COLLATE NOCASE;");
       String sql = sqlBuilder.toString();
       infoBuilder.append("Checking game ");
       infoBuilder.append(splittedRowValue[0].substring(1));
@@ -453,7 +453,7 @@ public class DbConnector
       }
       sqlBuilder.append(" WHERE title = ");
       sqlBuilder.append(title);
-      sqlBuilder.append("\";");
+      sqlBuilder.append("\" COLLATE NOCASE;");
       String sql = sqlBuilder.toString();
       logger.debug("Generated UPDATE String:\n{}", sql);
       try (Connection conn = this.connect(); PreparedStatement pstmt = conn.prepareStatement(sql))
@@ -683,5 +683,10 @@ public class DbConnector
     {
       ExceptionHandler.handleException(e, "Could not insert games in db.");
     }
+  }
+  
+  public void deleteGame(String rowId)
+  {
+    
   }
 }

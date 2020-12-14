@@ -109,6 +109,7 @@ public class MainPanel extends JPanel
   public void deleteCurrentGame()
   {
     //TODO
+    uiModel.deleteGame();
   }
   
   public void repaintAfterImport()

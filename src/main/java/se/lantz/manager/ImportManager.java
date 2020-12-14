@@ -89,28 +89,38 @@ public class ImportManager
 
     try (Stream<Path> filePathStream = Files.walk(srcParentFolder, 1))
     {
-      filePathStream.forEach(filePath -> {
-        if (Files.isRegularFile(filePath))
-        {
-          infoBuilder.append("Reading game info from ");
-          infoBuilder.append(filePath);
-          infoBuilder.append("\n");
-          List<String> result = readFileInList(filePath, infoBuilder);
-          if (result.size() > 0)
-          {
-            gameInfoFilesMap.put(filePath, result);
-          }
-          else
-          {
-            infoBuilder.append("Skipping file " + filePath.toString() + "\n");
-          }
-        }
-      });
+      filePathStream.forEach(filePath -> readGameInfoFile(filePath, infoBuilder));
     }
     catch (IOException e)
     {
       ExceptionHandler.handleException(e, "Could not read gameInfo files");
     }
+  }
+
+  private void readGameInfoFile(Path filePath, StringBuilder infoBuilder)
+  {
+    if (Files.isRegularFile(filePath) && getFileExtension(filePath).equalsIgnoreCase("tsg"))
+    {
+      infoBuilder.append("Reading game info from ");
+      infoBuilder.append(filePath);
+      infoBuilder.append("\n");
+      List<String> result = readFileInList(filePath, infoBuilder);
+      if (result.size() > 0)
+      {
+        gameInfoFilesMap.put(filePath, result);
+      }
+      else
+      {
+        infoBuilder.append("Skipping file " + filePath.toString() + "\n");
+      }
+    }
+  }
+
+  private String getFileExtension(Path path)
+  {
+    String fileName = path.toString();
+    int dotIndex = fileName.lastIndexOf('.');
+    return (dotIndex == -1) ? "" : fileName.substring(dotIndex + 1);
   }
 
   public void convertIntoDbRows()

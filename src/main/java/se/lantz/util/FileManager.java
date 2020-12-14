@@ -289,15 +289,27 @@ public class FileManager
       Files.createDirectories(gamesfolderPath);
       fw.write("F:" + folderName + "/" + gameDetails.getGame() + "\n");
       fw.write("C:" + folderName + "/" + gameDetails.getCover() + "\n");
-      fw.write("G:" + folderName + "/" + gameDetails.getScreen1() + "\n");
-      fw.write("G:" + folderName + "/" + gameDetails.getScreen2() + "\n");
+      if (!gameDetails.getScreen1().isEmpty())
+      {
+        fw.write("G:" + folderName + "/" + gameDetails.getScreen1() + "\n");
+      }
+      if (!gameDetails.getScreen2().isEmpty())
+      {
+        fw.write("G:" + folderName + "/" + gameDetails.getScreen2() + "\n");
+      }
     }
     else
     {
       fw.write("F:" + "games/" + gameDetails.getGame() + "\n");
       fw.write("C:" + "covers/" + gameDetails.getCover() + "\n");
-      fw.write("G:" + "screens/" + gameDetails.getScreen1() + "\n");
-      fw.write("G:" + "screens/" + gameDetails.getScreen2() + "\n");
+      if (!gameDetails.getScreen1().isEmpty())
+      {
+        fw.write("G:" + "screens/" + gameDetails.getScreen1() + "\n");
+      }
+      if (!gameDetails.getScreen2().isEmpty())
+      {
+        fw.write("G:" + "screens/" + gameDetails.getScreen2() + "\n");
+      }
     }
     if (!gameDetails.getJoy1().isEmpty())
     {

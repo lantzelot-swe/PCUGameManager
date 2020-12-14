@@ -301,6 +301,11 @@ public class MainViewModel extends AbstractModel
     }
     return false;
   }
+  
+  public void deleteGame()
+  {
+    dbConnector.deleteGame(currentGameId);
+  }
 
   private List<String> validateRequiredFields()
   {

@@ -38,7 +38,7 @@ public class ExportManager
 
   public void setTargerDirectory(File targetDir)
   {
-    this.targetDir = targetDir;
+    this.targetDir = targetDir.toPath().resolve("games").toFile();
   }
 
   public void readFromDb(StringBuilder infoBuilder)
