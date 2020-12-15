@@ -38,7 +38,7 @@ public class MenuManager
   private JMenuItem deleteGameItem;
   private JMenuItem importItem;
   private JMenuItem exportItem;
-  private JMenuItem exitItem;
+
 
   private JMenuItem backupDbItem;
   private JMenuItem restoreDbItem;
@@ -47,6 +47,7 @@ public class MenuManager
   private JMenuItem helpItem;
   private JMenuItem aboutItem;
 
+  private JMenuItem exitItem;
   private MainViewModel uiModel;
   private ImportManager importManager;
   private ExportManager exportManager;
@@ -255,7 +256,7 @@ public class MenuManager
           dialog.setVisible(true);
           //Refresh current game view after import
           uiModel.reloadCurrentGameView();
-          MainWindow.getInstance().repaintAfterImport();
+          MainWindow.getInstance().repaintAfterModifications();
         }
       }
       else

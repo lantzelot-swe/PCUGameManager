@@ -302,9 +302,23 @@ public class MainViewModel extends AbstractModel
     return false;
   }
   
-  public void deleteGame()
+  public boolean isNewGameSelected()
   {
-    dbConnector.deleteGame(currentGameId);
+    return currentGameId.isEmpty();
+  }
+  
+  public void deleteCurrentGame()
+  {
+    if (isNewGameSelected())
+    {
+      removeNewGameListData();
+    }
+    else
+    {
+      dbConnector.deleteGame(currentGameId);
+      //Reload the current view
+      reloadCurrentGameView();
+    }
   }
 
   private List<String> validateRequiredFields()

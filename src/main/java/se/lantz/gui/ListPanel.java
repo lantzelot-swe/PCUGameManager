@@ -158,6 +158,24 @@ public class ListPanel extends JPanel
     }
     return listViewComboBox;
   }
+  
+  int getSelectedIndexInList()
+  {
+    return getList().getSelectedIndex();
+  }
+  
+  void setSelectedIndexInList(int index)
+  {
+    int indexToSelect = index;
+    if (index >= uiModel.getGameListModel().getSize())
+    {
+      indexToSelect = uiModel.getGameListModel().getSize()-1;
+    }
+    //Select -1 first to ensure a change of selection is done
+    list.setSelectedIndex(-1);
+    list.setSelectedIndex(indexToSelect);
+    list.ensureIndexIsVisible(indexToSelect);
+  }
 
   private JPanel getViewInfoPanel()
   {

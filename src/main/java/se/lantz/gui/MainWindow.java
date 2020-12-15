@@ -85,8 +85,8 @@ public class MainWindow extends JFrame
     return menuBar;
   }
   
-  public void repaintAfterImport()
+  public void repaintAfterModifications()
   {
-    getMainPanel().repaintAfterImport();
+    getMainPanel().repaintAfterModifications();
   }
 }

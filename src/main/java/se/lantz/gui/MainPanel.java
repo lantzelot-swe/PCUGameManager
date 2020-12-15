@@ -6,6 +6,7 @@ import java.util.List;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
+import javax.swing.SwingUtilities;
 
 import se.lantz.model.MainViewModel;
 
@@ -108,11 +109,35 @@ public class MainPanel extends JPanel
   
   public void deleteCurrentGame()
   {
-    //TODO
-    uiModel.deleteGame();
+    if (getListPanel().getSelectedIndexInList() > -1)
+    {
+      int value = showDeleteDialog();
+      if (value == JOptionPane.YES_OPTION)
+      {
+        int currentSelectedIndex = getListPanel().getSelectedIndexInList();
+        uiModel.deleteCurrentGame();
+        repaintAfterModifications();
+        SwingUtilities.invokeLater(() -> getListPanel().setSelectedIndexInList(currentSelectedIndex));
+      }
+    }
   }
   
-  public void repaintAfterImport()
+  int showDeleteDialog()
+  {
+    String message = "Do you want to delete " + uiModel.getInfoModel().getTitle() + " from the database?";
+    if (uiModel.isNewGameSelected())
+    {
+      message = "Do you want to delete the new game entry?";
+    }
+    return JOptionPane.showConfirmDialog(MainPanel.this,
+                                         message,
+                                         "Delete",
+                                         JOptionPane.YES_NO_OPTION,
+                                         JOptionPane.QUESTION_MESSAGE);
+  }
+  
+  
+  public void repaintAfterModifications()
   {
     this.invalidate();
     this.repaint();
