@@ -12,6 +12,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Properties;
 import java.util.stream.Collectors;
@@ -22,6 +24,7 @@ import javax.imageio.ImageIO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import se.lantz.db.DbConnector;
 import se.lantz.model.InfoModel;
 import se.lantz.model.data.GameDetails;
 
@@ -30,6 +33,7 @@ public class FileManager
   private static final String GAMES = "./games/";
   private static final String SCREENS = "./screens/";
   private static final String COVERS = "./covers/";
+  private static final String BACKUP = "./backup/";
 
   private static final Logger logger = LoggerFactory.getLogger(FileManager.class);
 
@@ -231,23 +235,22 @@ public class FileManager
     return newNameString;
   }
 
-  public void exportGame(GameDetails gameDetails, File targetDir, boolean favFormat, StringBuilder infoBuilder)
+  public void exportGameInfoFile(GameDetails gameDetails, File targetDir, boolean favFormat, StringBuilder infoBuilder)
   {
     try
     {
-      String fileName = generateFileNameFromTitle(gameDetails.getTitle());
+      String filename = generateFileNameFromTitle(gameDetails.getTitle());
 
       infoBuilder.append("Creating game info file for " + gameDetails.getTitle() + "\n");
 
-      String filename = fileName;
       if (favFormat)
       {
-        filename = fileName + ".tsg";
+        filename = filename + ".tsg";
       }
       else
       {
         //Add -ms to comply with the maxi game tool.
-        filename = fileName + "-ms.tsg";
+        filename = filename + "-ms.tsg";
       }
       writeGameInfoFile(filename, targetDir, gameDetails, favFormat);
     }
@@ -257,9 +260,6 @@ public class FileManager
       logger.error(message, e);
       infoBuilder.append(message);
     }
-
-    //TODO copy the other files into the right location
-
   }
 
   public void writeGameInfoFile(String fileName, File targetDir, GameDetails gameDetails, boolean favFormat)
@@ -360,5 +360,28 @@ public class FileManager
       }
     }
     return fileProperties;
+  }
+  
+  public static String backupDb()
+  {
+    //TODO: Copy screens, covers, games also to the backup folder
+    DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss");  
+    LocalDateTime now = LocalDateTime.now();  
+    //String for current date and time
+    String dateAndTime = dtf.format(now);
+    File outputFolder = new File(BACKUP + "/" + dateAndTime + "/");
+    try
+    {
+      File dbFile = new File("./" + DbConnector.DB_NAME);
+      Files.createDirectories(outputFolder.toPath());
+      Path targetFile = outputFolder.toPath().resolve(DbConnector.DB_NAME);
+      Files.copy(dbFile.toPath(), targetFile);
+    }
+    catch (IOException e)
+    {
+      ExceptionHandler.handleException(e, "Could not create backup of Db");
+      return null;
+    }
+    return dateAndTime;
   }
 }

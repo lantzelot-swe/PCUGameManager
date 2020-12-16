@@ -50,7 +50,7 @@ public class ExportManager
   {
     for (GameDetails gameDetails : gameDetailsList)
     {
-      uiModel.exportGame(gameDetails, targetDir, this.favFormat, infoBuilder);
+      uiModel.exportGameInfoFile(gameDetails, targetDir, this.favFormat, infoBuilder);
     }
   }
 

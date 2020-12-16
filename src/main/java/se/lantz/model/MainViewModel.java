@@ -135,9 +135,9 @@ public class MainViewModel extends AbstractModel
     return returnList;
   }
   
-  public void exportGame(GameDetails gameDetails, File targetDir, boolean favFormat, StringBuilder infoBuilder)
+  public void exportGameInfoFile(GameDetails gameDetails, File targetDir, boolean favFormat, StringBuilder infoBuilder)
   {
-    fileManager.exportGame(gameDetails, targetDir, favFormat, infoBuilder);
+    fileManager.exportGameInfoFile(gameDetails, targetDir, favFormat, infoBuilder);
   }
 
   public InfoModel getInfoModel()
@@ -319,6 +319,21 @@ public class MainViewModel extends AbstractModel
       //Reload the current view
       reloadCurrentGameView();
     }
+  }
+  
+  public void deleteAllGames()
+  {
+    if (backupDb() != null)
+    {
+      dbConnector.deleteAllGames();
+      //Reload the current view
+      reloadCurrentGameView();
+    }
+  }
+  
+  public String backupDb()
+  {
+    return FileManager.backupDb();
   }
 
   private List<String> validateRequiredFields()

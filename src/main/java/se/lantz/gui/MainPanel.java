@@ -29,7 +29,7 @@ public class MainPanel extends JPanel
     });
 
     uiModel.addDuplicateGameListener(e -> showDuplicateDialog(e.getNewValue().toString()));
-    uiModel.addRequireFieldsListener(e -> showRequiredFieldsDialog((List<String>)e.getNewValue()));
+    uiModel.addRequireFieldsListener(e -> showRequiredFieldsDialog((List<String>) e.getNewValue()));
   }
 
   private JSplitPane getSplitPane()
@@ -106,7 +106,7 @@ public class MainPanel extends JPanel
   {
     getListPanel().addNewGame();
   }
-  
+
   public void deleteCurrentGame()
   {
     if (getListPanel().getSelectedIndexInList() > -1)
@@ -121,7 +121,40 @@ public class MainPanel extends JPanel
       }
     }
   }
+
+  public void deleteAllGames()
+  {
+    int value = showDeleteAllGamesDialog();
+    if (value == JOptionPane.YES_OPTION)
+    {
+      uiModel.deleteAllGames();
+      repaintAfterModifications();
+      SwingUtilities.invokeLater(() -> getListPanel().setSelectedIndexInList(0));
+    }
+  }
   
+  public void backupDb()
+  {
+    String backupFolderName = uiModel.backupDb();
+    String message = "";
+    if (backupFolderName != null)
+    {
+      message = "Backup saved in the folder " + backupFolderName;
+      JOptionPane.showMessageDialog(MainPanel.this,
+                                    message,
+                                    "Backup db",
+                                    JOptionPane.INFORMATION_MESSAGE);
+    }
+    else
+    {
+      message = "Could not create a backup.";
+      JOptionPane.showMessageDialog(MainPanel.this,
+                                    message,
+                                    "Backup db",
+                                    JOptionPane.ERROR_MESSAGE);
+    }
+  }
+
   int showDeleteDialog()
   {
     String message = "Do you want to delete " + uiModel.getInfoModel().getTitle() + " from the database?";
@@ -129,14 +162,20 @@ public class MainPanel extends JPanel
     {
       message = "Do you want to delete the new game entry?";
     }
-    return JOptionPane.showConfirmDialog(MainPanel.this,
+    return JOptionPane
+      .showConfirmDialog(MainPanel.this, message, "Delete", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+  }
+  
+  int showDeleteAllGamesDialog()
+  {
+    String message = "Do you want to delete all games from the database? A backup will added to the backups folder before deleting.\nCover, screenshot and game files will not be deleted.";
+    return  JOptionPane.showConfirmDialog(MainPanel.this,
                                          message,
-                                         "Delete",
+                                         "Delete all games",
                                          JOptionPane.YES_NO_OPTION,
                                          JOptionPane.QUESTION_MESSAGE);
   }
-  
-  
+
   public void repaintAfterModifications()
   {
     this.invalidate();

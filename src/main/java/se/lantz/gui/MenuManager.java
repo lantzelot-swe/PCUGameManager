@@ -180,10 +180,8 @@ public class MenuManager
 
   private JMenuItem getBackupDbItem()
   {
-    backupDbItem = new JMenuItem("Backup database...");
-    backupDbItem.addActionListener(e -> {
-
-    });
+    backupDbItem = new JMenuItem("Backup database");
+    backupDbItem.addActionListener(e -> mainWindow.getMainPanel().backupDb());
     return backupDbItem;
   }
 
@@ -198,10 +196,8 @@ public class MenuManager
 
   private JMenuItem getCreateEmptyDbItem()
   {
-    createEmptyDbItem = new JMenuItem("Create empty database...");
-    createEmptyDbItem.addActionListener(e -> {
-      //TODO
-    });
+    createEmptyDbItem = new JMenuItem("Delete all games");
+    createEmptyDbItem.addActionListener(e -> mainWindow.getMainPanel().deleteAllGames());
     return createEmptyDbItem;
   }
 

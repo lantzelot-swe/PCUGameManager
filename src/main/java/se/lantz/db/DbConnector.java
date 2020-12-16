@@ -23,7 +23,7 @@ import se.lantz.util.ExceptionHandler;
 
 public class DbConnector
 {
-
+  public static final String DB_NAME = "pcusb.db";
   private static final String COMMA = "\",\"";
   private static final Logger logger = LoggerFactory.getLogger(DbConnector.class);
   private List<String> columnList = new ArrayList<>();
@@ -58,7 +58,7 @@ public class DbConnector
     try
     {
       // db parameters
-      String url = "jdbc:sqlite:pcusb.db";
+      String url = "jdbc:sqlite:" + DB_NAME;
       // create a connection to the database
       connection = DriverManager.getConnection(url);
 
@@ -701,6 +701,21 @@ public class DbConnector
     catch (SQLException e)
     {
       ExceptionHandler.handleException(e, "Could not delete game in db.");
+    }
+  }
+  
+  public void deleteAllGames()
+  {
+    String sql = "DELETE FROM gameinfo;";
+    logger.debug("Generated DELETE String:\n{}", sql);
+    try (Connection conn = this.connect(); PreparedStatement pstmt = conn.prepareStatement(sql))
+    {
+      int value = pstmt.executeUpdate();
+      logger.debug("Executed successfully, value = {}", value);
+    }
+    catch (SQLException e)
+    {
+      ExceptionHandler.handleException(e, "Could not delete games in db.");
     }
   }
 }
