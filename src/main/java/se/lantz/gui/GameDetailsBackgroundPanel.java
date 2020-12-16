@@ -1,11 +1,13 @@
 package se.lantz.gui;
 
 import java.awt.BorderLayout;
+import java.awt.CardLayout;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.beans.Beans;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 import javax.swing.JButton;
 import javax.swing.JPanel;
@@ -16,11 +18,11 @@ import org.slf4j.LoggerFactory;
 
 import se.lantz.model.MainViewModel;
 import se.lantz.model.data.GameListData;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
 
 public class GameDetailsBackgroundPanel extends JPanel
 {
+  private static final String EMPTY = "empty";
+  private static final String DETAILS = "details";
   private static final Logger logger = LoggerFactory.getLogger(GameDetailsBackgroundPanel.class);
   private MainViewModel model;
   private JPanel settingsPanel;
@@ -30,17 +32,20 @@ public class GameDetailsBackgroundPanel extends JPanel
   private JPanel buttonPanel;
   private JButton saveButton;
 
+  private JPanel emptyPanel;
+  private JPanel detailsPanel;
+  private CardLayout cardLayout;
+
   public GameDetailsBackgroundPanel(MainViewModel model)
   {
     this.model = model;
     this.setMinimumSize(new Dimension(1250, 800));
-    setLayout(new BorderLayout(0, 0));
-    add(getSettingsPanel(), BorderLayout.CENTER);
-    add(getInfoPanel(), BorderLayout.NORTH);
-    add(getButtonPanel(), BorderLayout.SOUTH);
-
+    cardLayout = new CardLayout();
+    setLayout(cardLayout);
+    add(getDetailsPanel(), DETAILS);
+    add(getEmptyPanel(), EMPTY);
   }
-  
+
   void focusTitleField()
   {
     getInfoPanel().focusTitleField();
@@ -48,10 +53,37 @@ public class GameDetailsBackgroundPanel extends JPanel
 
   void updateSelectedGame(GameListData data)
   {
-    if (data != null)
+    if (data == null)
     {
+      cardLayout.show(this, EMPTY);
+    }
+    else
+    {
+      cardLayout.show(this, DETAILS);
       model.readGameDetails(data);
     }
+  }
+
+  private JPanel getDetailsPanel()
+  {
+    if (detailsPanel == null)
+    {
+      detailsPanel = new JPanel();
+      detailsPanel.setLayout(new BorderLayout(0, 0));
+      detailsPanel.add(getSettingsPanel(), BorderLayout.CENTER);
+      detailsPanel.add(getInfoPanel(), BorderLayout.NORTH);
+      detailsPanel.add(getButtonPanel(), BorderLayout.SOUTH);
+    }
+    return detailsPanel;
+  }
+
+  private JPanel getEmptyPanel()
+  {
+    if (emptyPanel == null)
+    {
+      emptyPanel = new JPanel();
+    }
+    return emptyPanel;
   }
 
   private JPanel getSettingsPanel()
@@ -142,11 +174,13 @@ public class GameDetailsBackgroundPanel extends JPanel
         saveButton.setEnabled(model.isDataChanged());
       });
       saveButton = new JButton("Save");
-      saveButton.addActionListener(new ActionListener() {
-        public void actionPerformed(ActionEvent e) {
-          model.saveData();
-        }
-      });
+      saveButton.addActionListener(new ActionListener()
+        {
+          public void actionPerformed(ActionEvent e)
+          {
+            model.saveData();
+          }
+        });
     }
     return saveButton;
   }

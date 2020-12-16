@@ -123,7 +123,7 @@ public class MainViewModel extends AbstractModel
   {
     return dbConnector.importRowsInGameInfoTable(rowValues, option);
   }
-  
+
   public List<GameDetails> readGameDetailsForExport(StringBuilder infoBuilder, List<GameListData> gamesList)
   {
     List<GameDetails> returnList = new ArrayList<>();
@@ -134,7 +134,7 @@ public class MainViewModel extends AbstractModel
     }
     return returnList;
   }
-  
+
   public void exportGameInfoFile(GameDetails gameDetails, File targetDir, boolean favFormat, StringBuilder infoBuilder)
   {
     fileManager.exportGameInfoFile(gameDetails, targetDir, favFormat, infoBuilder);
@@ -180,12 +180,12 @@ public class MainViewModel extends AbstractModel
       gameView.setGameCount(gamesList.size());
       if (gameView.getGameViewId() == GameView.ALL_GAMES_ID)
       {
-       this.allGamesCount = gamesList.size();
+        this.allGamesCount = gamesList.size();
       }
       logger.debug("...done.");
     }
   }
-  
+
   public int getAllGamesCount()
   {
     return allGamesCount;
@@ -301,12 +301,12 @@ public class MainViewModel extends AbstractModel
     }
     return false;
   }
-  
+
   public boolean isNewGameSelected()
   {
     return currentGameId.isEmpty();
   }
-  
+
   public void deleteCurrentGame()
   {
     if (isNewGameSelected())
@@ -320,20 +320,12 @@ public class MainViewModel extends AbstractModel
       reloadCurrentGameView();
     }
   }
-  
+
   public void deleteAllGames()
   {
-    if (backupDb() != null)
-    {
-      dbConnector.deleteAllGames();
-      //Reload the current view
-      reloadCurrentGameView();
-    }
-  }
-  
-  public String backupDb()
-  {
-    return FileManager.backupDb();
+    dbConnector.deleteAllGames();
+    //Reload the current view
+    reloadCurrentGameView();
   }
 
   private List<String> validateRequiredFields()

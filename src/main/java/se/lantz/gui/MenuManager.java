@@ -13,14 +13,21 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
 
+import se.lantz.gui.backup.BackupProgressDialog;
+import se.lantz.gui.backup.BackupWorker;
 import se.lantz.gui.exports.ExportGamesDialog;
 import se.lantz.gui.exports.ExportProgressDialog;
 import se.lantz.gui.exports.ExportWorker;
 import se.lantz.gui.imports.ImportOptionsDialog;
 import se.lantz.gui.imports.ImportProgressDialog;
 import se.lantz.gui.imports.ImportWorker;
+import se.lantz.gui.restore.RestoreDbDialog;
+import se.lantz.gui.restore.RestoreProgressDialog;
+import se.lantz.gui.restore.RestoreWorker;
+import se.lantz.manager.BackupManager;
 import se.lantz.manager.ExportManager;
 import se.lantz.manager.ImportManager;
+import se.lantz.manager.RestoreManager;
 import se.lantz.model.MainViewModel;
 import se.lantz.model.data.GameListData;
 import se.lantz.util.FileManager;
@@ -39,7 +46,6 @@ public class MenuManager
   private JMenuItem importItem;
   private JMenuItem exportItem;
 
-
   private JMenuItem backupDbItem;
   private JMenuItem restoreDbItem;
   private JMenuItem createEmptyDbItem;
@@ -51,6 +57,8 @@ public class MenuManager
   private MainViewModel uiModel;
   private ImportManager importManager;
   private ExportManager exportManager;
+  private BackupManager backupManager;
+  private RestoreManager restoreManager;
   private MainWindow mainWindow;
 
   public MenuManager(final MainViewModel uiModel, MainWindow mainWindow)
@@ -59,6 +67,8 @@ public class MenuManager
     this.mainWindow = mainWindow;
     this.importManager = new ImportManager(uiModel);
     this.exportManager = new ExportManager(uiModel);
+    this.backupManager = new BackupManager(uiModel);
+    this.restoreManager = new RestoreManager(uiModel);
     setupMenues();
   }
 
@@ -121,7 +131,7 @@ public class MenuManager
     addGameItem.addActionListener(e -> mainWindow.getMainPanel().addNewGame());
     return addGameItem;
   }
-  
+
   JMenuItem getDeleteGameMenuItem()
   {
     deleteGameItem = new JMenuItem("Delete Current Game");
@@ -181,23 +191,21 @@ public class MenuManager
   private JMenuItem getBackupDbItem()
   {
     backupDbItem = new JMenuItem("Backup database");
-    backupDbItem.addActionListener(e -> mainWindow.getMainPanel().backupDb());
+    backupDbItem.addActionListener(e -> backupDb());
     return backupDbItem;
   }
 
   private JMenuItem getRestoreDbItem()
   {
     restoreDbItem = new JMenuItem("Restore backup...");
-    restoreDbItem.addActionListener(e -> {
-      //TODO
-    });
+    restoreDbItem.addActionListener(e -> restoreDb());
     return restoreDbItem;
   }
 
   private JMenuItem getCreateEmptyDbItem()
   {
     createEmptyDbItem = new JMenuItem("Delete all games");
-    createEmptyDbItem.addActionListener(e -> mainWindow.getMainPanel().deleteAllGames());
+    createEmptyDbItem.addActionListener(e -> deleteAllGames());
     return createEmptyDbItem;
   }
 
@@ -299,6 +307,44 @@ public class MenuManager
           dialog.setVisible(true);
         }
       }
+    }
+  }
+
+  private void backupDb()
+  {
+    BackupProgressDialog dialog = new BackupProgressDialog(this.mainWindow);
+    BackupWorker worker = new BackupWorker(backupManager, dialog);
+    worker.execute();
+    dialog.setVisible(true);
+  }
+  
+  private void restoreDb()
+  {
+    RestoreDbDialog restoreDialog = new RestoreDbDialog(MainWindow.getInstance());
+    restoreDialog.pack();
+    restoreDialog.setLocationRelativeTo(this.mainWindow);
+    if (restoreDialog.showDialog())
+    {
+      restoreManager.setBackupFolderName(restoreDialog.getSelectedFolder());
+      RestoreProgressDialog progressDialog = new RestoreProgressDialog(this.mainWindow);
+      RestoreWorker worker = new RestoreWorker(restoreManager, progressDialog);
+      worker.execute();
+      progressDialog.setVisible(true);
+    }
+  }
+
+  private void deleteAllGames()
+  {
+    String message =
+      "Do you want to delete all games from the database? A backup will added to the backups folder before deleting.\nCover, screenshot and game files will also be deleted.";
+    int option = JOptionPane.showConfirmDialog(MainWindow.getInstance()
+      .getMainPanel(), message, "Delete all games", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+    if (option == JOptionPane.YES_OPTION)
+    {
+      backupDb();
+      uiModel.deleteAllGames();
+      FileManager.deleteAllFolderContent();
+      MainWindow.getInstance().getMainPanel().repaintAfterModifications();
     }
   }
 }

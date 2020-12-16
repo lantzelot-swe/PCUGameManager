@@ -12,8 +12,9 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 import java.util.stream.Collectors;
@@ -361,15 +362,10 @@ public class FileManager
     }
     return fileProperties;
   }
-  
-  public static String backupDb()
+
+  public static void backupDb(String targetFolderName)
   {
-    //TODO: Copy screens, covers, games also to the backup folder
-    DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss");  
-    LocalDateTime now = LocalDateTime.now();  
-    //String for current date and time
-    String dateAndTime = dtf.format(now);
-    File outputFolder = new File(BACKUP + "/" + dateAndTime + "/");
+    File outputFolder = new File(BACKUP + "/" + targetFolderName + "/");
     try
     {
       File dbFile = new File("./" + DbConnector.DB_NAME);
@@ -380,8 +376,160 @@ public class FileManager
     catch (IOException e)
     {
       ExceptionHandler.handleException(e, "Could not create backup of Db");
-      return null;
     }
-    return dateAndTime;
+  }
+
+  public static void backupScreens(String targetFolderName)
+  {
+    File outputFolder = new File(BACKUP + "/" + targetFolderName + "/");
+    try
+    {
+      Files.createDirectories(outputFolder.toPath());
+      Path screens = new File(SCREENS).toPath();
+      copyDirectory(screens.toString(), outputFolder.toPath().resolve("screens").toString());
+    }
+    catch (IOException e)
+    {
+      ExceptionHandler.handleException(e, "Could not create backup of screens.");
+    }
+  }
+
+  public static void backupCovers(String targetFolderName)
+  {
+    File outputFolder = new File(BACKUP + "/" + targetFolderName + "/");
+    try
+    {
+      Files.createDirectories(outputFolder.toPath());
+      Path covers = new File(COVERS).toPath();
+      copyDirectory(covers.toString(), outputFolder.toPath().resolve("covers").toString());
+    }
+    catch (IOException e)
+    {
+      ExceptionHandler.handleException(e, "Could not create backup of covers.");
+    }
+  }
+
+  public static void backupGames(String targetFolderName)
+  {
+    File outputFolder = new File(BACKUP + "/" + targetFolderName + "/");
+    try
+    {
+      Files.createDirectories(outputFolder.toPath());
+      Path games = new File(GAMES).toPath();
+      copyDirectory(games.toString(), outputFolder.toPath().resolve("games").toString());
+    }
+    catch (IOException e)
+    {
+      ExceptionHandler.handleException(e, "Could not create backup of games.");
+    }
+  }
+
+  public static void copyDirectory(String sourceDirectoryLocation, String destinationDirectoryLocation)
+    throws IOException
+  {
+    Files.walk(Paths.get(sourceDirectoryLocation)).forEach(source -> {
+      Path destination =
+        Paths.get(destinationDirectoryLocation, source.toString().substring(sourceDirectoryLocation.length()));
+      try
+      {
+        Files.copy(source, destination);
+      }
+      catch (IOException e)
+      {
+        e.printStackTrace();
+      }
+    });
+  }
+
+  public static void deleteAllFolderContent()
+  {
+    deleteDirContent(new File(COVERS));
+    deleteDirContent(new File(SCREENS));
+    deleteDirContent(new File(GAMES));
+  }
+
+  private static void deleteDirContent(File dir)
+  {
+    for (File file : dir.listFiles())
+    {
+      if (!file.isDirectory())
+      {
+        file.delete();
+      }
+    }
+  }
+
+  public static void restoreDb(String backupFolderName)
+  {
+    File backupFolder = new File(BACKUP + "/" + backupFolderName + "/");
+    try
+    {
+      Path backupFile = backupFolder.toPath().resolve(DbConnector.DB_NAME);
+      Path dbFile = new File("./" + DbConnector.DB_NAME).toPath();
+      Files.copy(backupFile, dbFile, StandardCopyOption.REPLACE_EXISTING);
+    }
+    catch (IOException e)
+    {
+      ExceptionHandler.handleException(e, "Could not restore backup of Db");
+    }
+  }
+
+  public static void restoreCovers(String backupFolderName)
+  {
+    File backupFolder = new File(BACKUP + "/" + backupFolderName + "/");
+    try
+    {
+      File coversDir = new File(COVERS);
+      deleteDirContent(coversDir);
+      copyDirectory(backupFolder.toPath().resolve("covers").toString(), coversDir.toPath().toString());
+    }
+    catch (IOException e)
+    {
+      ExceptionHandler.handleException(e, "Could not restore backup of covers.");
+    }
+  }
+
+  public static void restoreScreens(String backupFolderName)
+  {
+    File backupFolder = new File(BACKUP + "/" + backupFolderName + "/");
+    try
+    {
+      File coversDir = new File(SCREENS);
+      deleteDirContent(coversDir);
+      copyDirectory(backupFolder.toPath().resolve("screens").toString(), coversDir.toPath().toString());
+    }
+    catch (IOException e)
+    {
+      ExceptionHandler.handleException(e, "Could not restore backup of screens.");
+    }
+  }
+
+  public static void restoreGames(String backupFolderName)
+  {
+    File backupFolder = new File(BACKUP + "/" + backupFolderName + "/");
+    try
+    {
+      File coversDir = new File(GAMES);
+      deleteDirContent(coversDir);
+      copyDirectory(backupFolder.toPath().resolve("games").toString(), coversDir.toPath().toString());
+    }
+    catch (IOException e)
+    {
+      ExceptionHandler.handleException(e, "Could not restore backup of games.");
+    }
+  }
+
+  public static List<String> getAllBackups()
+  {
+    List<String> returnList = new ArrayList<>();
+    File backupFolder = new File(BACKUP);
+    for (File file : backupFolder.listFiles())
+    {
+      if (file.isDirectory())
+      {
+        returnList.add(file.getName());
+      }
+    }
+    return returnList;
   }
 }

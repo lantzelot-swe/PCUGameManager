@@ -122,39 +122,17 @@ public class MainPanel extends JPanel
     }
   }
 
-  public void deleteAllGames()
-  {
-    int value = showDeleteAllGamesDialog();
-    if (value == JOptionPane.YES_OPTION)
-    {
-      uiModel.deleteAllGames();
-      repaintAfterModifications();
-      SwingUtilities.invokeLater(() -> getListPanel().setSelectedIndexInList(0));
-    }
-  }
+//  public void deleteAllGames()
+//  {
+//    int value = showDeleteAllGamesDialog();
+//    if (value == JOptionPane.YES_OPTION)
+//    {
+//      uiModel.deleteAllGames();
+//      repaintAfterModifications();
+//      SwingUtilities.invokeLater(() -> getListPanel().setSelectedIndexInList(0));
+//    }
+//  }
   
-  public void backupDb()
-  {
-    String backupFolderName = uiModel.backupDb();
-    String message = "";
-    if (backupFolderName != null)
-    {
-      message = "Backup saved in the folder " + backupFolderName;
-      JOptionPane.showMessageDialog(MainPanel.this,
-                                    message,
-                                    "Backup db",
-                                    JOptionPane.INFORMATION_MESSAGE);
-    }
-    else
-    {
-      message = "Could not create a backup.";
-      JOptionPane.showMessageDialog(MainPanel.this,
-                                    message,
-                                    "Backup db",
-                                    JOptionPane.ERROR_MESSAGE);
-    }
-  }
-
   int showDeleteDialog()
   {
     String message = "Do you want to delete " + uiModel.getInfoModel().getTitle() + " from the database?";
