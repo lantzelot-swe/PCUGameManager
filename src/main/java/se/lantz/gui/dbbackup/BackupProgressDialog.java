@@ -1,18 +1,18 @@
-package se.lantz.gui.restore;
+package se.lantz.gui.dbbackup;
 
 import java.awt.Frame;
 
 import javax.swing.JDialog;
 
-public class RestoreProgressDialog extends JDialog
+public class BackupProgressDialog extends JDialog
 {
   private static final long serialVersionUID = 1L;
 
-  private RestoreProgressPanel panel;
+  private BackupProgressPanel panel;
 
-  public RestoreProgressDialog(Frame frame)
+  public BackupProgressDialog(Frame frame)
   {
-    super(frame,"Restore backup", true);
+    super(frame,"Backup database", true);
     this.add(getExportProgressPanel());
     setSize(900, 600);
     setAlwaysOnTop(true);
@@ -30,11 +30,11 @@ public class RestoreProgressDialog extends JDialog
     getExportProgressPanel().finish();
   }
 
-  public RestoreProgressPanel getExportProgressPanel()
+  public BackupProgressPanel getExportProgressPanel()
   {
     if (panel == null)
     {
-      panel = new RestoreProgressPanel();
+      panel = new BackupProgressPanel();
       panel.getCloseButton().addActionListener(e -> setVisible(false));
     }
     return panel;

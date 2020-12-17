@@ -1,4 +1,4 @@
-package se.lantz.gui.restore;
+package se.lantz.gui.dbrestore;
 
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
