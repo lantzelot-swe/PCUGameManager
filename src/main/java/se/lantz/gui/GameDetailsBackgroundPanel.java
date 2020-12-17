@@ -42,8 +42,8 @@ public class GameDetailsBackgroundPanel extends JPanel
     this.setMinimumSize(new Dimension(1250, 800));
     cardLayout = new CardLayout();
     setLayout(cardLayout);
-    add(getDetailsPanel(), DETAILS);
     add(getEmptyPanel(), EMPTY);
+    add(getDetailsPanel(), DETAILS);
   }
 
   void focusTitleField()

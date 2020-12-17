@@ -21,7 +21,11 @@ public class RestoreWorker extends SwingWorker<Void, String>
   @Override
   protected Void doInBackground() throws Exception
   {
-    publish("Restoring database...");
+    StringBuilder infoBuilder = new StringBuilder();
+    infoBuilder.append("Restoring database from folder backup/");
+    infoBuilder.append(restoreManager.getBackupFolderName());
+    infoBuilder.append("...");
+    publish(infoBuilder.toString());
     restoreManager.restoreDb();
     publish("Done");
     publish("Restoring covers directory...");

@@ -89,4 +89,9 @@ public class MainWindow extends JFrame
   {
     getMainPanel().repaintAfterModifications();
   }
+  
+  public void selectViewAfterRestore()
+  {
+    getMainPanel().selectViewAfterRestore();
+  }
 }

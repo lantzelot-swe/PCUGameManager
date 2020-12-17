@@ -21,10 +21,9 @@ public class BackupWorker extends SwingWorker<Void, String>
   @Override
   protected Void doInBackground() throws Exception
   {
-    String folderName = backupManager.setupTargetFolderName();
     StringBuilder infoBuilder = new StringBuilder();
-    infoBuilder.append("Backing up database to folder ");
-    infoBuilder.append(folderName);
+    infoBuilder.append("Backing up database to folder backup/");
+    infoBuilder.append(backupManager.setupTargetFolderName());
     infoBuilder.append("...");
     publish(infoBuilder.toString());
     backupManager.backupDb();

@@ -25,6 +25,11 @@ public class RestoreManager
   {
     currentFolderName = folderName;
   }
+  
+  public String getBackupFolderName()
+  {
+    return currentFolderName;
+  }
  
   public void restoreDb()
   {

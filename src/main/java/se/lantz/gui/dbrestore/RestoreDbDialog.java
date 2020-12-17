@@ -2,12 +2,8 @@ package se.lantz.gui.dbrestore;
 
 import java.awt.Dimension;
 import java.awt.Frame;
-import java.util.List;
-
-import javax.swing.JPanel;
 
 import se.lantz.gui.BaseDialog;
-import se.lantz.model.data.GameListData;
 
 public class RestoreDbDialog extends BaseDialog
 {
@@ -16,10 +12,11 @@ public class RestoreDbDialog extends BaseDialog
   public RestoreDbDialog(Frame owner)
   {
     super(owner);
-    setTitle("Export games");
+    setTitle("Restore database backup");
     addContent(getRestoreDbPanel());
-    getOkButton().setText("OK");
-    this.setPreferredSize(new Dimension(800,700));
+    getOkButton().setText("Restore");
+    getOkButton().setPreferredSize(null);
+    this.setPreferredSize(new Dimension(400,200));
   }
 
   private RestoreDbPanel getRestoreDbPanel() {

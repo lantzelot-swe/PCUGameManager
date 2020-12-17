@@ -50,6 +50,17 @@ public class MainViewModel extends AbstractModel
     logger.debug("Creating DBConnector...");
     dbConnector = new DbConnector();
     logger.debug("...done.");
+    setupGameViews();
+
+    joy1Model.setPrimaryChangeListener(e -> joy2Model
+      .setPrimaryWithoutListenerNotification(!Boolean.valueOf(e.getActionCommand())));
+
+    joy2Model.setPrimaryChangeListener(e -> joy1Model
+      .setPrimaryWithoutListenerNotification(!Boolean.valueOf(e.getActionCommand())));
+  }
+  
+  private void setupGameViews()
+  {
     //Setup game views
     selectedGameView = new GameView(GameView.ALL_GAMES_ID);
     selectedGameView.setName("All Games");
@@ -59,12 +70,13 @@ public class MainViewModel extends AbstractModel
     {
       gameViewModel.addElement(gameView);
     }
-
-    joy1Model.setPrimaryChangeListener(e -> joy2Model
-      .setPrimaryWithoutListenerNotification(!Boolean.valueOf(e.getActionCommand())));
-
-    joy2Model.setPrimaryChangeListener(e -> joy1Model
-      .setPrimaryWithoutListenerNotification(!Boolean.valueOf(e.getActionCommand())));
+  }
+  
+  public void reloadGameViews()
+  {
+    gameViewModel.removeAllElements();
+    setupGameViews();
+    reloadCurrentGameView();
   }
 
   public ListModel<GameListData> getGameListModel()

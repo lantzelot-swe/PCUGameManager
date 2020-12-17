@@ -122,17 +122,6 @@ public class MainPanel extends JPanel
     }
   }
 
-//  public void deleteAllGames()
-//  {
-//    int value = showDeleteAllGamesDialog();
-//    if (value == JOptionPane.YES_OPTION)
-//    {
-//      uiModel.deleteAllGames();
-//      repaintAfterModifications();
-//      SwingUtilities.invokeLater(() -> getListPanel().setSelectedIndexInList(0));
-//    }
-//  }
-  
   int showDeleteDialog()
   {
     String message = "Do you want to delete " + uiModel.getInfoModel().getTitle() + " from the database?";
@@ -152,6 +141,13 @@ public class MainPanel extends JPanel
                                          "Delete all games",
                                          JOptionPane.YES_NO_OPTION,
                                          JOptionPane.QUESTION_MESSAGE);
+  }
+  
+  public void selectViewAfterRestore()
+  {
+    getListPanel().getListViewComboBox().setSelectedIndex(-1);
+    getListPanel().getListViewComboBox().setSelectedIndex(0);
+    repaintAfterModifications();
   }
 
   public void repaintAfterModifications()

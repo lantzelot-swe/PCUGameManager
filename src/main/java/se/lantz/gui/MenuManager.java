@@ -330,6 +330,9 @@ public class MenuManager
       RestoreWorker worker = new RestoreWorker(restoreManager, progressDialog);
       worker.execute();
       progressDialog.setVisible(true);
+      //Trigger a reload of game views
+      uiModel.reloadGameViews();
+      MainWindow.getInstance().selectViewAfterRestore();
     }
   }
 
@@ -344,7 +347,9 @@ public class MenuManager
       backupDb();
       uiModel.deleteAllGames();
       FileManager.deleteAllFolderContent();
-      MainWindow.getInstance().getMainPanel().repaintAfterModifications();
+      //Trigger a reload of game views
+      uiModel.reloadGameViews();
+      MainWindow.getInstance().selectViewAfterRestore();
     }
   }
 }

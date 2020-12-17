@@ -1,18 +1,19 @@
 package se.lantz.gui.dbrestore;
 
-import java.awt.LayoutManager;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.Collections;
+import java.util.List;
 
+import javax.swing.JComboBox;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.UIManager;
 
 import se.lantz.util.FileManager;
-
-import java.awt.GridBagLayout;
-import javax.swing.JLabel;
-import java.awt.GridBagConstraints;
-import java.awt.Insets;
-import javax.swing.JComboBox;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
 
 public class RestoreDbPanel extends JPanel
 {
@@ -28,6 +29,7 @@ public class RestoreDbPanel extends JPanel
     gridBagLayout.columnWeights = new double[]{1.0};
     setLayout(gridBagLayout);
     GridBagConstraints gbc_infoLabel = new GridBagConstraints();
+    gbc_infoLabel.fill = GridBagConstraints.HORIZONTAL;
     gbc_infoLabel.weightx = 1.0;
     gbc_infoLabel.anchor = GridBagConstraints.WEST;
     gbc_infoLabel.insets = new Insets(10, 10, 10, 10);
@@ -54,7 +56,8 @@ public class RestoreDbPanel extends JPanel
   }
   private JLabel getInfoLabel() {
     if (infoLabel == null) {
-    	infoLabel = new JLabel("<html>Restoring a backup will overwrite the existing db and all covers, screens and game files.<br>Custom views are also replaced.</html>");
+    	infoLabel = new JLabel("<html>Restoring a backup will overwrite the existing database and all covers, screens and game files. Custom views are also replaced.</html>");
+    	infoLabel.setIcon(UIManager.getIcon("OptionPane.warningIcon"));
     }
     return infoLabel;
   }
@@ -78,7 +81,10 @@ public class RestoreDbPanel extends JPanel
   
   private void setupComboBox()
   {
-    for (String dirName : FileManager.getAllBackups())
+    List<String> backupsList = FileManager.getAllBackups();
+    Collections.sort(backupsList, Collections.reverseOrder()); 
+    
+    for (String dirName : backupsList)
     {
       backupComboBox.addItem(dirName);
     }    

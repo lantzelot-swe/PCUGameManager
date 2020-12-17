@@ -432,11 +432,11 @@ public class FileManager
         Paths.get(destinationDirectoryLocation, source.toString().substring(sourceDirectoryLocation.length()));
       try
       {
-        Files.copy(source, destination);
+        Files.copy(source, destination, StandardCopyOption.REPLACE_EXISTING);
       }
       catch (IOException e)
       {
-        e.printStackTrace();
+        ExceptionHandler.handleException(e, "Could not copy directory " + sourceDirectoryLocation + " to " + destinationDirectoryLocation);
       }
     });
   }
