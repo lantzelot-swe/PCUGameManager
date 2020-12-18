@@ -57,6 +57,8 @@ public class MainViewModel extends AbstractModel
 
     joy2Model.setPrimaryChangeListener(e -> joy1Model
       .setPrimaryWithoutListenerNotification(!Boolean.valueOf(e.getActionCommand())));
+    
+    resetDataChangedAfterInit();
   }
   
   private void setupGameViews()
@@ -74,9 +76,10 @@ public class MainViewModel extends AbstractModel
   
   public void reloadGameViews()
   {
+    this.disableChangeNotification(true);
     gameViewModel.removeAllElements();
     setupGameViews();
-    reloadCurrentGameView();
+    this.disableChangeNotification(false);
   }
 
   public ListModel<GameListData> getGameListModel()
@@ -175,6 +178,7 @@ public class MainViewModel extends AbstractModel
   public void reloadCurrentGameView()
   {
     setSelectedGameView(getSelectedGameView());
+    resetDataChanged();
   }
 
   public void setSelectedGameView(GameView gameView)
@@ -182,6 +186,7 @@ public class MainViewModel extends AbstractModel
     this.selectedGameView = gameView;
     if (gameView != null)
     {
+      this.disableChangeNotification(true);
       logger.debug("Fetching games for view {}...", gameView);
       gameListModel.clear();
       List<GameListData> gamesList = dbConnector.fetchGamesByView(gameView);
@@ -194,6 +199,7 @@ public class MainViewModel extends AbstractModel
       {
         this.allGamesCount = gamesList.size();
       }
+      this.disableChangeNotification(false);
       logger.debug("...done.");
     }
   }
@@ -241,6 +247,24 @@ public class MainViewModel extends AbstractModel
   {
     return infoModel.isDataChanged() || joy1Model.isDataChanged() || joy2Model.isDataChanged() ||
       systemModel.isDataChanged();
+  }
+  
+  @Override
+  public void resetDataChanged()
+  {
+    infoModel.resetDataChanged();
+    joy1Model.resetDataChanged();
+    joy2Model.resetDataChanged();
+    systemModel.resetDataChanged();
+  }
+  
+  @Override
+  public void resetDataChangedAfterInit()
+  {
+    infoModel.resetDataChangedAfterInit();
+    joy1Model.resetDataChangedAfterInit();
+    joy2Model.resetDataChangedAfterInit();
+    systemModel.resetDataChangedAfterInit();
   }
 
   /**
@@ -376,6 +400,7 @@ public class MainViewModel extends AbstractModel
     if (gameListModel.get(gameListModel.getSize() - 1).getGameId().isEmpty())
     {
       gameListModel.remove(gameListModel.getSize() - 1);
+      resetDataChanged();
     }
   }
 }

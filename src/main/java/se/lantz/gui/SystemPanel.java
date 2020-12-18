@@ -122,7 +122,7 @@ public class SystemPanel extends JPanel
     add(getConfigPanel(), gbc_configPanel);
     if (!Beans.isDesignTime())
     {
-      model.addPropertyChangeListener((e) -> modelChanged());
+      model.addPropertyChangeListener(e -> modelChanged());
     }
   }
 
@@ -181,6 +181,7 @@ public class SystemPanel extends JPanel
     if (c64Button == null)
     {
       c64Button = new JRadioButton("Commodore 64");
+      c64Button.setSelected(true);
       c64Button.addItemListener(new ItemListener()
         {
           public void itemStateChanged(ItemEvent e)
@@ -192,7 +193,6 @@ public class SystemPanel extends JPanel
             }
           }
         });
-      c64Button.setSelected(true);
       c64Button.addActionListener(new ActionListener()
         {
           public void actionPerformed(ActionEvent e)

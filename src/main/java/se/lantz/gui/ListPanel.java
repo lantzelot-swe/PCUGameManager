@@ -145,13 +145,16 @@ public class ListPanel extends JPanel
         {
           public void actionPerformed(ActionEvent e)
           {
-            uiModel.setSelectedGameView((GameView) listViewComboBox.getSelectedItem());
-            //TODO: keep track of selected index for the view and select it once data is updated
-            updateViewInfoLabel();
-            SwingUtilities.invokeLater(() -> {
-              getList().setSelectedIndex(0);
-              getList().ensureIndexIsVisible(0);
-            });
+            if (!uiModel.isDisableChangeNotifcation())
+            {
+              uiModel.setSelectedGameView((GameView) listViewComboBox.getSelectedItem());
+              //TODO: keep track of selected index for the view and select it once data is updated
+              updateViewInfoLabel();
+              SwingUtilities.invokeLater(() -> {
+                getList().setSelectedIndex(0);
+                getList().ensureIndexIsVisible(0);
+              });
+            }
           }
         });
       listViewComboBox.setModel(uiModel.getGameViewModel());
@@ -290,7 +293,7 @@ public class ListPanel extends JPanel
       list.addListSelectionListener(e -> {
         if (!e.getValueIsAdjusting() || pageButtonPressed)
         {
-          if (!delayDetailsUpdate)
+          if (!delayDetailsUpdate && !uiModel.isDisableChangeNotifcation())
           {
             updateSelectedGame();
           }
@@ -308,6 +311,7 @@ public class ListPanel extends JPanel
 
   private void updateSelectedGame()
   {
+    System.out.println("Update selected Game!!!");
     SwingUtilities
       .invokeLater(() -> mainPanel.getGameDetailsBackgroundPanel().updateSelectedGame(list.getSelectedValue()));
   }

@@ -94,22 +94,11 @@ public class MenuManager
     helpMenu = new JMenu("Help");
     helpMenu.add(getHelpItem());
     helpMenu.add(getAboutItem());
-
-    uiModel.addSaveChangeListener(e -> {
-      addGameItem.setEnabled(!uiModel.isDataChanged());
-    });
-    //    KeyStroke keyStrokeToAddGame = KeyStroke.getKeyStroke(KeyEvent.VK_P, KeyEvent.CTRL_DOWN_MASK);
-    //    
-    //    mainWindow.getRootPane().getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(keyStrokeToAddGame, "AddGame");
-    //    mainWindow.getRootPane().getActionMap().put("AddGame", new AbstractAction()
-    //    {
-    //      @Override
-    //      public void actionPerformed(ActionEvent arg0)
-    //      {
-    //        mainWindow.getMainPanel().addNewGame();
-    //      }
-    //    });
-
+  }
+  
+  public void intialize()
+  {
+    uiModel.addSaveChangeListener(e -> addGameItem.setEnabled(!uiModel.isDataChanged()));
   }
 
   public List<JMenu> getMenues()
@@ -224,7 +213,10 @@ public class MenuManager
   {
     aboutItem = new JMenuItem("About...");
     aboutItem.addActionListener(e -> {
-      //TODO
+      AboutDialog dialog = new AboutDialog();
+      dialog.pack();
+      dialog.setLocationRelativeTo(this.mainWindow);
+      dialog.setVisible(true);
     });
     return aboutItem;
   }

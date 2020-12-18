@@ -47,10 +47,19 @@ public abstract class AbstractModel
     dataChanged = false;
     propertyChangeSupport.firePropertyChange("notify", null, "");
   }
+  
+  public void resetDataChangedAfterInit()
+  {
+    dataChanged = false;
+  }
 
   public void disableChangeNotification(boolean disable)
   {
     this.disable = disable;
-
+  }
+  
+  public boolean isDisableChangeNotifcation()
+  {
+    return disable;
   }
 }

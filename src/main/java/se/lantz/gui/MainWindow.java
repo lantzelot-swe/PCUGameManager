@@ -6,10 +6,13 @@ import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
+import javax.swing.SwingUtilities;
+import javax.swing.WindowConstants;
 
 import se.lantz.model.MainViewModel;
+import se.lantz.util.FileManager;
 
-public class MainWindow extends JFrame
+public final class MainWindow extends JFrame
 {
   /**
    * 
@@ -43,7 +46,7 @@ public class MainWindow extends JFrame
     this.setTitle("PCU Game Manager");
     uiModel = new MainViewModel();
     menuManager = new MenuManager(uiModel, this);
-    this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+    this.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
     
     this.addWindowListener(new java.awt.event.WindowAdapter()
       {
@@ -56,11 +59,19 @@ public class MainWindow extends JFrame
 
     
     this.setJMenuBar(getMainMenuBar());
+    
+    //Update title with version if available
+    String versionValue = FileManager.getPcuVersionFromManifest();
+    if (!versionValue.isEmpty())
+    {
+      setTitle("PCU Game Manager v." + versionValue);
+    }
   }
   
   public void initialize()
   {
     getMainPanel().initialize();
+    menuManager.intialize();
   }
 
   MainPanel getMainPanel()

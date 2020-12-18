@@ -125,19 +125,31 @@ public class ScreenshotsPanel extends JPanel
   private void reloadScreens()
   {
     String modelCoverFile = model.getCoverFile();
-    if (!modelCoverFile.equals(currentCoverFile))
+    if (modelCoverFile.isEmpty())
+    {
+      getCoverImageLabel().setIcon(getMissingCoverImageIcon());
+    }
+    else if (!modelCoverFile.equals(currentCoverFile))
     {
       loadCover(modelCoverFile);
       currentCoverFile = modelCoverFile;
     }
     String modelScreen1File = model.getScreens1File();
-    if (!model.getScreens1File().equals(currentScreen1File))
+    if (modelScreen1File.isEmpty())
+    {
+      getScreen1ImageLabel().setIcon(getMissingScreenshotImageIcon());
+    }
+    else if (!model.getScreens1File().equals(currentScreen1File))
     {
       loadScreen(modelScreen1File, getScreen1ImageLabel());
       currentScreen1File = modelScreen1File;
     }
     String modelScreen2File = model.getScreens2File();
-    if (!modelScreen2File.equals(currentScreen2File))
+    if (modelScreen2File.isEmpty())
+    {
+      getScreen2ImageLabel().setIcon(getMissingScreenshotImageIcon());
+    }
+    else if (!modelScreen2File.equals(currentScreen2File))
     {
       loadScreen(modelScreen2File, getScreen2ImageLabel());
       currentScreen2File = modelScreen2File;

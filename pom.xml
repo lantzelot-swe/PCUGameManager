@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>se.lantz</groupId>
 	<artifactId>PCUGameManager</artifactId>
-	<version>0.0.9</version>
+	<version>0.9.0</version>
 	<name>PCUGameManager</name>
 	<dependencies>
 		<dependency>
@@ -70,6 +70,11 @@
 										se.lantz.PCUGameManager
 									</mainClass>
 								</manifest>
+								<manifestEntries>
+									<buildVersion>
+										${project.version}
+									</buildVersion>
+								</manifestEntries>
 							</archive>
 							<descriptorRefs>
 								<descriptorRef>jar-with-dependencies</descriptorRef>
@@ -79,50 +84,52 @@
 				</executions>
 			</plugin>
 			<plugin>
-			  <groupId>com.akathist.maven.plugins.launch4j</groupId>
-			  <artifactId>launch4j-maven-plugin</artifactId>
-			  <version>3.12</version>
-			  <executions>
-				<execution>
-				  <id>l4j-gui</id>
-				  <phase>package</phase>
-				  <goals><goal>launch4j</goal></goals>
-				  <configuration>
-					<headerType>gui</headerType>
-					<outfile>target/PcuGameManager.exe</outfile>
-					<jar>target/PCUGameManager-${project.version}-jar-with-dependencies.jar</jar>
-					<errTitle>PcuGameManager</errTitle>
-					<chdir>.</chdir>
-					<singleInstance>
-					  <mutexName>PcuGameManager</mutexName>  
-					</singleInstance> 
-					<classPath>
-					  <mainClass>se.lantz.PCUGameManager</mainClass>
-				<!--	  <addDependencies>true</addDependencies> -->
-					</classPath>
-					<jre>
-					  <minVersion>1.8</minVersion>
-					  <path>./JRE</path>
-					</jre>
-					<splash>
-				      <file>target/classes/PCUGameManager.bmp</file>
-					  <timeout>30</timeout>
-					</splash>
-					<icon>target/classes/Icon.ico</icon>
-					<versionInfo>
-					  <fileVersion>0.0.0.1</fileVersion>
-					  <txtFileVersion>txt file version?</txtFileVersion>
-					  <fileDescription>a description</fileDescription>
-					  <copyright>my copyright</copyright>
-					  <productVersion>0.0.0.1</productVersion>
-					  <txtProductVersion>txt product version</txtProductVersion>
-					  <productName>PcuGameManager</productName>
-					  <internalName>pcu</internalName>
-					  <originalFilename>PcuGameManager.exe</originalFilename>
-					</versionInfo>
-				  </configuration>
-				</execution>
-			  </executions>
+				<groupId>com.akathist.maven.plugins.launch4j</groupId>
+				<artifactId>launch4j-maven-plugin</artifactId>
+				<version>1.7.25</version>
+				<executions>
+					<execution>
+						<id>l4j-gui</id>
+						<phase>package</phase>
+						<goals>
+							<goal>launch4j</goal>
+						</goals>
+						<configuration>
+							<headerType>gui</headerType>
+							<outfile>target/PcuGameManager.exe</outfile>
+							<jar>target/PCUGameManager-${project.version}-jar-with-dependencies.jar</jar>
+							<errTitle>PcuGameManager</errTitle>
+							<chdir>.</chdir>
+							<singleInstance>
+								<mutexName>PcuGameManager</mutexName>
+							</singleInstance>
+							<classPath>
+								<mainClass>se.lantz.PCUGameManager</mainClass>
+								<!-- <addDependencies>true</addDependencies> -->
+							</classPath>
+							<jre>
+								<minVersion>1.8</minVersion>
+								<path>./JRE</path>
+							</jre>
+							<splash>
+								<file>target/classes/PCUGameManager.bmp</file>
+								<timeout>30</timeout>
+							</splash>
+							<icon>target/classes/Icon.ico</icon>
+							<versionInfo>
+								<fileVersion>${project.version}.1</fileVersion>
+								<txtFileVersion>${project.version}}</txtFileVersion>
+								<fileDescription>PCU Game Manager</fileDescription>
+								<copyright>Lantzelot</copyright>
+								<productVersion>${project.version}.1</productVersion>
+								<txtProductVersion>${project.version}</txtProductVersion>
+								<productName>PCU Game Manager</productName>
+								<internalName>pcu</internalName>
+								<originalFilename>PcuGameManager.exe</originalFilename>
+							</versionInfo>
+						</configuration>
+					</execution>
+				</executions>
 			</plugin>
 		</plugins>
 	</build>

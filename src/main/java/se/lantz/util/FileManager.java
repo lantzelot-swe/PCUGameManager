@@ -10,6 +10,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -17,6 +18,8 @@ import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
+import java.util.jar.Attributes;
+import java.util.jar.Manifest;
 import java.util.stream.Collectors;
 import java.util.zip.GZIPOutputStream;
 
@@ -26,6 +29,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import se.lantz.db.DbConnector;
+import se.lantz.gui.MainWindow;
 import se.lantz.model.InfoModel;
 import se.lantz.model.data.GameDetails;
 
@@ -523,6 +527,17 @@ public class FileManager
   {
     List<String> returnList = new ArrayList<>();
     File backupFolder = new File(BACKUP);
+    if (!backupFolder.exists())
+    {
+      try
+      {
+        Files.createDirectory(backupFolder.toPath());
+      }
+      catch (IOException e)
+      {
+        ExceptionHandler.handleException(e, "Could not create backup folder");
+      }
+    }
     for (File file : backupFolder.listFiles())
     {
       if (file.isDirectory())
@@ -531,5 +546,30 @@ public class FileManager
       }
     }
     return returnList;
+  }
+  
+  public static String getPcuVersionFromManifest()
+  {
+    String returnValue = "";
+    Class clazz = FileManager.class;
+    String className = clazz.getSimpleName() + ".class";
+    String classPath = clazz.getResource(className).toString();
+    if (classPath.startsWith("jar"))
+    {
+      String manifestPath = classPath.substring(0, classPath.lastIndexOf("!") + 1) + "/META-INF/MANIFEST.MF";
+      Manifest manifest;
+      try
+      {
+        manifest = new Manifest(new URL(manifestPath).openStream());
+        Attributes attr = manifest.getMainAttributes();
+        returnValue = attr.getValue("BuildVersion");
+      }
+      catch (IOException e1)
+      {
+        // TODO Auto-generated catch block
+        ExceptionHandler.handleException(e1, "Could not read manifest");
+      }
+    }
+    return returnValue;
   }
 }
