@@ -4,6 +4,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import javax.swing.DefaultComboBoxModel;
@@ -68,7 +69,9 @@ public class MainViewModel extends AbstractModel
     selectedGameView.setName("All Games");
     selectedGameView.setSqlQuery("");
     gameViewModel.addElement(selectedGameView);
-    for (GameView gameView : dbConnector.loadGameViews())
+    List<GameView> gameViewList = dbConnector.loadGameViews();
+    Collections.sort(gameViewList);
+    for (GameView gameView : gameViewList)
     {
       gameViewModel.addElement(gameView);
     }
@@ -362,6 +365,15 @@ public class MainViewModel extends AbstractModel
     dbConnector.deleteAllGames();
     //Reload the current view
     reloadCurrentGameView();
+  }
+  
+  public void deleteGameView(GameView view)
+  {
+    if (view.getGameViewId() != GameView.ALL_GAMES_ID)
+    {
+      dbConnector.deleteView(view);
+      reloadGameViews();
+    }
   }
 
   private List<String> validateRequiredFields()

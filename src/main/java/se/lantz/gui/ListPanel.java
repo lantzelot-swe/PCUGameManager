@@ -126,6 +126,10 @@ public class ListPanel extends JPanel
               editItem.addActionListener(e -> gameViewManager
                 .openViewEditDialog((GameView) getListViewComboBox().getSelectedItem()));
               menu.add(editItem);
+              JMenuItem deleteItem = new JMenuItem("Delete view...");
+              deleteItem.addActionListener(e -> gameViewManager
+                .deleteView((GameView) getListViewComboBox().getSelectedItem()));
+              menu.add(deleteItem);
             }
 
             menu.show(listViewEditButton, 15, 15);
@@ -174,10 +178,14 @@ public class ListPanel extends JPanel
     {
       indexToSelect = uiModel.getGameListModel().getSize()-1;
     }
-    //Select -1 first to ensure a change of selection is done
-    list.setSelectedIndex(-1);
+    list.clearSelection();
     list.setSelectedIndex(indexToSelect);
     list.ensureIndexIsVisible(indexToSelect);
+  }
+  
+  public void clearGameListSelection()
+  {
+    list.clearSelection();
   }
 
   private JPanel getViewInfoPanel()

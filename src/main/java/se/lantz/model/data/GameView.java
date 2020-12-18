@@ -6,7 +6,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class GameView
+public class GameView implements Comparable
 {
   public static final int ALL_GAMES_ID = -1;
   private static final Logger logger = LoggerFactory.getLogger(GameView.class);
@@ -138,5 +138,11 @@ public class GameView
   public void setGameCount(int count)
   {
     this.gameCount = count;
+  }
+
+  @Override
+  public int compareTo(Object o)
+  {
+    return this.name.compareTo(o.toString());
   }
 }

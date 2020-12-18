@@ -156,4 +156,9 @@ public class MainPanel extends JPanel
     this.repaint();
     getListPanel().updateViewInfoLabel();
   }
+  
+  public void clearGameListSelection()
+  {
+    getListPanel().clearGameListSelection();
+  }
 }

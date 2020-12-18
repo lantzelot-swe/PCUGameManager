@@ -337,6 +337,7 @@ public class MenuManager
     if (option == JOptionPane.YES_OPTION)
     {
       backupDb();
+      MainWindow.getInstance().getMainPanel().clearGameListSelection();
       uiModel.deleteAllGames();
       FileManager.deleteAllFolderContent();
       //Trigger a reload of game views

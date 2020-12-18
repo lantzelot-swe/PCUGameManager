@@ -74,7 +74,7 @@ public final class MainWindow extends JFrame
     menuManager.intialize();
   }
 
-  MainPanel getMainPanel()
+  public MainPanel getMainPanel()
   {
     if (mainPanel == null)
     {

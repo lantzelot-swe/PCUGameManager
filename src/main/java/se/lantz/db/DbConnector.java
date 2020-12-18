@@ -718,4 +718,21 @@ public class DbConnector
       ExceptionHandler.handleException(e, "Could not delete games in db.");
     }
   }
+  
+  public void deleteView(GameView view)
+  {
+    String viewFilterSql = "DELETE FROM viewfilter WHERE gameview = " + view.getGameViewId();
+    String gameViewSql = "DELETE FROM gameview WHERE viewId = " + view.getGameViewId();
+    try (Connection conn = this.connect(); PreparedStatement viewFilterstmt = conn.prepareStatement(viewFilterSql); PreparedStatement gameViewStmt = conn.prepareStatement(gameViewSql))
+    {
+      int value = viewFilterstmt.executeUpdate(); 
+      logger.debug("Executed successfully, value = {}", value);
+      value = gameViewStmt.executeUpdate(); 
+      logger.debug("Executed successfully, value = {}", value);
+    }
+    catch (SQLException e)
+    {
+      ExceptionHandler.handleException(e, "Could not delete gameview or viewfilter in db.");
+    }
+  }
 }

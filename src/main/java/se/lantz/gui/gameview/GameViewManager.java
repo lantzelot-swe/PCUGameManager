@@ -1,6 +1,7 @@
 package se.lantz.gui.gameview;
 
 import javax.swing.JComboBox;
+import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
 import se.lantz.gui.ListPanel;
@@ -12,7 +13,6 @@ import se.lantz.model.data.GameView;
 public class GameViewManager
 {
   private JComboBox<GameView> viewCombobox;
-  private MainWindow mainWindow;
   private final MainViewModel uiModel;
   private ListPanel mainPanel;
   
@@ -25,8 +25,7 @@ public class GameViewManager
 
   public void openViewEditDialog(GameView gameView)
   {
-    mainWindow = (MainWindow)SwingUtilities.getAncestorOfClass(MainWindow.class, viewCombobox);
-    GameViewEditDialog dialog = new GameViewEditDialog(mainWindow, gameView);
+    GameViewEditDialog dialog = new GameViewEditDialog(MainWindow.getInstance(), gameView);
     if (gameView.getGameViewId() == 0)
     {
       dialog.setTitle("Add game view");
@@ -36,7 +35,7 @@ public class GameViewManager
       dialog.setTitle("Edit game view");
     }
     dialog.pack();
-    dialog.setLocationRelativeTo(mainWindow);
+    dialog.setLocationRelativeTo(MainWindow.getInstance());
     if (dialog.showDialog())
     {
       //Update gameView instance with edited values in the dialog
@@ -58,6 +57,19 @@ public class GameViewManager
         viewCombobox.repaint();
         mainPanel.updateViewInfoLabel();
       }
+    }
+  }
+  
+  public void deleteView(GameView view)
+  {
+    String message = "Do you want to delete the game view  \"" + view.getName() + "\"?";
+    int value = JOptionPane.showConfirmDialog(MainWindow.getInstance().getMainPanel(), message, "Delete game view", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+    if (value == JOptionPane.YES_OPTION)
+    {
+      uiModel.deleteGameView(view);
+      //Trigger a reload of game views
+      uiModel.reloadGameViews();
+      MainWindow.getInstance().selectViewAfterRestore();
     }
   }
 }
