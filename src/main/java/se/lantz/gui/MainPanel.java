@@ -145,7 +145,6 @@ public class MainPanel extends JPanel
   
   public void selectViewAfterRestore()
   {
-    getListPanel().getListViewComboBox().setSelectedIndex(-1);
     getListPanel().getListViewComboBox().setSelectedIndex(0);
     repaintAfterModifications();
   }

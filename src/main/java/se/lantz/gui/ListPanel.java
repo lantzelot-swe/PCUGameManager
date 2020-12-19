@@ -151,10 +151,11 @@ public class ListPanel extends JPanel
           {
             if (!uiModel.isDisableChangeNotifcation())
             {
+              getList().clearSelection();
               uiModel.setSelectedGameView((GameView) listViewComboBox.getSelectedItem());
               //TODO: keep track of selected index for the view and select it once data is updated
               updateViewInfoLabel();
-              SwingUtilities.invokeLater(() -> {
+              SwingUtilities.invokeLater(() -> {             
                 getList().setSelectedIndex(0);
                 getList().ensureIndexIsVisible(0);
               });
