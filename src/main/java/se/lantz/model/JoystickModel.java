@@ -25,6 +25,11 @@ public class JoystickModel extends AbstractModel
   {
     this.port1 = port1;
     setupKeyKodes();
+    //Initialize with an empty list of right length
+    for (int i = 0; i < 15; i++)
+    {
+      configList.add("");
+    }
   }
 
   private void setupKeyKodes()

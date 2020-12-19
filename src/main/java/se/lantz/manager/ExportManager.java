@@ -38,7 +38,16 @@ public class ExportManager
 
   public void setTargerDirectory(File targetDir)
   {
-    this.targetDir = targetDir.toPath().resolve("games").toFile();
+    Path targetDirPath = targetDir.toPath().resolve("games");
+    this.targetDir = targetDirPath.toFile();
+    try
+    {
+      Files.createDirectories(targetDirPath);
+    }
+    catch (IOException e)
+    {
+      ExceptionHandler.handleException(e, "Could not create " + targetDirPath);
+    }
   }
 
   public void readFromDb(StringBuilder infoBuilder)

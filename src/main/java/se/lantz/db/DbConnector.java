@@ -1,5 +1,6 @@
 package se.lantz.db;
 
+import java.io.File;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -25,6 +26,35 @@ public class DbConnector
 {
   public static final String DB_NAME = "pcusb.db";
   private static final String COMMA = "\",\"";
+  private static final String GAMEINFO_SQL =  "CREATE TABLE gameinfo (\r\n" + 
+    "    Title         STRING  NOT NULL,\r\n" + 
+    "    Year          INTEGER,\r\n" + 
+    "    Author        STRING,\r\n" + 
+    "    Composer      STRING,\r\n" + 
+    "    Genre         STRING,\r\n" + 
+    "    Description   STRING,\r\n" + 
+    "    Gamefile      STRING,\r\n" + 
+    "    Coverfile     STRING,\r\n" + 
+    "    Screen1file   STRING,\r\n" + 
+    "    Screen2file   STRING,\r\n" + 
+    "    Joy1config    STRING,\r\n" + 
+    "    Joy2config    STRING,\r\n" + 
+    "    System        STRING,\r\n" + 
+    "    VerticalShift INTEGER\r\n" + 
+    ");";
+  private static final String GAMEVIEW_SQL = "CREATE TABLE gameview (\r\n" + 
+    "    viewId   INTEGER PRIMARY KEY,\r\n" + 
+    "    name     STRING,\r\n" + 
+    "    matchAll BOOLEAN\r\n" + 
+    ");";
+  private static final String VIEWFILTER_SQL = "CREATE TABLE viewfilter (\r\n" + 
+    "    gameview  INTEGER REFERENCES gameview (viewId),\r\n" + 
+    "    field     STRING,\r\n" + 
+    "    operator  STRING,\r\n" + 
+    "    fieldData STRING\r\n" + 
+    ");";
+  
+    
   private static final Logger logger = LoggerFactory.getLogger(DbConnector.class);
   private List<String> columnList = new ArrayList<>();
 
@@ -44,16 +74,38 @@ public class DbConnector
     columnList.add(DbConstants.JOY2);
     columnList.add(DbConstants.SYSTEM);
     columnList.add(DbConstants.VERTICALSHIFT);
+    //Check if database file exists, if not create an empty db.
+    File dbFile = new File("./"+ DB_NAME);
+    if (!dbFile.exists())
+    {
+      createNewDb();
+      logger.debug("Database missing, new db created.");
+    }
   }
 
+  
+  private void createNewDb()
+  {
+    try (Connection conn = this.connect(); PreparedStatement gameInfostmt = conn.prepareStatement(GAMEINFO_SQL);
+      PreparedStatement gameViewstmt = conn.prepareStatement(GAMEVIEW_SQL);
+      PreparedStatement viewFilterstmt = conn.prepareStatement(VIEWFILTER_SQL))
+    {
+      gameInfostmt.executeUpdate();
+      gameViewstmt.executeUpdate();
+      viewFilterstmt.executeUpdate();
+    }
+    catch (SQLException e)
+    {
+      ExceptionHandler.handleException(e, "Could not cretate db tables");
+    }
+  }
+  
+  
   /**
-   * Connect to a sample database
-   *
-   * @param fileName the database file name
+   * Connect to the database. 
    */
   public Connection connect()
   {
-
     Connection connection = null;
     try
     {
