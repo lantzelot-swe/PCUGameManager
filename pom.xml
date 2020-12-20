@@ -50,8 +50,8 @@
 					<executable><!-- path-to-javac -->
 					</executable>
 					<compilerVersion>1.8.0</compilerVersion>
-					<source>1.8</source>
-					<target>1.8</target>
+					<source>14</source>
+					<target>14</target>
 				</configuration>
 			</plugin>
 			<plugin>
@@ -108,7 +108,7 @@
 								<!-- <addDependencies>true</addDependencies> -->
 							</classPath>
 							<jre>
-								<minVersion>1.8</minVersion>
+								<minVersion>14</minVersion>
 								<path>./JRE</path>
 							</jre>
 							<splash>
