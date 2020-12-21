@@ -18,7 +18,9 @@ import se.lantz.manager.ImportManager;
 import se.lantz.model.data.GameDetails;
 import se.lantz.model.data.GameListData;
 import se.lantz.model.data.GameView;
+import se.lantz.model.data.ScraperFields;
 import se.lantz.util.FileManager;
+import se.lantz.util.MobyGamesScraper;
 
 public class MainViewModel extends AbstractModel
 {
@@ -45,6 +47,8 @@ public class MainViewModel extends AbstractModel
   private PropertyChangeListener requiredFieldsListener;
 
   private GameListData selectedData;
+  
+  MobyGamesScraper scraper = new MobyGamesScraper();
 
   public void initialize()
   {
@@ -414,5 +418,31 @@ public class MainViewModel extends AbstractModel
       gameListModel.remove(gameListModel.getSize() - 1);
       resetDataChanged();
     }
+  }
+  public void connectScraper(String url) throws Exception
+  {
+    scraper.connectToMobyGames(url);
+  }
+  
+  public void scrapeGameInformation(ScraperFields fields)
+  {
+    if (fields.isTitle())
+    {
+      infoModel.setTitle(scraper.scrapeTitle());
+    }
+    if (fields.isAuthor())
+    {
+      infoModel.setAuthor(scraper.scrapeAuthor());
+    }
+    if (fields.isYear())
+    {
+      //TODO: Parse properly
+     // infoModel.setYear(Integer.parseInt(scraper.scrapeYear()));
+    }
+    if (fields.isDescription())
+    {
+      infoModel.setDescription(scraper.scrapeDescription());
+    }
+    //TODO: Genre, cover, screenshots
   }
 }

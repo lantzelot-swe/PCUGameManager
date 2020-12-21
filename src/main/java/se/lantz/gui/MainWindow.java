@@ -1,6 +1,7 @@
 package se.lantz.gui;
 
 import java.awt.BorderLayout;
+import java.awt.Cursor;
 
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
@@ -9,6 +10,7 @@ import javax.swing.JMenuBar;
 import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 
+import se.lantz.gui.scraper.MobyGamesOptionsPanel;
 import se.lantz.model.MainViewModel;
 import se.lantz.util.FileManager;
 
@@ -25,6 +27,9 @@ public final class MainWindow extends JFrame
   private final MenuManager menuManager;
   
   private static MainWindow instance = null;
+  
+  private Cursor waitCursor = new Cursor(Cursor.WAIT_CURSOR);
+  private Cursor defaultCursor = new Cursor(Cursor.DEFAULT_CURSOR);
   
   public static MainWindow getInstance()
   {
@@ -104,5 +109,17 @@ public final class MainWindow extends JFrame
   public void selectViewAfterRestore()
   {
     getMainPanel().selectViewAfterRestore();
+  }
+  
+  public void setWaitCursor(boolean wait)
+  {
+    if (wait)
+    {
+      this.setCursor(waitCursor);
+    }
+    else
+    {
+      this.setCursor(defaultCursor);
+    }
   }
 }

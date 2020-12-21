@@ -16,6 +16,7 @@ import javax.swing.border.TitledBorder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import se.lantz.gui.scraper.ScraperDialog;
 import se.lantz.model.MainViewModel;
 import se.lantz.model.data.GameListData;
 
@@ -35,6 +36,7 @@ public class GameDetailsBackgroundPanel extends JPanel
   private JPanel emptyPanel;
   private JPanel detailsPanel;
   private CardLayout cardLayout;
+  private JButton scrapeButton;
 
   public GameDetailsBackgroundPanel(MainViewModel model)
   {
@@ -53,6 +55,7 @@ public class GameDetailsBackgroundPanel extends JPanel
 
   void updateSelectedGame(GameListData data)
   {
+    scraperDialog = null;
     if (data == null)
     {
       cardLayout.show(this, EMPTY);
@@ -149,17 +152,24 @@ public class GameDetailsBackgroundPanel extends JPanel
     {
       buttonPanel = new JPanel();
       GridBagLayout gbl_buttonPanel = new GridBagLayout();
-      gbl_buttonPanel.columnWidths = new int[] { 0, 0 };
+      gbl_buttonPanel.columnWidths = new int[] { 0, 0, 0 };
       gbl_buttonPanel.rowHeights = new int[] { 0, 0 };
-      gbl_buttonPanel.columnWeights = new double[] { 0.0, Double.MIN_VALUE };
+      gbl_buttonPanel.columnWeights = new double[] { 0.0, 0.0, Double.MIN_VALUE };
       gbl_buttonPanel.rowWeights = new double[] { 0.0, Double.MIN_VALUE };
       buttonPanel.setLayout(gbl_buttonPanel);
+      GridBagConstraints gbc_scrapeButton = new GridBagConstraints();
+      gbc_scrapeButton.weighty = 1.0;
+      gbc_scrapeButton.anchor = GridBagConstraints.SOUTHWEST;
+      gbc_scrapeButton.insets = new Insets(5, 10, 5, 5);
+      gbc_scrapeButton.gridx = 0;
+      gbc_scrapeButton.gridy = 0;
+      buttonPanel.add(getScrapeButton(), gbc_scrapeButton);
       GridBagConstraints gbc_saveButton = new GridBagConstraints();
       gbc_saveButton.weighty = 1.0;
       gbc_saveButton.weightx = 1.0;
       gbc_saveButton.anchor = GridBagConstraints.SOUTHEAST;
       gbc_saveButton.insets = new Insets(5, 5, 5, 6);
-      gbc_saveButton.gridx = 0;
+      gbc_saveButton.gridx = 1;
       gbc_saveButton.gridy = 0;
       buttonPanel.add(getSaveButton(), gbc_saveButton);
     }
@@ -183,5 +193,36 @@ public class GameDetailsBackgroundPanel extends JPanel
         });
     }
     return saveButton;
+  }
+  private JButton getScrapeButton() {
+    if (scrapeButton == null) {
+    	scrapeButton = new JButton("Scrape...");
+    	scrapeButton.addActionListener(new ActionListener() {
+    	  public void actionPerformed(ActionEvent e) {
+    	    scrapeGamesInformation();
+    	  }
+    	});
+    }
+    return scrapeButton;
+  }
+  
+  private ScraperDialog scraperDialog = null;
+  
+  private void scrapeGamesInformation()
+  {
+    if (scraperDialog == null)
+    {
+      scraperDialog = new ScraperDialog(MainWindow.getInstance(), model);
+      scraperDialog.pack();
+      scraperDialog.setLocationRelativeTo(MainWindow.getInstance());
+    }
+    
+    if (scraperDialog.showDialog())
+    {
+      MainWindow.getInstance().setWaitCursor(true);
+      model.scrapeGameInformation(scraperDialog.getScraperFields());
+      MainWindow.getInstance().setWaitCursor(false);
+    }
+    
   }
 }
