@@ -6,7 +6,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
@@ -44,6 +46,8 @@ public class MobyGamesScraper
 
   private long startTime = 0L;
 
+  Map<String, String> genreMap = new HashMap<>();
+  
   public MobyGamesScraper()
   {
     // TODO Auto-generated constructor stub
@@ -53,6 +57,14 @@ public class MobyGamesScraper
   //*[@id="main"]/div/div[3]/div[1]/h2[1]
     
     //*[@id="coreGameCover"]/a/img
+    
+    //Keys are Genres defined on MobyGames, values are supported genres in the tool
+    genreMap.put("Adventure, Role-Playing (RPG)", "adventure");
+    genreMap.put("Racing / driving", "driving");
+    genreMap.put("Puzzle, Strategy / tactics", "puzzle");
+    genreMap.put("Educational", "programming");
+    genreMap.put("Simulation", "simulation");
+    genreMap.put("Sports", "sport");
   }
 
   public static void main(String[] args)
@@ -100,12 +112,7 @@ public class MobyGamesScraper
   {
     return scarpeElementValue(yearCssQuery);
   }
-
-  public String scrapeGenre()
-  {
-    return scarpeElementValue(genreCssQuery);
-  }
-
+  
   private void scrapeMobyGames()
   {
     startTime = System.currentTimeMillis();
@@ -148,6 +155,25 @@ public class MobyGamesScraper
     {
       ExceptionHandler.handleException(e, "Could not scrape description");
     }
+    return "";
+  }
+  
+  public String scrapeGenre()
+  {
+    String genreFromMobyGames = scarpeElementValue(genreCssQuery);
+    String[] split = genreFromMobyGames.split(", ");
+    for (int i = 0; i < split.length; i++)
+    {
+      //Map towards available genres, return first one found
+      for (Map.Entry<String, String> entry : genreMap.entrySet()) {
+        if (entry.getKey().contains(split[i]))
+        {
+          System.out.println(entry.getKey() + "/" + entry.getValue());
+          return entry.getValue();
+        } 
+      }
+    }
+    
     return "";
   }
 

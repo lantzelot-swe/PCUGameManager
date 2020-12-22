@@ -101,6 +101,7 @@ public class MobyGamesOptionsPanel extends JPanel
         "(Example: https://www.mobygames.com/game/c64/arkanoid)</li></ol></html>";
 
       infoEditorPane = new JEditorPane("text/html", info);
+      infoEditorPane.putClientProperty(JEditorPane.HONOR_DISPLAY_PROPERTIES, Boolean.TRUE);
       infoEditorPane.setFont(UIManager.getDefaults().getFont("Label.font"));
       infoEditorPane.setEditable(false);
       infoEditorPane.setOpaque(false);

@@ -43,6 +43,7 @@ import se.lantz.model.MainViewModel;
 import se.lantz.model.data.GameListData;
 import se.lantz.util.ExceptionHandler;
 import se.lantz.util.FileManager;
+import se.lantz.util.VersionChecker;
 
 public class MenuManager
 {
@@ -106,8 +107,8 @@ public class MenuManager
     dbMenu.add(getCreateEmptyDbItem());
     helpMenu = new JMenu("Help");
     helpMenu.add(getHelpItem());
+    helpMenu.add(getCheckVersionItem());
     helpMenu.add(getAboutItem());
-    helpMenu.add(getNewVersionItem());
   }
 
   public void intialize()
@@ -234,10 +235,10 @@ public class MenuManager
     });
     return aboutItem;
   }
-  
-  private JMenuItem getNewVersionItem()
+
+  private JMenuItem getCheckVersionItem()
   {
-    newVersionItem = new JMenuItem("Check for new version...");
+    newVersionItem = new JMenuItem("Check for updates");
     newVersionItem.addActionListener(e -> {
       checkForNewRelease();
     });
@@ -369,35 +370,25 @@ public class MenuManager
     }
   }
 
-  /**
-   * Fetches the latet version information from github
-   */
   private void checkForNewRelease()
   {
-    try
+    VersionChecker.fetchLatestVersionFromGithub();
+    if (VersionChecker.isNewVersionAvailable())
     {
-      URL url = new URL("https://lantzelot-swe@api.github.com/repos/lantzelot-swe/PCUGameManager/releases/latest");
-      HttpURLConnection con = (HttpURLConnection) url.openConnection();
-      con.setRequestProperty("accept", "application/vnd.github.v3+json");
-      con.setRequestMethod("GET");
-      StringBuilder builder = new StringBuilder();
-      Scanner scanner = new Scanner(url.openStream());
-      while (scanner.hasNext())
+      VersionDownloadDialog dialog = new VersionDownloadDialog(MainWindow.getInstance());
+      dialog.pack();
+      dialog.setLocationRelativeTo(MainWindow.getInstance());
+      if (dialog.showDialog())
       {
-        builder.append(scanner.nextLine() + "/n");
+        getExitItem().doClick();
       }
-      scanner.close();
-      con.disconnect();
-     
-      JsonReader reader = new JsonReader(new StringReader(builder.toString()));
-      reader.setLenient(true);
-      JsonElement root = new JsonParser().parse(reader);
-      String tagName = root.getAsJsonObject().get("tag_name").getAsString();
-      System.out.println("tagName = " + tagName);
     }
-    catch (IOException ex)
+    else
     {
-      ExceptionHandler.handleException(ex, "Could not check version");
+      JOptionPane.showMessageDialog(this.mainWindow,
+                                    "This is the latest version.",
+                                    "Version check",
+                                    JOptionPane.INFORMATION_MESSAGE);
     }
   }
 }

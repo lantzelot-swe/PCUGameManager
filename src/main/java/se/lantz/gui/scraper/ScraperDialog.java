@@ -8,7 +8,6 @@ import javax.swing.JPanel;
 import se.lantz.gui.BaseDialog;
 import se.lantz.model.MainViewModel;
 import se.lantz.model.data.ScraperFields;
-import se.lantz.util.MobyGamesScraper;
 
 public class ScraperDialog extends BaseDialog
 {
@@ -23,6 +22,7 @@ public class ScraperDialog extends BaseDialog
     content.add(getMobyGamesPanel(), BorderLayout.CENTER);
     addContent(content);
     setTitle("Scrape game information");
+    this.setResizable(false);
   }
 
   private MobyGamesOptionsPanel getMobyGamesPanel()

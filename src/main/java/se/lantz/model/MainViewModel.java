@@ -6,6 +6,8 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.ListModel;
@@ -436,13 +438,25 @@ public class MainViewModel extends AbstractModel
     }
     if (fields.isYear())
     {
-      //TODO: Parse properly
-     // infoModel.setYear(Integer.parseInt(scraper.scrapeYear()));
+      Pattern p = Pattern.compile("\\d+");
+      Matcher m = p.matcher(scraper.scrapeYear());
+      if (m.find())
+      {
+        infoModel.setYear(Integer.parseInt(m.group()));
+      }
     }
     if (fields.isDescription())
     {
       infoModel.setDescription(scraper.scrapeDescription());
     }
-    //TODO: Genre, cover, screenshots
+    if (fields.isGenre())
+    {
+      String genre = scraper.scrapeGenre();
+      if (!genre.isEmpty())
+      {
+        infoModel.setGenre(genre);
+      }
+    }
+    //TODO: cover, screenshots
   }
 }
