@@ -9,7 +9,7 @@ public class VersionDownloadDialog extends BaseDialog
   public VersionDownloadDialog(Frame owner)
   {
     super(owner);
-    setTitle("Version check");
+    setTitle("New version available");
     addContent(getVersionDownloadPanel());
     getOkButton().setText("Exit");
   }
