@@ -3,15 +3,26 @@ package se.lantz.gui;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.io.File;
+import java.io.IOException;
+import java.io.StringReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
 
 import javax.swing.JFileChooser;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
+
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import com.google.gson.stream.JsonReader;
 
 import se.lantz.gui.dbbackup.BackupProgressDialog;
 import se.lantz.gui.dbbackup.BackupWorker;
@@ -30,6 +41,7 @@ import se.lantz.manager.ImportManager;
 import se.lantz.manager.RestoreManager;
 import se.lantz.model.MainViewModel;
 import se.lantz.model.data.GameListData;
+import se.lantz.util.ExceptionHandler;
 import se.lantz.util.FileManager;
 
 public class MenuManager
@@ -52,6 +64,7 @@ public class MenuManager
 
   private JMenuItem helpItem;
   private JMenuItem aboutItem;
+  private JMenuItem newVersionItem;
 
   private JMenuItem exitItem;
   private MainViewModel uiModel;
@@ -94,8 +107,9 @@ public class MenuManager
     helpMenu = new JMenu("Help");
     helpMenu.add(getHelpItem());
     helpMenu.add(getAboutItem());
+    helpMenu.add(getNewVersionItem());
   }
-  
+
   public void intialize()
   {
     uiModel.addSaveChangeListener(e -> addGameItem.setEnabled(!uiModel.isDataChanged()));
@@ -220,6 +234,15 @@ public class MenuManager
     });
     return aboutItem;
   }
+  
+  private JMenuItem getNewVersionItem()
+  {
+    newVersionItem = new JMenuItem("Check for new version...");
+    newVersionItem.addActionListener(e -> {
+      checkForNewRelease();
+    });
+    return newVersionItem;
+  }
 
   private void importGameList()
   {
@@ -309,7 +332,7 @@ public class MenuManager
     worker.execute();
     dialog.setVisible(true);
   }
-  
+
   private void restoreDb()
   {
     RestoreDbDialog restoreDialog = new RestoreDbDialog(MainWindow.getInstance());
@@ -343,6 +366,38 @@ public class MenuManager
       //Trigger a reload of game views
       uiModel.reloadGameViews();
       MainWindow.getInstance().selectViewAfterRestore();
+    }
+  }
+
+  /**
+   * Fetches the latet version information from github
+   */
+  private void checkForNewRelease()
+  {
+    try
+    {
+      URL url = new URL("https://lantzelot-swe@api.github.com/repos/lantzelot-swe/PCUGameManager/releases/latest");
+      HttpURLConnection con = (HttpURLConnection) url.openConnection();
+      con.setRequestProperty("accept", "application/vnd.github.v3+json");
+      con.setRequestMethod("GET");
+      StringBuilder builder = new StringBuilder();
+      Scanner scanner = new Scanner(url.openStream());
+      while (scanner.hasNext())
+      {
+        builder.append(scanner.nextLine() + "/n");
+      }
+      scanner.close();
+      con.disconnect();
+     
+      JsonReader reader = new JsonReader(new StringReader(builder.toString()));
+      reader.setLenient(true);
+      JsonElement root = new JsonParser().parse(reader);
+      String tagName = root.getAsJsonObject().get("tag_name").getAsString();
+      System.out.println("tagName = " + tagName);
+    }
+    catch (IOException ex)
+    {
+      ExceptionHandler.handleException(ex, "Could not check version");
     }
   }
 }
