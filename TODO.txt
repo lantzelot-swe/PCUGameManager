@@ -1,0 +1,9 @@
+-Progress dialog for scraper while loading info
+-Favorites for games
+-Better query support for gameviews (one OR, one AND table)
+-Support for selecting screenshots and cover in the MobyGames scraper
+-VICE support: running games from the tool
+-Write some documentation (F1)
+-More sites for the scraper.
+
+

@@ -1,5 +1,6 @@
 package se.lantz.model;
 
+import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
@@ -461,6 +462,18 @@ public class MainViewModel extends AbstractModel
     {
       infoModel.setCoverImage(scraper.scrapeCover());
     }
-    //TODO: cover, screenshots
+    
+    if (fields.isScreenshots())
+    {  //TODO: Make it possible to select which screenshot to use
+      List<BufferedImage> images = scraper.scrapeScreenshots();
+      if (images.size() > 0)
+      {
+        infoModel.setScreen1Image(images.get(0));
+      }
+      if (images.size() > 1)
+      {
+        infoModel.setScreen2Image(images.get(1));
+      }
+    }
   }
 }

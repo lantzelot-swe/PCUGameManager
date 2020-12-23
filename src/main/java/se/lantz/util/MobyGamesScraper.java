@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -43,6 +44,8 @@ public class MobyGamesScraper
   private String genreCssQuery = "#coreGameGenre > div > div:contains(Genre)";
 
   private String coverCssQuery = "#coreGameCover > a > img";
+  
+  private String screensCssQuery = ".thumbnail-image-wrapper > a";
 
   private long startTime = 0L;
 
@@ -224,42 +227,7 @@ public class MobyGamesScraper
     }
     return null;
   }
-  
-  
-//  private void scrapeCoverTest()
-//  {
-//    Document doc;
-//    try
-//    {
-//      Connection.Response result = Jsoup.connect(mobyGamesGameUrl).method(Connection.Method.GET).execute();
-//      doc = result.parse();
-//      //Fetch the right element
-//      Elements coverElements = doc.select(coverCssQuery);
-//      if (coverElements.first() != null)
-//      {
-//        Element coverElement = coverElements.first();
-//        String absoluteUrl = coverElement.absUrl("src");
-//        String srcValue = coverElement.attr("src");
-//
-//        URL url = new URL(absoluteUrl);
-//        BufferedImage c = ImageIO.read(url);
-//        ImageIcon image = new ImageIcon(c);
-//
-//        saveImage(absoluteUrl, game + ".jpg");
-//
-//        //TODO: big cover: 
-//
-//        String bigCoverUrl = coverElement.parent().attr("href");
-//        return scrapeBigCover(bigCoverUrl);
-//        System.out.println("Cover art: " + absoluteUrl);
-//      }
-//    }
-//    catch (IOException e)
-//    {
-//      e.printStackTrace();
-//    }
-//  }
-
+ 
   private BufferedImage scrapeBigCover(String url)
   {
     String cssQuery = "#main > div > div:eq(1) > center > img"; //*[@id="main"]/div/div[2]/center/img
@@ -285,22 +253,63 @@ public class MobyGamesScraper
     }
     return null;
   }
-
-  public static void saveImage(String imageUrl, String destinationFile) throws IOException
+  
+  public List<BufferedImage> scrapeScreenshots()
   {
-    URL url = new URL(imageUrl);
-    InputStream is = url.openStream();
-    OutputStream os = new FileOutputStream(destinationFile);
-
-    byte[] b = new byte[2048];
-    int length;
-
-    while ((length = is.read(b)) != -1)
+    List<BufferedImage> returnList = new ArrayList<>();
+    Document doc;
+    try
     {
-      os.write(b, 0, length);
+      Connection.Response result = Jsoup.connect(mobyGamesGameUrl + "/screenshots").method(Connection.Method.GET).execute();
+      doc = result.parse();
+      //Fetch the right element
+      Elements coverElements = doc.select(screensCssQuery);
+      
+      logger.debug("Number of screenshots found: {}", coverElements.size());
+      //Only scrape first two for now
+      for (int i = 0; i < Math.min(2, coverElements.size()); i++)
+      {
+        String bigScreenUrl = coverElements.get(i).attr("href");
+        logger.debug("Screen URL = " + bigScreenUrl);
+        returnList.add(scrapeBigScreenshot(bigScreenUrl));
+      } 
+//      for (Element element : coverElements)
+//      {
+//        String bigScreenUrl = element.attr("href");
+//        logger.debug("Screen URL = " + bigScreenUrl);
+//        returnList.add(scrapeBigScreenshot(bigScreenUrl));
+//      }
     }
+    catch (IOException e)
+    {
+      ExceptionHandler.handleException(e, "Could not scrape cover");
+    }
+    return returnList;
+  }
 
-    is.close();
-    os.close();
+  private BufferedImage scrapeBigScreenshot(String url)
+  {
+    String cssQuery = "#main > div > div:eq(1) > div > div > img"; //*[@id="main"]/div/div[2]/div/div/img
+    Document doc;
+    try
+    {
+      Connection.Response result = Jsoup.connect(url).method(Connection.Method.GET).execute();
+      doc = result.parse();
+      //Fetch the right element
+      Elements coverElements = doc.select(cssQuery);
+      if (coverElements.first() != null)
+      {
+        Element coverElement = coverElements.first();
+        String absoluteUrl = coverElement.absUrl("src");
+
+        URL imageUrl = new URL(absoluteUrl);
+        return ImageIO.read(imageUrl);    
+      }
+    }
+    catch (IOException e)
+    {
+      ExceptionHandler.handleException(e, "Could not scrape screenshot");
+    }
+    return null;
   }
 }

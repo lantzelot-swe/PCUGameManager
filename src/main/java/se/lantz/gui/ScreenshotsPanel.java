@@ -54,6 +54,8 @@ public class ScreenshotsPanel extends JPanel
   private String currentScreen1File = "";
   private String currentScreen2File = "";
   private BufferedImage currentCoverImage = null;
+  private BufferedImage currentScreen1Image = null;
+  private BufferedImage currentScreen2Image = null;
 
   private ImageIcon missingSceenshotIcon = null;
   private ImageIcon missingCoverIcon = null;
@@ -125,6 +127,7 @@ public class ScreenshotsPanel extends JPanel
 
   private void reloadScreens()
   {
+    //Cover
     BufferedImage coverImage = model.getCoverImage();
     if (coverImage != null)
     {
@@ -149,25 +152,57 @@ public class ScreenshotsPanel extends JPanel
         currentCoverFile = modelCoverFile;
       }
     }
-    String modelScreen1File = model.getScreens1File();
-    if (modelScreen1File.isEmpty())
+    //Screen 1
+    BufferedImage screen1Image = model.getScreen1Image(); 
+    if (screen1Image != null)
     {
-      getScreen1ImageLabel().setIcon(getMissingScreenshotImageIcon());
+      if (!screen1Image.equals(currentScreen1Image))
+      {
+        logger.debug("SETTING SCREEN 1 IMAGE");
+        Image newImage = screen1Image.getScaledInstance(320, 200, Image.SCALE_DEFAULT);
+        getScreen1ImageLabel().setIcon(new ImageIcon(newImage));
+        setCropButtonVisibility(screen1Image, crop1Button);
+        currentScreen1Image = screen1Image;
+      }
     }
-    else if (!model.getScreens1File().equals(currentScreen1File))
+    else
     {
-      loadScreen(modelScreen1File, getScreen1ImageLabel());
-      currentScreen1File = modelScreen1File;
+      String modelScreen1File = model.getScreens1File();
+      if (modelScreen1File.isEmpty())
+      {
+        getScreen1ImageLabel().setIcon(getMissingScreenshotImageIcon());
+      }
+      else if (!model.getScreens1File().equals(currentScreen1File))
+      {
+        loadScreen(modelScreen1File, getScreen1ImageLabel());
+        currentScreen1File = modelScreen1File;
+      }
+    }   
+    //Screen 2
+    BufferedImage screen2Image = model.getScreen2Image();
+    if (screen2Image != null)
+    {
+      if (!screen2Image.equals(currentScreen2Image))
+      {
+        logger.debug("SETTING SCREEN 2 IMAGE");
+        Image newImage = screen2Image.getScaledInstance(320, 200, Image.SCALE_DEFAULT);
+        getScreen2ImageLabel().setIcon(new ImageIcon(newImage));
+        setCropButtonVisibility(screen1Image, crop2Button);
+        currentScreen2Image = screen2Image;
+      }
     }
-    String modelScreen2File = model.getScreens2File();
-    if (modelScreen2File.isEmpty())
+    else
     {
-      getScreen2ImageLabel().setIcon(getMissingScreenshotImageIcon());
-    }
-    else if (!modelScreen2File.equals(currentScreen2File))
-    {
-      loadScreen(modelScreen2File, getScreen2ImageLabel());
-      currentScreen2File = modelScreen2File;
+      String modelScreen2File = model.getScreens2File();
+      if (modelScreen2File.isEmpty())
+      {
+        getScreen2ImageLabel().setIcon(getMissingScreenshotImageIcon());
+      }
+      else if (!modelScreen2File.equals(currentScreen2File))
+      {
+        loadScreen(modelScreen2File, getScreen2ImageLabel());
+        currentScreen2File = modelScreen2File;
+      }
     }
   }
 
@@ -575,14 +610,7 @@ public class ScreenshotsPanel extends JPanel
       {
         returnImage = ImageIO.read(files[0]);
 
-        if (returnImage.getHeight() > 200 && returnImage.getWidth() > 320)
-        {
-          cropButton.setVisible(true);
-        }
-        else
-        {
-          cropButton.setVisible(false);
-        }
+        setCropButtonVisibility(returnImage, cropButton);
         Image newImage = returnImage.getScaledInstance(320, 200, Image.SCALE_DEFAULT);
         imageLabel.setIcon(new ImageIcon(newImage));
       }
@@ -593,6 +621,18 @@ public class ScreenshotsPanel extends JPanel
       }
     }
     return returnImage;
+  }
+  
+  private void setCropButtonVisibility(BufferedImage image, JButton cropButton)
+  {
+    if (image.getHeight() > 200 && image.getWidth() > 320)
+    {
+      cropButton.setVisible(true);
+    }
+    else
+    {
+      cropButton.setVisible(false);
+    }
   }
 
   private BufferedImage cropImage(BufferedImage originalImage, JLabel screenLabel)
