@@ -40,9 +40,7 @@ public class VersionChecker
       reader.setLenient(true);
       JsonElement root = new JsonParser().parse(reader);
       latestVersion = root.getAsJsonObject().get("tag_name").getAsString();
-      System.out.println("tagName = " + latestVersion);
       downloadUrl = root.getAsJsonObject().get("html_url").getAsString();
-      System.out.println("html url = " + downloadUrl);
     }
     catch (IOException ex)
     {

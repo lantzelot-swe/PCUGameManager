@@ -53,6 +53,7 @@ public class ScreenshotsPanel extends JPanel
   private String currentCoverFile = "";
   private String currentScreen1File = "";
   private String currentScreen2File = "";
+  private BufferedImage currentCoverImage = null;
 
   private ImageIcon missingSceenshotIcon = null;
   private ImageIcon missingCoverIcon = null;
@@ -124,15 +125,29 @@ public class ScreenshotsPanel extends JPanel
 
   private void reloadScreens()
   {
-    String modelCoverFile = model.getCoverFile();
-    if (modelCoverFile.isEmpty())
+    BufferedImage coverImage = model.getCoverImage();
+    if (coverImage != null)
     {
-      getCoverImageLabel().setIcon(getMissingCoverImageIcon());
+      if (!coverImage.equals(currentCoverImage))
+      {
+        logger.debug("SETTING NEW COVER IMAGE");
+        Image newImage = coverImage.getScaledInstance(130, 200, Image.SCALE_DEFAULT);
+        getCoverImageLabel().setIcon(new ImageIcon(newImage));
+        currentCoverImage = coverImage;
+      }
     }
-    else if (!modelCoverFile.equals(currentCoverFile))
+    else
     {
-      loadCover(modelCoverFile);
-      currentCoverFile = modelCoverFile;
+      String modelCoverFile = model.getCoverFile();
+      if (modelCoverFile.isEmpty())
+      {
+        getCoverImageLabel().setIcon(getMissingCoverImageIcon());
+      }
+      else if (!modelCoverFile.equals(currentCoverFile))
+      {
+        loadCover(modelCoverFile);
+        currentCoverFile = modelCoverFile;
+      }
     }
     String modelScreen1File = model.getScreens1File();
     if (modelScreen1File.isEmpty())

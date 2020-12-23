@@ -202,7 +202,7 @@ public class MobyGamesScraper
     return value;
   }
 
-  private void scrapeCover()
+  public BufferedImage scrapeCover()
   {
     Document doc;
     try
@@ -214,29 +214,53 @@ public class MobyGamesScraper
       if (coverElements.first() != null)
       {
         Element coverElement = coverElements.first();
-        String absoluteUrl = coverElement.absUrl("src");
-        String srcValue = coverElement.attr("src");
-
-        URL url = new URL(absoluteUrl);
-        BufferedImage c = ImageIO.read(url);
-        ImageIcon image = new ImageIcon(c);
-
-        saveImage(absoluteUrl, game + ".jpg");
-
-        //TODO: big cover: 
-
         String bigCoverUrl = coverElement.parent().attr("href");
-        scrapeBigCover(bigCoverUrl);
-        System.out.println("Cover art: " + absoluteUrl);
+        return scrapeBigCover(bigCoverUrl);
       }
     }
     catch (IOException e)
     {
-      e.printStackTrace();
+      ExceptionHandler.handleException(e, "Could not scrape cover");
     }
+    return null;
   }
+  
+  
+//  private void scrapeCoverTest()
+//  {
+//    Document doc;
+//    try
+//    {
+//      Connection.Response result = Jsoup.connect(mobyGamesGameUrl).method(Connection.Method.GET).execute();
+//      doc = result.parse();
+//      //Fetch the right element
+//      Elements coverElements = doc.select(coverCssQuery);
+//      if (coverElements.first() != null)
+//      {
+//        Element coverElement = coverElements.first();
+//        String absoluteUrl = coverElement.absUrl("src");
+//        String srcValue = coverElement.attr("src");
+//
+//        URL url = new URL(absoluteUrl);
+//        BufferedImage c = ImageIO.read(url);
+//        ImageIcon image = new ImageIcon(c);
+//
+//        saveImage(absoluteUrl, game + ".jpg");
+//
+//        //TODO: big cover: 
+//
+//        String bigCoverUrl = coverElement.parent().attr("href");
+//        return scrapeBigCover(bigCoverUrl);
+//        System.out.println("Cover art: " + absoluteUrl);
+//      }
+//    }
+//    catch (IOException e)
+//    {
+//      e.printStackTrace();
+//    }
+//  }
 
-  private void scrapeBigCover(String url)
+  private BufferedImage scrapeBigCover(String url)
   {
     String cssQuery = "#main > div > div:eq(1) > center > img"; //*[@id="main"]/div/div[2]/center/img
     Document doc;
@@ -252,18 +276,14 @@ public class MobyGamesScraper
         String absoluteUrl = coverElement.absUrl("src");
 
         URL imageUrl = new URL(absoluteUrl);
-        BufferedImage c = ImageIO.read(imageUrl);
-        ImageIcon image = new ImageIcon(c);
-
-        saveImage(absoluteUrl, game + "-large.jpg");
-
-        System.out.println("Big Cover art: " + absoluteUrl);
+        return ImageIO.read(imageUrl);    
       }
     }
     catch (IOException e)
     {
-      e.printStackTrace();
+      ExceptionHandler.handleException(e, "Could not scrape cover");
     }
+    return null;
   }
 
   public static void saveImage(String imageUrl, String destinationFile) throws IOException

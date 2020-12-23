@@ -457,6 +457,10 @@ public class MainViewModel extends AbstractModel
         infoModel.setGenre(genre);
       }
     }
+    if (fields.isCover())
+    {
+      infoModel.setCoverImage(scraper.scrapeCover());
+    }
     //TODO: cover, screenshots
   }
 }

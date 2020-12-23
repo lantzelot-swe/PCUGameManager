@@ -40,7 +40,7 @@ public class VersionDownloadPanel extends JPanel
       String downloadUrl = VersionChecker.getDownloadUrl();
       String info = "<html>There is a new version of PCU Game Manager available: <b>" +
         VersionChecker.getLatestVersion() + "</b><p>" + "Go to <a href='" + downloadUrl + "'>" + downloadUrl +
-        "</a> and download PCUGameManager.exe.<br>" +
+        "</a> and download PCUGameManager.exe.<p>" +
         "Exit PCU Game Manager and replace the existing PCUGameManager.exe with the downloaded file to upgrade.</html>";
 
       editorPane = new JEditorPane("text/html", info);
