@@ -7,8 +7,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.ListModel;
@@ -429,30 +427,27 @@ public class MainViewModel extends AbstractModel
   
   public void scrapeGameInformation(ScraperFields fields)
   {
+    scraper.scrapeInformation(fields);
+      
     if (fields.isTitle())
     {
-      infoModel.setTitle(scraper.scrapeTitle());
+      infoModel.setTitle(scraper.getTitle());
     }
     if (fields.isAuthor())
     {
-      infoModel.setAuthor(scraper.scrapeAuthor());
+      infoModel.setAuthor(scraper.getAuthor());
     }
     if (fields.isYear())
-    {
-      Pattern p = Pattern.compile("\\d+");
-      Matcher m = p.matcher(scraper.scrapeYear());
-      if (m.find())
-      {
-        infoModel.setYear(Integer.parseInt(m.group()));
-      }
+    {    
+      infoModel.setYear(scraper.getYear());
     }
     if (fields.isDescription())
     {
-      infoModel.setDescription(scraper.scrapeDescription());
+      infoModel.setDescription(scraper.getDescription());
     }
     if (fields.isGenre())
     {
-      String genre = scraper.scrapeGenre();
+      String genre = scraper.getGenre();
       if (!genre.isEmpty())
       {
         infoModel.setGenre(genre);
@@ -460,20 +455,18 @@ public class MainViewModel extends AbstractModel
     }
     if (fields.isCover())
     {
-      infoModel.setCoverImage(scraper.scrapeCover());
+      infoModel.setCoverImage(scraper.getCover());
     }
-    
-    if (fields.isScreenshots())
-    {  //TODO: Make it possible to select which screenshot to use
-      List<BufferedImage> images = scraper.scrapeScreenshots();
-      if (images.size() > 0)
-      {
-        infoModel.setScreen1Image(images.get(0));
-      }
-      if (images.size() > 1)
-      {
-        infoModel.setScreen2Image(images.get(1));
-      }
-    }
+  }
+  
+  public List<BufferedImage> scrapeScreenshots()
+  {
+    return scraper.scrapeScreenshots();
+  }
+  
+  public void setScreenshotImages(BufferedImage screen1, BufferedImage screen2)
+  {
+    getInfoModel().setScreen1Image(screen1);
+    getInfoModel().setScreen2Image(screen2);
   }
 }

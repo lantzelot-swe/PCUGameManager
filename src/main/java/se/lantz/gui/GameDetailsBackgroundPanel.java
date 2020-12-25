@@ -8,6 +8,8 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
+import java.util.List;
 
 import javax.swing.JButton;
 import javax.swing.JPanel;
@@ -17,8 +19,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import se.lantz.gui.scraper.ScraperDialog;
+import se.lantz.gui.scraper.ScreenshotsSelectionDialog;
 import se.lantz.model.MainViewModel;
 import se.lantz.model.data.GameListData;
+import se.lantz.model.data.ScraperFields;
 
 public class GameDetailsBackgroundPanel extends JPanel
 {
@@ -220,8 +224,30 @@ public class GameDetailsBackgroundPanel extends JPanel
     if (scraperDialog.showDialog())
     {
       MainWindow.getInstance().setWaitCursor(true);
-      model.scrapeGameInformation(scraperDialog.getScraperFields());
+      ScraperFields scraperFields = scraperDialog.getScraperFields();
+      model.scrapeGameInformation(scraperFields);
       MainWindow.getInstance().setWaitCursor(false);
+      if (scraperFields.isScreenshots())
+      {
+        //Scrape the screens and check how many there are.
+        List<BufferedImage> screenshots =  model.scrapeScreenshots();
+        if (screenshots.size() > 2)
+        {
+          //Show dialog for selecting screenshots
+          ScreenshotsSelectionDialog screenDialog = new ScreenshotsSelectionDialog(MainWindow.getInstance(), screenshots);
+          screenDialog.pack();
+          screenDialog.setLocationRelativeTo(MainWindow.getInstance());
+          if (screenDialog.showDialog())
+          {
+            List<BufferedImage> selectedScreenshots = screenDialog.getSelectedScreenshots();
+            model.setScreenshotImages(selectedScreenshots.get(0), selectedScreenshots.get(1));
+          }
+        }
+        else
+        {
+          //TODO
+        }
+      }
     }
     
   }
