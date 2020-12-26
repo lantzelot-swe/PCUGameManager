@@ -6,17 +6,17 @@ import java.awt.Frame;
 import javax.swing.JPanel;
 
 import se.lantz.gui.BaseDialog;
-import se.lantz.model.MainViewModel;
+import se.lantz.manager.ScraperManager;
 import se.lantz.model.data.ScraperFields;
 
 public class ScraperDialog extends BaseDialog
 {
   private MobyGamesOptionsPanel mbyGamesPanel;
-  private final MainViewModel model;
-  public ScraperDialog(Frame owner, MainViewModel model)
+  private final ScraperManager scraper;
+  public ScraperDialog(Frame owner, ScraperManager scraper)
   {
     super(owner);
-    this.model = model;
+    this.scraper = scraper;
     JPanel content = new JPanel();
     content.setLayout(new BorderLayout());
     content.add(getMobyGamesPanel(), BorderLayout.CENTER);
@@ -29,7 +29,7 @@ public class ScraperDialog extends BaseDialog
   {
     if (mbyGamesPanel == null)
     {
-      mbyGamesPanel = new MobyGamesOptionsPanel(model, getOkButton());
+      mbyGamesPanel = new MobyGamesOptionsPanel(scraper, getOkButton());
     }
     return mbyGamesPanel;
   }

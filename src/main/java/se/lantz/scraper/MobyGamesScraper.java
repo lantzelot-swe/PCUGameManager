@@ -1,4 +1,4 @@
-package se.lantz.util;
+package se.lantz.scraper;
 
 import java.awt.image.BufferedImage;
 import java.io.IOException;
@@ -22,16 +22,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import se.lantz.model.data.ScraperFields;
+import se.lantz.util.ExceptionHandler;
 
 public class MobyGamesScraper
 {
   private static final Logger logger = LoggerFactory.getLogger(MobyGamesScraper.class);
 
-  private String mobyGamesBaseUrl = "https://www.mobygames.com/game/c64/*";
-
   private String mobyGamesGameUrl = "";
-
-  private String game = "rushn-attack";
 
   private String descriptionCssQuery = "#main > div > div:eq(2) > div";
 
@@ -65,14 +62,6 @@ public class MobyGamesScraper
 
   public MobyGamesScraper()
   {
-    // TODO Auto-generated constructor stub
-
-    //*[@id="main"]/div/div[2]/h1/a
-
-    //*[@id="main"]/div/div[3]/div[1]/h2[1]
-
-    //*[@id="coreGameCover"]/a/img
-
     //Keys are Genres defined on MobyGames, values are supported genres in the tool
     genreMap.put("Adventure, Role-Playing (RPG)", "adventure");
     genreMap.put("Racing / driving", "driving");
@@ -135,25 +124,11 @@ public class MobyGamesScraper
       {
         scrapedCover = scrapeCover(doc);
       }
-      //TODO: Screens
     }
     catch (IOException e)
     {
       ExceptionHandler.handleException(e, "Could not scrape title");
     }
-    //    
-    //    if (fields.isScreenshots())
-    //    {  //TODO: Make it possible to select which screenshot to use
-    //      List<BufferedImage> images = scraper.scrapeScreenshots();
-    //      if (images.size() > 0)
-    //      {
-    //        infoModel.setScreen1Image(images.get(0));
-    //      }
-    //      if (images.size() > 1)
-    //      {
-    //        infoModel.setScreen2Image(images.get(1));
-    //      }
-    //    }
   }
 
   public String getTitle()
@@ -185,29 +160,6 @@ public class MobyGamesScraper
   {
     return scrapedCover;
   }
-
-  //  public String scrapeTitle()
-  //  {
-  //    String value = "";
-  //    Document doc;
-  //    try
-  //    {
-  //      Connection.Response result = Jsoup.connect(mobyGamesGameUrl).method(Connection.Method.GET).execute();
-  //      doc = result.parse();
-  //      //Fetch the right element
-  //      Elements queryElements = doc.select(titleCssQuery);
-  //      Element first = queryElements.first();
-  //      if (first != null)
-  //      {
-  //        value = first.text();
-  //      }
-  //    }
-  //    catch (IOException e)
-  //    {
-  //      ExceptionHandler.handleException(e, "Could not scrape title");
-  //    }
-  //    return value;
-  //  }
 
   public String scrapeDescription(Document doc)
   {
@@ -316,9 +268,10 @@ public class MobyGamesScraper
       Elements coverElements = doc.select(screensCssQuery);
 
       logger.debug("Number of screenshots found: {}", coverElements.size());
-      for (Element element : coverElements)
+      //Scrape max 6 screens
+      for (int i = 0; i < Math.min(6, coverElements.size()); i++)
       {
-        String bigScreenUrl = element.attr("href");
+        String bigScreenUrl = coverElements.get(i).attr("href");
         logger.debug("Screen URL = " + bigScreenUrl);
         returnList.add(scrapeBigScreenshot(bigScreenUrl));
       }

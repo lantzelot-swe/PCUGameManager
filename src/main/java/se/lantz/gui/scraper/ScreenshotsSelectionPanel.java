@@ -28,11 +28,12 @@ public class ScreenshotsSelectionPanel extends JPanel
     GridBagConstraints gbc_infoLabel = new GridBagConstraints();
     gbc_infoLabel.weightx = 1.0;
     gbc_infoLabel.anchor = GridBagConstraints.WEST;
-    gbc_infoLabel.insets = new Insets(10, 5, 5, 0);
+    gbc_infoLabel.insets = new Insets(10, 10, 5, 0);
     gbc_infoLabel.gridx = 0;
     gbc_infoLabel.gridy = 0;
     add(getInfoLabel(), gbc_infoLabel);
     GridBagConstraints gbc_screenPanel = new GridBagConstraints();
+    gbc_screenPanel.insets = new Insets(5, 10, 10, 10);
     gbc_screenPanel.weighty = 1.0;
     gbc_screenPanel.weightx = 1.0;
     gbc_screenPanel.fill = GridBagConstraints.BOTH;
@@ -60,6 +61,7 @@ public class ScreenshotsSelectionPanel extends JPanel
       {
         ScreenshotCheckBoxPanel checkBox = new ScreenshotCheckBoxPanel();
         checkBox.getImageLabel().setIcon(new ImageIcon(screenshots.get(i)));
+        checkBox.getCheckBox().setText("Screenshot " + (i+1));
         screenshotCheckBoxList.add(checkBox);
         screenPanel.add(checkBox);
       }

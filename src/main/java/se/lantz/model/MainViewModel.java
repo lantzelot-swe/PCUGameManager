@@ -20,8 +20,8 @@ import se.lantz.model.data.GameDetails;
 import se.lantz.model.data.GameListData;
 import se.lantz.model.data.GameView;
 import se.lantz.model.data.ScraperFields;
+import se.lantz.scraper.MobyGamesScraper;
 import se.lantz.util.FileManager;
-import se.lantz.util.MobyGamesScraper;
 
 public class MainViewModel extends AbstractModel
 {
@@ -48,7 +48,7 @@ public class MainViewModel extends AbstractModel
   private PropertyChangeListener requiredFieldsListener;
 
   private GameListData selectedData;
-  
+
   MobyGamesScraper scraper = new MobyGamesScraper();
 
   public void initialize()
@@ -63,10 +63,10 @@ public class MainViewModel extends AbstractModel
 
     joy2Model.setPrimaryChangeListener(e -> joy1Model
       .setPrimaryWithoutListenerNotification(!Boolean.valueOf(e.getActionCommand())));
-    
+
     resetDataChangedAfterInit();
   }
-  
+
   private void setupGameViews()
   {
     //Setup game views
@@ -81,7 +81,7 @@ public class MainViewModel extends AbstractModel
       gameViewModel.addElement(gameView);
     }
   }
-  
+
   public void reloadGameViews()
   {
     this.disableChangeNotification(true);
@@ -256,7 +256,7 @@ public class MainViewModel extends AbstractModel
     return infoModel.isDataChanged() || joy1Model.isDataChanged() || joy2Model.isDataChanged() ||
       systemModel.isDataChanged();
   }
-  
+
   @Override
   public void resetDataChanged()
   {
@@ -265,7 +265,7 @@ public class MainViewModel extends AbstractModel
     joy2Model.resetDataChanged();
     systemModel.resetDataChanged();
   }
-  
+
   @Override
   public void resetDataChangedAfterInit()
   {
@@ -371,7 +371,7 @@ public class MainViewModel extends AbstractModel
     //Reload the current view
     reloadCurrentGameView();
   }
-  
+
   public void deleteGameView(GameView view)
   {
     if (view.getGameViewId() != GameView.ALL_GAMES_ID)
@@ -419,54 +419,5 @@ public class MainViewModel extends AbstractModel
       gameListModel.remove(gameListModel.getSize() - 1);
       resetDataChanged();
     }
-  }
-  public void connectScraper(String url) throws Exception
-  {
-    scraper.connectToMobyGames(url);
-  }
-  
-  public void scrapeGameInformation(ScraperFields fields)
-  {
-    scraper.scrapeInformation(fields);
-      
-    if (fields.isTitle())
-    {
-      infoModel.setTitle(scraper.getTitle());
-    }
-    if (fields.isAuthor())
-    {
-      infoModel.setAuthor(scraper.getAuthor());
-    }
-    if (fields.isYear())
-    {    
-      infoModel.setYear(scraper.getYear());
-    }
-    if (fields.isDescription())
-    {
-      infoModel.setDescription(scraper.getDescription());
-    }
-    if (fields.isGenre())
-    {
-      String genre = scraper.getGenre();
-      if (!genre.isEmpty())
-      {
-        infoModel.setGenre(genre);
-      }
-    }
-    if (fields.isCover())
-    {
-      infoModel.setCoverImage(scraper.getCover());
-    }
-  }
-  
-  public List<BufferedImage> scrapeScreenshots()
-  {
-    return scraper.scrapeScreenshots();
-  }
-  
-  public void setScreenshotImages(BufferedImage screen1, BufferedImage screen2)
-  {
-    getInfoModel().setScreen1Image(screen1);
-    getInfoModel().setScreen2Image(screen2);
   }
 }

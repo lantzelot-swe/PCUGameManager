@@ -19,7 +19,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import se.lantz.gui.scraper.ScraperDialog;
+import se.lantz.gui.scraper.ScraperProgressDialog;
+import se.lantz.gui.scraper.ScraperWorker;
 import se.lantz.gui.scraper.ScreenshotsSelectionDialog;
+import se.lantz.manager.ScraperManager;
 import se.lantz.model.MainViewModel;
 import se.lantz.model.data.GameListData;
 import se.lantz.model.data.ScraperFields;
@@ -29,7 +32,7 @@ public class GameDetailsBackgroundPanel extends JPanel
   private static final String EMPTY = "empty";
   private static final String DETAILS = "details";
   private static final Logger logger = LoggerFactory.getLogger(GameDetailsBackgroundPanel.class);
-  private MainViewModel model;
+  private final MainViewModel model;
   private JPanel settingsPanel;
   private InfoPanel infoPanel;
   private CombinedJoystickPanel joystickPanel;
@@ -42,9 +45,12 @@ public class GameDetailsBackgroundPanel extends JPanel
   private CardLayout cardLayout;
   private JButton scrapeButton;
 
+  private final ScraperManager scraperManager;
+
   public GameDetailsBackgroundPanel(MainViewModel model)
   {
     this.model = model;
+    this.scraperManager = new ScraperManager(model.getInfoModel());
     this.setMinimumSize(new Dimension(1250, 800));
     cardLayout = new CardLayout();
     setLayout(cardLayout);
@@ -198,57 +204,82 @@ public class GameDetailsBackgroundPanel extends JPanel
     }
     return saveButton;
   }
-  private JButton getScrapeButton() {
-    if (scrapeButton == null) {
-    	scrapeButton = new JButton("Scrape...");
-    	scrapeButton.addActionListener(new ActionListener() {
-    	  public void actionPerformed(ActionEvent e) {
-    	    scrapeGamesInformation();
-    	  }
-    	});
+
+  private JButton getScrapeButton()
+  {
+    if (scrapeButton == null)
+    {
+      scrapeButton = new JButton("Scrape...");
+      scrapeButton.addActionListener(new ActionListener()
+        {
+          public void actionPerformed(ActionEvent e)
+          {
+            scrapeGamesInformation();
+          }
+        });
     }
     return scrapeButton;
   }
-  
+
   private ScraperDialog scraperDialog = null;
-  
+
   private void scrapeGamesInformation()
   {
     if (scraperDialog == null)
     {
-      scraperDialog = new ScraperDialog(MainWindow.getInstance(), model);
+      scraperDialog = new ScraperDialog(MainWindow.getInstance(), scraperManager);
       scraperDialog.pack();
       scraperDialog.setLocationRelativeTo(MainWindow.getInstance());
     }
-    
+
     if (scraperDialog.showDialog())
     {
       MainWindow.getInstance().setWaitCursor(true);
+
       ScraperFields scraperFields = scraperDialog.getScraperFields();
-      model.scrapeGameInformation(scraperFields);
+      ScraperProgressDialog dialog = new ScraperProgressDialog(MainWindow.getInstance());
+      dialog.pack();
+      dialog.setLocationRelativeTo(MainWindow.getInstance());
+
+      ScraperWorker worker = new ScraperWorker(scraperManager, scraperFields, dialog);
+      worker.execute();
+      dialog.setVisible(true);
+
       MainWindow.getInstance().setWaitCursor(false);
       if (scraperFields.isScreenshots())
       {
-        //Scrape the screens and check how many there are.
-        List<BufferedImage> screenshots =  model.scrapeScreenshots();
+
+        List<BufferedImage> screenshots = scraperManager.getScreenshots();
         if (screenshots.size() > 2)
         {
           //Show dialog for selecting screenshots
-          ScreenshotsSelectionDialog screenDialog = new ScreenshotsSelectionDialog(MainWindow.getInstance(), screenshots);
+          ScreenshotsSelectionDialog screenDialog =
+            new ScreenshotsSelectionDialog(MainWindow.getInstance(), screenshots);
           screenDialog.pack();
           screenDialog.setLocationRelativeTo(MainWindow.getInstance());
           if (screenDialog.showDialog())
           {
-            List<BufferedImage> selectedScreenshots = screenDialog.getSelectedScreenshots();
-            model.setScreenshotImages(selectedScreenshots.get(0), selectedScreenshots.get(1));
+            screenshots = screenDialog.getSelectedScreenshots();
           }
+          else
+          {
+            return;
+          }
+        }
+        //Update with screenshots
+        if (screenshots.size() >= 2)
+        {
+          scraperManager.updateModelWithScreenshotImages(screenshots.get(0), screenshots.get(1));
+        }
+        else if (screenshots.size() == 1)
+        {
+          scraperManager.updateModelWithScreenshotImages(screenshots.get(0), null);
         }
         else
         {
-          //TODO
+          //Do nothing
         }
       }
     }
-    
   }
 }

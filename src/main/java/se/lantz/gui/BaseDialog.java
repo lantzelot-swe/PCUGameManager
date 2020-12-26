@@ -124,6 +124,7 @@ public class BaseDialog extends JDialog
 
   public boolean showDialog()
   {
+    okPressed = false;
     this.setVisible(true);
     return okPressed;
   }

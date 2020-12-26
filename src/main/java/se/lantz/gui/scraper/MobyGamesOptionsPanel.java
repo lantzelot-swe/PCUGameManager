@@ -20,6 +20,7 @@ import javax.swing.JTextField;
 import javax.swing.UIManager;
 import javax.swing.event.HyperlinkEvent;
 
+import se.lantz.manager.ScraperManager;
 import se.lantz.model.MainViewModel;
 import se.lantz.model.data.ScraperFields;
 import se.lantz.util.ExceptionHandler;
@@ -36,7 +37,7 @@ public class MobyGamesOptionsPanel extends JPanel
   private JCheckBox descriptionCheckBox;
   private JCheckBox coverCheckBox;
   private JCheckBox screensCheckBox;
-  private MainViewModel model;
+  private ScraperManager scraper;
   private JButton connectButton;
   private JLabel connectionStatusLabel;
   
@@ -46,9 +47,9 @@ public class MobyGamesOptionsPanel extends JPanel
   private JCheckBox genreCheckBox;
   
 
-  public MobyGamesOptionsPanel(MainViewModel model, JButton okButton)
+  public MobyGamesOptionsPanel(ScraperManager scraper, JButton okButton)
   {
-    this.model = model;
+    this.scraper = scraper;
     this.okButton = okButton;
     GridBagLayout gridBagLayout = new GridBagLayout();
     setLayout(gridBagLayout);
@@ -74,8 +75,8 @@ public class MobyGamesOptionsPanel extends JPanel
     gbc_connectButton.gridy = 1;
     add(getConnectButton(), gbc_connectButton);
     GridBagConstraints gbc_connectionStatusLabel = new GridBagConstraints();
-    gbc_connectionStatusLabel.anchor = GridBagConstraints.WEST;
-    gbc_connectionStatusLabel.insets = new Insets(0, 10, 0, 5);
+    gbc_connectionStatusLabel.gridwidth = 2;
+    gbc_connectionStatusLabel.insets = new Insets(0, 10, 10, 5);
     gbc_connectionStatusLabel.gridx = 0;
     gbc_connectionStatusLabel.gridy = 2;
     add(getConnectionStatusLabel(), gbc_connectionStatusLabel);
@@ -288,6 +289,8 @@ public class MobyGamesOptionsPanel extends JPanel
     returnValue.setYear(yearCheckBox.isSelected());
     returnValue.setGenre(genreCheckBox.isSelected());
     returnValue.setDescription(descriptionCheckBox.isSelected());
+    returnValue.setCover(coverCheckBox.isSelected());
+    returnValue.setScreenshots(screensCheckBox.isSelected());
     return returnValue;
   }
   private JButton getConnectButton() {
@@ -298,7 +301,7 @@ public class MobyGamesOptionsPanel extends JPanel
     	    try
           {
     	      MobyGamesOptionsPanel.this.setCursor(waitCursor);
-            model.connectScraper(urlTextField.getText());
+            scraper.connectScraper(urlTextField.getText());
             getConnectionStatusLabel().setText("Connection status: OK");
             enableCheckBoxes(true);
             okButton.setEnabled(true);
