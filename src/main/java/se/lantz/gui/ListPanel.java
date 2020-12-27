@@ -127,8 +127,8 @@ public class ListPanel extends JPanel
                 .openViewEditDialog((GameView) getListViewComboBox().getSelectedItem()));
               menu.add(editItem);
               JMenuItem deleteItem = new JMenuItem("Delete view...");
-              deleteItem.addActionListener(e -> gameViewManager
-                .deleteView((GameView) getListViewComboBox().getSelectedItem()));
+              deleteItem
+                .addActionListener(e -> gameViewManager.deleteView((GameView) getListViewComboBox().getSelectedItem()));
               menu.add(deleteItem);
             }
 
@@ -155,7 +155,7 @@ public class ListPanel extends JPanel
               uiModel.setSelectedGameView((GameView) listViewComboBox.getSelectedItem());
               //TODO: keep track of selected index for the view and select it once data is updated
               updateViewInfoLabel();
-              SwingUtilities.invokeLater(() -> {             
+              SwingUtilities.invokeLater(() -> {
                 getList().setSelectedIndex(0);
                 getList().ensureIndexIsVisible(0);
               });
@@ -166,24 +166,24 @@ public class ListPanel extends JPanel
     }
     return listViewComboBox;
   }
-  
+
   int getSelectedIndexInList()
   {
     return getList().getSelectedIndex();
   }
-  
+
   void setSelectedIndexInList(int index)
   {
     int indexToSelect = index;
     if (index >= uiModel.getGameListModel().getSize())
     {
-      indexToSelect = uiModel.getGameListModel().getSize()-1;
+      indexToSelect = uiModel.getGameListModel().getSize() - 1;
     }
     list.clearSelection();
     list.setSelectedIndex(indexToSelect);
     list.ensureIndexIsVisible(indexToSelect);
   }
-  
+
   public void clearGameListSelection()
   {
     list.clearSelection();
@@ -309,6 +309,7 @@ public class ListPanel extends JPanel
         }
       });
       list.setModel(uiModel.getGameListModel());
+      list.setCellRenderer(new GameListDataRenderer());
     }
     return list;
   }
@@ -340,5 +341,14 @@ public class ListPanel extends JPanel
     getList().ensureIndexIsVisible(rowToSelect);
     mainPanel.getGameDetailsBackgroundPanel().updateSelectedGame(list.getSelectedValue());
     mainPanel.getGameDetailsBackgroundPanel().focusTitleField();
+  }
+
+  public void toggleFavorite()
+  {
+    if (!uiModel.isDataChanged())
+    {
+      uiModel.toggleFavorite(list.getSelectedValue());
+
+    }
   }
 }

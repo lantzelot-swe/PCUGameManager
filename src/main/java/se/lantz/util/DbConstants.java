@@ -16,6 +16,7 @@ public class DbConstants
   public static final String JOY2 = "Joy2config";
   public static final String SYSTEM = "System";
   public static final String VERTICALSHIFT = "VerticalShift";
+  public static final String FAVORITE = "Favorite";
 
   private DbConstants()
   {

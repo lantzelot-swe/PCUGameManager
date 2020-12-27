@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 public class GameView implements Comparable
 {
   public static final int ALL_GAMES_ID = -1;
+  public static final int FAVORITES_ID = -2;
   private static final Logger logger = LoggerFactory.getLogger(GameView.class);
   private String name = "";
   private boolean matchAll = true;

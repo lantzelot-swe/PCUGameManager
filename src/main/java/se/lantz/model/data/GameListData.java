@@ -2,16 +2,17 @@ package se.lantz.model.data;
 
 public class GameListData implements Comparable
 {
+  private String title;
+  private String gameId;
+  private int favorite;
 
-  public GameListData(String title, String gameId)
+  public GameListData(String title, String gameId, int favorite)
   {
     super();
     this.title = title;
     this.gameId = gameId;
+    this.favorite = favorite;
   }
-
-  private String title;
-  private String gameId;
 
   public String getTitle()
   {
@@ -31,6 +32,27 @@ public class GameListData implements Comparable
   public void setGameId(String gameId)
   {
     this.gameId = gameId;
+  }
+
+  public int getFavorite()
+  {
+    return favorite;
+  }
+  
+  public void toggleFavorite()
+  {
+    this.favorite = favorite == 0 ? 1 : 0;
+  }
+
+  public boolean isFavorite()
+  {
+    //For now "1" means favorite and "0 means no favorite. Possible to add support for multiple favorite lists later on.
+    return favorite == 1;
+  }
+
+  public void setFavorite(int favorite)
+  {
+    this.favorite = favorite;
   }
 
   @Override

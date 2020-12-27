@@ -51,6 +51,7 @@ public class MenuManager
   private static final String IMPORT_DIR_PROPERTY = "importDir";
   private static final String EXPORT_DIR_PROPERTY = "exportDir";
   private JMenu fileMenu;
+  private JMenu editMenu;
   private JMenu dbMenu;
   private JMenu helpMenu;
 
@@ -58,6 +59,8 @@ public class MenuManager
   private JMenuItem deleteGameItem;
   private JMenuItem importItem;
   private JMenuItem exportItem;
+  
+  private JMenuItem toggleFavoriteItem;
 
   private JMenuItem backupDbItem;
   private JMenuItem restoreDbItem;
@@ -101,6 +104,8 @@ public class MenuManager
     fileMenu.add(getExportItem());
     fileMenu.addSeparator();
     fileMenu.add(getExitItem());
+    editMenu = new JMenu("Edit");
+    editMenu.add(getToggleFavoriteItem());
     dbMenu = new JMenu("Database");
     dbMenu.add(getBackupDbItem());
     dbMenu.add(getRestoreDbItem());
@@ -120,6 +125,7 @@ public class MenuManager
   {
     List<JMenu> menuList = new ArrayList<JMenu>();
     menuList.add(fileMenu);
+    menuList.add(editMenu);
     menuList.add(dbMenu);
     menuList.add(helpMenu);
     return menuList;
@@ -190,6 +196,18 @@ public class MenuManager
       System.exit(0);
     });
     return exitItem;
+  }
+  
+  private JMenuItem getToggleFavoriteItem()
+  {
+    toggleFavoriteItem = new JMenuItem("Add/remove from favorites");
+    KeyStroke keyStrokeToToggleFav = KeyStroke.getKeyStroke(KeyEvent.VK_F12, InputEvent.CTRL_DOWN_MASK);
+    toggleFavoriteItem.setAccelerator(keyStrokeToToggleFav);
+    toggleFavoriteItem.setMnemonic('F');
+    toggleFavoriteItem.addActionListener(e -> {
+      mainWindow.getMainPanel().toggleFavorite();
+    });
+    return toggleFavoriteItem;
   }
 
   private JMenuItem getBackupDbItem()
@@ -270,6 +288,7 @@ public class MenuManager
         if (optionsDialog.showDialog())
         {
           importManager.setSelectedOption(optionsDialog.getSelectedOption());
+          importManager.setAddAsFavorite(optionsDialog.getMarkAsFavorite());
           ImportProgressDialog dialog = new ImportProgressDialog(this.mainWindow);
           ImportWorker worker = new ImportWorker(importManager, dialog);
           worker.execute();

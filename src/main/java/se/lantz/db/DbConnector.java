@@ -40,7 +40,9 @@ public class DbConnector
     "    Joy1config    STRING,\r\n" + 
     "    Joy2config    STRING,\r\n" + 
     "    System        STRING,\r\n" + 
-    "    VerticalShift INTEGER\r\n" + 
+    "    VerticalShift INTEGER,\r\n" + 
+    "    Favorite      INTEGER NOT NULL\r\n" + 
+    "                          DEFAULT (0) \r\n" + 
     ");";
   private static final String GAMEVIEW_SQL = "CREATE TABLE gameview (\r\n" + 
     "    viewId   INTEGER PRIMARY KEY,\r\n" + 
@@ -74,6 +76,7 @@ public class DbConnector
     columnList.add(DbConstants.JOY2);
     columnList.add(DbConstants.SYSTEM);
     columnList.add(DbConstants.VERTICALSHIFT);
+    columnList.add(DbConstants.FAVORITE);
     //Check if database file exists, if not create an empty db.
     File dbFile = new File("./"+ DB_NAME);
     if (!dbFile.exists())
@@ -127,14 +130,14 @@ public class DbConnector
   public List<GameListData> fetchAllGames()
   {
     List<GameListData> returnList = new ArrayList<>();
-    String sql = "SELECT title, rowid FROM gameinfo ORDER BY title ASC";
+    String sql = "SELECT title, rowid, Favorite FROM gameinfo ORDER BY title ASC";
     try (Connection conn = this.connect(); Statement stmt = conn.createStatement();
       ResultSet rs = stmt.executeQuery(sql))
     {
       // loop through the result set
       while (rs.next())
       {
-        GameListData data = new GameListData(rs.getString("Title"), Integer.toString(rs.getInt("rowid")));
+        GameListData data = new GameListData(rs.getString("Title"), Integer.toString(rs.getInt("rowid")), rs.getInt("Favorite"));
         returnList.add(data);
       }
     }
@@ -151,7 +154,7 @@ public class DbConnector
 
     //Construct SQL
     StringBuilder sqlBuilder = new StringBuilder();
-    sqlBuilder.append("SELECT title, rowid FROM gameinfo ");
+    sqlBuilder.append("SELECT title, rowid, favorite FROM gameinfo ");
     sqlBuilder.append(view.getSqlQuery());
     sqlBuilder.append(" ORDER BY title ASC");
 
@@ -162,7 +165,7 @@ public class DbConnector
       // loop through the result set
       while (rs.next())
       {
-        GameListData data = new GameListData(rs.getString("Title"), Integer.toString(rs.getInt("rowid")));
+        GameListData data = new GameListData(rs.getString("Title"), Integer.toString(rs.getInt("rowid")), rs.getInt("Favorite"));
         returnList.add(data);
       }
     }
@@ -315,17 +318,19 @@ public class DbConnector
     }
   }
 
-  public StringBuilder importRowsInGameInfoTable(List<String> rowValues, ImportManager.Options option)
+  public StringBuilder importRowsInGameInfoTable(List<String> rowValues,
+                                                 ImportManager.Options option,
+                                                 boolean addAsFavorite)
   {
     StringBuilder returnBuilder = new StringBuilder();
     switch (option)
     {
     case SKIP:
-      skipExistingAndInsertMissingIntoGameInfoTable(rowValues, returnBuilder);
+      skipExistingAndInsertMissingIntoGameInfoTable(rowValues, returnBuilder, addAsFavorite);
       break;
 
     case OVERWRITE:
-      overwriteExistingAndInsertMissingIntoGameInfoTable(rowValues, returnBuilder);
+      overwriteExistingAndInsertMissingIntoGameInfoTable(rowValues, returnBuilder, addAsFavorite);
       break;
     default:
       break;
@@ -333,7 +338,7 @@ public class DbConnector
     return returnBuilder;
   }
 
-  private void overwriteExistingAndInsertMissingIntoGameInfoTable(List<String> rowValues, StringBuilder infoBuilder)
+  private void overwriteExistingAndInsertMissingIntoGameInfoTable(List<String> rowValues, StringBuilder infoBuilder, boolean addAsFavorite)
   {
     List<String> existingRowValues = new ArrayList<>();
     List<String> newRowValues = new ArrayList<>();
@@ -377,16 +382,16 @@ public class DbConnector
 
     if (existingRowValues.size() > 0)
     {
-      updateAllInGameInfoTable(existingRowValues);
+      updateAllInGameInfoTable(existingRowValues, addAsFavorite);
     }
 
     if (newRowValues.size() > 0)
     {
-      insertAllIntoGameInfoTable(newRowValues, infoBuilder);
+      insertAllIntoGameInfoTable(newRowValues, infoBuilder, addAsFavorite);
     }
   }
 
-  private void skipExistingAndInsertMissingIntoGameInfoTable(List<String> rowValues, StringBuilder infoBuilder)
+  private void skipExistingAndInsertMissingIntoGameInfoTable(List<String> rowValues, StringBuilder infoBuilder, boolean addAsFavorite)
   {
     List<String> newRowValues = new ArrayList<>();
     //Check which are already available and sort them out of rowValues
@@ -428,14 +433,14 @@ public class DbConnector
 
     if (newRowValues.size() > 0)
     {
-      insertAllIntoGameInfoTable(newRowValues, infoBuilder);
+      insertAllIntoGameInfoTable(newRowValues, infoBuilder, addAsFavorite);
     }
     //Replace content of rowValues with the ones that was added. Only look at these in the next step of the import
     rowValues.clear();
     rowValues.addAll(newRowValues);
   }
 
-  private void insertAllIntoGameInfoTable(List<String> rowValues, StringBuilder infoBuilder)
+  private void insertAllIntoGameInfoTable(List<String> rowValues, StringBuilder infoBuilder, boolean addAsFavorite)
   {
     infoBuilder.append("Adding ");
     infoBuilder.append(rowValues.size());
@@ -454,6 +459,14 @@ public class DbConnector
     for (String rowData : rowValues)
     {
       st.append(rowData);
+      if (addAsFavorite)
+      {
+        st.append(",1");
+      }
+      else
+      {
+        st.append(",0");
+      }
       st.append("),(");
     }
     st.delete(st.length() - 3, st.length());
@@ -473,7 +486,7 @@ public class DbConnector
     }
   }
 
-  private void updateAllInGameInfoTable(List<String> rowValues)
+  private void updateAllInGameInfoTable(List<String> rowValues, boolean addAsFavorite)
   {
     for (String rowValue : rowValues)
     {
@@ -481,7 +494,8 @@ public class DbConnector
       String title = splittedRowValueList.get(0);
       StringBuilder sqlBuilder = new StringBuilder();
       sqlBuilder.append("UPDATE gameinfo SET ");
-      for (int i = 1; i < columnList.size(); i++)
+      //Loop from 1 (year) to verticalshift, exclude favorite from loop
+      for (int i = 1; i < columnList.size()-1; i++)
       {
         sqlBuilder.append(columnList.get(i));
         sqlBuilder.append(" = ");
@@ -491,7 +505,7 @@ public class DbConnector
         }
 
         sqlBuilder.append(splittedRowValueList.get(i));
-        if (i < columnList.size() - 1)
+        if (i < columnList.size() - 2)
         {
           if (i == 1)
           {
@@ -502,6 +516,14 @@ public class DbConnector
             sqlBuilder.append("\",");
           }
         }
+      }
+      if (addAsFavorite)
+      {
+        sqlBuilder.append(",Favorite = 1");
+      }
+      else
+      {
+        sqlBuilder.append(",Favorite = 0");
       }
       sqlBuilder.append(" WHERE title = ");
       sqlBuilder.append(title);
@@ -619,6 +641,7 @@ public class DbConnector
     st.append(details.getSystem());
     st.append("\",");
     st.append(details.getVerticalShift());
+    st.append(",0");
     st.append(");");
 
     String sql = st.toString();
@@ -647,21 +670,6 @@ public class DbConnector
 
   public void saveGame(String rowId, GameDetails details)
   {
-    columnList.add(DbConstants.TITLE);
-    columnList.add(DbConstants.YEAR);
-    columnList.add(DbConstants.AUTHOR);
-    columnList.add(DbConstants.COMPOSER);
-    columnList.add(DbConstants.GENRE);
-    columnList.add(DbConstants.DESC);
-    columnList.add(DbConstants.GAME);
-    columnList.add(DbConstants.COVER);
-    columnList.add(DbConstants.SCREEN1);
-    columnList.add(DbConstants.SCREEN2);
-    columnList.add(DbConstants.JOY1);
-    columnList.add(DbConstants.JOY2);
-    columnList.add(DbConstants.SYSTEM);
-    columnList.add(DbConstants.VERTICALSHIFT);
-
     StringBuilder sqlBuilder = new StringBuilder();
     sqlBuilder.append("UPDATE gameinfo SET ");
 
@@ -785,6 +793,21 @@ public class DbConnector
     catch (SQLException e)
     {
       ExceptionHandler.handleException(e, "Could not delete gameview or viewfilter in db.");
+    }
+  }
+  
+  public void toggleFavorite(String gameId, int currentFavoriteValue)
+  {
+    int newValue = currentFavoriteValue == 0 ? 1 : 0;
+    String sql = "UPDATE gameinfo SET Favorite = " + newValue + " WHERE rowId = " + gameId + ";";
+    try (Connection conn = this.connect(); PreparedStatement favoritestmt = conn.prepareStatement(sql))
+    {
+      int value = favoritestmt.executeUpdate(); 
+      logger.debug("Executed successfully, value = {}", value);
+    }
+    catch (SQLException e)
+    {
+      ExceptionHandler.handleException(e, "Could not update favorite value in db.");
     }
   }
 }

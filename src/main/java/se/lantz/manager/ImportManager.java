@@ -40,6 +40,7 @@ public class ImportManager
 
   private MainViewModel uiModel;
   private Options selectedOption;
+  private boolean addAsFavorite = false;
 
   public ImportManager(MainViewModel uiModel)
   {
@@ -49,6 +50,11 @@ public class ImportManager
   public void setSelectedOption(Options option)
   {
     this.selectedOption = option;
+  }
+  
+  public void setAddAsFavorite(boolean favorite)
+  {
+    this.addAsFavorite = favorite;
   }
 
   public boolean checkSelectedFolder(Path folder)
@@ -131,7 +137,7 @@ public class ImportManager
 
   public StringBuilder insertRowsIntoDb()
   {
-    return uiModel.importGameInfo(dbRowDataList, selectedOption);
+    return uiModel.importGameInfo(dbRowDataList, selectedOption, addAsFavorite);
   }
 
   private void extractInfoIntoRowString(List<String> fileLines)

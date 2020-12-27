@@ -74,6 +74,12 @@ public class MainViewModel extends AbstractModel
     selectedGameView.setName("All Games");
     selectedGameView.setSqlQuery("");
     gameViewModel.addElement(selectedGameView);
+    //Add favorites view
+    GameView favoritesView = new GameView(GameView.FAVORITES_ID);
+    favoritesView.setName("Favorites");
+    favoritesView.setSqlQuery(" WHERE Favorite = 1");
+    gameViewModel.addElement(favoritesView);
+    
     List<GameView> gameViewList = dbConnector.loadGameViews();
     Collections.sort(gameViewList);
     for (GameView gameView : gameViewList)
@@ -142,9 +148,9 @@ public class MainViewModel extends AbstractModel
     }
   }
 
-  public StringBuilder importGameInfo(List<String> rowValues, ImportManager.Options option)
+  public StringBuilder importGameInfo(List<String> rowValues, ImportManager.Options option, boolean addAsFavorite)
   {
-    return dbConnector.importRowsInGameInfoTable(rowValues, option);
+    return dbConnector.importRowsInGameInfoTable(rowValues, option, addAsFavorite);
   }
 
   public List<GameDetails> readGameDetailsForExport(StringBuilder infoBuilder, List<GameListData> gamesList)
@@ -328,7 +334,7 @@ public class MainViewModel extends AbstractModel
         dbConnector.saveGame(currentGameId, updatedGame);
       }
       selectedData.setTitle(updatedGame.getTitle());
-      gameListModel.notifySave();
+      gameListModel.notifyChange();
 
       fileManager.saveFiles();
       //Notify of any changes to covers/screens etc
@@ -374,7 +380,7 @@ public class MainViewModel extends AbstractModel
 
   public void deleteGameView(GameView view)
   {
-    if (view.getGameViewId() != GameView.ALL_GAMES_ID)
+    if (view.getGameViewId() > GameView.ALL_GAMES_ID)
     {
       dbConnector.deleteView(view);
       reloadGameViews();
@@ -409,7 +415,7 @@ public class MainViewModel extends AbstractModel
 
   public void addNewGameListData()
   {
-    gameListModel.addElement(new GameListData("New Game", ""));
+    gameListModel.addElement(new GameListData("New Game", "", 0));
   }
 
   public void removeNewGameListData()
@@ -418,6 +424,16 @@ public class MainViewModel extends AbstractModel
     {
       gameListModel.remove(gameListModel.getSize() - 1);
       resetDataChanged();
+    }
+  }
+  
+  public void toggleFavorite(GameListData data)
+  {
+    if (data != null && !data.getGameId().isEmpty())
+    {
+      dbConnector.toggleFavorite(data.getGameId(), data.getFavorite());
+      data.toggleFavorite();
+      gameListModel.notifyChange();
     }
   }
 }

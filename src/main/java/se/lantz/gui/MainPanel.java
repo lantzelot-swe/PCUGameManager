@@ -160,4 +160,9 @@ public class MainPanel extends JPanel
   {
     getListPanel().clearGameListSelection();
   }
+  
+  public void toggleFavorite()
+  {
+    getListPanel().toggleFavorite();
+  }
 }

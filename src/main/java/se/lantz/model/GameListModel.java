@@ -6,7 +6,7 @@ import se.lantz.model.data.GameListData;
 
 public class GameListModel extends DefaultListModel<GameListData>
 { 
-  void notifySave()
+  void notifyChange()
   {
     fireContentsChanged(this, 0, getSize()-1);
   }

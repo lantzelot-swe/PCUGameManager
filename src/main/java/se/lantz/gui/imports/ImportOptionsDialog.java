@@ -15,6 +15,7 @@ public class ImportOptionsDialog extends BaseDialog
     setTitle("Import game carousel");
     addContent(getImportOptionsPanel());
     getOkButton().setText("Import");
+    this.setResizable(false);
   }
 
   private ImportOptionsPanel getImportOptionsPanel() {
@@ -29,5 +30,8 @@ public class ImportOptionsDialog extends BaseDialog
     return getImportOptionsPanel().getSelectedOption();
   }
   
-  
+  public boolean getMarkAsFavorite()
+  {
+   return  getImportOptionsPanel().getMarkAsFavorite();
+  }
 }
