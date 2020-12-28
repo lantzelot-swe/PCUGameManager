@@ -39,7 +39,7 @@ public class MainViewModel extends AbstractModel
   private JoystickModel joy2Model = new JoystickModel(false);
   private SystemModel systemModel = new SystemModel();
 
-  private FileManager fileManager = new FileManager(infoModel);
+  private FileManager fileManager = new FileManager(this);
 
   private String currentGameId = "";
 
@@ -435,5 +435,10 @@ public class MainViewModel extends AbstractModel
       data.toggleFavorite();
       gameListModel.notifyChange();
     }
+  }
+  
+  public void runGameInVice()
+  {
+    fileManager.runGameInVice();
   }
 }

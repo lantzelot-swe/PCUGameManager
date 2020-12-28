@@ -12,7 +12,7 @@ public class VersionDownloadDialog extends BaseDialog
     setTitle("New version available");
     addContent(getVersionDownloadPanel());
     getOkButton().setText("Exit");
-    getCancelButton().setText("Continue");
+    getCancelButton().setText("Close");
     this.setResizable(false);
   }
 

@@ -26,6 +26,7 @@ import se.lantz.manager.ScraperManager;
 import se.lantz.model.MainViewModel;
 import se.lantz.model.data.GameListData;
 import se.lantz.model.data.ScraperFields;
+import se.lantz.util.FileManager;
 
 public class GameDetailsBackgroundPanel extends JPanel
 {
@@ -56,6 +57,10 @@ public class GameDetailsBackgroundPanel extends JPanel
     setLayout(cardLayout);
     add(getEmptyPanel(), EMPTY);
     add(getDetailsPanel(), DETAILS);
+    model.addSaveChangeListener(e -> {
+      saveButton.setEnabled(model.isDataChanged());
+      runButton.setEnabled(!model.getInfoModel().getGamesFile().isEmpty());
+    });
   }
 
   void focusTitleField()
@@ -162,10 +167,6 @@ public class GameDetailsBackgroundPanel extends JPanel
     {
       buttonPanel = new JPanel();
       GridBagLayout gbl_buttonPanel = new GridBagLayout();
-      gbl_buttonPanel.columnWidths = new int[] { 0, 0, 0 };
-      gbl_buttonPanel.rowHeights = new int[] { 0, 0 };
-      gbl_buttonPanel.columnWeights = new double[] { 0.0, 0.0, Double.MIN_VALUE };
-      gbl_buttonPanel.rowWeights = new double[] { 0.0, Double.MIN_VALUE };
       buttonPanel.setLayout(gbl_buttonPanel);
       GridBagConstraints gbc_scrapeButton = new GridBagConstraints();
       gbc_scrapeButton.weighty = 1.0;
@@ -176,12 +177,19 @@ public class GameDetailsBackgroundPanel extends JPanel
       buttonPanel.add(getScrapeButton(), gbc_scrapeButton);
       GridBagConstraints gbc_saveButton = new GridBagConstraints();
       gbc_saveButton.weighty = 1.0;
-      gbc_saveButton.weightx = 1.0;
       gbc_saveButton.anchor = GridBagConstraints.SOUTHEAST;
       gbc_saveButton.insets = new Insets(5, 5, 5, 6);
-      gbc_saveButton.gridx = 1;
+      gbc_saveButton.gridx = 2;
       gbc_saveButton.gridy = 0;
       buttonPanel.add(getSaveButton(), gbc_saveButton);
+      GridBagConstraints gbc_runButton = new GridBagConstraints();
+      gbc_runButton.anchor = GridBagConstraints.EAST;
+      gbc_runButton.weighty = 1.0;
+      gbc_runButton.weightx = 1.0;
+      gbc_runButton.insets = new Insets(5, 0, 5, 10);
+      gbc_runButton.gridx = 1;
+      gbc_runButton.gridy = 0;
+      buttonPanel.add(getRunButton(), gbc_runButton);
     }
     return buttonPanel;
   }
@@ -190,9 +198,6 @@ public class GameDetailsBackgroundPanel extends JPanel
   {
     if (saveButton == null)
     {
-      model.addSaveChangeListener(e -> {
-        saveButton.setEnabled(model.isDataChanged());
-      });
       saveButton = new JButton("Save");
       saveButton.addActionListener(new ActionListener()
         {
@@ -222,6 +227,7 @@ public class GameDetailsBackgroundPanel extends JPanel
   }
 
   private ScraperDialog scraperDialog = null;
+  private JButton runButton;
 
   private void scrapeGamesInformation()
   {
@@ -281,5 +287,12 @@ public class GameDetailsBackgroundPanel extends JPanel
         }
       }
     }
+  }
+  private JButton getRunButton() {
+    if (runButton == null) {
+    	runButton = new JButton("Run game");
+    	runButton.addActionListener(e -> model.runGameInVice());
+    }
+    return runButton;
   }
 }

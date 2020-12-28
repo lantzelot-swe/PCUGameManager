@@ -31,6 +31,8 @@ import org.slf4j.LoggerFactory;
 import se.lantz.db.DbConnector;
 import se.lantz.gui.MainWindow;
 import se.lantz.model.InfoModel;
+import se.lantz.model.MainViewModel;
+import se.lantz.model.SystemModel;
 import se.lantz.model.data.GameDetails;
 
 public class FileManager
@@ -44,32 +46,36 @@ public class FileManager
 
   private static Properties fileProperties;
 
-  private InfoModel model;
+  private MainViewModel model;
+  private InfoModel infoModel;
+  private SystemModel systemModel;
 
-  public FileManager(InfoModel model)
+  public FileManager(MainViewModel model)
   {
+    this.infoModel = model.getInfoModel();
+    this.systemModel = model.getSystemModel();
     this.model = model;
   }
 
   public void saveFiles()
   {
     //Check if title is different that in db, then rename existing files!
-    if (model.isTitleChanged())
+    if (infoModel.isTitleChanged())
     {
       //Rename existing covers and screens and game file
       renameFiles();
     }
 
     //Fetch images that has been added
-    BufferedImage cover = model.getCoverImage();
-    BufferedImage screen1 = model.getScreen1Image();
-    BufferedImage screen2 = model.getScreen2Image();
-    String coverFileName = model.getCoverFile();
-    String screen1FileName = model.getScreens1File();
-    String screen2FileName = model.getScreens2File();
+    BufferedImage cover = infoModel.getCoverImage();
+    BufferedImage screen1 = infoModel.getScreen1Image();
+    BufferedImage screen2 = infoModel.getScreen2Image();
+    String coverFileName = infoModel.getCoverFile();
+    String screen1FileName = infoModel.getScreens1File();
+    String screen2FileName = infoModel.getScreens2File();
 
-    String gameName = model.getGamesFile();
-    Path gamePath = model.getGamesPath();
+    String gameName = infoModel.getGamesFile();
+    Path gamePath = infoModel.getGamesPath();
 
     //Store on disk with the name in the models. The UI must make sure the names is according to the Maxi format.
 
@@ -162,11 +168,11 @@ public class FileManager
 
   private void renameFiles()
   {
-    String oldTitle = generateFileNameFromTitle(model.getTitleInDb());
-    if (!model.getCoverFile().isEmpty())
+    String oldTitle = generateFileNameFromTitle(infoModel.getTitleInDb());
+    if (!infoModel.getCoverFile().isEmpty())
     {
       File oldCover = new File(COVERS + oldTitle + "-cover.png");
-      File newCover = new File(COVERS + model.getCoverFile());
+      File newCover = new File(COVERS + infoModel.getCoverFile());
       if (oldCover.renameTo(newCover))
       {
         logger.debug("Renamed cover {} to {}", oldCover.getName(), newCover.getName());
@@ -176,10 +182,10 @@ public class FileManager
         logger.debug("Could NOT rename cover {} to {}", oldCover.getName(), newCover.getName());
       }
     }
-    if (!model.getScreens1File().isEmpty())
+    if (!infoModel.getScreens1File().isEmpty())
     {
       File oldScreen1 = new File(SCREENS + oldTitle + "-00.png");
-      File newScreen1 = new File(SCREENS + model.getScreens1File());
+      File newScreen1 = new File(SCREENS + infoModel.getScreens1File());
       if (oldScreen1.renameTo(newScreen1))
       {
         logger.debug("Renamed screen1 {} to {}", oldScreen1.getName(), newScreen1.getName());
@@ -189,10 +195,10 @@ public class FileManager
         logger.debug("Could NOT rename screen1 {} to {}", oldScreen1.getName(), newScreen1.getName());
       }
     }
-    if (!model.getScreens2File().isEmpty())
+    if (!infoModel.getScreens2File().isEmpty())
     {
       File oldScreen2 = new File(SCREENS + oldTitle + "-01.png");
-      File newScreen2 = new File(SCREENS + model.getScreens2File());
+      File newScreen2 = new File(SCREENS + infoModel.getScreens2File());
       if (oldScreen2.renameTo(newScreen2))
       {
         logger.debug("Renamed screen2 {} to {}", oldScreen2.getName(), newScreen2.getName());
@@ -202,11 +208,11 @@ public class FileManager
         logger.debug("Could NOT rename screen2 {} to {}", oldScreen2.getName(), newScreen2.getName());
       }
     }
-    if (!model.getGamesFile().isEmpty())
+    if (!infoModel.getGamesFile().isEmpty())
     {
-      String fileEnding = model.getGamesFile().substring(model.getGamesFile().indexOf("."));
+      String fileEnding = infoModel.getGamesFile().substring(infoModel.getGamesFile().indexOf("."));
       File oldGame = new File(GAMES + oldTitle + fileEnding);
-      File newGame = new File(GAMES + model.getGamesFile());
+      File newGame = new File(GAMES + infoModel.getGamesFile());
       if (oldGame.renameTo(newGame))
       {
         logger.debug("Renamed game {} to {}", oldGame.getName(), newGame.getName());
@@ -330,6 +336,62 @@ public class FileManager
     }
     fw.close();
   }
+  
+  public void runGameInVice()
+  {
+    String gameFile = GAMES + infoModel.getGamesFile();
+    StringBuilder command = new StringBuilder();
+    if (systemModel.isC64())
+    {
+      command.append("./vice/x64.exe ");
+    }
+    else
+    {
+      command.append("./vice/xvic.exe ");
+    }
+    //Append game file
+    Path gamePath = infoModel.getGamesPath();
+    if (gamePath != null)
+    {
+      command.append("-autostart " + gamePath.toString());
+    }
+    else
+    {
+      command.append("-autostart " + gameFile);
+    }
+    //Append truedrive
+    command.append(" -autostart-handle-tde ");
+    if (systemModel.isAccurateDisk())
+    {
+      command.append("-truedrive ");
+    }
+    else
+    {
+      command.append("+truedrive ");
+    }
+    //Append default joystick port
+    if (model.getJoy1Model().isPrimary())
+    {
+      command.append("-joydev1 1 ");
+      command.append("-joydev2 0");
+    }
+    else
+    {
+      command.append("-joydev1 0 ");
+      command.append("-joydev2 1");
+    }
+    
+    //Launch Vice
+    try
+    {
+      logger.debug("Launching VICE with command: {}", command.toString());
+      Runtime. getRuntime().exec(command.toString());
+    }
+    catch (IOException e)
+    {
+      ExceptionHandler.handleException(e, "Could not launch Vice with command " + command) ;
+    }
+  }
 
   public static void storeProperties()
   {
@@ -354,7 +416,6 @@ public class FileManager
       fileProperties = new Properties();
       try (InputStream input = new FileInputStream("./pcu.properties"))
       {
-
         // load a properties file
         fileProperties.load(input);
 
