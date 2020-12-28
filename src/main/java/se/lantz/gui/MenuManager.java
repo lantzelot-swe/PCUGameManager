@@ -57,6 +57,7 @@ public class MenuManager
 
   private JMenuItem addGameItem;
   private JMenuItem deleteGameItem;
+  private JMenuItem runGameItem;
   private JMenuItem importItem;
   private JMenuItem exportItem;
   
@@ -100,6 +101,8 @@ public class MenuManager
     fileMenu.add(getAddGameMenuItem());
     fileMenu.add(getDeleteGameMenuItem());
     fileMenu.addSeparator();
+    fileMenu.add(getRunGameMenuItem());
+    fileMenu.addSeparator();
     fileMenu.add(getImportItem());
     fileMenu.add(getExportItem());
     fileMenu.addSeparator();
@@ -118,7 +121,14 @@ public class MenuManager
 
   public void intialize()
   {
-    uiModel.addSaveChangeListener(e -> addGameItem.setEnabled(!uiModel.isDataChanged()));
+    uiModel.addSaveChangeListener(e -> {
+      boolean okToEnable = !uiModel.isDataChanged();
+      addGameItem.setEnabled(okToEnable);
+      importItem.setEnabled(okToEnable);
+      exportItem.setEnabled(okToEnable);
+      toggleFavoriteItem.setEnabled(okToEnable);
+      runGameItem.setEnabled(!uiModel.getInfoModel().getGamesFile().isEmpty());
+    });
   }
 
   public List<JMenu> getMenues()
@@ -152,6 +162,17 @@ public class MenuManager
     deleteGameItem.addActionListener(e -> mainWindow.getMainPanel().deleteCurrentGame());
     return deleteGameItem;
   }
+  
+  JMenuItem getRunGameMenuItem()
+  {
+    runGameItem = new JMenuItem("Run Current Game");
+    KeyStroke keyStrokeToRunGame = KeyStroke.getKeyStroke(KeyEvent.VK_R, InputEvent.CTRL_DOWN_MASK);
+    runGameItem.setAccelerator(keyStrokeToRunGame);
+    runGameItem.setMnemonic('R');
+
+    runGameItem.addActionListener(e -> mainWindow.getMainPanel().runCurrentGame());
+    return runGameItem;
+  }
 
   private JMenuItem getImportItem()
   {
@@ -176,6 +197,9 @@ public class MenuManager
   private JMenuItem getExitItem()
   {
     exitItem = new JMenuItem("Exit");
+    KeyStroke keyStrokeExit = KeyStroke.getKeyStroke(KeyEvent.VK_F4, InputEvent.ALT_DOWN_MASK);
+    exitItem.setAccelerator(keyStrokeExit);
+    
     exitItem.setMnemonic('x');
     exitItem.addActionListener(e -> {
       if (uiModel.isDataChanged())

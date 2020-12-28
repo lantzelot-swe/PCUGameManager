@@ -8,6 +8,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -234,6 +236,16 @@ public class ListPanel extends JPanel
       list = new JList<GameListData>()
         {
           @Override
+          public void removeSelectionInterval(int start, int end)
+          {
+            //Don't allow clearing selection if unsaved data
+            if (!uiModel.isDataChanged())
+            {
+              super.removeSelectionInterval(start, end);
+            }
+          }
+
+          @Override
           public void setSelectionInterval(int anchor, int lead)
           {
             if (!uiModel.isDataChanged())
@@ -242,6 +254,11 @@ public class ListPanel extends JPanel
             }
             else
             {
+              if (list.getSelectedIndex() == anchor)
+              {
+                //Clicked on the selected game, just ignore
+                return;
+              }
               //Just ignore
               int value = mainPanel.showUnsavedChangesDialog();
               if (value == JOptionPane.YES_OPTION)
@@ -298,7 +315,19 @@ public class ListPanel extends JPanel
             }
           }
         });
+      list.addMouseListener(new MouseAdapter() {
 
+        @Override
+        public void mouseClicked(MouseEvent e)
+        {
+          if (e.getClickCount() == 2)
+          {
+            //trigger run game...
+            MainWindow.getInstance().getMainPanel().runCurrentGame();
+          }
+        }
+        
+      });
       list.addListSelectionListener(e -> {
         if (!e.getValueIsAdjusting() || pageButtonPressed)
         {

@@ -8,11 +8,19 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 import java.util.List;
 
+import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JPanel;
+import javax.swing.JRootPane;
+import javax.swing.KeyStroke;
+import javax.swing.SwingUtilities;
 import javax.swing.border.TitledBorder;
 
 import org.slf4j.Logger;
@@ -45,6 +53,16 @@ public class GameDetailsBackgroundPanel extends JPanel
   private JPanel detailsPanel;
   private CardLayout cardLayout;
   private JButton scrapeButton;
+  private Action runGameAction = new AbstractAction("Run Game") {
+
+    @Override
+    public void actionPerformed(ActionEvent e)
+    {
+      if (runButton.isEnabled())
+      {
+        model.runGameInVice();
+      }
+    }};
 
   private final ScraperManager scraperManager;
 
@@ -290,9 +308,16 @@ public class GameDetailsBackgroundPanel extends JPanel
   }
   private JButton getRunButton() {
     if (runButton == null) {
-    	runButton = new JButton("Run game");
-    	runButton.addActionListener(e -> model.runGameInVice());
+    	runButton = new JButton(runGameAction);
     }
     return runButton;
+  }
+  
+  public void runCurrentGame()
+  {
+    if (getRunButton().isEnabled())
+    {
+      getRunButton().doClick();
+    }
   }
 }

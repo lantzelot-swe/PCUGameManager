@@ -304,5 +304,6 @@ public class InfoModel extends AbstractModel
     this.coverImage = null;
     this.screen1Image = null;
     this.screen2Image = null;
+    this.gamesPath = null;
   }
 }

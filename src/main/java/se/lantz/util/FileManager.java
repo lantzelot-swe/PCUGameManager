@@ -96,7 +96,7 @@ public class FileManager
       }
       catch (IOException e)
       {
-        logger.error("Could not store cover", e);
+        ExceptionHandler.handleException(e, "Could not store cover");
       }
     }
 
@@ -109,7 +109,7 @@ public class FileManager
       }
       catch (IOException e)
       {
-        logger.error("Could not store screen1", e);
+        ExceptionHandler.handleException(e, "Could not store screen1");
       }
     }
 
@@ -122,7 +122,7 @@ public class FileManager
       }
       catch (IOException e)
       {
-        logger.error("Could not store screen2", e);
+        ExceptionHandler.handleException(e, "Could not store screen2");
       }
     }
 
@@ -136,16 +136,22 @@ public class FileManager
         System.err.printf("The path %s doesn't exist!", source);
         return;
       }
-
+      
       try
       {
-
-        compressGzip(source, target);
-
+        if (source.toString().endsWith(".gz"))
+        {
+          //Just copy
+          Files.copy(source, target, StandardCopyOption.REPLACE_EXISTING);
+        }
+        else
+        {
+          compressGzip(source, target);
+        }
       }
       catch (IOException e)
       {
-        e.printStackTrace();
+        ExceptionHandler.handleException(e, "Could not copy game file from " + source.toString());
       }
     }
   }
@@ -373,12 +379,18 @@ public class FileManager
     if (model.getJoy1Model().isPrimary())
     {
       command.append("-joydev1 1 ");
-      command.append("-joydev2 0");
+      if (systemModel.isC64())
+      {
+        command.append("-joydev2 0");
+      }
     }
     else
     {
       command.append("-joydev1 0 ");
-      command.append("-joydev2 1");
+      if (systemModel.isC64())
+      {
+        command.append("-joydev2 1");
+      }
     }
     
     //Launch Vice

@@ -165,4 +165,12 @@ public class MainPanel extends JPanel
   {
     getListPanel().toggleFavorite();
   }
+  
+  public void runCurrentGame()
+  {
+    if (getListPanel().getSelectedIndexInList() > -1)
+    {
+      getGameDetailsBackgroundPanel().runCurrentGame();
+    }
+  }
 }
