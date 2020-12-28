@@ -26,7 +26,9 @@ public class DbConnector
 {
   public static final String DB_NAME = "pcusb.db";
   private static final String COMMA = "\",\"";
-  private static final String GAMEINFO_SQL =  "CREATE TABLE gameinfo (\r\n" + 
+  // @J-
+  private static final String GAMEINFO_SQL =
+    "CREATE TABLE gameinfo (\r\n" + 
     "    Title         STRING  NOT NULL,\r\n" + 
     "    Year          INTEGER,\r\n" + 
     "    Author        STRING,\r\n" + 
@@ -44,19 +46,21 @@ public class DbConnector
     "    Favorite      INTEGER NOT NULL\r\n" + 
     "                          DEFAULT (0) \r\n" + 
     ");";
-  private static final String GAMEVIEW_SQL = "CREATE TABLE gameview (\r\n" + 
-    "    viewId   INTEGER PRIMARY KEY,\r\n" + 
-    "    name     STRING,\r\n" + 
-    "    matchAll BOOLEAN\r\n" + 
+  private static final String GAMEVIEW_SQL =
+    "CREATE TABLE gameview (\r\n" + 
+    "    viewId INTEGER PRIMARY KEY,\r\n" + 
+    "    name   STRING\r\n" + 
     ");";
-  private static final String VIEWFILTER_SQL = "CREATE TABLE viewfilter (\r\n" + 
-    "    gameview  INTEGER REFERENCES gameview (viewId),\r\n" + 
-    "    field     STRING,\r\n" + 
-    "    operator  STRING,\r\n" + 
-    "    fieldData STRING\r\n" + 
+  private static final String VIEWFILTER_SQL =
+    "CREATE TABLE viewfilter (\r\n" + 
+    "    gameview    INTEGER REFERENCES gameview (viewId),\r\n" + 
+    "    field       STRING,\r\n" + 
+    "    operator    STRING,\r\n" + 
+    "    fieldData   STRING,\r\n" + 
+    "    andCriteria BOOLEAN NOT NULL\r\n" + 
+    "                        DEFAULT (true) \r\n" + 
     ");";
-  
-    
+  // @J+
   private static final Logger logger = LoggerFactory.getLogger(DbConnector.class);
   private List<String> columnList = new ArrayList<>();
 
@@ -78,7 +82,7 @@ public class DbConnector
     columnList.add(DbConstants.VERTICALSHIFT);
     columnList.add(DbConstants.FAVORITE);
     //Check if database file exists, if not create an empty db.
-    File dbFile = new File("./"+ DB_NAME);
+    File dbFile = new File("./" + DB_NAME);
     if (!dbFile.exists())
     {
       createNewDb();
@@ -86,7 +90,6 @@ public class DbConnector
     }
   }
 
-  
   private void createNewDb()
   {
     try (Connection conn = this.connect(); PreparedStatement gameInfostmt = conn.prepareStatement(GAMEINFO_SQL);
@@ -102,10 +105,9 @@ public class DbConnector
       ExceptionHandler.handleException(e, "Could not cretate db tables");
     }
   }
-  
-  
+
   /**
-   * Connect to the database. 
+   * Connect to the database.
    */
   public Connection connect()
   {
@@ -137,7 +139,8 @@ public class DbConnector
       // loop through the result set
       while (rs.next())
       {
-        GameListData data = new GameListData(rs.getString("Title"), Integer.toString(rs.getInt("rowid")), rs.getInt("Favorite"));
+        GameListData data =
+          new GameListData(rs.getString("Title"), Integer.toString(rs.getInt("rowid")), rs.getInt("Favorite"));
         returnList.add(data);
       }
     }
@@ -165,7 +168,8 @@ public class DbConnector
       // loop through the result set
       while (rs.next())
       {
-        GameListData data = new GameListData(rs.getString("Title"), Integer.toString(rs.getInt("rowid")), rs.getInt("Favorite"));
+        GameListData data =
+          new GameListData(rs.getString("Title"), Integer.toString(rs.getInt("rowid")), rs.getInt("Favorite"));
         returnList.add(data);
       }
     }
@@ -188,7 +192,6 @@ public class DbConnector
       {
         GameView gameView = new GameView(rs.getInt("viewId"));
         gameView.setName(rs.getString("name"));
-        gameView.setMatchAll(rs.getBoolean("matchAll"));
         //Fetch all filters       
         List<ViewFilter> viewFilters = new ArrayList<>();
 
@@ -200,7 +203,8 @@ public class DbConnector
           {
             viewFilters.add(new ViewFilter(filterRs.getString("field"),
                                            filterRs.getString("operator"),
-                                           filterRs.getString("fieldData")));
+                                           filterRs.getString("fieldData"),
+                                           Boolean.parseBoolean(filterRs.getString("andCriteria"))));
           }
         }
         catch (SQLException e)
@@ -236,19 +240,15 @@ public class DbConnector
     {
       sqlBuilder.append("UPDATE gameview SET name = '");
       sqlBuilder.append(view.getName());
-      sqlBuilder.append("', matchAll = ");
-      sqlBuilder.append(view.isMatchAll());
-      sqlBuilder.append(" WHERE viewId = ");
+      sqlBuilder.append("' WHERE viewId = ");
       sqlBuilder.append(view.getGameViewId());
       sqlBuilder.append(";");
     }
     else
     {
-      sqlBuilder.append("INSERT INTO gameview (name, matchAll) VALUES (\"");
+      sqlBuilder.append("INSERT INTO gameview (name) VALUES (\"");
       sqlBuilder.append(view.getName());
-      sqlBuilder.append("\",");
-      sqlBuilder.append(view.isMatchAll());
-      sqlBuilder.append(");");
+      sqlBuilder.append("\");");
     }
     String gameViewsql = sqlBuilder.toString();
     logger.debug("gameViewsql:\n{}", gameViewsql);
@@ -257,7 +257,7 @@ public class DbConnector
     logger.debug("deleteViewFiltersql:\n{}", deleteViewFiltersql);
 
     StringBuilder insertFilterBuilder = new StringBuilder();
-    insertFilterBuilder.append("INSERT INTO viewfilter (gameview,field,operator,fielddata) VALUES ");
+    insertFilterBuilder.append("INSERT INTO viewfilter (gameview,field,operator,fielddata,andCriteria) VALUES ");
     int filterIndex = 0;
     for (ViewFilter filter : view.getViewFilters())
     {
@@ -270,7 +270,9 @@ public class DbConnector
       insertFilterBuilder.append(filter.getOperator());
       insertFilterBuilder.append(COMMA);
       insertFilterBuilder.append(filter.getFilterData());
-      insertFilterBuilder.append("\")");
+      insertFilterBuilder.append("\",");
+      insertFilterBuilder.append(filter.isAndOperator());
+      insertFilterBuilder.append(")");
       if (filterIndex < view.getViewFilters().size())
       {
         insertFilterBuilder.append(",");
@@ -338,7 +340,9 @@ public class DbConnector
     return returnBuilder;
   }
 
-  private void overwriteExistingAndInsertMissingIntoGameInfoTable(List<String> rowValues, StringBuilder infoBuilder, boolean addAsFavorite)
+  private void overwriteExistingAndInsertMissingIntoGameInfoTable(List<String> rowValues,
+                                                                  StringBuilder infoBuilder,
+                                                                  boolean addAsFavorite)
   {
     List<String> existingRowValues = new ArrayList<>();
     List<String> newRowValues = new ArrayList<>();
@@ -391,7 +395,9 @@ public class DbConnector
     }
   }
 
-  private void skipExistingAndInsertMissingIntoGameInfoTable(List<String> rowValues, StringBuilder infoBuilder, boolean addAsFavorite)
+  private void skipExistingAndInsertMissingIntoGameInfoTable(List<String> rowValues,
+                                                             StringBuilder infoBuilder,
+                                                             boolean addAsFavorite)
   {
     List<String> newRowValues = new ArrayList<>();
     //Check which are already available and sort them out of rowValues
@@ -495,7 +501,7 @@ public class DbConnector
       StringBuilder sqlBuilder = new StringBuilder();
       sqlBuilder.append("UPDATE gameinfo SET ");
       //Loop from 1 (year) to verticalshift, exclude favorite from loop
-      for (int i = 1; i < columnList.size()-1; i++)
+      for (int i = 1; i < columnList.size() - 1; i++)
       {
         sqlBuilder.append(columnList.get(i));
         sqlBuilder.append(" = ");
@@ -744,7 +750,7 @@ public class DbConnector
       ExceptionHandler.handleException(e, "Could not insert games in db.");
     }
   }
-  
+
   public void deleteGame(String rowId)
   {
     StringBuilder sqlBuilder = new StringBuilder();
@@ -763,7 +769,7 @@ public class DbConnector
       ExceptionHandler.handleException(e, "Could not delete game in db.");
     }
   }
-  
+
   public void deleteAllGames()
   {
     String sql = "DELETE FROM gameinfo;";
@@ -778,16 +784,17 @@ public class DbConnector
       ExceptionHandler.handleException(e, "Could not delete games in db.");
     }
   }
-  
+
   public void deleteView(GameView view)
   {
     String viewFilterSql = "DELETE FROM viewfilter WHERE gameview = " + view.getGameViewId();
     String gameViewSql = "DELETE FROM gameview WHERE viewId = " + view.getGameViewId();
-    try (Connection conn = this.connect(); PreparedStatement viewFilterstmt = conn.prepareStatement(viewFilterSql); PreparedStatement gameViewStmt = conn.prepareStatement(gameViewSql))
+    try (Connection conn = this.connect(); PreparedStatement viewFilterstmt = conn.prepareStatement(viewFilterSql);
+      PreparedStatement gameViewStmt = conn.prepareStatement(gameViewSql))
     {
-      int value = viewFilterstmt.executeUpdate(); 
+      int value = viewFilterstmt.executeUpdate();
       logger.debug("Executed successfully, value = {}", value);
-      value = gameViewStmt.executeUpdate(); 
+      value = gameViewStmt.executeUpdate();
       logger.debug("Executed successfully, value = {}", value);
     }
     catch (SQLException e)
@@ -795,14 +802,14 @@ public class DbConnector
       ExceptionHandler.handleException(e, "Could not delete gameview or viewfilter in db.");
     }
   }
-  
+
   public void toggleFavorite(String gameId, int currentFavoriteValue)
   {
     int newValue = currentFavoriteValue == 0 ? 1 : 0;
     String sql = "UPDATE gameinfo SET Favorite = " + newValue + " WHERE rowId = " + gameId + ";";
     try (Connection conn = this.connect(); PreparedStatement favoritestmt = conn.prepareStatement(sql))
     {
-      int value = favoritestmt.executeUpdate(); 
+      int value = favoritestmt.executeUpdate();
       logger.debug("Executed successfully, value = {}", value);
     }
     catch (SQLException e)

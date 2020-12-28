@@ -12,7 +12,6 @@ public class GameView implements Comparable
   public static final int FAVORITES_ID = -2;
   private static final Logger logger = LoggerFactory.getLogger(GameView.class);
   private String name = "";
-  private boolean matchAll = true;
   private List<ViewFilter> viewFilters = new ArrayList<>();
   private String sqlQuery = "";
   
@@ -55,16 +54,6 @@ public class GameView implements Comparable
     return name;
   }
 
-  public boolean isMatchAll()
-  {
-    return matchAll;
-  }
-
-  public void setMatchAll(boolean matchAll)
-  {
-    this.matchAll = matchAll;
-  }
-
   public List<ViewFilter> getViewFilters()
   {
     return viewFilters;
@@ -73,15 +62,32 @@ public class GameView implements Comparable
   public void setViewFilters(List<ViewFilter> viewFilters)
   {
     this.viewFilters = viewFilters;
+    
+    //Divide depending on operator
+    List<ViewFilter> andFiltersList = new ArrayList<>();
+    List<ViewFilter> orFiltersList = new ArrayList<>();
+    
+    for (ViewFilter viewFilter : viewFilters)
+    {
+      if (viewFilter.isAndOperator())
+      {
+        andFiltersList.add(viewFilter);
+      }
+      else
+      {
+        orFiltersList.add(viewFilter);
+      }
+    }
+      
     StringBuilder builder = new StringBuilder();
     builder.append("WHERE ");
     int index = 0;
-    for (ViewFilter viewFilter : viewFilters)
+    for (ViewFilter viewFilter : andFiltersList)
     {
       index++;
       if (index > 1)
       {
-        builder.append(isMatchAll() ? " AND ": " OR ");
+        builder.append(" AND ");
       }
       builder.append(viewFilter.getField());
       switch (viewFilter.getOperator())
@@ -122,6 +128,62 @@ public class GameView implements Comparable
         logger.debug("Unexpected value: {}", viewFilter.getOperator());
         break;
       }
+    }
+    index = 0;
+    for (ViewFilter viewFilter : orFiltersList)
+    {
+      if (index == 0 && !andFiltersList.isEmpty())
+      {
+        builder.append(" AND ( ");
+      }
+      index++;
+      if (index > 1)
+      {
+        builder.append(" OR ");
+      }
+      builder.append(viewFilter.getField());
+      switch (viewFilter.getOperator())
+      {
+      case ViewFilter.BEGINS_WITH_TEXT:
+        builder.append(" LIKE '");
+        builder.append(viewFilter.getFilterData());
+        builder.append("%'");
+        break;
+
+      case ViewFilter.ENDS_WITH_TEXT:
+        builder.append(" LIKE '%");
+        builder.append(viewFilter.getFilterData());
+        builder.append("'");
+        break;
+        
+     case ViewFilter.CONTAINS_TEXT:
+       builder.append(" LIKE '%");
+       builder.append(viewFilter.getFilterData());
+       builder.append("%'");
+        break;
+        
+     case ViewFilter.IS:
+       builder.append(" = ");
+       builder.append(viewFilter.getFilterData());
+       break;
+            
+     case ViewFilter.BEFORE:
+       builder.append(" < ");
+       builder.append(viewFilter.getFilterData());
+       break;
+       
+     case ViewFilter.AFTER:
+       builder.append(" > ");
+       builder.append(viewFilter.getFilterData());
+       break;
+      default:
+        logger.debug("Unexpected value: {}", viewFilter.getOperator());
+        break;
+      }
+    }
+    if (!andFiltersList.isEmpty() && !orFiltersList.isEmpty())
+    {
+      builder.append(")");
     }
     this.sqlQuery = builder.toString();
   }

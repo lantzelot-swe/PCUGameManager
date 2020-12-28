@@ -12,13 +12,15 @@ public class ViewFilter
   private String filterData;
   private String operator;
   private String field;
+  private boolean andOperator;
 
-  public ViewFilter(String field, String operator, String filterData)
+  public ViewFilter(String field, String operator, String filterData, boolean andOperator)
   {
     super();
     this.filterData = filterData;
     this.operator = operator;
     this.field = field;
+    this.andOperator = andOperator;
   }
 
   public String getFilterData()
@@ -49,5 +51,15 @@ public class ViewFilter
   public void setField(String field)
   {
     this.field = field;
+  }
+
+  public boolean isAndOperator()
+  {
+    return andOperator;
+  }
+
+  public void setAndOperator(boolean andOperator)
+  {
+    this.andOperator = andOperator;
   }
 }

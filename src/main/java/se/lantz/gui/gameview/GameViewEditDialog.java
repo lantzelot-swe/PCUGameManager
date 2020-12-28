@@ -1,6 +1,7 @@
 package se.lantz.gui.gameview;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.Frame;
 
 import javax.swing.JPanel;
@@ -21,7 +22,8 @@ public class GameViewEditDialog extends BaseDialog
     content.setLayout(new BorderLayout());
     content.add(getViewNamePanel(gameView), BorderLayout.NORTH);
     content.add(getFilterPanel(gameView), BorderLayout.CENTER);
-
+    setPreferredSize(new Dimension(400, 600));
+    this.setResizable(false);
     addContent(content);
   }
 
