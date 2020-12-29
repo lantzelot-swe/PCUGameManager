@@ -117,7 +117,7 @@ public class MainPanel extends JPanel
         int currentSelectedIndex = getListPanel().getSelectedIndexInList();
         uiModel.deleteCurrentGame();
         repaintAfterModifications();
-        SwingUtilities.invokeLater(() -> getListPanel().setSelectedIndexInList(currentSelectedIndex));
+        getListPanel().setSelectedIndexInList(currentSelectedIndex);
       }
     }
   }

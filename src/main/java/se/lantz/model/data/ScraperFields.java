@@ -9,6 +9,7 @@ public class ScraperFields
   private boolean genre = true;
   private boolean cover = true;
   private boolean screenshots = true;
+  private boolean composer = true;
   public ScraperFields()
   {
     
@@ -68,6 +69,14 @@ public class ScraperFields
   public void setGenre(boolean genre)
   {
     this.genre = genre;
+  }
+  public boolean isComposer()
+  {
+    return composer;
+  }
+  public void setComposer(boolean composer)
+  {
+    this.composer = composer;
   }
 
 }

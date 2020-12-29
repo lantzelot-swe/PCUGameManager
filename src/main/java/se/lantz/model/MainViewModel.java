@@ -67,6 +67,24 @@ public class MainViewModel extends AbstractModel
     resetDataChangedAfterInit();
   }
 
+  @Override
+  public void disableChangeNotification(boolean disable)
+  {
+    super.disableChangeNotification(disable);
+    infoModel.disableChangeNotification(disable);
+    joy1Model.disableChangeNotification(disable);
+    joy2Model.disableChangeNotification(disable);
+    systemModel.disableChangeNotification(disable);
+  }
+
+  protected void notifyChangeForAllModels()
+  {
+    infoModel.notifyChange();
+    joy1Model.notifyChange();
+    joy2Model.notifyChange();
+    systemModel.notifyChange();
+  }
+
   private void setupGameViews()
   {
     //Setup game views
@@ -79,7 +97,7 @@ public class MainViewModel extends AbstractModel
     favoritesView.setName("Favorites");
     favoritesView.setSqlQuery(" WHERE Favorite = 1");
     gameViewModel.addElement(favoritesView);
-    
+
     List<GameView> gameViewList = dbConnector.loadGameViews();
     Collections.sort(gameViewList);
     for (GameView gameView : gameViewList)
@@ -116,6 +134,8 @@ public class MainViewModel extends AbstractModel
       // Read from db, update all models after that.
       details = dbConnector.getGameDetails(selectedData.getGameId());
     }
+    disableChangeNotification(true);
+
     // Map to models
     infoModel.setTitleFromDb(details.getTitle());
 
@@ -132,19 +152,24 @@ public class MainViewModel extends AbstractModel
     //Reset and images that where added previously
     infoModel.resetImages();
 
-    infoModel.resetDataChanged();
-
     joy1Model.setConfigStringFromDb(details.getJoy1());
-    joy1Model.resetDataChanged();
+
     joy2Model.setConfigStringFromDb(details.getJoy2());
-    joy2Model.resetDataChanged();
+
     systemModel.setConfigStringFromDb(details.getSystem());
     systemModel.setVerticalShift(details.getVerticalShift());
-    systemModel.resetDataChanged();
+
     //Set empty title to trigger a change
     if (selectedData.getGameId().isEmpty())
     {
       infoModel.setTitle("");
+    }
+    disableChangeNotification(false);
+    notifyChangeForAllModels();
+    //Do not reset unsaved for new entry
+    if (!selectedData.getGameId().isEmpty())
+    {
+      resetDataChanged();
     }
   }
 
@@ -426,7 +451,7 @@ public class MainViewModel extends AbstractModel
       resetDataChanged();
     }
   }
-  
+
   public void toggleFavorite(GameListData data)
   {
     if (data != null && !data.getGameId().isEmpty())
@@ -436,7 +461,7 @@ public class MainViewModel extends AbstractModel
       gameListModel.notifyChange();
     }
   }
-  
+
   public void runGameInVice()
   {
     fileManager.runGameInVice();

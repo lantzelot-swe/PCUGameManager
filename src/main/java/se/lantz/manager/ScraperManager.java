@@ -68,6 +68,10 @@ public class ScraperManager
         infoModel.setGenre(genre);
       }
     }
+    if (fields.isComposer())
+    {
+      infoModel.setComposer(scraper.getComposer());
+    }
     if (fields.isCover())
     {
       infoModel.setCoverImage(scraper.getCover());

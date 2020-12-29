@@ -181,8 +181,8 @@ public class ListPanel extends JPanel
     {
       indexToSelect = uiModel.getGameListModel().getSize() - 1;
     }
-    list.clearSelection();
-    list.setSelectedIndex(indexToSelect);
+    list.setSelectionInterval(indexToSelect, indexToSelect);
+    updateSelectedGame();
     list.ensureIndexIsVisible(indexToSelect);
   }
 
@@ -350,7 +350,6 @@ public class ListPanel extends JPanel
 
   private void updateSelectedGame()
   {
-    System.out.println("Update selected Game!!!");
     SwingUtilities
       .invokeLater(() -> mainPanel.getGameDetailsBackgroundPanel().updateSelectedGame(list.getSelectedValue()));
   }

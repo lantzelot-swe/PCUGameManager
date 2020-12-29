@@ -95,7 +95,7 @@ public class BaseDialog extends JDialog
     return buttonPanel;
   }
 
-  protected JButton getOkButton()
+  public JButton getOkButton()
   {
     if (okButton == null)
     {

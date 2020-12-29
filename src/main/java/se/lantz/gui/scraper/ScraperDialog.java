@@ -38,4 +38,13 @@ public class ScraperDialog extends BaseDialog
   {
     return getMobyGamesPanel().getScraperFields();
   }
+  
+  @Override
+  public boolean showDialog()
+  {
+    getMobyGamesPanel().getUrlTextField().requestFocusInWindow();
+    this.getRootPane().setDefaultButton(getMobyGamesPanel().getConnectButton());
+  
+    return super.showDialog();
+  }
 }

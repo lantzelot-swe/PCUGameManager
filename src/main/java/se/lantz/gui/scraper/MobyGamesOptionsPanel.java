@@ -8,6 +8,8 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.io.IOException;
 import java.net.URISyntaxException;
 
@@ -17,11 +19,12 @@ import javax.swing.JEditorPane;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.event.HyperlinkEvent;
 
+import se.lantz.gui.BaseDialog;
 import se.lantz.manager.ScraperManager;
-import se.lantz.model.MainViewModel;
 import se.lantz.model.data.ScraperFields;
 import se.lantz.util.ExceptionHandler;
 
@@ -40,12 +43,12 @@ public class MobyGamesOptionsPanel extends JPanel
   private ScraperManager scraper;
   private JButton connectButton;
   private JLabel connectionStatusLabel;
-  
+
   private Cursor waitCursor = new Cursor(Cursor.WAIT_CURSOR);
   private Cursor defaultCursor = new Cursor(Cursor.DEFAULT_CURSOR);
   private JButton okButton;
   private JCheckBox genreCheckBox;
-  
+  private JCheckBox composerCheckBox;
 
   public MobyGamesOptionsPanel(ScraperManager scraper, JButton okButton)
   {
@@ -124,12 +127,23 @@ public class MobyGamesOptionsPanel extends JPanel
     return infoEditorPane;
   }
 
-  private JTextField getUrlTextField()
+  JTextField getUrlTextField()
   {
     if (urlTextField == null)
     {
       urlTextField = new JTextField();
       urlTextField.setText("https://www.mobygames.com/game/");
+      urlTextField.addKeyListener(new KeyAdapter()
+      {
+        @Override
+        public void keyPressed(KeyEvent e)
+        {
+          if (e.getKeyCode() == KeyEvent.VK_ENTER)
+          {
+            getConnectButton().doClick();
+          }
+        }
+      });
     }
     return urlTextField;
   }
@@ -161,11 +175,17 @@ public class MobyGamesOptionsPanel extends JPanel
       gbc_authorCheckBox.gridx = 0;
       gbc_authorCheckBox.gridy = 2;
       fieldsPanel.add(getAuthorCheckBox(), gbc_authorCheckBox);
+      GridBagConstraints gbc_composerCheckBox = new GridBagConstraints();
+      gbc_composerCheckBox.anchor = GridBagConstraints.WEST;
+      gbc_composerCheckBox.insets = new Insets(0, 0, 5, 5);
+      gbc_composerCheckBox.gridx = 1;
+      gbc_composerCheckBox.gridy = 2;
+      fieldsPanel.add(getComposerCheckBox(), gbc_composerCheckBox);
       GridBagConstraints gbc_coverCheckBox = new GridBagConstraints();
       gbc_coverCheckBox.anchor = GridBagConstraints.WEST;
-      gbc_coverCheckBox.insets = new Insets(0, 0, 5, 0);
+      gbc_coverCheckBox.insets = new Insets(0, 0, 5, 5);
       gbc_coverCheckBox.gridx = 1;
-      gbc_coverCheckBox.gridy = 2;
+      gbc_coverCheckBox.gridy = 3;
       fieldsPanel.add(getCoverCheckBox(), gbc_coverCheckBox);
       GridBagConstraints gbc_yearCheckBox = new GridBagConstraints();
       gbc_yearCheckBox.insets = new Insets(0, 0, 5, 5);
@@ -174,22 +194,22 @@ public class MobyGamesOptionsPanel extends JPanel
       gbc_yearCheckBox.gridy = 3;
       fieldsPanel.add(getYearCheckBox(), gbc_yearCheckBox);
       GridBagConstraints gbc_descriptionCheckBox = new GridBagConstraints();
-      gbc_descriptionCheckBox.insets = new Insets(0, 0, 5, 0);
+      gbc_descriptionCheckBox.insets = new Insets(0, 0, 5, 5);
       gbc_descriptionCheckBox.anchor = GridBagConstraints.WEST;
       gbc_descriptionCheckBox.gridx = 1;
       gbc_descriptionCheckBox.gridy = 1;
       fieldsPanel.add(getDescriptionCheckBox(), gbc_descriptionCheckBox);
       GridBagConstraints gbc_genreCheckBox = new GridBagConstraints();
-      gbc_genreCheckBox.insets = new Insets(0, 0, 5, 5);
+      gbc_genreCheckBox.insets = new Insets(0, 0, 0, 5);
       gbc_genreCheckBox.anchor = GridBagConstraints.WEST;
       gbc_genreCheckBox.gridx = 0;
       gbc_genreCheckBox.gridy = 4;
       fieldsPanel.add(getGenreCheckBox(), gbc_genreCheckBox);
       GridBagConstraints gbc_screensCheckBox = new GridBagConstraints();
-      gbc_screensCheckBox.insets = new Insets(0, 0, 5, 0);
+      gbc_screensCheckBox.insets = new Insets(0, 0, 0, 5);
       gbc_screensCheckBox.anchor = GridBagConstraints.WEST;
       gbc_screensCheckBox.gridx = 1;
-      gbc_screensCheckBox.gridy = 3;
+      gbc_screensCheckBox.gridy = 4;
       fieldsPanel.add(getScreensCheckBox(), gbc_screensCheckBox);
     }
     return fieldsPanel;
@@ -269,7 +289,7 @@ public class MobyGamesOptionsPanel extends JPanel
     }
     return screensCheckBox;
   }
-  
+
   private void enableCheckBoxes(boolean enable)
   {
     titleCheckBox.setEnabled(enable);
@@ -279,8 +299,9 @@ public class MobyGamesOptionsPanel extends JPanel
     coverCheckBox.setEnabled(enable);
     screensCheckBox.setEnabled(enable);
     genreCheckBox.setEnabled(enable);
+    composerCheckBox.setEnabled(enable);
   }
-  
+
   public ScraperFields getScraperFields()
   {
     ScraperFields returnValue = new ScraperFields();
@@ -291,47 +312,72 @@ public class MobyGamesOptionsPanel extends JPanel
     returnValue.setDescription(descriptionCheckBox.isSelected());
     returnValue.setCover(coverCheckBox.isSelected());
     returnValue.setScreenshots(screensCheckBox.isSelected());
+    returnValue.setComposer(composerCheckBox.isSelected());
     return returnValue;
   }
-  private JButton getConnectButton() {
-    if (connectButton == null) {
-    	connectButton = new JButton("Connect");
-    	connectButton.addActionListener(new ActionListener() {
-    	  public void actionPerformed(ActionEvent e) {
-    	    try
+
+  JButton getConnectButton()
+  {
+    if (connectButton == null)
+    {
+      connectButton = new JButton("Connect");
+      connectButton.addActionListener(new ActionListener()
+        {
+          public void actionPerformed(ActionEvent e)
           {
-    	      MobyGamesOptionsPanel.this.setCursor(waitCursor);
-            scraper.connectScraper(urlTextField.getText());
-            getConnectionStatusLabel().setText("Connection status: OK");
-            enableCheckBoxes(true);
-            okButton.setEnabled(true);
-            MobyGamesOptionsPanel.this.setCursor(defaultCursor);
+            try
+            {
+              MobyGamesOptionsPanel.this.setCursor(waitCursor);
+              scraper.connectScraper(urlTextField.getText());
+              getConnectionStatusLabel().setText("Connection status: OK");
+              enableCheckBoxes(true);
+              okButton.setEnabled(true);
+              MobyGamesOptionsPanel.this.setCursor(defaultCursor);
+              SwingUtilities.invokeLater(() -> SwingUtilities.getRootPane(connectButton).setDefaultButton(okButton));
+            }
+            catch (Exception e2)
+            {
+              getConnectionStatusLabel().setText("Connection status: Error. Invalid URL?");
+              enableCheckBoxes(false);
+              okButton.setEnabled(false);
+              MobyGamesOptionsPanel.this.setCursor(defaultCursor);
+              SwingUtilities.invokeLater(() -> SwingUtilities.getRootPane(connectButton).setDefaultButton(connectButton));
+            }
           }
-          catch (Exception e2)
-          {
-            getConnectionStatusLabel().setText("Connection status: Error. Invalid URL?");
-            enableCheckBoxes(false);
-            okButton.setEnabled(false);
-            MobyGamesOptionsPanel.this.setCursor(defaultCursor);
-          }
-    	  }
-    	});
+        });
     }
     return connectButton;
   }
-  private JLabel getConnectionStatusLabel() {
-    if (connectionStatusLabel == null) {
-    	connectionStatusLabel = new JLabel(" ");
-    	connectionStatusLabel.setFont(connectionStatusLabel.getFont().deriveFont(Font.BOLD));
+
+  private JLabel getConnectionStatusLabel()
+  {
+    if (connectionStatusLabel == null)
+    {
+      connectionStatusLabel = new JLabel(" ");
+      connectionStatusLabel.setFont(connectionStatusLabel.getFont().deriveFont(Font.BOLD));
     }
     return connectionStatusLabel;
   }
-  private JCheckBox getGenreCheckBox() {
-    if (genreCheckBox == null) {
-    	genreCheckBox = new JCheckBox("Genre");
-    	genreCheckBox.setSelected(true);
-    	genreCheckBox.setEnabled(false);
+
+  private JCheckBox getGenreCheckBox()
+  {
+    if (genreCheckBox == null)
+    {
+      genreCheckBox = new JCheckBox("Genre");
+      genreCheckBox.setSelected(true);
+      genreCheckBox.setEnabled(false);
     }
     return genreCheckBox;
+  }
+
+  private JCheckBox getComposerCheckBox()
+  {
+    if (composerCheckBox == null)
+    {
+      composerCheckBox = new JCheckBox("Composer");
+      composerCheckBox.setSelected(true);
+      composerCheckBox.setEnabled(false);
+    }
+    return composerCheckBox;
   }
 }

@@ -139,6 +139,7 @@ public class SystemModel extends AbstractModel
     resetValues();
     if (configString == null || configString.isEmpty())
     {
+      disableChangeNotification(false);
       return;
     }
     else
@@ -154,6 +155,7 @@ public class SystemModel extends AbstractModel
   {
     setC64(true);
     setPal(true);
+    setVic(false);
     setAccurateDisk(false);
     setDriveIcon(false);
     setReadOnly(false);

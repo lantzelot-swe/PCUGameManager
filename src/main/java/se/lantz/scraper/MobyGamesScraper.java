@@ -16,6 +16,7 @@ import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
+import org.jsoup.nodes.Node;
 import org.jsoup.nodes.TextNode;
 import org.jsoup.select.Elements;
 import org.slf4j.Logger;
@@ -57,6 +58,8 @@ public class MobyGamesScraper
   private String scrapedDescription = "";
 
   private String scrapedGenre = "";
+  
+  private String scrapedComposer = "";
 
   private BufferedImage scrapedCover = null;
 
@@ -120,10 +123,15 @@ public class MobyGamesScraper
           scrapedGenre = genre;
         }
       }
+      if (fields.isComposer())
+      {
+        scrapedComposer = scrapeComposer(doc);
+      }
       if (fields.isCover())
       {
         scrapedCover = scrapeCover(doc);
       }
+      
     }
     catch (IOException e)
     {
@@ -154,6 +162,11 @@ public class MobyGamesScraper
   public String getGenre()
   {
     return scrapedGenre;
+  }
+  
+  public String getComposer()
+  {
+    return scrapedComposer;
   }
 
   public BufferedImage getCover()
@@ -212,6 +225,40 @@ public class MobyGamesScraper
       int index = queryElements.first().elementSiblingIndex();
       Element valueElement = first.parent().child(index + 1);
       value = valueElement.text();
+    }
+    return value;
+  }
+  
+  public String scrapeComposer(Document doc)
+  {
+    String value = "";
+    //Look for div with music in sidebar
+    String cssQuery = ".sideBarContent";
+    Elements queryElements = doc.select(cssQuery);
+    Element first = queryElements.first();
+    if (first != null)
+    {
+      boolean musicFound = false;
+      for (Node node : first.childNodes())
+      {
+        if (node instanceof TextNode)
+        {
+          String test = ((TextNode)node).text();
+          //TODO: Add more possible labels
+          if (test.contains("Music") || test.contains("music"))
+          {
+            musicFound = true;
+          }
+        }
+        else if (node instanceof Element && musicFound)
+        {
+          value = ((Element)node).text();
+          if (!value.isEmpty())
+          {
+            break;
+          }
+        }
+      }
     }
     return value;
   }

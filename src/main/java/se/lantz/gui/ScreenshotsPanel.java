@@ -144,6 +144,7 @@ public class ScreenshotsPanel extends JPanel
       String modelCoverFile = model.getCoverFile();
       if (modelCoverFile.isEmpty())
       {
+        currentCoverFile = "";
         getCoverImageLabel().setIcon(getMissingCoverImageIcon());
       }
       else if (!modelCoverFile.equals(currentCoverFile))
@@ -170,6 +171,7 @@ public class ScreenshotsPanel extends JPanel
       String modelScreen1File = model.getScreens1File();
       if (modelScreen1File.isEmpty())
       {
+        currentScreen1File = "";
         getScreen1ImageLabel().setIcon(getMissingScreenshotImageIcon());
       }
       else if (!model.getScreens1File().equals(currentScreen1File))
@@ -196,6 +198,7 @@ public class ScreenshotsPanel extends JPanel
       String modelScreen2File = model.getScreens2File();
       if (modelScreen2File.isEmpty())
       {
+        currentScreen2File = "";
         getScreen2ImageLabel().setIcon(getMissingScreenshotImageIcon());
       }
       else if (!modelScreen2File.equals(currentScreen2File))

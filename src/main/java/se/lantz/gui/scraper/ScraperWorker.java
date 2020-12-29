@@ -26,7 +26,10 @@ public class ScraperWorker extends SwingWorker<Void, String>
   {
     scraperManager.scrapeGameInformation(fields);
     publish("");
-    scraperManager.scrapeScreenshots();
+    if (fields.isScreenshots())
+    {
+      scraperManager.scrapeScreenshots();
+    }
     return null;
   }
 
