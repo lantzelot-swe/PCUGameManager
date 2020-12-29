@@ -45,8 +45,6 @@ public class MobyGamesScraper
 
   private String screensCssQuery = ".thumbnail-image-wrapper > a";
 
-  private long startTime = 0L;
-
   Map<String, String> genreMap = new HashMap<>();
 
   private String scrapedTitle = "";
@@ -109,6 +107,11 @@ public class MobyGamesScraper
         if (m.find())
         {
           scrapedYear = Integer.parseInt(m.group());
+          //Some may have a specific day, e.g. Mar 17, 2020
+          if (m.find())
+          {
+            scrapedYear = Integer.parseInt(m.group());
+          }
         }
       }
       if (fields.isDescription())
