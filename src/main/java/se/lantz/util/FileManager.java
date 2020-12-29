@@ -136,7 +136,7 @@ public class FileManager
         System.err.printf("The path %s doesn't exist!", source);
         return;
       }
-      
+
       try
       {
         if (source.toString().endsWith(".gz"))
@@ -342,7 +342,7 @@ public class FileManager
     }
     fw.close();
   }
-  
+
   public void runGameInVice()
   {
     String gameFile = GAMES + infoModel.getGamesFile();
@@ -350,11 +350,55 @@ public class FileManager
     if (systemModel.isC64())
     {
       command.append("./vice/x64.exe ");
+      //SID config
+      command.append("-sidenginemodel ");
+      if (systemModel.isSid6581())
+      {
+        command.append("256 ");
+      }
+      else if (systemModel.isSid8580())
+      {
+        command.append("257 ");
+      }
+      else
+      {
+        command.append("258 ");
+      }
     }
     else
     {
       command.append("./vice/xvic.exe ");
+      //ViC 20 memory config
+      List<String> memoryFlagsList = new ArrayList<>();
+      if (systemModel.isBank0())
+      {
+        memoryFlagsList.add("0");
+      }
+      if (systemModel.isBank1())
+      {
+        memoryFlagsList.add("1");
+      }
+      if (systemModel.isBank2())
+      {
+        memoryFlagsList.add("2");
+      }
+      if (systemModel.isBank3())
+      {
+        memoryFlagsList.add("3");
+      }
+      if (systemModel.isBank5())
+      {
+        memoryFlagsList.add("5");
+      }
+      if (memoryFlagsList.size() > 0)
+      {
+        String configuredBanks = String.join(",", memoryFlagsList);
+        command.append("-memory ");
+        command.append(configuredBanks);
+        command.append(" ");
+      }
     }
+
     //Append game file
     Path gamePath = infoModel.getGamesPath();
     if (gamePath != null)
@@ -365,6 +409,7 @@ public class FileManager
     {
       command.append("-autostart " + gameFile);
     }
+
     //Append truedrive
     command.append(" -autostart-handle-tde ");
     if (systemModel.isAccurateDisk())
@@ -392,16 +437,16 @@ public class FileManager
         command.append("-joydev2 1");
       }
     }
-    
+
     //Launch Vice
     try
     {
       logger.debug("Launching VICE with command: {}", command.toString());
-      Runtime. getRuntime().exec(command.toString());
+      Runtime.getRuntime().exec(command.toString());
     }
     catch (IOException e)
     {
-      ExceptionHandler.handleException(e, "Could not launch Vice with command " + command) ;
+      ExceptionHandler.handleException(e, "Could not launch Vice with command " + command);
     }
   }
 
@@ -513,7 +558,9 @@ public class FileManager
       }
       catch (IOException e)
       {
-        ExceptionHandler.handleException(e, "Could not copy directory " + sourceDirectoryLocation + " to " + destinationDirectoryLocation);
+        ExceptionHandler.handleException(e,
+                                         "Could not copy directory " + sourceDirectoryLocation + " to " +
+                                           destinationDirectoryLocation);
       }
     });
   }
@@ -620,7 +667,7 @@ public class FileManager
     }
     return returnList;
   }
-  
+
   public static String getPcuVersionFromManifest()
   {
     String returnValue = "";
