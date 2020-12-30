@@ -1,11 +1,14 @@
 package se.lantz.gui;
 
+import java.awt.Desktop;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
 import java.net.HttpURLConnection;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -217,6 +220,7 @@ public class MenuManager
       }
       //Save properties before exit
       FileManager.storeProperties();
+      FileManager.deleteTempFolder();
       System.exit(0);
     });
     return exitItem;
@@ -261,7 +265,14 @@ public class MenuManager
     KeyStroke keyStrokeToImportGames = KeyStroke.getKeyStroke(KeyEvent.VK_F1, 0);
     helpItem.setAccelerator(keyStrokeToImportGames);
     helpItem.addActionListener(e -> {
-      //TODO
+      try
+      {
+        Desktop.getDesktop().open(new File("./help.htm"));
+      }
+      catch (IOException ex)
+      {
+        JOptionPane.showMessageDialog(MainWindow.getInstance(), "Could not open help", "Help missing", JOptionPane.ERROR_MESSAGE);
+      }
     });
     return helpItem;
   }

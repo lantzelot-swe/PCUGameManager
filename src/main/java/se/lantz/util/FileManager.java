@@ -16,11 +16,13 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Properties;
 import java.util.jar.Attributes;
 import java.util.jar.Manifest;
 import java.util.stream.Collectors;
+import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
 import javax.imageio.ImageIO;
@@ -42,6 +44,7 @@ public class FileManager
   private static final String COVERS = "./covers/";
   private static final String BACKUP = "./backup/";
 
+  private static final Path TEMP_PATH = Paths.get("./temp");
   private static final Logger logger = LoggerFactory.getLogger(FileManager.class);
 
   private static Properties fileProperties;
@@ -168,6 +171,21 @@ public class FileManager
       while ((len = fis.read(buffer)) > 0)
       {
         gos.write(buffer, 0, len);
+      }
+    }
+  }
+
+  public void decompressGzip(Path source, Path target) throws IOException
+  {
+    try (GZIPInputStream gis = new GZIPInputStream(new FileInputStream(source.toFile()));
+      FileOutputStream fos = new FileOutputStream(target.toFile()))
+    {
+      // copy GZIPInputStream to FileOutputStream
+      byte[] buffer = new byte[1024];
+      int len;
+      while ((len = gis.read(buffer)) > 0)
+      {
+        fos.write(buffer, 0, len);
       }
     }
   }
@@ -400,14 +418,32 @@ public class FileManager
     }
 
     //Append game file
+    String gameFileToRun = gameFile;
+    
+    
+    
     Path gamePath = infoModel.getGamesPath();
     if (gamePath != null)
     {
-      command.append("-autostart " + gamePath.toString());
+      if (gamePath.toString().contains("crt"))
+      {
+        command.append("-cartcrt " + gamePath.toString());
+      }
+      else
+      {
+        command.append("-autostart " + gamePath.toString());
+      }
     }
     else
     {
-      command.append("-autostart " + gameFile);
+      if (gameFile.contains("crt"))
+      {
+        command.append("-cartcrt " + decompressIfNeeded(gameFile));
+      }
+      else
+      {
+        command.append("-autostart " + gameFile);
+      }
     }
 
     //Append truedrive
@@ -448,6 +484,26 @@ public class FileManager
     {
       ExceptionHandler.handleException(e, "Could not launch Vice with command " + command);
     }
+  }
+  
+  private String decompressIfNeeded(String path)
+  {
+    String returnPath = path;
+    if (path.contains("crt.gz") || path.contains("CRT.gz"))
+    {
+      Path targetFile = Paths.get("./temp/" + path.substring(path.lastIndexOf("/") + 1, path.lastIndexOf(".")));  
+      try
+      {
+        Files.createDirectories(TEMP_PATH);
+        decompressGzip(Paths.get(path), targetFile);
+        returnPath = targetFile.toString();
+      }
+      catch (IOException e)
+      {
+        ExceptionHandler.handleException(e, "Could not decomrpess file: " + path);
+      }
+    }
+    return returnPath;
   }
 
   public static void storeProperties()
@@ -691,5 +747,20 @@ public class FileManager
       }
     }
     return returnValue;
+  }
+  
+  public static void deleteTempFolder()
+  {
+    try
+    {
+      Files.walk(TEMP_PATH)
+      .sorted(Comparator.reverseOrder())
+      .map(Path::toFile)
+      .forEach(File::delete);
+    }
+    catch (IOException e)
+    {
+      ExceptionHandler.handleException(e,  "Could not delete temp folder");
+    }
   }
 }
