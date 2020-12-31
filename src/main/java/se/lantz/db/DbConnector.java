@@ -204,7 +204,7 @@ public class DbConnector
             viewFilters.add(new ViewFilter(filterRs.getString("field"),
                                            filterRs.getString("operator"),
                                            filterRs.getString("fieldData"),
-                                           Boolean.parseBoolean(filterRs.getString("andCriteria"))));
+                                           filterRs.getBoolean("andCriteria")));
           }
         }
         catch (SQLException e)
