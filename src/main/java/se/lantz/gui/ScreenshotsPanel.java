@@ -662,7 +662,7 @@ public class ScreenshotsPanel extends JPanel
     }
     fileChooser.setCurrentDirectory(new File(gameDir));
 
-    FileNameExtensionFilter vicefilter = new FileNameExtensionFilter("Vice runnable files", "d64", "t64", "VSF", "GZ", "crt", "prg", "g64");
+    FileNameExtensionFilter vicefilter = new FileNameExtensionFilter("Vice runnable files", "d64", "t64", "tap", "VSF", "GZ", "crt", "prg", "g64");
     fileChooser.addChoosableFileFilter(vicefilter);
     fileChooser.setFileFilter(vicefilter);
     int value = fileChooser.showOpenDialog(MainWindow.getInstance());

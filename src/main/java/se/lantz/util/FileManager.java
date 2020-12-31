@@ -418,31 +418,27 @@ public class FileManager
     }
 
     //Append game file
-    String gameFileToRun = gameFile;
-    
-    
-    
     Path gamePath = infoModel.getGamesPath();
     if (gamePath != null)
     {
       if (gamePath.toString().contains("crt"))
       {
-        command.append("-cartcrt " + gamePath.toString());
+        command.append("-cartcrt \"" + gamePath.toString() + "\"");
       }
       else
       {
-        command.append("-autostart " + gamePath.toString());
+        command.append("-autostart \"" + gamePath.toString() + "\"");
       }
     }
     else
     {
       if (gameFile.contains("crt"))
       {
-        command.append("-cartcrt " + decompressIfNeeded(gameFile));
+        command.append("-cartcrt \"" + decompressIfNeeded(gameFile) + "\"");
       }
       else
       {
-        command.append("-autostart " + gameFile);
+        command.append("-autostart \"" + gameFile + "\"");
       }
     }
 
