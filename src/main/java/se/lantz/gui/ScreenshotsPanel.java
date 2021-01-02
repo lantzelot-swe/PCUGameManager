@@ -18,7 +18,9 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JTextField;
 import javax.swing.border.TitledBorder;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -59,17 +61,19 @@ public class ScreenshotsPanel extends JPanel
 
   private ImageIcon missingSceenshotIcon = null;
   private ImageIcon missingCoverIcon = null;
-  private JButton crop1Button;
-  private JButton crop2Button;
+  private JButton edit1Button;
+  private JButton edit2Button;
 
   private ImageIcon warningIcon = new ImageIcon(getClass().getResource("/se/lantz/warning-icon.png"));
   private String cropTooltip =
-    "<html>Optimal resolution for the carousel is 320x200.<br>Press to automatically crop the image to this size.</html>";
+    "<html>Optimal resolution for the carousel is 320x200.<br>Press to crop or scale the image to this size.</html>";
   private boolean gamesFileUpdated = false;
 
   FileNameExtensionFilter imagefilter =
     new FileNameExtensionFilter("png, gif, jpeg, bmp", "png", "gif", "jpg", "jpeg", "bmp");
-  
+  private JLabel resolution1Label;
+  private JLabel resolution2Label;
+
   public ScreenshotsPanel(InfoModel model)
   {
     this.model = model;
@@ -154,7 +158,7 @@ public class ScreenshotsPanel extends JPanel
       }
     }
     //Screen 1
-    BufferedImage screen1Image = model.getScreen1Image(); 
+    BufferedImage screen1Image = model.getScreen1Image();
     if (screen1Image != null)
     {
       if (!screen1Image.equals(currentScreen1Image))
@@ -162,7 +166,7 @@ public class ScreenshotsPanel extends JPanel
         logger.debug("SETTING SCREEN 1 IMAGE");
         Image newImage = screen1Image.getScaledInstance(320, 200, Image.SCALE_DEFAULT);
         getScreen1ImageLabel().setIcon(new ImageIcon(newImage));
-        setCropButtonVisibility(screen1Image, crop1Button);
+        setEditButtonVisibilityAndResolution(screen1Image, getResolution1Label(), getEdit1Button());
         currentScreen1Image = screen1Image;
       }
     }
@@ -176,10 +180,11 @@ public class ScreenshotsPanel extends JPanel
       }
       else if (!model.getScreens1File().equals(currentScreen1File))
       {
-        loadScreen(modelScreen1File, getScreen1ImageLabel());
+        currentScreen1Image =
+          loadScreen(modelScreen1File, getScreen1ImageLabel(), getResolution1Label(), getEdit1Button());
         currentScreen1File = modelScreen1File;
       }
-    }   
+    }
     //Screen 2
     BufferedImage screen2Image = model.getScreen2Image();
     if (screen2Image != null)
@@ -189,7 +194,7 @@ public class ScreenshotsPanel extends JPanel
         logger.debug("SETTING SCREEN 2 IMAGE");
         Image newImage = screen2Image.getScaledInstance(320, 200, Image.SCALE_DEFAULT);
         getScreen2ImageLabel().setIcon(new ImageIcon(newImage));
-        setCropButtonVisibility(screen1Image, crop2Button);
+        setEditButtonVisibilityAndResolution(screen2Image, getResolution2Label(), getEdit2Button());
         currentScreen2Image = screen2Image;
       }
     }
@@ -203,10 +208,17 @@ public class ScreenshotsPanel extends JPanel
       }
       else if (!modelScreen2File.equals(currentScreen2File))
       {
-        loadScreen(modelScreen2File, getScreen2ImageLabel());
+        currentScreen2Image =
+          loadScreen(modelScreen2File, getScreen2ImageLabel(), getResolution2Label(), getEdit2Button());
         currentScreen2File = modelScreen2File;
       }
     }
+  }
+
+  private void setEditButtonVisibilityAndResolution(BufferedImage image, JLabel resolutionLabel, JButton editButton)
+  {
+    resolutionLabel.setText(image.getWidth() + "x" + image.getHeight());
+    setEditButtonVisibility(image, editButton);
   }
 
   private void loadCover(String filename)
@@ -232,16 +244,18 @@ public class ScreenshotsPanel extends JPanel
     }
   }
 
-  private void loadScreen(String filename, JLabel screenLabel)
+  private BufferedImage loadScreen(String filename, JLabel screenLabel, JLabel resolutionLabel, JButton editButton)
   {
+    BufferedImage image = null;
     if (!filename.isEmpty())
     {
       File imagefile = new File("./screens/" + filename);
       try
       {
-        BufferedImage image = ImageIO.read(imagefile);
+        image = ImageIO.read(imagefile);
         Image newImage = image.getScaledInstance(320, 200, Image.SCALE_DEFAULT);
         screenLabel.setIcon(new ImageIcon(newImage));
+        setEditButtonVisibilityAndResolution(image, resolutionLabel, editButton);
       }
       catch (IOException e)
       {
@@ -253,6 +267,7 @@ public class ScreenshotsPanel extends JPanel
     {
       screenLabel.setIcon(getMissingScreenshotImageIcon());
     }
+    return image;
   }
 
   private ImageIcon getMissingScreenshotImageIcon()
@@ -349,7 +364,7 @@ public class ScreenshotsPanel extends JPanel
       GridBagLayout gbl_screenshotPanel = new GridBagLayout();
       screenshotPanel.setLayout(gbl_screenshotPanel);
       GridBagConstraints gbc_screen1ImageLabel = new GridBagConstraints();
-      gbc_screen1ImageLabel.gridwidth = 2;
+      gbc_screen1ImageLabel.gridwidth = 3;
       gbc_screen1ImageLabel.weightx = 0.5;
       gbc_screen1ImageLabel.weighty = 1.0;
       gbc_screen1ImageLabel.anchor = GridBagConstraints.WEST;
@@ -359,7 +374,7 @@ public class ScreenshotsPanel extends JPanel
       screenshotPanel.add(getScreen1ImageLabel(), gbc_screen1ImageLabel);
       GridBagConstraints gbc_screen1Button = new GridBagConstraints();
       gbc_screen1Button.weightx = 0.5;
-      gbc_screen1Button.insets = new Insets(0, 5, 5, 5);
+      gbc_screen1Button.insets = new Insets(0, 5, 0, 5);
       gbc_screen1Button.anchor = GridBagConstraints.NORTHWEST;
       gbc_screen1Button.gridx = 0;
       gbc_screen1Button.gridy = 1;
@@ -370,28 +385,38 @@ public class ScreenshotsPanel extends JPanel
       gbc_screen2ImageLabel.anchor = GridBagConstraints.WEST;
       gbc_screen2ImageLabel.weightx = 0.5;
       gbc_screen2ImageLabel.insets = new Insets(0, 5, 5, 0);
-      gbc_screen2ImageLabel.gridx = 2;
+      gbc_screen2ImageLabel.gridx = 3;
       gbc_screen2ImageLabel.gridy = 0;
       screenshotPanel.add(getScreen2ImageLabel(), gbc_screen2ImageLabel);
+      GridBagConstraints gbc_resolution1Label = new GridBagConstraints();
+      gbc_resolution1Label.insets = new Insets(0, 0, 0, 5);
+      gbc_resolution1Label.gridx = 1;
+      gbc_resolution1Label.gridy = 1;
+      screenshotPanel.add(getResolution1Label(), gbc_resolution1Label);
       GridBagConstraints gbc_crop1Button = new GridBagConstraints();
       gbc_crop1Button.anchor = GridBagConstraints.NORTHEAST;
       gbc_crop1Button.insets = new Insets(0, 0, 3, 5);
-      gbc_crop1Button.gridx = 1;
+      gbc_crop1Button.gridx = 2;
       gbc_crop1Button.gridy = 1;
-      screenshotPanel.add(getCrop1Button(), gbc_crop1Button);
+      screenshotPanel.add(getEdit1Button(), gbc_crop1Button);
       GridBagConstraints gbc_screen2Button = new GridBagConstraints();
       gbc_screen2Button.weightx = 0.5;
       gbc_screen2Button.anchor = GridBagConstraints.NORTHWEST;
-      gbc_screen2Button.insets = new Insets(0, 5, 5, 5);
-      gbc_screen2Button.gridx = 2;
+      gbc_screen2Button.insets = new Insets(0, 5, 0, 5);
+      gbc_screen2Button.gridx = 3;
       gbc_screen2Button.gridy = 1;
       screenshotPanel.add(getScreen2Button(), gbc_screen2Button);
+      GridBagConstraints gbc_resolution2Label = new GridBagConstraints();
+      gbc_resolution2Label.insets = new Insets(0, 0, 0, 5);
+      gbc_resolution2Label.gridx = 4;
+      gbc_resolution2Label.gridy = 1;
+      screenshotPanel.add(getResolution2Label(), gbc_resolution2Label);
       GridBagConstraints gbc_crop2Button = new GridBagConstraints();
       gbc_crop2Button.anchor = GridBagConstraints.NORTHEAST;
-      gbc_crop2Button.insets = new Insets(0, 0, 3, 5);
-      gbc_crop2Button.gridx = 3;
+      gbc_crop2Button.insets = new Insets(0, 0, 3, 0);
+      gbc_crop2Button.gridx = 5;
       gbc_crop2Button.gridy = 1;
-      screenshotPanel.add(getCrop2Button(), gbc_crop2Button);
+      screenshotPanel.add(getEdit2Button(), gbc_crop2Button);
     }
     return screenshotPanel;
   }
@@ -405,7 +430,7 @@ public class ScreenshotsPanel extends JPanel
         {
           public void filesDropped(java.io.File[] files)
           {
-            model.setScreen1Image(handleScreenFileDrop(files, screen1ImageLabel, crop1Button));
+            model.setScreen1Image(handleScreenFileDrop(files, screen1ImageLabel, edit1Button));
           }
         });
     }
@@ -438,7 +463,7 @@ public class ScreenshotsPanel extends JPanel
         {
           public void filesDropped(java.io.File[] files)
           {
-            model.setScreen2Image(handleScreenFileDrop(files, screen2ImageLabel, crop2Button));
+            model.setScreen2Image(handleScreenFileDrop(files, screen2ImageLabel, edit2Button));
           }
         });
     }
@@ -544,44 +569,73 @@ public class ScreenshotsPanel extends JPanel
     return gameButton;
   }
 
-  private JButton getCrop1Button()
+  private JButton getEdit1Button()
   {
-    if (crop1Button == null)
+    if (edit1Button == null)
     {
-      crop1Button = new JButton(warningIcon);
-      crop1Button.addActionListener(new ActionListener()
+      edit1Button = new JButton(warningIcon);
+      edit1Button.addActionListener(new ActionListener()
         {
           public void actionPerformed(ActionEvent arg0)
           {
-            model.setScreen1Image(cropImage(model.getScreen1Image(), getScreen1ImageLabel()));
-            crop1Button.setVisible(false);
+            JPopupMenu menu = new JPopupMenu();
+            JMenuItem addItem = new JMenuItem("Crop to 320x200");
+            addItem.addActionListener(e -> {
+              model.setScreen1Image(cropImage(currentScreen1Image, getScreen1ImageLabel()));
+              edit1Button.setVisible(false);
+            });
+            menu.add(addItem);
+
+            JMenuItem editItem = new JMenuItem("Scale to 320x200");
+            editItem.addActionListener(e -> {
+              BufferedImage scaledImage = scaleImage(currentScreen1Image);
+              model.setScreen1Image(scaledImage);
+              edit1Button.setVisible(false);
+            });
+            menu.add(editItem);
+
+            menu.show(edit1Button, 15, 15);
           }
         });
-      crop1Button.setMargin(new Insets(1, 3, 1, 3));
-      crop1Button.setToolTipText(cropTooltip);
-      crop1Button.setVisible(false);
+      edit1Button.setMargin(new Insets(1, 3, 1, 3));
+      edit1Button.setToolTipText(cropTooltip);
+      edit1Button.setVisible(false);
     }
-    return crop1Button;
+    return edit1Button;
   }
 
-  private JButton getCrop2Button()
+  private JButton getEdit2Button()
   {
-    if (crop2Button == null)
+    if (edit2Button == null)
     {
-      crop2Button = new JButton(warningIcon);
-      crop2Button.addActionListener(new ActionListener()
+      edit2Button = new JButton(warningIcon);
+      edit2Button.addActionListener(new ActionListener()
         {
           public void actionPerformed(ActionEvent arg0)
           {
-            model.setScreen2Image(cropImage(model.getScreen2Image(), getScreen2ImageLabel()));
-            crop2Button.setVisible(false);
+            JPopupMenu menu = new JPopupMenu();
+            JMenuItem addItem = new JMenuItem("Crop to 320x200");
+            addItem.addActionListener(e -> {
+              model.setScreen2Image(cropImage(currentScreen2Image, getScreen2ImageLabel()));
+              edit2Button.setVisible(false);
+            });
+            menu.add(addItem);
+
+            JMenuItem editItem = new JMenuItem("Scale to 320x200");
+            editItem.addActionListener(e -> {
+              BufferedImage scaledImage = scaleImage(currentScreen2Image);
+              model.setScreen2Image(scaledImage);
+              edit2Button.setVisible(false);
+            });
+            menu.add(editItem);
+            menu.show(edit2Button, 15, 15);
           }
         });
-      crop2Button.setMargin(new Insets(1, 3, 1, 3));
-      crop2Button.setToolTipText(cropTooltip);
-      crop2Button.setVisible(false);
+      edit2Button.setMargin(new Insets(1, 3, 1, 3));
+      edit2Button.setToolTipText(cropTooltip);
+      edit2Button.setVisible(false);
     }
-    return crop2Button;
+    return edit2Button;
   }
 
   private BufferedImage handleCoverFileDrop(File[] files, JLabel imageLabel)
@@ -604,7 +658,7 @@ public class ScreenshotsPanel extends JPanel
     return returnImage;
   }
 
-  private BufferedImage handleScreenFileDrop(File[] files, JLabel imageLabel, JButton cropButton)
+  private BufferedImage handleScreenFileDrop(File[] files, JLabel imageLabel, JButton editButton)
   {
     BufferedImage returnImage = null;
     if (files.length > 0)
@@ -613,7 +667,7 @@ public class ScreenshotsPanel extends JPanel
       {
         returnImage = ImageIO.read(files[0]);
 
-        setCropButtonVisibility(returnImage, cropButton);
+        setEditButtonVisibility(returnImage, editButton);
         Image newImage = returnImage.getScaledInstance(320, 200, Image.SCALE_DEFAULT);
         imageLabel.setIcon(new ImageIcon(newImage));
       }
@@ -625,29 +679,41 @@ public class ScreenshotsPanel extends JPanel
     }
     return returnImage;
   }
-  
-  private void setCropButtonVisibility(BufferedImage image, JButton cropButton)
+
+  private void setEditButtonVisibility(BufferedImage image, JButton editButton)
   {
-    if (image.getHeight() > 200 && image.getWidth() > 320)
+    if (image.getHeight() != 200 || image.getWidth() != 320)
     {
-      cropButton.setVisible(true);
+      editButton.setVisible(true);
     }
     else
     {
-      cropButton.setVisible(false);
+      editButton.setVisible(false);
     }
   }
 
   private BufferedImage cropImage(BufferedImage originalImage, JLabel screenLabel)
   {
-    // Crop to right size: Remove the border to fit nicely in the carousel.
-    BufferedImage newImage = originalImage.getSubimage(32, 35, 320, 200);
+    // Crop to right size for C64: Remove the border to fit nicely in the carousel.
+    BufferedImage newImage = originalImage
+      .getSubimage((originalImage.getWidth() - 320) / 2, ((originalImage.getHeight() - 200) / 2) - 1, 320, 200);
     BufferedImage copyOfImage =
       new BufferedImage(newImage.getWidth(), newImage.getHeight(), BufferedImage.TYPE_INT_RGB);
     Graphics g = copyOfImage.createGraphics();
     g.drawImage(newImage, 0, 0, null);
     screenLabel.setIcon(new ImageIcon(newImage));
     return newImage;
+  }
+
+  private BufferedImage scaleImage(BufferedImage originalImage)
+  {
+    // Scale to right size.
+    Image newImage = originalImage.getScaledInstance(320, 200, Image.SCALE_DEFAULT);
+    BufferedImage copyOfImage =
+      new BufferedImage(newImage.getWidth(null), newImage.getHeight(null), BufferedImage.TYPE_INT_RGB);
+    Graphics g = copyOfImage.createGraphics();
+    g.drawImage(newImage, 0, 0, null);
+    return copyOfImage;
   }
 
   private void selectGameFile()
@@ -662,7 +728,8 @@ public class ScreenshotsPanel extends JPanel
     }
     fileChooser.setCurrentDirectory(new File(gameDir));
 
-    FileNameExtensionFilter vicefilter = new FileNameExtensionFilter("Vice runnable files", "d64", "t64", "tap", "VSF", "GZ", "crt", "prg", "g64");
+    FileNameExtensionFilter vicefilter =
+      new FileNameExtensionFilter("Vice runnable files", "d64", "t64", "tap", "VSF", "GZ", "crt", "prg", "g64");
     fileChooser.addChoosableFileFilter(vicefilter);
     fileChooser.setFileFilter(vicefilter);
     int value = fileChooser.showOpenDialog(MainWindow.getInstance());
@@ -684,8 +751,8 @@ public class ScreenshotsPanel extends JPanel
     if (coverDir == null)
     {
       coverDir = ".";
-    }  
-    fileChooser.setCurrentDirectory(new File(coverDir));   
+    }
+    fileChooser.setCurrentDirectory(new File(coverDir));
     fileChooser.addChoosableFileFilter(imagefilter);
     fileChooser.setFileFilter(imagefilter);
     int value = fileChooser.showOpenDialog(MainWindow.getInstance());
@@ -717,12 +784,30 @@ public class ScreenshotsPanel extends JPanel
       FileManager.getConfiguredProperties().put(SCREENS_DIR_PROPERTY, selectedFile.toPath().getParent().toString());
       if (first)
       {
-        model.setScreen1Image(handleScreenFileDrop(new File[] { selectedFile }, screen1ImageLabel, crop1Button));
+        model.setScreen1Image(handleScreenFileDrop(new File[] { selectedFile }, screen1ImageLabel, edit1Button));
       }
       else
       {
-        model.setScreen2Image(handleScreenFileDrop(new File[] { selectedFile }, screen2ImageLabel, crop2Button));
+        model.setScreen2Image(handleScreenFileDrop(new File[] { selectedFile }, screen2ImageLabel, edit2Button));
       }
     }
+  }
+
+  private JLabel getResolution1Label()
+  {
+    if (resolution1Label == null)
+    {
+      resolution1Label = new JLabel(" ");
+    }
+    return resolution1Label;
+  }
+
+  private JLabel getResolution2Label()
+  {
+    if (resolution2Label == null)
+    {
+      resolution2Label = new JLabel(" ");
+    }
+    return resolution2Label;
   }
 }
