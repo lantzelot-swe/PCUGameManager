@@ -5,11 +5,14 @@ import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.beans.Beans;
+import java.text.ParseException;
 
-import javax.swing.JComboBox;
+import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -19,8 +22,10 @@ import javax.swing.UIManager;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.DefaultStyledDocument;
+import javax.swing.text.MaskFormatter;
 
 import se.lantz.model.InfoModel;
+import se.lantz.util.ExceptionHandler;
 
 public class InfoPanel extends JPanel
 {
@@ -34,7 +39,7 @@ public class InfoPanel extends JPanel
   private JLabel composerLabel;
   private JTextField composerField;
   private JLabel yearLabel;
-  private JTextField yearField;
+  private JFormattedTextField yearField;
   private JLabel genreLabel;
   private GenreComboBox genreComboBox;
   private JLabel descriptionLabel;
@@ -173,12 +178,30 @@ public class InfoPanel extends JPanel
   private void modelChanged()
   {
     // Read from model
-    getTitleField().setText(model.getTitle());
-    getDescriptionTextArea().setText(model.getDescription());
-    getYearField().setText(Integer.toString(model.getYear()));
-    getGenreComboBox().setSelectedGenre(model.getGenre());
-    getAuthorField().setText(model.getAuthor());
-    getComposerField().setText(model.getComposer());
+    if (!getTitleField().hasFocus())
+    {
+      getTitleField().setText(model.getTitle());
+    }
+    if (!getDescriptionTextArea().hasFocus())
+    {
+      getDescriptionTextArea().setText(model.getDescription());
+    }
+    if (!getYearField().hasFocus())
+    {
+      getYearField().setText(Integer.toString(model.getYear()));
+    }
+    if (!getGenreComboBox().hasFocus())
+    {
+      getGenreComboBox().setSelectedGenre(model.getGenre());
+    }
+    if (!getAuthorField().hasFocus())
+    {
+      getAuthorField().setText(model.getAuthor());
+    }
+    if (!getComposerField().hasFocus())
+    {
+      getComposerField().setText(model.getComposer());
+    }
   }
 
   private JPanel getSettingsPanel()
@@ -205,7 +228,6 @@ public class InfoPanel extends JPanel
     if (titleField == null)
     {
       titleField = new JTextField();
-      titleField.setColumns(10);
       titleField.addKeyListener(new KeyAdapter()
         {
           public void keyReleased(KeyEvent e)
@@ -236,13 +258,13 @@ public class InfoPanel extends JPanel
       authorField.setPreferredSize(new Dimension(300, 20));
       authorField.setColumns(10);
       authorField.addKeyListener(new KeyAdapter()
-      {
-        public void keyReleased(KeyEvent e)
         {
-          JTextField textField = (JTextField) e.getSource();
-          model.setAuthor(textField.getText());
-        }
-      });
+          public void keyReleased(KeyEvent e)
+          {
+            JTextField textField = (JTextField) e.getSource();
+            model.setAuthor(textField.getText());
+          }
+        });
     }
     return authorField;
   }
@@ -265,13 +287,13 @@ public class InfoPanel extends JPanel
       composerField.setPreferredSize(new Dimension(200, 20));
       composerField.setColumns(10);
       composerField.addKeyListener(new KeyAdapter()
-      {
-        public void keyReleased(KeyEvent e)
         {
-          JTextField textField = (JTextField) e.getSource();
-          model.setComposer(textField.getText());
-        }
-      });
+          public void keyReleased(KeyEvent e)
+          {
+            JTextField textField = (JTextField) e.getSource();
+            model.setComposer(textField.getText());
+          }
+        });
     }
     return composerField;
   }
@@ -285,20 +307,29 @@ public class InfoPanel extends JPanel
     return yearLabel;
   }
 
-  private JTextField getYearField()
+  private JFormattedTextField getYearField()
   {
     if (yearField == null)
     {
-      yearField = new JTextField();
-      yearField.setColumns(10);
-      yearField.addKeyListener(new KeyAdapter()
+      MaskFormatter maskformatter;
+      try
       {
-        public void keyReleased(KeyEvent e)
-        {
-          JTextField textField = (JTextField) e.getSource();
-          model.setYear(Integer.parseInt(textField.getText()));
-        }
-      });
+        maskformatter = new MaskFormatter("####");
+        maskformatter.setPlaceholderCharacter('0');
+        yearField = new JFormattedTextField(maskformatter);
+        yearField.addKeyListener(new KeyAdapter()
+          {
+            public void keyReleased(KeyEvent e)
+            {
+              JFormattedTextField textField = (JFormattedTextField) e.getSource();
+              model.setYear(Integer.parseInt(textField.getText()));
+            }
+          });
+      }
+      catch (ParseException e1)
+      {
+        ExceptionHandler.handleException(e1, "Invalid mask");
+      }
     }
     return yearField;
   }
@@ -317,7 +348,7 @@ public class InfoPanel extends JPanel
     if (genreComboBox == null)
     {
       genreComboBox = new GenreComboBox();
-      genreComboBox.addActionListener((e) -> model.setGenre((String)genreComboBox.getSelectedGenre()));
+      genreComboBox.addActionListener((e) -> model.setGenre((String) genreComboBox.getSelectedGenre()));
     }
     return genreComboBox;
   }
@@ -377,15 +408,25 @@ public class InfoPanel extends JPanel
         .setToolTipText("<html>The Carousel description screen can only show a limited number of characters.<br>Consider limiting the text to 512 characters at the most.</html>");
 
       updateDescriptionCharCount(doc.getLength());
-      
+
       descriptionTextArea.addKeyListener(new KeyAdapter()
-      {
-        public void keyReleased(KeyEvent e)
         {
-          JTextArea textField = (JTextArea) e.getSource();
-          model.setDescription(textField.getText());
-        }
-      });
+          public void keyReleased(KeyEvent e)
+          {
+            JTextArea textField = (JTextArea) e.getSource();
+            model.setDescription(textField.getText());
+          }
+        });
+      descriptionTextArea.addFocusListener(new FocusAdapter()
+        {
+          @Override
+          public void focusLost(FocusEvent e)
+          {
+            //Read the text from the model again to "format" it
+            JTextArea textField = (JTextArea) e.getSource();
+            textField.setText(model.getDescription());
+          }
+        });
     }
     return descriptionTextArea;
   }
@@ -420,7 +461,7 @@ public class InfoPanel extends JPanel
     }
     getCharCountLabel().setText(length + " characters (recommended max: 512)");
   }
-  
+
   void focusTitleField()
   {
     getTitleField().requestFocus();
