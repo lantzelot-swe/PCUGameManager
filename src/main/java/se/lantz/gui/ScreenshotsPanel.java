@@ -65,8 +65,8 @@ public class ScreenshotsPanel extends JPanel
   private JButton edit2Button;
 
   private ImageIcon warningIcon = new ImageIcon(getClass().getResource("/se/lantz/warning-icon.png"));
-  private String cropTooltip =
-    "<html>Optimal resolution for the carousel is 320x200.<br>Press to crop or scale the image to this size.</html>";
+  private String editTooltip =
+    "<html>Optimal resolution for the carousel is 320x200.<br>Press to crop the image to this size (the border will be removed).<br>Otherwise it will be resized when saving which might make it blurry.</html>";
   private boolean gamesFileUpdated = false;
 
   FileNameExtensionFilter imagefilter =
@@ -578,27 +578,14 @@ public class ScreenshotsPanel extends JPanel
         {
           public void actionPerformed(ActionEvent arg0)
           {
-            JPopupMenu menu = new JPopupMenu();
-            JMenuItem addItem = new JMenuItem("Crop to 320x200");
-            addItem.addActionListener(e -> {
-              model.setScreen1Image(cropImage(currentScreen1Image, getScreen1ImageLabel()));
-              edit1Button.setVisible(false);
-            });
-            menu.add(addItem);
-
-            JMenuItem editItem = new JMenuItem("Scale to 320x200");
-            editItem.addActionListener(e -> {
-              BufferedImage scaledImage = scaleImage(currentScreen1Image);
-              model.setScreen1Image(scaledImage);
-              edit1Button.setVisible(false);
-            });
-            menu.add(editItem);
-
-            menu.show(edit1Button, 15, 15);
+            BufferedImage croppedImage = FileManager.cropImageTo320x200(currentScreen1Image);
+            getScreen1ImageLabel().setIcon(new ImageIcon(croppedImage));
+            model.setScreen1Image(croppedImage);
+            edit1Button.setVisible(false);
           }
         });
       edit1Button.setMargin(new Insets(1, 3, 1, 3));
-      edit1Button.setToolTipText(cropTooltip);
+      edit1Button.setToolTipText(editTooltip);
       edit1Button.setVisible(false);
     }
     return edit1Button;
@@ -613,26 +600,14 @@ public class ScreenshotsPanel extends JPanel
         {
           public void actionPerformed(ActionEvent arg0)
           {
-            JPopupMenu menu = new JPopupMenu();
-            JMenuItem addItem = new JMenuItem("Crop to 320x200");
-            addItem.addActionListener(e -> {
-              model.setScreen2Image(cropImage(currentScreen2Image, getScreen2ImageLabel()));
-              edit2Button.setVisible(false);
-            });
-            menu.add(addItem);
-
-            JMenuItem editItem = new JMenuItem("Scale to 320x200");
-            editItem.addActionListener(e -> {
-              BufferedImage scaledImage = scaleImage(currentScreen2Image);
-              model.setScreen2Image(scaledImage);
-              edit2Button.setVisible(false);
-            });
-            menu.add(editItem);
-            menu.show(edit2Button, 15, 15);
+            BufferedImage croppedImage = FileManager.cropImageTo320x200(currentScreen2Image);
+            getScreen2ImageLabel().setIcon(new ImageIcon(croppedImage));
+            model.setScreen2Image(croppedImage);
+            edit2Button.setVisible(false);
           }
         });
       edit2Button.setMargin(new Insets(1, 3, 1, 3));
-      edit2Button.setToolTipText(cropTooltip);
+      edit2Button.setToolTipText(editTooltip);
       edit2Button.setVisible(false);
     }
     return edit2Button;
@@ -690,30 +665,6 @@ public class ScreenshotsPanel extends JPanel
     {
       editButton.setVisible(false);
     }
-  }
-
-  private BufferedImage cropImage(BufferedImage originalImage, JLabel screenLabel)
-  {
-    // Crop to right size for C64: Remove the border to fit nicely in the carousel.
-    BufferedImage newImage = originalImage
-      .getSubimage((originalImage.getWidth() - 320) / 2, ((originalImage.getHeight() - 200) / 2) - 1, 320, 200);
-    BufferedImage copyOfImage =
-      new BufferedImage(newImage.getWidth(), newImage.getHeight(), BufferedImage.TYPE_INT_RGB);
-    Graphics g = copyOfImage.createGraphics();
-    g.drawImage(newImage, 0, 0, null);
-    screenLabel.setIcon(new ImageIcon(newImage));
-    return newImage;
-  }
-
-  private BufferedImage scaleImage(BufferedImage originalImage)
-  {
-    // Scale to right size.
-    Image newImage = originalImage.getScaledInstance(320, 200, Image.SCALE_DEFAULT);
-    BufferedImage copyOfImage =
-      new BufferedImage(newImage.getWidth(null), newImage.getHeight(null), BufferedImage.TYPE_INT_RGB);
-    Graphics g = copyOfImage.createGraphics();
-    g.drawImage(newImage, 0, 0, null);
-    return copyOfImage;
   }
 
   private void selectGameFile()

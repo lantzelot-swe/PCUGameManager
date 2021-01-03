@@ -31,7 +31,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import se.lantz.db.DbConnector;
-import se.lantz.gui.MainWindow;
 import se.lantz.model.InfoModel;
 import se.lantz.model.MainViewModel;
 import se.lantz.model.SystemModel;
@@ -108,6 +107,8 @@ public class FileManager
       try
       {
         File outputfile = new File(SCREENS + screen1FileName);
+        //Scale if not the right size
+        screen1 = scaleImageTo320x200(screen1);
         ImageIO.write(screen1, "png", outputfile);
       }
       catch (IOException e)
@@ -121,6 +122,8 @@ public class FileManager
       try
       {
         File outputfile = new File(SCREENS + screen2FileName);
+        //Scale if not the right size
+        screen2 = scaleImageTo320x200(screen2);
         ImageIO.write(screen2, "png", outputfile);
       }
       catch (IOException e)
@@ -749,14 +752,44 @@ public class FileManager
   {
     try
     {
-      Files.walk(TEMP_PATH)
-      .sorted(Comparator.reverseOrder())
-      .map(Path::toFile)
-      .forEach(File::delete);
+      if (Files.exists(TEMP_PATH))
+      {
+        Files.walk(TEMP_PATH)
+        .sorted(Comparator.reverseOrder())
+        .map(Path::toFile)
+        .forEach(File::delete);
+      }
     }
     catch (IOException e)
     {
       ExceptionHandler.handleException(e,  "Could not delete temp folder");
     }
+  }
+  
+  public static BufferedImage scaleImageTo320x200(BufferedImage originalImage)
+  {
+    if (originalImage.getWidth() != 320 || originalImage.getHeight() != 200)
+    {
+      // Scale to right size.
+      Image newImage = originalImage.getScaledInstance(320, 200, Image.SCALE_DEFAULT);
+      BufferedImage copyOfImage =
+        new BufferedImage(newImage.getWidth(null), newImage.getHeight(null), BufferedImage.TYPE_INT_RGB);
+      Graphics g = copyOfImage.createGraphics();
+      g.drawImage(newImage, 0, 0, null);
+      return copyOfImage;
+    }
+    return originalImage;
+  }
+  
+  public static BufferedImage cropImageTo320x200(BufferedImage originalImage)
+  {
+    // Crop to right size for C64: Remove the border to fit nicely in the carousel.
+    BufferedImage newImage = originalImage
+      .getSubimage((originalImage.getWidth() - 320) / 2, ((originalImage.getHeight() - 200) / 2) - 1, 320, 200);
+    BufferedImage copyOfImage =
+      new BufferedImage(newImage.getWidth(), newImage.getHeight(), BufferedImage.TYPE_INT_RGB);
+    Graphics g = copyOfImage.createGraphics();
+    g.drawImage(newImage, 0, 0, null);
+    return newImage;
   }
 }
