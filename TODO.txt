@@ -1,9 +1,26 @@
--Progress dialog for scraper while loading info -DONE
--Favorites for games -DONE
--Better query support for gameviews (one OR, one AND table) -DONE
--Support for selecting screenshots and cover in the MobyGames scraper -DONE
--VICE support: running games from the tool
--Write some documentation (F1)
 -More sites for the scraper.
+-screenshots cropping and resizing. -1.0.3
+-Always save a screenshot with 320x200 resolution. Now it can have the original size, which doesn't seem to work with the carousel? -1.0.3
+-Add button for running VICE with the system settings selected, to be able to create csf files more easily. -1.0.3
+-Bug: prg files for vic-20?
+-Bug: editing fields:
+  
+
+	"When editing a game and editing the Game Tile, Year, Author, Composer and Description if you want to edit a word or number it allows you to do one character then the cursor(|) jumps to the end of the line or end of the description.
+	Like the Year ..
+	1999
+	so put cursor here..  (|) cursor
+	199|9
+	to change it to 1989 when you press backspace to delete 9 then it says..
+	199
+	and then the cursor end up after the number..
+	199|
+	so if you press 8 to make it say 1989 it then says..
+	1998|
+	the cursor should be here..
+	19|9
+	The cursor should stay were you put it not jump to the end of the line."
 
 
+-Bug: renaming with capital letters: -1.0.3
+	"You can't edit the Game Title if the game is in the PCUGM already..? I wanted to change the games name "Great court" cause "court" is meant to be "Court" not "court", it needs a capital C, its saying name it a different name, I know it sounds a bit silly but I thought I report it anyway.. :)"
