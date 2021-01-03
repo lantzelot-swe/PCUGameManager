@@ -464,6 +464,11 @@ public class MainViewModel extends AbstractModel
 
   public void runGameInVice()
   {
-    fileManager.runGameInVice();
+    fileManager.runVice(true);
+  }
+  
+  public void runVice()
+  {
+    fileManager.runVice(false);
   }
 }

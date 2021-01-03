@@ -193,11 +193,16 @@ public class GameDetailsBackgroundPanel extends JPanel
       gbc_scrapeButton.gridx = 0;
       gbc_scrapeButton.gridy = 0;
       buttonPanel.add(getScrapeButton(), gbc_scrapeButton);
+      GridBagConstraints gbc_btnNewButton = new GridBagConstraints();
+      gbc_btnNewButton.insets = new Insets(5, 10, 5, 5);
+      gbc_btnNewButton.gridx = 1;
+      gbc_btnNewButton.gridy = 0;
+      buttonPanel.add(getBtnNewButton(), gbc_btnNewButton);
       GridBagConstraints gbc_saveButton = new GridBagConstraints();
       gbc_saveButton.weighty = 1.0;
       gbc_saveButton.anchor = GridBagConstraints.SOUTHEAST;
       gbc_saveButton.insets = new Insets(5, 5, 5, 6);
-      gbc_saveButton.gridx = 2;
+      gbc_saveButton.gridx = 3;
       gbc_saveButton.gridy = 0;
       buttonPanel.add(getSaveButton(), gbc_saveButton);
       GridBagConstraints gbc_runButton = new GridBagConstraints();
@@ -205,7 +210,7 @@ public class GameDetailsBackgroundPanel extends JPanel
       gbc_runButton.weighty = 1.0;
       gbc_runButton.weightx = 1.0;
       gbc_runButton.insets = new Insets(5, 0, 5, 10);
-      gbc_runButton.gridx = 1;
+      gbc_runButton.gridx = 2;
       gbc_runButton.gridy = 0;
       buttonPanel.add(getRunButton(), gbc_runButton);
     }
@@ -246,6 +251,7 @@ public class GameDetailsBackgroundPanel extends JPanel
 
   private ScraperDialog scraperDialog = null;
   private JButton runButton;
+  private JButton btnNewButton;
 
   private void scrapeGamesInformation()
   {
@@ -319,5 +325,16 @@ public class GameDetailsBackgroundPanel extends JPanel
     {
       getRunButton().doClick();
     }
+  }
+  private JButton getBtnNewButton() {
+    if (btnNewButton == null) {
+    	btnNewButton = new JButton("VICE");
+    	btnNewButton.addActionListener(new ActionListener() {
+    	  public void actionPerformed(ActionEvent e) {
+    	    model.runVice();
+    	  }
+    	});
+    }
+    return btnNewButton;
   }
 }

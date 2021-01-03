@@ -364,7 +364,7 @@ public class FileManager
     fw.close();
   }
 
-  public void runGameInVice()
+  public void runVice(boolean appendGame)
   {
     String gameFile = GAMES + infoModel.getGamesFile();
     StringBuilder command = new StringBuilder();
@@ -420,28 +420,41 @@ public class FileManager
       }
     }
 
-    //Append game file
-    Path gamePath = infoModel.getGamesPath();
-    if (gamePath != null)
+    //Append PAL,NTSC
+    if (systemModel.isPal())
     {
-      if (gamePath.toString().contains("crt"))
-      {
-        command.append("-cartcrt \"" + gamePath.toString() + "\"");
-      }
-      else
-      {
-        command.append("-autostart \"" + gamePath.toString() + "\"");
-      }
+      command.append("-pal ");
     }
     else
     {
-      if (gameFile.contains("crt"))
+      command.append("-ntsc ");
+    }
+
+    if (appendGame)
+    {
+      //Append game file
+      Path gamePath = infoModel.getGamesPath();
+      if (gamePath != null)
       {
-        command.append("-cartcrt \"" + decompressIfNeeded(gameFile) + "\"");
+        if (gamePath.toString().contains("crt"))
+        {
+          command.append("-cartcrt \"" + gamePath.toString() + "\"");
+        }
+        else
+        {
+          command.append("-autostart \"" + gamePath.toString() + "\"");
+        }
       }
       else
       {
-        command.append("-autostart \"" + gameFile + "\"");
+        if (gameFile.contains("crt"))
+        {
+          command.append("-cartcrt \"" + decompressIfNeeded(gameFile) + "\"");
+        }
+        else
+        {
+          command.append("-autostart \"" + gameFile + "\"");
+        }
       }
     }
 
@@ -455,6 +468,11 @@ public class FileManager
     {
       command.append("+truedrive ");
     }
+    if (systemModel.isReadOnly())
+    {
+      command.append("-attach8ro ");
+    }
+    
     //Append default joystick port
     if (model.getJoy1Model().isPrimary())
     {
@@ -484,13 +502,13 @@ public class FileManager
       ExceptionHandler.handleException(e, "Could not launch Vice with command " + command);
     }
   }
-  
+
   private String decompressIfNeeded(String path)
   {
     String returnPath = path;
     if (path.contains("crt.gz") || path.contains("CRT.gz"))
     {
-      Path targetFile = Paths.get("./temp/" + path.substring(path.lastIndexOf("/") + 1, path.lastIndexOf(".")));  
+      Path targetFile = Paths.get("./temp/" + path.substring(path.lastIndexOf("/") + 1, path.lastIndexOf(".")));
       try
       {
         Files.createDirectories(TEMP_PATH);
@@ -747,25 +765,22 @@ public class FileManager
     }
     return returnValue;
   }
-  
+
   public static void deleteTempFolder()
   {
     try
     {
       if (Files.exists(TEMP_PATH))
       {
-        Files.walk(TEMP_PATH)
-        .sorted(Comparator.reverseOrder())
-        .map(Path::toFile)
-        .forEach(File::delete);
+        Files.walk(TEMP_PATH).sorted(Comparator.reverseOrder()).map(Path::toFile).forEach(File::delete);
       }
     }
     catch (IOException e)
     {
-      ExceptionHandler.handleException(e,  "Could not delete temp folder");
+      ExceptionHandler.handleException(e, "Could not delete temp folder");
     }
   }
-  
+
   public static BufferedImage scaleImageTo320x200(BufferedImage originalImage)
   {
     if (originalImage.getWidth() != 320 || originalImage.getHeight() != 200)
@@ -780,7 +795,7 @@ public class FileManager
     }
     return originalImage;
   }
-  
+
   public static BufferedImage cropImageTo320x200(BufferedImage originalImage)
   {
     // Crop to right size for C64: Remove the border to fit nicely in the carousel.
