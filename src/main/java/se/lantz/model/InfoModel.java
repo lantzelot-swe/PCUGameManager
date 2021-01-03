@@ -295,7 +295,7 @@ public class InfoModel extends AbstractModel
   
   public boolean isTitleChanged()
   {
-    return !titleInDb.isEmpty() && !titleInDb.equals(title);
+    return !titleInDb.isEmpty() && !titleInDb.equalsIgnoreCase(title);
   }
   
   
