@@ -27,10 +27,11 @@ import se.lantz.model.data.GameListData;
 import se.lantz.model.data.GameView;
 import javax.swing.JRadioButton;
 import javax.swing.ButtonGroup;
+import javax.swing.ImageIcon;
 
 public class ExportGamesSelectionPanel extends JPanel
 {
-  private static final int _MAX_GAMES = 226;
+  private static final int MAX_GAMES = 226;
   private JPanel listPanel;
   private JPanel buttonPanel;
   private JButton addButton;
@@ -158,7 +159,8 @@ public class ExportGamesSelectionPanel extends JPanel
   {
     if (addButton == null)
     {
-      addButton = new JButton("->");
+      addButton = new JButton("");
+      addButton.setIcon(new ImageIcon(this.getClass().getResource("/se/lantz/arrow-right.png")));
       addButton.addActionListener(new ActionListener()
         {
           public void actionPerformed(ActionEvent e)
@@ -186,7 +188,8 @@ public class ExportGamesSelectionPanel extends JPanel
   {
     if (removeButton == null)
     {
-      removeButton = new JButton("<-");
+      removeButton = new JButton("");
+      removeButton.setIcon(new ImageIcon(this.getClass().getResource("/se/lantz/arrow-left.png")));
       removeButton.addActionListener(new ActionListener()
         {
           public void actionPerformed(ActionEvent e)
@@ -198,7 +201,7 @@ public class ExportGamesSelectionPanel extends JPanel
               selectedListModel.removeElement(gameListData);
             }
             sortSelectedList();
-            getWarningLabel().setVisible(selectedListModel.getSize() > _MAX_GAMES);
+            getWarningLabel().setVisible(selectedListModel.getSize() > MAX_GAMES);
             getCountLabel().setText(Integer.toString(selectedListModel.getSize()));
           }
         });
@@ -333,7 +336,7 @@ public class ExportGamesSelectionPanel extends JPanel
   {
     if (warningLabel == null)
     {
-      warningLabel = new JLabel("The game carousel only support " + _MAX_GAMES +
+      warningLabel = new JLabel("The game carousel only support " + MAX_GAMES +
         " games in total. Are you sure you want to export more than that?");
       warningLabel.setIcon(UIManager.getIcon("OptionPane.warningIcon"));
       warningLabel.setVisible(false);
@@ -350,7 +353,7 @@ public class ExportGamesSelectionPanel extends JPanel
     }
     return returnList;
   }
-  
+
   boolean isFavFormat()
   {
     return getFavFormatRadioButton().isSelected();
@@ -364,54 +367,67 @@ public class ExportGamesSelectionPanel extends JPanel
     }
     return countLabel;
   }
-  private JPanel getFormatPanel() {
-    if (formatPanel == null) {
-    	formatPanel = new JPanel();
-    	GridBagLayout gbl_formatPanel = new GridBagLayout();
-    	formatPanel.setLayout(gbl_formatPanel);
-    	GridBagConstraints gbc_formatInfoLabel = new GridBagConstraints();
-    	gbc_formatInfoLabel.weightx = 1.0;
-    	gbc_formatInfoLabel.anchor = GridBagConstraints.WEST;
-    	gbc_formatInfoLabel.insets = new Insets(10, 10, 5, 5);
-    	gbc_formatInfoLabel.gridx = 0;
-    	gbc_formatInfoLabel.gridy = 0;
-    	formatPanel.add(getFormatInfoLabel(), gbc_formatInfoLabel);
-    	GridBagConstraints gbc_maxiFormatRadioButton = new GridBagConstraints();
-    	gbc_maxiFormatRadioButton.weightx = 1.0;
-    	gbc_maxiFormatRadioButton.anchor = GridBagConstraints.WEST;
-    	gbc_maxiFormatRadioButton.insets = new Insets(0, 5, 0, 0);
-    	gbc_maxiFormatRadioButton.gridx = 0;
-    	gbc_maxiFormatRadioButton.gridy = 1;
-    	formatPanel.add(getMaxiFormatRadioButton(), gbc_maxiFormatRadioButton);
-    	GridBagConstraints gbc_favFormatRadioButton = new GridBagConstraints();
-    	gbc_favFormatRadioButton.weighty = 1.0;
-    	gbc_favFormatRadioButton.weightx = 1.0;
-    	gbc_favFormatRadioButton.insets = new Insets(0, 5, 5, 0);
-    	gbc_favFormatRadioButton.anchor = GridBagConstraints.NORTHWEST;
-    	gbc_favFormatRadioButton.gridx = 0;
-    	gbc_favFormatRadioButton.gridy = 2;
-    	formatPanel.add(getFavFormatRadioButton(), gbc_favFormatRadioButton);
+
+  private JPanel getFormatPanel()
+  {
+    if (formatPanel == null)
+    {
+      formatPanel = new JPanel();
+      GridBagLayout gbl_formatPanel = new GridBagLayout();
+      formatPanel.setLayout(gbl_formatPanel);
+      GridBagConstraints gbc_formatInfoLabel = new GridBagConstraints();
+      gbc_formatInfoLabel.weightx = 1.0;
+      gbc_formatInfoLabel.anchor = GridBagConstraints.WEST;
+      gbc_formatInfoLabel.insets = new Insets(10, 10, 5, 5);
+      gbc_formatInfoLabel.gridx = 0;
+      gbc_formatInfoLabel.gridy = 0;
+      formatPanel.add(getFormatInfoLabel(), gbc_formatInfoLabel);
+      GridBagConstraints gbc_maxiFormatRadioButton = new GridBagConstraints();
+      gbc_maxiFormatRadioButton.weightx = 1.0;
+      gbc_maxiFormatRadioButton.anchor = GridBagConstraints.WEST;
+      gbc_maxiFormatRadioButton.insets = new Insets(0, 5, 0, 0);
+      gbc_maxiFormatRadioButton.gridx = 0;
+      gbc_maxiFormatRadioButton.gridy = 1;
+      formatPanel.add(getMaxiFormatRadioButton(), gbc_maxiFormatRadioButton);
+      GridBagConstraints gbc_favFormatRadioButton = new GridBagConstraints();
+      gbc_favFormatRadioButton.weighty = 1.0;
+      gbc_favFormatRadioButton.weightx = 1.0;
+      gbc_favFormatRadioButton.insets = new Insets(0, 5, 5, 0);
+      gbc_favFormatRadioButton.anchor = GridBagConstraints.NORTHWEST;
+      gbc_favFormatRadioButton.gridx = 0;
+      gbc_favFormatRadioButton.gridy = 2;
+      formatPanel.add(getFavFormatRadioButton(), gbc_favFormatRadioButton);
     }
     return formatPanel;
   }
-  private JLabel getFormatInfoLabel() {
-    if (formatInfoLabel == null) {
-    	formatInfoLabel = new JLabel("Select which format to export to:");
+
+  private JLabel getFormatInfoLabel()
+  {
+    if (formatInfoLabel == null)
+    {
+      formatInfoLabel = new JLabel("Select which format to export to:");
     }
     return formatInfoLabel;
   }
-  private JRadioButton getMaxiFormatRadioButton() {
-    if (maxiFormatRadioButton == null) {
-    	maxiFormatRadioButton = new JRadioButton("Separate folders for covers, screens and games (supported by the Maxi game tool)");
-    	maxiFormatRadioButton.setSelected(true);
-    	formatGroup.add(maxiFormatRadioButton);
+
+  private JRadioButton getMaxiFormatRadioButton()
+  {
+    if (maxiFormatRadioButton == null)
+    {
+      maxiFormatRadioButton =
+        new JRadioButton("Separate folders for covers, screens and games (supported by the Maxi game tool)");
+      maxiFormatRadioButton.setSelected(true);
+      formatGroup.add(maxiFormatRadioButton);
     }
     return maxiFormatRadioButton;
   }
-  private JRadioButton getFavFormatRadioButton() {
-    if (favFormatRadioButton == null) {
-    	favFormatRadioButton = new JRadioButton("Separate folder for each game");
-    	formatGroup.add(favFormatRadioButton);
+
+  private JRadioButton getFavFormatRadioButton()
+  {
+    if (favFormatRadioButton == null)
+    {
+      favFormatRadioButton = new JRadioButton("Separate folder for each game");
+      formatGroup.add(favFormatRadioButton);
     }
     return favFormatRadioButton;
   }

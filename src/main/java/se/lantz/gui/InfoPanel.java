@@ -5,27 +5,33 @@ import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.KeyboardFocusManager;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.beans.Beans;
-import java.text.ParseException;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.HashSet;
+import java.util.Set;
 
-import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JSpinner;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.KeyStroke;
+import javax.swing.SpinnerModel;
+import javax.swing.SpinnerNumberModel;
+import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.DefaultStyledDocument;
-import javax.swing.text.MaskFormatter;
 
 import se.lantz.model.InfoModel;
-import se.lantz.util.ExceptionHandler;
 
 public class InfoPanel extends JPanel
 {
@@ -39,7 +45,7 @@ public class InfoPanel extends JPanel
   private JLabel composerLabel;
   private JTextField composerField;
   private JLabel yearLabel;
-  private JFormattedTextField yearField;
+  private JSpinner yearField;
   private JLabel genreLabel;
   private GenreComboBox genreComboBox;
   private JLabel descriptionLabel;
@@ -188,7 +194,7 @@ public class InfoPanel extends JPanel
     }
     if (!getYearField().hasFocus())
     {
-      getYearField().setText(Integer.toString(model.getYear()));
+      getYearField().setValue(model.getYear());
     }
     if (!getGenreComboBox().hasFocus())
     {
@@ -230,6 +236,7 @@ public class InfoPanel extends JPanel
       titleField = new JTextField();
       titleField.addKeyListener(new KeyAdapter()
         {
+          @Override
           public void keyReleased(KeyEvent e)
           {
             JTextField textField = (JTextField) e.getSource();
@@ -259,6 +266,7 @@ public class InfoPanel extends JPanel
       authorField.setColumns(10);
       authorField.addKeyListener(new KeyAdapter()
         {
+          @Override
           public void keyReleased(KeyEvent e)
           {
             JTextField textField = (JTextField) e.getSource();
@@ -288,6 +296,7 @@ public class InfoPanel extends JPanel
       composerField.setColumns(10);
       composerField.addKeyListener(new KeyAdapter()
         {
+          @Override
           public void keyReleased(KeyEvent e)
           {
             JTextField textField = (JTextField) e.getSource();
@@ -307,29 +316,35 @@ public class InfoPanel extends JPanel
     return yearLabel;
   }
 
-  private JFormattedTextField getYearField()
+  private JSpinner getYearField()
   {
     if (yearField == null)
     {
-      MaskFormatter maskformatter;
-      try
-      {
-        maskformatter = new MaskFormatter("####");
-        maskformatter.setPlaceholderCharacter('0');
-        yearField = new JFormattedTextField(maskformatter);
-        yearField.addKeyListener(new KeyAdapter()
+      SpinnerModel spinnerModel = new SpinnerNumberModel(1986, //initial value
+                                                         1978, //min
+                                                         Calendar.getInstance().get(Calendar.YEAR), //max, no need to add more than current year
+                                                         1);
+      yearField = new JSpinner(spinnerModel);
+      JSpinner.NumberEditor numberEditor = new JSpinner.NumberEditor(yearField, "####");
+      yearField.setEditor(numberEditor);
+      //Select all when gaining focus
+      numberEditor.getTextField().addFocusListener(new FocusAdapter()
+        {
+          @Override
+          public void focusGained(final FocusEvent e)
           {
-            public void keyReleased(KeyEvent e)
-            {
-              JFormattedTextField textField = (JFormattedTextField) e.getSource();
-              model.setYear(Integer.parseInt(textField.getText()));
-            }
-          });
-      }
-      catch (ParseException e1)
-      {
-        ExceptionHandler.handleException(e1, "Invalid mask");
-      }
+            SwingUtilities.invokeLater(() -> {
+              JTextField tf = (JTextField) e.getSource();
+              tf.selectAll();
+            });
+          }
+        });
+
+      yearField.addChangeListener(e -> {
+        JSpinner textField = (JSpinner) e.getSource();
+        model.setYear(Integer.parseInt(textField.getValue().toString()));
+
+      });
     }
     return yearField;
   }
@@ -348,7 +363,7 @@ public class InfoPanel extends JPanel
     if (genreComboBox == null)
     {
       genreComboBox = new GenreComboBox();
-      genreComboBox.addActionListener((e) -> model.setGenre((String) genreComboBox.getSelectedGenre()));
+      genreComboBox.addActionListener(e -> model.setGenre(genreComboBox.getSelectedGenre()));
     }
     return genreComboBox;
   }
@@ -404,6 +419,13 @@ public class InfoPanel extends JPanel
           }
         });
       descriptionTextArea.setDocument(doc);
+
+      //Setup tab and shift tab to transfer focus
+      Set<KeyStroke> strokes = new HashSet<>(Arrays.asList(KeyStroke.getKeyStroke("pressed TAB")));
+      descriptionTextArea.setFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS, strokes);
+      strokes = new HashSet<>(Arrays.asList(KeyStroke.getKeyStroke("shift pressed TAB")));
+      descriptionTextArea.setFocusTraversalKeys(KeyboardFocusManager.BACKWARD_TRAVERSAL_KEYS, strokes);
+
       getCharCountLabel()
         .setToolTipText("<html>The Carousel description screen can only show a limited number of characters.<br>Consider limiting the text to 512 characters at the most.</html>");
 
@@ -411,6 +433,7 @@ public class InfoPanel extends JPanel
 
       descriptionTextArea.addKeyListener(new KeyAdapter()
         {
+          @Override
           public void keyReleased(KeyEvent e)
           {
             JTextArea textField = (JTextArea) e.getSource();

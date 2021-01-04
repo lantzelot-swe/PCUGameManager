@@ -13,12 +13,14 @@ import java.awt.event.KeyEvent;
 import java.io.IOException;
 import java.net.URISyntaxException;
 
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JEditorPane;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.event.HyperlinkEvent;
@@ -330,7 +332,8 @@ public class MobyGamesOptionsPanel extends JPanel
               MobyGamesOptionsPanel.this.setCursor(waitCursor);
               scraper.connectScraper(urlTextField.getText());
               getConnectionStatusLabel().setText("Connection status: OK");
-              enableCheckBoxes(true);
+              getConnectionStatusLabel().setIcon(new ImageIcon(this.getClass().getResource("/se/lantz/check.png")));
+              
               okButton.setEnabled(true);
               MobyGamesOptionsPanel.this.setCursor(defaultCursor);
               SwingUtilities.invokeLater(() -> SwingUtilities.getRootPane(connectButton).setDefaultButton(okButton));
@@ -338,6 +341,7 @@ public class MobyGamesOptionsPanel extends JPanel
             catch (Exception e2)
             {
               getConnectionStatusLabel().setText("Connection status: Error. Invalid URL?");
+              getConnectionStatusLabel().setIcon(new ImageIcon(this.getClass().getResource("/se/lantz/failure.png")));
               enableCheckBoxes(false);
               okButton.setEnabled(false);
               MobyGamesOptionsPanel.this.setCursor(defaultCursor);
@@ -355,6 +359,7 @@ public class MobyGamesOptionsPanel extends JPanel
     {
       connectionStatusLabel = new JLabel(" ");
       connectionStatusLabel.setFont(connectionStatusLabel.getFont().deriveFont(Font.BOLD));
+      connectionStatusLabel.setHorizontalTextPosition(SwingConstants.LEADING);
     }
     return connectionStatusLabel;
   }
