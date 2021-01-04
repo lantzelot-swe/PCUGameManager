@@ -267,9 +267,9 @@ public class MenuManager
     helpItem.addActionListener(e -> {
       try
       {
-        Desktop.getDesktop().open(new File("./help.htm"));
+        Desktop.getDesktop().browse(new URI("https://github.com/lantzelot-swe/PCUGameManager/wiki"));
       }
-      catch (IOException ex)
+      catch (IOException | URISyntaxException ex)
       {
         JOptionPane.showMessageDialog(MainWindow.getInstance(), "Could not open help", "Help missing", JOptionPane.ERROR_MESSAGE);
       }
