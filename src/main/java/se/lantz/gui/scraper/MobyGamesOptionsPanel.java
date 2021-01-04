@@ -333,7 +333,7 @@ public class MobyGamesOptionsPanel extends JPanel
               scraper.connectScraper(urlTextField.getText());
               getConnectionStatusLabel().setText("Connection status: OK");
               getConnectionStatusLabel().setIcon(new ImageIcon(this.getClass().getResource("/se/lantz/check.png")));
-              
+              enableCheckBoxes(true);
               okButton.setEnabled(true);
               MobyGamesOptionsPanel.this.setCursor(defaultCursor);
               SwingUtilities.invokeLater(() -> SwingUtilities.getRootPane(connectButton).setDefaultButton(okButton));

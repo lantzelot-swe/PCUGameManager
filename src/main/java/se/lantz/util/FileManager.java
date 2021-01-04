@@ -86,7 +86,7 @@ public class FileManager
     {
       try
       {
-        Image coverToSave = cover.getScaledInstance(122, 175, Image.SCALE_DEFAULT);
+        Image coverToSave = cover.getScaledInstance(122, 175, Image.SCALE_SMOOTH);
         BufferedImage copyOfImage =
           new BufferedImage(coverToSave.getWidth(null), coverToSave.getHeight(null), BufferedImage.TYPE_INT_RGB);
         Graphics g = copyOfImage.createGraphics();
@@ -783,17 +783,23 @@ public class FileManager
 
   public static BufferedImage scaleImageTo320x200(BufferedImage originalImage)
   {
+    BufferedImage returnImage = originalImage;
+    if (originalImage.getWidth() >= 544 && originalImage.getHeight() >= 284)
+    {
+      //Standard VIC-20 screenshot from Vice. This is best scaled by first cropping to 448x280
+      returnImage = cropImageTo448x280(originalImage);
+    }
     if (originalImage.getWidth() != 320 || originalImage.getHeight() != 200)
     {
       // Scale to right size.
-      Image newImage = originalImage.getScaledInstance(320, 200, Image.SCALE_DEFAULT);
+      Image newImage = returnImage.getScaledInstance(320, 200, Image.SCALE_SMOOTH);
       BufferedImage copyOfImage =
         new BufferedImage(newImage.getWidth(null), newImage.getHeight(null), BufferedImage.TYPE_INT_RGB);
       Graphics g = copyOfImage.createGraphics();
       g.drawImage(newImage, 0, 0, null);
       return copyOfImage;
     }
-    return originalImage;
+    return returnImage;
   }
 
   public static BufferedImage cropImageTo320x200(BufferedImage originalImage)
@@ -801,6 +807,18 @@ public class FileManager
     // Crop to right size for C64: Remove the border to fit nicely in the carousel.
     BufferedImage newImage = originalImage
       .getSubimage((originalImage.getWidth() - 320) / 2, ((originalImage.getHeight() - 200) / 2) - 1, 320, 200);
+    BufferedImage copyOfImage =
+      new BufferedImage(newImage.getWidth(), newImage.getHeight(), BufferedImage.TYPE_INT_RGB);
+    Graphics g = copyOfImage.createGraphics();
+    g.drawImage(newImage, 0, 0, null);
+    return newImage;
+  }
+  
+  private static BufferedImage cropImageTo448x280(BufferedImage originalImage)
+  {
+    // Crop to right size for Vic-20: Remove the border to fit nicely in the carousel.
+    BufferedImage newImage = originalImage
+      .getSubimage((originalImage.getWidth() - 448) / 2, ((originalImage.getHeight() - 280) / 2) - 1, 448, 280);
     BufferedImage copyOfImage =
       new BufferedImage(newImage.getWidth(), newImage.getHeight(), BufferedImage.TYPE_INT_RGB);
     Graphics g = copyOfImage.createGraphics();

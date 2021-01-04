@@ -66,7 +66,7 @@ public class ScreenshotsPanel extends JPanel
 
   private ImageIcon warningIcon = new ImageIcon(getClass().getResource("/se/lantz/warning-icon.png"));
   private String editTooltip =
-    "<html>Optimal resolution for the carousel is 320x200.<br>Press to crop the image to this size (the border will be removed).<br>Otherwise it will be resized when saving which might make it blurry.</html>";
+    "<html>Optimal resolution for the carousel is 320x200.<br>Press to crop the image to this size (the border will be removed).<br>It will be resized when saving but it might make it blurry.</html>";
   private boolean gamesFileUpdated = false;
 
   FileNameExtensionFilter imagefilter =
@@ -138,7 +138,7 @@ public class ScreenshotsPanel extends JPanel
       if (!coverImage.equals(currentCoverImage))
       {
         logger.debug("SETTING NEW COVER IMAGE");
-        Image newImage = coverImage.getScaledInstance(130, 200, Image.SCALE_DEFAULT);
+        Image newImage = coverImage.getScaledInstance(130, 200, Image.SCALE_SMOOTH);
         getCoverImageLabel().setIcon(new ImageIcon(newImage));
         currentCoverImage = coverImage;
       }
@@ -164,8 +164,7 @@ public class ScreenshotsPanel extends JPanel
       if (!screen1Image.equals(currentScreen1Image))
       {
         logger.debug("SETTING SCREEN 1 IMAGE");
-        Image newImage = screen1Image.getScaledInstance(320, 200, Image.SCALE_DEFAULT);
-        getScreen1ImageLabel().setIcon(new ImageIcon(newImage));
+        getScreen1ImageLabel().setIcon(new ImageIcon(FileManager.scaleImageTo320x200(screen1Image)));
         setEditButtonVisibilityAndResolution(screen1Image, getResolution1Label(), getEdit1Button());
         currentScreen1Image = screen1Image;
       }
@@ -192,8 +191,7 @@ public class ScreenshotsPanel extends JPanel
       if (!screen2Image.equals(currentScreen2Image))
       {
         logger.debug("SETTING SCREEN 2 IMAGE");
-        Image newImage = screen2Image.getScaledInstance(320, 200, Image.SCALE_DEFAULT);
-        getScreen2ImageLabel().setIcon(new ImageIcon(newImage));
+        getScreen2ImageLabel().setIcon(new ImageIcon(FileManager.scaleImageTo320x200(screen2Image)));
         setEditButtonVisibilityAndResolution(screen2Image, getResolution2Label(), getEdit2Button());
         currentScreen2Image = screen2Image;
       }
@@ -229,7 +227,7 @@ public class ScreenshotsPanel extends JPanel
       try
       {
         BufferedImage image = ImageIO.read(imagefile);
-        Image newImage = image.getScaledInstance(130, 200, Image.SCALE_DEFAULT);
+        Image newImage = image.getScaledInstance(130, 200, Image.SCALE_SMOOTH);
         getCoverImageLabel().setIcon(new ImageIcon(newImage));
       }
       catch (IOException e)
@@ -253,7 +251,7 @@ public class ScreenshotsPanel extends JPanel
       try
       {
         image = ImageIO.read(imagefile);
-        Image newImage = image.getScaledInstance(320, 200, Image.SCALE_DEFAULT);
+        Image newImage = image.getScaledInstance(320, 200, Image.SCALE_SMOOTH);
         screenLabel.setIcon(new ImageIcon(newImage));
         setEditButtonVisibilityAndResolution(image, resolutionLabel, editButton);
       }
@@ -621,7 +619,7 @@ public class ScreenshotsPanel extends JPanel
       try
       {
         returnImage = ImageIO.read(files[0]);
-        Image newImage = returnImage.getScaledInstance(135, 200, Image.SCALE_DEFAULT);
+        Image newImage = returnImage.getScaledInstance(130, 200, Image.SCALE_SMOOTH);
         imageLabel.setIcon(new ImageIcon(newImage));
       }
       catch (IOException e)
@@ -643,8 +641,7 @@ public class ScreenshotsPanel extends JPanel
         returnImage = ImageIO.read(files[0]);
 
         setEditButtonVisibility(returnImage, editButton);
-        Image newImage = returnImage.getScaledInstance(320, 200, Image.SCALE_DEFAULT);
-        imageLabel.setIcon(new ImageIcon(newImage));
+        imageLabel.setIcon(new ImageIcon(FileManager.scaleImageTo320x200(returnImage)));
       }
       catch (IOException e)
       {
