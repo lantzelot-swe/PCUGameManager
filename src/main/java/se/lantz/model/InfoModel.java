@@ -266,26 +266,29 @@ public class InfoModel extends AbstractModel
   
   public void updateFileNames()
   {
-    disableChangeNotification(true);
-    String fileName = FileManager.generateFileNameFromTitle(this.title);
-    if (!getCoverFile().isEmpty() || getCoverImage() != null)
+    if (isNewGame() || isTitleChanged())
     {
-      setCoverFile(fileName + "-cover.png");
+      disableChangeNotification(true);
+      String fileName = FileManager.generateFileNameFromTitle(this.title);
+      if (!getCoverFile().isEmpty() || getCoverImage() != null)
+      {
+        setCoverFile(fileName + "-cover.png");
+      }
+      if (!getScreens1File().isEmpty() || getScreen1Image() != null)
+      {
+        setScreens1File(fileName + "-00.png");
+      }
+      if (!getScreens2File().isEmpty() || getScreen2Image() != null)
+      {
+        setScreens2File(fileName + "-01.png");
+      }
+      if (!getGamesFile().isEmpty())
+      {
+        String fileEnding = getGamesFile().substring(getGamesFile().indexOf("."));
+        setGamesFile(fileName + fileEnding);
+      }
+      disableChangeNotification(false);
     }
-    if (!getScreens1File().isEmpty() || getScreen1Image() != null)
-    {
-      setScreens1File(fileName + "-00.png");
-    }
-    if (!getScreens2File().isEmpty() || getScreen2Image() != null)
-    {
-      setScreens2File(fileName + "-01.png");
-    }
-    if (!getGamesFile().isEmpty())
-    {
-      String fileEnding = getGamesFile().substring(getGamesFile().indexOf("."));
-      setGamesFile(fileName + fileEnding);
-    }
-    disableChangeNotification(false);
   }
   
   public boolean isNewGame()

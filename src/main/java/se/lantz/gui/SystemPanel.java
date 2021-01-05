@@ -440,7 +440,7 @@ public class SystemPanel extends JPanel
       gbc_configLabel.gridheight = 2;
       gbc_configLabel.weighty = 1.0;
       gbc_configLabel.anchor = GridBagConstraints.NORTHWEST;
-      gbc_configLabel.insets = new Insets(59, 5, 5, 5);
+      gbc_configLabel.insets = new Insets(62, 5, 5, 5);
       gbc_configLabel.gridx = 0;
       gbc_configLabel.gridy = 0;
       configPanel.add(getConfigLabel(), gbc_configLabel);
@@ -448,7 +448,7 @@ public class SystemPanel extends JPanel
       gbc_configTextField.weighty = 1.0;
       gbc_configTextField.fill = GridBagConstraints.HORIZONTAL;
       gbc_configTextField.weightx = 1.0;
-      gbc_configTextField.insets = new Insets(42, 0, 5, 0);
+      gbc_configTextField.insets = new Insets(45, 0, 5, 0);
       gbc_configTextField.anchor = GridBagConstraints.NORTHWEST;
       gbc_configTextField.gridx = 1;
       gbc_configTextField.gridy = 1;
