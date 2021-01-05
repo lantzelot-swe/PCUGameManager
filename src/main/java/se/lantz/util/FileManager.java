@@ -472,7 +472,7 @@ public class FileManager
     {
       command.append("-attach8ro ");
     }
-    
+
     //Append default joystick port
     if (model.getJoy1Model().isPrimary())
     {
@@ -784,9 +784,9 @@ public class FileManager
   public static BufferedImage scaleImageTo320x200(BufferedImage originalImage)
   {
     BufferedImage returnImage = originalImage;
-    if (originalImage.getWidth() >= 544 && originalImage.getHeight() >= 284)
+    if (originalImage.getWidth() >= 544 && originalImage.getWidth() < 600 && originalImage.getHeight() >= 284)
     {
-      //Standard VIC-20 screenshot from Vice. This is best scaled by first cropping to 448x280
+      //Somewhat standard VIC-20 screenshot from Vice. This is best scaled by first cropping to 448x280
       returnImage = cropImageTo448x280(originalImage);
     }
     if (originalImage.getWidth() != 320 || originalImage.getHeight() != 200)
@@ -813,7 +813,7 @@ public class FileManager
     g.drawImage(newImage, 0, 0, null);
     return newImage;
   }
-  
+
   private static BufferedImage cropImageTo448x280(BufferedImage originalImage)
   {
     // Crop to right size for Vic-20: Remove the border to fit nicely in the carousel.

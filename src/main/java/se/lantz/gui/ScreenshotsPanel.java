@@ -107,6 +107,18 @@ public class ScreenshotsPanel extends JPanel
       model.addPropertyChangeListener((e) -> modelChanged());
     }
   }
+  
+  public void resetWhenSaved()
+  {
+    currentCoverFile = "";
+    currentScreen1File = "";
+    currentScreen2File = "";
+    currentCoverImage = null;
+    currentScreen1Image = null;
+    currentScreen2Image = null;
+    //Trigger a reload from the model
+    modelChanged();
+  }
 
   private void modelChanged()
   {
@@ -181,6 +193,10 @@ public class ScreenshotsPanel extends JPanel
       {
         currentScreen1Image =
           loadScreen(modelScreen1File, getScreen1ImageLabel(), getResolution1Label(), getEdit1Button());
+        if (currentScreen1Image != null)
+        {
+          setEditButtonVisibilityAndResolution(currentScreen1Image, getResolution1Label(), getEdit1Button());
+        }
         currentScreen1File = modelScreen1File;
       }
     }
@@ -208,6 +224,10 @@ public class ScreenshotsPanel extends JPanel
       {
         currentScreen2Image =
           loadScreen(modelScreen2File, getScreen2ImageLabel(), getResolution2Label(), getEdit2Button());
+        if (currentScreen2Image != null)
+        {
+          setEditButtonVisibilityAndResolution(currentScreen2Image, getResolution2Label(), getEdit2Button());
+        }
         currentScreen2File = modelScreen2File;
       }
     }

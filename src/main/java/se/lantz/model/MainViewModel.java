@@ -362,8 +362,8 @@ public class MainViewModel extends AbstractModel
       gameListModel.notifyChange();
 
       fileManager.saveFiles();
-      //Notify of any changes to covers/screens etc
-      infoModel.notifyChange();
+      //Reset and images that where added previously
+      infoModel.resetImages();
       //Reset all models
       infoModel.resetDataChanged();
       joy1Model.resetDataChanged();

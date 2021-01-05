@@ -454,7 +454,7 @@ public class InfoPanel extends JPanel
     return descriptionTextArea;
   }
 
-  private ScreenshotsPanel getScreensPanel()
+  public ScreenshotsPanel getScreensPanel()
   {
     if (screensPanel == null)
     {

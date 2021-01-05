@@ -225,8 +225,11 @@ public class GameDetailsBackgroundPanel extends JPanel
       saveButton.addActionListener(new ActionListener()
         {
           public void actionPerformed(ActionEvent e)
-          {
-            model.saveData();
+          {    
+            if (model.saveData())
+            {
+              getInfoPanel().getScreensPanel().resetWhenSaved();
+            }
           }
         });
     }
