@@ -69,7 +69,7 @@ public class GameDetailsBackgroundPanel extends JPanel
   public GameDetailsBackgroundPanel(MainViewModel model)
   {
     this.model = model;
-    this.scraperManager = new ScraperManager(model.getInfoModel());
+    this.scraperManager = new ScraperManager(model);
     this.setMinimumSize(new Dimension(1250, 800));
     cardLayout = new CardLayout();
     setLayout(cardLayout);

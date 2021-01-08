@@ -358,4 +358,9 @@ public class MobyGamesScraper
     }
     return null;
   }
+  
+  public boolean isC64()
+  {
+    return mobyGamesGameUrl.contains("c64");
+  }
 }

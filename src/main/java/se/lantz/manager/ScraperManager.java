@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import se.lantz.model.InfoModel;
+import se.lantz.model.MainViewModel;
+import se.lantz.model.SystemModel;
 import se.lantz.model.data.ScraperFields;
 import se.lantz.scraper.MobyGamesScraper;
 
@@ -13,11 +15,13 @@ public class ScraperManager
   MobyGamesScraper scraper = new MobyGamesScraper();
   List<BufferedImage> screenshotsList = new ArrayList<>();
   private InfoModel infoModel;
+  private SystemModel systemModel;
   private ScraperFields fields;
   
-  public ScraperManager(InfoModel model)
+  public ScraperManager(MainViewModel model)
   {
-    this.infoModel = model;
+    this.infoModel = model.getInfoModel();
+    this.systemModel = model.getSystemModel();
   }
   
   public void connectScraper(String url) throws Exception
@@ -75,6 +79,15 @@ public class ScraperManager
     if (fields.isCover())
     {
       infoModel.setCoverImage(scraper.getCover());
+    }
+    //Set system based on the scraped URL
+    if (scraper.isC64())
+    {
+      systemModel.setC64(true);
+    }
+    else
+    {
+      systemModel.setVic(true);
     }
   }
   
