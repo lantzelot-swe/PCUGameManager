@@ -28,7 +28,9 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import se.lantz.gui.screenshot.EditScreenshotDialog;
 import se.lantz.model.InfoModel;
+import se.lantz.model.data.GameView;
 import se.lantz.util.FileDrop;
 import se.lantz.util.FileManager;
 
@@ -66,7 +68,7 @@ public class ScreenshotsPanel extends JPanel
 
   private ImageIcon warningIcon = new ImageIcon(getClass().getResource("/se/lantz/warning-icon.png"));
   private String editTooltip =
-    "<html>Optimal resolution for the carousel is 320x200.<br>Press to crop the image to this size (the border will be removed).<br>It will be resized when saving but it might make it blurry.</html>";
+    "<html>Optimal resolution for the carousel is 320x200.<br>Press to edit the image.<br>It will be resized when the game is saved but it might make it blurry.</html>";
   private boolean gamesFileUpdated = false;
 
   FileNameExtensionFilter imagefilter =
@@ -107,7 +109,7 @@ public class ScreenshotsPanel extends JPanel
       model.addPropertyChangeListener((e) -> modelChanged());
     }
   }
-  
+
   public void resetWhenSaved()
   {
     currentCoverFile = "";
@@ -596,10 +598,31 @@ public class ScreenshotsPanel extends JPanel
         {
           public void actionPerformed(ActionEvent arg0)
           {
-            BufferedImage croppedImage = FileManager.cropImageTo320x200(currentScreen1Image);
-            getScreen1ImageLabel().setIcon(new ImageIcon(croppedImage));
-            model.setScreen1Image(croppedImage);
-            edit1Button.setVisible(false);
+            JPopupMenu menu = new JPopupMenu();
+            JMenuItem autoEditItem = new JMenuItem("Crop automatically to 320x200");
+            autoEditItem.addActionListener(e -> {
+              BufferedImage croppedImage = FileManager.cropImageTo320x200(currentScreen1Image);
+              getScreen1ImageLabel().setIcon(new ImageIcon(croppedImage));
+              model.setScreen1Image(croppedImage);
+              edit1Button.setVisible(false);
+            });
+            menu.add(autoEditItem);
+
+            JMenuItem manEditItem = new JMenuItem("Crop manually...");
+            manEditItem.addActionListener(e -> {
+              EditScreenshotDialog dialog = new EditScreenshotDialog(currentScreen1Image);
+              dialog.pack();
+              dialog.setLocationRelativeTo(MainWindow.getInstance());
+              if (dialog.showDialog())
+              {
+                BufferedImage croppedImage = dialog.getEditedImage();
+                getScreen1ImageLabel().setIcon(new ImageIcon(croppedImage));
+                model.setScreen1Image(croppedImage);
+                edit1Button.setVisible(false);
+              }
+            });
+            menu.add(manEditItem);
+            menu.show(edit1Button, 15, 15);
           }
         });
       edit1Button.setMargin(new Insets(1, 3, 1, 3));
@@ -618,10 +641,31 @@ public class ScreenshotsPanel extends JPanel
         {
           public void actionPerformed(ActionEvent arg0)
           {
-            BufferedImage croppedImage = FileManager.cropImageTo320x200(currentScreen2Image);
-            getScreen2ImageLabel().setIcon(new ImageIcon(croppedImage));
-            model.setScreen2Image(croppedImage);
-            edit2Button.setVisible(false);
+            JPopupMenu menu = new JPopupMenu();
+            JMenuItem autoEditItem = new JMenuItem("Crop automatically to 320x200");
+            autoEditItem.addActionListener(e -> {
+              BufferedImage croppedImage = FileManager.cropImageTo320x200(currentScreen2Image);
+              getScreen2ImageLabel().setIcon(new ImageIcon(croppedImage));
+              model.setScreen2Image(croppedImage);
+              edit2Button.setVisible(false);
+            });
+            menu.add(autoEditItem);
+
+            JMenuItem manEditItem = new JMenuItem("Crop manually...");
+            manEditItem.addActionListener(e -> {
+              EditScreenshotDialog dialog = new EditScreenshotDialog(currentScreen2Image);
+              dialog.pack();
+              dialog.setLocationRelativeTo(MainWindow.getInstance());
+              if (dialog.showDialog())
+              {
+                BufferedImage croppedImage = dialog.getEditedImage();
+                getScreen2ImageLabel().setIcon(new ImageIcon(croppedImage));
+                model.setScreen2Image(croppedImage);
+                edit2Button.setVisible(false);
+              }
+            });
+            menu.add(manEditItem);
+            menu.show(edit2Button, 15, 15);
           }
         });
       edit2Button.setMargin(new Insets(1, 3, 1, 3));
