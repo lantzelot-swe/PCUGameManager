@@ -1,9 +1,11 @@
 package se.lantz.gui.scraper;
 
+import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.Insets;
+import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
@@ -11,14 +13,16 @@ import java.util.List;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.Scrollable;
 
 public class ScreenshotsSelectionPanel extends JPanel
 {
-
   private List<BufferedImage> screenshots;
   private List<ScreenshotCheckBoxPanel> screenshotCheckBoxList = new ArrayList<>();
   private JLabel infoLabel;
-  private JPanel screenPanel;
+  private ScreensPanel screenPanel;
+  private JScrollPane scrollPane;
 
   public ScreenshotsSelectionPanel(List<BufferedImage> screenshots)
   {
@@ -32,14 +36,14 @@ public class ScreenshotsSelectionPanel extends JPanel
     gbc_infoLabel.gridx = 0;
     gbc_infoLabel.gridy = 0;
     add(getInfoLabel(), gbc_infoLabel);
-    GridBagConstraints gbc_screenPanel = new GridBagConstraints();
-    gbc_screenPanel.insets = new Insets(5, 10, 10, 10);
-    gbc_screenPanel.weighty = 1.0;
-    gbc_screenPanel.weightx = 1.0;
-    gbc_screenPanel.fill = GridBagConstraints.BOTH;
-    gbc_screenPanel.gridx = 0;
-    gbc_screenPanel.gridy = 1;
-    add(getScreenPanel(), gbc_screenPanel);
+    GridBagConstraints gbc_scrollPane = new GridBagConstraints();
+    gbc_scrollPane.insets = new Insets(0, 5, 5, 5);
+    gbc_scrollPane.weighty = 1.0;
+    gbc_scrollPane.weightx = 1.0;
+    gbc_scrollPane.fill = GridBagConstraints.BOTH;
+    gbc_scrollPane.gridx = 0;
+    gbc_scrollPane.gridy = 1;
+    add(getScrollPane(), gbc_scrollPane);
   }
 
   private JLabel getInfoLabel()
@@ -51,24 +55,23 @@ public class ScreenshotsSelectionPanel extends JPanel
     return infoLabel;
   }
 
-  private JPanel getScreenPanel()
+  private ScreensPanel getScreenPanel()
   {
     if (screenPanel == null)
     {
-      screenPanel = new JPanel();
-      screenPanel.setLayout(new GridLayout(2, 2, 5, 5));
+      screenPanel = new ScreensPanel();
       for (int i = 0; i < screenshots.size(); i++)
       {
         ScreenshotCheckBoxPanel checkBox = new ScreenshotCheckBoxPanel();
         checkBox.getImageLabel().setIcon(new ImageIcon(screenshots.get(i)));
-        checkBox.getCheckBox().setText("Screenshot " + (i+1));
+        checkBox.getCheckBox().setText("Screenshot " + (i + 1));
         screenshotCheckBoxList.add(checkBox);
         screenPanel.add(checkBox);
       }
     }
     return screenPanel;
   }
-  
+
   public List<BufferedImage> getSelectedScreenshots()
   {
     List<BufferedImage> returnList = new ArrayList<>();
@@ -81,4 +84,57 @@ public class ScreenshotsSelectionPanel extends JPanel
     }
     return returnList;
   }
+
+  private JScrollPane getScrollPane()
+  {
+    if (scrollPane == null)
+    {
+      scrollPane = new JScrollPane();
+      scrollPane.setViewportView(getScreenPanel());
+      scrollPane.setPreferredSize(new Dimension(Math.min(1400, getScreenPanel().getPreferredSize().width + 2),
+                                  Math.min(800, getScreenPanel().getPreferredSize().height + 2)));
+    }
+    return scrollPane;
+  }
+}
+
+class ScreensPanel extends JPanel implements Scrollable
+{
+  
+  public ScreensPanel()
+  {
+    this.setLayout(new GridLayout(2, 2, 5, 5));
+  }
+
+  @Override
+  public Dimension getPreferredScrollableViewportSize()
+  {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  @Override
+  public int getScrollableUnitIncrement(Rectangle visibleRect, int orientation, int direction)
+  {
+    return 10;
+  }
+
+  @Override
+  public int getScrollableBlockIncrement(Rectangle visibleRect, int orientation, int direction)
+  {
+    return 40;
+  }
+
+  @Override
+  public boolean getScrollableTracksViewportWidth()
+  {
+    return false;
+  }
+
+  @Override
+  public boolean getScrollableTracksViewportHeight()
+  {
+    return false;
+  }
+  
 }
