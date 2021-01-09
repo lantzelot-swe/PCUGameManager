@@ -25,7 +25,6 @@ import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.event.HyperlinkEvent;
 
-import se.lantz.gui.BaseDialog;
 import se.lantz.manager.ScraperManager;
 import se.lantz.model.data.ScraperFields;
 import se.lantz.util.ExceptionHandler;

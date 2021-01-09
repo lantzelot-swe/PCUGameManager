@@ -21,6 +21,7 @@ import javax.swing.JPanel;
 import javax.swing.JRootPane;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
+import javax.swing.Timer;
 import javax.swing.border.TitledBorder;
 
 import org.slf4j.Logger;
@@ -53,6 +54,11 @@ public class GameDetailsBackgroundPanel extends JPanel
   private JPanel detailsPanel;
   private CardLayout cardLayout;
   private JButton scrapeButton;
+  private Timer cursorTimer;
+  private ActionListener defaultCursorAction = e -> {
+    MainWindow.getInstance().setWaitCursor(false);
+    cursorTimer.stop();
+  };
   private Action runGameAction = new AbstractAction("Run Game") {
 
     @Override
@@ -60,6 +66,8 @@ public class GameDetailsBackgroundPanel extends JPanel
     {
       if (runButton.isEnabled())
       {
+        MainWindow.getInstance().setWaitCursor(true);
+        cursorTimer.start();
         model.runGameInVice();
       }
     }};
@@ -79,6 +87,7 @@ public class GameDetailsBackgroundPanel extends JPanel
       saveButton.setEnabled(model.isDataChanged());
       runButton.setEnabled(!model.getInfoModel().getGamesFile().isEmpty());
     });
+    cursorTimer = new Timer(500, defaultCursorAction);
   }
 
   void focusTitleField()

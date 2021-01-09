@@ -320,7 +320,7 @@ public class ListPanel extends JPanel
         @Override
         public void mouseClicked(MouseEvent e)
         {
-          if (e.getClickCount() == 2)
+          if (SwingUtilities.isLeftMouseButton(e) && e.getClickCount() == 2)
           {
             //trigger run game...
             MainWindow.getInstance().getMainPanel().runCurrentGame();
