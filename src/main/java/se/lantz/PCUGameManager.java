@@ -4,7 +4,6 @@ import java.awt.Dimension;
 
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
-import javax.swing.UnsupportedLookAndFeelException;
 
 import se.lantz.gui.MainWindow;
 import se.lantz.util.ExceptionHandler;
@@ -22,12 +21,10 @@ public class PCUGameManager
     {
       //Set Exceptionhandler
       Thread.setDefaultUncaughtExceptionHandler(new TopLevelExceptionHandler());
-      
-//      UIManager.setLookAndFeel("com.jtattoo.plaf.graphite.GraphiteLookAndFeel");
       // Set System L&F
       UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
     }
-    catch (UnsupportedLookAndFeelException | ClassNotFoundException | InstantiationException | IllegalAccessException e)
+    catch (Exception e)
     {
       ExceptionHandler.handleException(e, "Startup failure");
     }
