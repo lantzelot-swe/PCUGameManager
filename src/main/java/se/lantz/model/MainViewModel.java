@@ -411,6 +411,13 @@ public class MainViewModel extends AbstractModel
       reloadGameViews();
     }
   }
+  
+  public void clearFavorites()
+  {
+    dbConnector.clearFavorites();
+    //Reload the current view
+    reloadCurrentGameView();
+  }
 
   private List<String> validateRequiredFields()
   {

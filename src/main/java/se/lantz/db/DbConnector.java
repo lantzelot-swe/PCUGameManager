@@ -817,4 +817,18 @@ public class DbConnector
       ExceptionHandler.handleException(e, "Could not update favorite value in db.");
     }
   }
+  
+  public void clearFavorites()
+  {
+    String sql = "UPDATE gameinfo SET Favorite = 0 where Favorite = 1;";
+    try (Connection conn = this.connect(); PreparedStatement favoritestmt = conn.prepareStatement(sql))
+    {
+      int value = favoritestmt.executeUpdate();
+      logger.debug("Executed successfully, value = {}", value);
+    }
+    catch (SQLException e)
+    {
+      ExceptionHandler.handleException(e, "Could not clear favorite values in db.");
+    }
+  }
 }

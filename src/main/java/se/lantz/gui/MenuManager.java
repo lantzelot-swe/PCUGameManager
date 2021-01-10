@@ -65,6 +65,7 @@ public class MenuManager
   private JMenuItem exportItem;
   
   private JMenuItem toggleFavoriteItem;
+  private JMenuItem clearFavoritesItem;
 
   private JMenuItem backupDbItem;
   private JMenuItem restoreDbItem;
@@ -112,6 +113,7 @@ public class MenuManager
     fileMenu.add(getExitItem());
     editMenu = new JMenu("Edit");
     editMenu.add(getToggleFavoriteItem());
+    editMenu.add(getClearFavoritesItem());
     dbMenu = new JMenu("Database");
     dbMenu.add(getBackupDbItem());
     dbMenu.add(getRestoreDbItem());
@@ -236,6 +238,16 @@ public class MenuManager
       mainWindow.getMainPanel().toggleFavorite();
     });
     return toggleFavoriteItem;
+  }
+  
+  private JMenuItem getClearFavoritesItem()
+  {
+    clearFavoritesItem = new JMenuItem("Clear all favorites");
+    clearFavoritesItem.setMnemonic('C');
+    clearFavoritesItem.addActionListener(e -> {
+      clearFavorites();
+    });
+    return clearFavoritesItem;
   }
 
   private JMenuItem getBackupDbItem()
@@ -421,6 +433,18 @@ public class MenuManager
       //Trigger a reload of game views
       uiModel.reloadGameViews();
       MainWindow.getInstance().selectViewAfterRestore();
+    }
+  }
+  
+  private void clearFavorites()
+  {
+    String message =
+      "Are you sure you want to clear all games marked as favorites?";
+    int option = JOptionPane.showConfirmDialog(MainWindow.getInstance()
+      .getMainPanel(), message, "Clear all favorites", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+    if (option == JOptionPane.YES_OPTION)
+    {
+      uiModel.clearFavorites();
     }
   }
 
