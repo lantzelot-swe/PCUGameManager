@@ -102,6 +102,11 @@ public class ScraperManager
     {
       infoModel.setCoverImage(usedScraper.getCover());
     }
+    
+    if (fields.isGame())
+    {
+      infoModel.setGamesPath(usedScraper.getGameFile());
+    }
     //Set system based on the scraped URL
     if (usedScraper.isC64())
     {

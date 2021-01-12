@@ -1,14 +1,19 @@
 package se.lantz.scraper;
 
 import java.awt.image.BufferedImage;
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URL;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.imageio.ImageIO;
 
 import org.jsoup.Connection;
+import org.jsoup.Connection.Response;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -18,6 +23,7 @@ import org.slf4j.LoggerFactory;
 
 import se.lantz.model.data.ScraperFields;
 import se.lantz.util.ExceptionHandler;
+import se.lantz.util.FileManager;
 
 public class C64comScraper implements Scraper
 {
@@ -35,12 +41,13 @@ public class C64comScraper implements Scraper
   
   
   private String scrapedTitle;
-  private int scrapedYear;
+  private int scrapedYear = 1985;
   private String scrapedAuthor;
   private List<String> scrapedMusicList = new ArrayList<>();
   
   private String scrapedGenre;
   private BufferedImage scrapedCover;
+  private File scrapedFile;
   
   public static void main(String[] args)
   {    
@@ -59,6 +66,17 @@ public class C64comScraper implements Scraper
     this.c64comGameUrl = "";
     Jsoup.connect(url).method(Connection.Method.GET).execute();
     this.c64comGameUrl = url;
+    resetFields();
+  }
+  
+  private void resetFields()
+  {
+    scrapedTitle = "";
+    scrapedYear = 1985;
+    scrapedAuthor = "";
+    scrapedMusicList.clear();
+    scrapedCover = null;
+    scrapedGenre = "";
   }
   
   @Override
@@ -86,7 +104,15 @@ public class C64comScraper implements Scraper
       Elements yearElements = mainFrameDocument.select(yearCssQuery);
       if (yearElements.first() != null)
       {
-        scrapedYear = Integer.parseInt(yearElements.first().text().trim());
+        try
+        {
+          scrapedYear = Integer.parseInt(yearElements.first().text().trim());
+        }
+        catch (Exception e)
+        {
+          logger.error("Could not scrape year for {}",  scrapedTitle);
+        }
+        
       }
       logger.debug("scraped year: {}", scrapedYear);
       
@@ -133,8 +159,47 @@ public class C64comScraper implements Scraper
             URL imageUrl = new URL(url);
             scrapedCover = ImageIO.read(imageUrl);
             logger.debug("Cover url: {}", url);
-            
-//            http://www.c64.com/games/inlay.php?url=inlays/a/arkanoid.png
+            continue;
+          }
+          if (info.equalsIgnoreCase("Download:"))
+          {
+            Element gameElement = child.select("td:eq(1) > a").first();
+            if (gameElement.text().equalsIgnoreCase("Game"))
+            {
+              try
+              {
+                String url = gameElement.attr("abs:href");
+                Response response = Jsoup.connect(url)
+                  .header("Accept-Encoding", "gzip, deflate")
+                  .userAgent("Mozilla/5.0 (Windows NT 6.1; WOW64; rv:23.0) Gecko/20100101 Firefox/23.0")
+  //                .referrer(URL_TO_PARSE)
+                  .ignoreContentType(true)
+                  .maxBodySize(0)
+                  .timeout(600000)
+                  .execute();
+  //                .bodyAsBytes();
+                
+                //TODO: add to temp folder instead
+                File file = new File("scrapedFile.zip");
+                BufferedInputStream inputStream = response.bodyStream();
+                FileOutputStream fos = new FileOutputStream(file);
+                byte[] buffer = new byte[1024];
+                int len;
+                while ((len = inputStream.read(buffer)) != -1) {
+                    fos.write(buffer, 0, len);
+                }
+                inputStream.close();
+                fos.close();
+                
+                //Unzip
+                scrapedFile = FileManager.unzipAndPickFirstEntry(file.getAbsolutePath(), ".");
+                logger.debug("File to include as game: {}", scrapedFile.getAbsolutePath());
+              }
+              catch (IOException e)
+              {
+                logger.error("", e);
+              }
+            }
           }
         }
       }     
@@ -221,6 +286,12 @@ public class C64comScraper implements Scraper
   public BufferedImage getCover()
   {
     return scrapedCover;
+  }
+  
+  @Override
+  public File getGameFile()
+  {
+    return scrapedFile;
   }
 
   @Override

@@ -24,6 +24,8 @@ import java.util.jar.Manifest;
 import java.util.stream.Collectors;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 import javax.imageio.ImageIO;
 
@@ -825,4 +827,51 @@ public class FileManager
     g.drawImage(newImage, 0, 0, null);
     return newImage;
   }
+
+  public static File unzipAndPickFirstEntry(String zipFilePath, String destDir)
+  {
+    Path filePath = null;
+    File dir = new File(destDir);
+    // create output directory if it doesn't exist
+    if (!dir.exists())
+      dir.mkdirs();
+    FileInputStream fis;
+    //buffer for read and write data to file
+    byte[] buffer = new byte[1024];
+    try
+    {
+      fis = new FileInputStream(zipFilePath);
+      ZipInputStream zis = new ZipInputStream(fis);
+      ZipEntry ze = zis.getNextEntry();
+      if (ze != null)
+      {
+        String fileName = ze.getName();
+        File newFile = new File(destDir + File.separator + fileName);
+        System.out.println("Unzipping to " + newFile.getAbsolutePath());
+        //create directories for sub directories in zip
+        new File(newFile.getParent()).mkdirs();
+        FileOutputStream fos = new FileOutputStream(newFile);
+        int len;
+        while ((len = zis.read(buffer)) > 0)
+        {
+          fos.write(buffer, 0, len);
+        }
+        fos.close();
+        //close this ZipEntry
+        zis.closeEntry();
+        ze = zis.getNextEntry();
+        filePath = newFile.toPath();
+      }
+      //close last ZipEntry
+      zis.closeEntry();
+      zis.close();
+      fis.close();
+    }
+    catch (IOException e)
+    {
+      e.printStackTrace();
+    }
+    return filePath.toFile();
+  }
+
 }

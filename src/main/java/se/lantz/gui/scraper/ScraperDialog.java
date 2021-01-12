@@ -66,7 +66,14 @@ public class ScraperDialog extends BaseDialog
 
   public ScraperFields getScraperFields()
   {
-    return getMobyGamesPanel().getScraperFields();
+    if (getScraperComboBox().getSelectedItem().equals("www.mobygames.com"))
+    {
+      return getMobyGamesPanel().getScraperFields();
+    }
+    else
+    {
+      return getC64comPanel().getScraperFields();
+    }
   }
 
   @Override

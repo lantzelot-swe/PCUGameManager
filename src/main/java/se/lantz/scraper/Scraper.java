@@ -1,6 +1,7 @@
 package se.lantz.scraper;
 
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
@@ -30,5 +31,7 @@ public interface Scraper
   List<BufferedImage> scrapeScreenshots();
 
   boolean isC64();
+  
+  File getGameFile();
 
 }

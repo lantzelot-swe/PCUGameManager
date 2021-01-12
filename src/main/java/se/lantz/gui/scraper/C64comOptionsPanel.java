@@ -101,7 +101,7 @@ public class C64comOptionsPanel extends JPanel
     if (infoEditorPane == null)
     {
       String info = "<html>To scrape information from c64.com you need to specify the URL for a specific game." +
-        "<ol><li>Go to <a href='http:/www.c64.com/'>http:/www.c64.com/</a> and search for the game you want to<br>scrape information for.</li>" +
+        "<ol><li>Go to <a href='http://www.c64.com/games/games.php'>http:/www.c64.com/</a> and search for the game you want to<br>scrape information for.</li>" +
         "<li>Select the game and click on the \"direct link\" for it. Copy the URL to the<br>field below." +
         "(Example: http://www.c64.com/games/53)</li></ol></html>";
 
@@ -314,6 +314,8 @@ public class C64comOptionsPanel extends JPanel
     returnValue.setCover(coverCheckBox.isSelected());
     returnValue.setScreenshots(screensCheckBox.isSelected());
     returnValue.setComposer(composerCheckBox.isSelected());
+    //TODO:add option
+    returnValue.setGame(true);
     return returnValue;
   }
 

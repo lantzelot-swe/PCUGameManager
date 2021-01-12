@@ -1,6 +1,7 @@
 package se.lantz.scraper;
 
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -78,6 +79,18 @@ public class MobyGamesScraper implements Scraper
     this.mobyGamesGameUrl = "";
     Jsoup.connect(url).method(Connection.Method.GET).execute();
     this.mobyGamesGameUrl = url;
+    resetFields();
+  }
+  
+  private void resetFields()
+  {
+    scrapedTitle = "";
+    scrapedYear = 1985;
+    scrapedAuthor = "";
+    scrapedComposer = "";
+    scrapedDescription = "";
+    scrapedCover = null;
+    scrapedGenre = "";
   }
 
   @Override
@@ -373,5 +386,12 @@ public class MobyGamesScraper implements Scraper
   public boolean isC64()
   {
     return mobyGamesGameUrl.contains("c64");
+  }
+
+  @Override
+  public File getGameFile()
+  {
+    //No file to download
+    return null;
   }
 }
