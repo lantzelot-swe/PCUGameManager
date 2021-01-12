@@ -21,6 +21,7 @@ import se.lantz.model.data.GameListData;
 import se.lantz.model.data.GameView;
 import se.lantz.model.data.ScraperFields;
 import se.lantz.scraper.MobyGamesScraper;
+import se.lantz.scraper.Scraper;
 import se.lantz.util.FileManager;
 
 public class MainViewModel extends AbstractModel
@@ -49,7 +50,7 @@ public class MainViewModel extends AbstractModel
 
   private GameListData selectedData;
 
-  MobyGamesScraper scraper = new MobyGamesScraper();
+  Scraper scraper = new MobyGamesScraper();
 
   public void initialize()
   {

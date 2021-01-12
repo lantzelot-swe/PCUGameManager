@@ -25,7 +25,7 @@ import org.slf4j.LoggerFactory;
 import se.lantz.model.data.ScraperFields;
 import se.lantz.util.ExceptionHandler;
 
-public class MobyGamesScraper
+public class MobyGamesScraper implements Scraper
 {
   private static final Logger logger = LoggerFactory.getLogger(MobyGamesScraper.class);
 
@@ -72,13 +72,15 @@ public class MobyGamesScraper
     genreMap.put("Sports", "sport");
   }
 
-  public void connectToMobyGames(String url) throws IOException
+  @Override
+  public void connect(String url) throws IOException
   {
     this.mobyGamesGameUrl = "";
     Jsoup.connect(url).method(Connection.Method.GET).execute();
     this.mobyGamesGameUrl = url;
   }
 
+  @Override
   public void scrapeInformation(ScraperFields fields)
   {
     Document doc;
@@ -142,36 +144,43 @@ public class MobyGamesScraper
     }
   }
 
+  @Override
   public String getTitle()
   {
     return scrapedTitle;
   }
 
+  @Override
   public String getAuthor()
   {
     return scrapedAuthor;
   }
 
+  @Override
   public int getYear()
   {
     return scrapedYear;
   }
 
+  @Override
   public String getDescription()
   {
     return scrapedDescription;
   }
 
+  @Override
   public String getGenre()
   {
     return scrapedGenre;
   }
   
+  @Override
   public String getComposer()
   {
     return scrapedComposer;
   }
 
+  @Override
   public BufferedImage getCover()
   {
     return scrapedCover;
@@ -305,6 +314,7 @@ public class MobyGamesScraper
     return null;
   }
 
+  @Override
   public List<BufferedImage> scrapeScreenshots()
   {
     List<BufferedImage> returnList = new ArrayList<>();
@@ -359,6 +369,7 @@ public class MobyGamesScraper
     return null;
   }
   
+  @Override
   public boolean isC64()
   {
     return mobyGamesGameUrl.contains("c64");

@@ -16,12 +16,13 @@ import org.jsoup.select.Elements;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import se.lantz.model.data.ScraperFields;
 import se.lantz.util.ExceptionHandler;
 
-public class C64comScraper
+public class C64comScraper implements Scraper
 {
   private static final Logger logger = LoggerFactory.getLogger(C64comScraper.class);
-  private String c64comGameUrl = "http://www.c64.com/games/259";
+  private String c64comGameUrl = "http://www.c64.com/games/53";
   
   private String screenshotCssQuery = "html > body > table > tbody > tr > td:eq(0) > table > tbody > tr:eq(1) > td > table:eq(1) > tbody > tr > td:eq(4) > table > tbody > tr:eq(0) > td > img";
  
@@ -34,16 +35,17 @@ public class C64comScraper
   
   
   private String scrapedTitle;
-  private String scrapedYear;
+  private int scrapedYear;
   private String scrapedAuthor;
   private List<String> scrapedMusicList = new ArrayList<>();
   
   private String scrapedGenre;
+  private BufferedImage scrapedCover;
   
   public static void main(String[] args)
   {    
     C64comScraper scraper = new C64comScraper();   
-    scraper.scrapeInformation();
+    scraper.scrapeInformation(null);
     scraper.scrapeScreenshots();
   }
   public C64comScraper()
@@ -51,14 +53,16 @@ public class C64comScraper
     // TODO Auto-generated constructor stub
   }
   
-  public void connectToC64Com(String url) throws IOException
+  @Override
+  public void connect(String url) throws IOException
   {
     this.c64comGameUrl = "";
     Jsoup.connect(url).method(Connection.Method.GET).execute();
     this.c64comGameUrl = url;
   }
   
-  public void scrapeInformation()//ScraperFields fields)
+  @Override
+  public void scrapeInformation(ScraperFields fields)
   {
     Document doc;
     try
@@ -82,7 +86,7 @@ public class C64comScraper
       Elements yearElements = mainFrameDocument.select(yearCssQuery);
       if (yearElements.first() != null)
       {
-        scrapedYear = yearElements.first().text();
+        scrapedYear = Integer.parseInt(yearElements.first().text().trim());
       }
       logger.debug("scraped year: {}", scrapedYear);
       
@@ -110,11 +114,27 @@ public class C64comScraper
             String music = child.select("td:eq(1)").first().text();
             scrapedMusicList.add(music);
             logger.debug("scraped music: {}", music);
+            continue;
           }
-          else if (info.equalsIgnoreCase("Genre:"))
+          if (info.equalsIgnoreCase("Genre:"))
           {
             scrapedGenre = child.select("td:eq(1)").first().text();
             logger.debug("scraped genre: {}", scrapedGenre);
+            continue;
+          }
+          if (info.startsWith("Inlay"))
+          {
+            String url = child.select("td:eq(1) > a").first().attr("href");
+            //Select the right part 
+            url = url.substring(url.indexOf("'")+1);
+            url = url.substring(0, url.indexOf("'"));
+            url = url.substring(url.indexOf("=")+1);
+            url = "http://www.c64.com/games/" + url;
+            URL imageUrl = new URL(url);
+            scrapedCover = ImageIO.read(imageUrl);
+            logger.debug("Cover url: {}", url);
+            
+//            http://www.c64.com/games/inlay.php?url=inlays/a/arkanoid.png
           }
         }
       }     
@@ -125,7 +145,8 @@ public class C64comScraper
     }
   }
   
-  private List<BufferedImage> scrapeScreenshots()
+  @Override
+  public List<BufferedImage> scrapeScreenshots()
   {
     List<BufferedImage> screensList = new ArrayList<>();
     Document doc;
@@ -154,8 +175,58 @@ public class C64comScraper
     }
     catch (IOException e)
     {
-      ExceptionHandler.handleException(e, "Could not scrape screenshot");
+      logger.warn("Could not scrape all six screenshots", e);
     }
     return screensList;
+  }
+  
+  @Override
+  public String getTitle()
+  {
+    return scrapedTitle;
+  }
+
+  @Override
+  public String getAuthor()
+  {
+    return scrapedAuthor;
+  }
+
+  @Override
+  public int getYear()
+  {
+    return scrapedYear;
+  }
+
+  @Override
+  public String getDescription()
+  {
+    //Not supported, no description on c64.com
+    return "";
+  }
+
+  @Override
+  public String getGenre()
+  {
+    return scrapedGenre;
+  }
+  
+  @Override
+  public String getComposer()
+  {
+    return String.join(", ", scrapedMusicList);
+  }
+
+  @Override
+  public BufferedImage getCover()
+  {
+    return scrapedCover;
+  }
+
+  @Override
+  public boolean isC64()
+  {
+    // Only C64 games available
+    return true;
   }
 }

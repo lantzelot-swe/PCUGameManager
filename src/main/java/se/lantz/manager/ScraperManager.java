@@ -8,65 +8,87 @@ import se.lantz.model.InfoModel;
 import se.lantz.model.MainViewModel;
 import se.lantz.model.SystemModel;
 import se.lantz.model.data.ScraperFields;
+import se.lantz.scraper.C64comScraper;
 import se.lantz.scraper.MobyGamesScraper;
+import se.lantz.scraper.Scraper;
 
 public class ScraperManager
 {
-  MobyGamesScraper scraper = new MobyGamesScraper();
+  public enum SCRAPER {
+    moby, c64com
+  }
+  Scraper mobyScraper = new MobyGamesScraper();
+  Scraper c64comScraper = new C64comScraper();
+  Scraper usedScraper = mobyScraper;
+
   List<BufferedImage> screenshotsList = new ArrayList<>();
   private InfoModel infoModel;
   private SystemModel systemModel;
   private ScraperFields fields;
-  
+
   public ScraperManager(MainViewModel model)
   {
     this.infoModel = model.getInfoModel();
     this.systemModel = model.getSystemModel();
   }
   
+  public void setScrapertoUse(SCRAPER scraper)
+  {
+    switch (scraper)
+    {
+    case moby:
+      usedScraper = mobyScraper;
+      break;
+    case c64com:
+      usedScraper = c64comScraper;
+      break;
+    default:
+      break;
+    }
+  }
+
   public void connectScraper(String url) throws Exception
   {
-    scraper.connectToMobyGames(url);
+    usedScraper.connect(url);
   }
-  
+
   public void scrapeGameInformation(ScraperFields fields)
   {
     this.fields = fields;
-    scraper.scrapeInformation(fields);
+    usedScraper.scrapeInformation(fields);
   }
-  
+
   public void scrapeScreenshots()
   {
-    screenshotsList = scraper.scrapeScreenshots();
+    screenshotsList = usedScraper.scrapeScreenshots();
   }
-  
-  
+
   public List<BufferedImage> getScreenshots()
   {
     return screenshotsList;
   }
-  
+
   public void updateModelWithGamesInfo()
   {
     if (fields.isTitle())
     {
-      infoModel.setTitle(scraper.getTitle());
+      infoModel.setTitle(usedScraper.getTitle());
     }
     if (fields.isAuthor())
     {
-      infoModel.setAuthor(scraper.getAuthor());
+      infoModel.setAuthor(usedScraper.getAuthor());
     }
     if (fields.isYear())
-    {    
-      infoModel.setYear(scraper.getYear());
+    {
+      infoModel.setYear(usedScraper.getYear());
     }
     if (fields.isDescription())
     {
-      infoModel.setDescription(scraper.getDescription());
+      infoModel.setDescription(usedScraper.getDescription());
     }
     if (fields.isGenre())
     {
-      String genre = scraper.getGenre();
+      String genre = usedScraper.getGenre();
       if (!genre.isEmpty())
       {
         infoModel.setGenre(genre);
@@ -74,14 +96,14 @@ public class ScraperManager
     }
     if (fields.isComposer())
     {
-      infoModel.setComposer(scraper.getComposer());
+      infoModel.setComposer(usedScraper.getComposer());
     }
     if (fields.isCover())
     {
-      infoModel.setCoverImage(scraper.getCover());
+      infoModel.setCoverImage(usedScraper.getCover());
     }
     //Set system based on the scraped URL
-    if (scraper.isC64())
+    if (usedScraper.isC64())
     {
       systemModel.setC64(true);
     }
@@ -90,7 +112,7 @@ public class ScraperManager
       systemModel.setVic(true);
     }
   }
-  
+
   public void updateModelWithScreenshotImages(BufferedImage screen1, BufferedImage screen2)
   {
     infoModel.setScreen1Image(screen1);
