@@ -20,6 +20,10 @@ import se.lantz.model.data.ScraperFields;
 
 public class ScraperDialog extends BaseDialog
 {
+  private static final String MOBY = "moby";
+  private static final String C64COM = "c64com";
+  private static final String WWW_C64_COM = "www.c64.com";
+  private static final String WWW_MOBYGAMES_COM = "www.mobygames.com";
   private MobyGamesOptionsPanel mobyGamesPanel;
   private C64comOptionsPanel c64comPanel;
   private final ScraperManager scraper;
@@ -38,8 +42,8 @@ public class ScraperDialog extends BaseDialog
     content.setLayout(new BorderLayout());
     cardPanel = new JPanel();
     cardPanel.setLayout(cardLayout);
-    cardPanel.add(getMobyGamesPanel(), "moby");
-    cardPanel.add(getC64comPanel(), "c64com");
+    cardPanel.add(getMobyGamesPanel(), MOBY);
+    cardPanel.add(getC64comPanel(), C64COM);
     content.add(cardPanel, BorderLayout.CENTER);
     addContent(content);
     content.add(getScraperSelectionPanel(), BorderLayout.NORTH);
@@ -66,7 +70,7 @@ public class ScraperDialog extends BaseDialog
 
   public ScraperFields getScraperFields()
   {
-    if (getScraperComboBox().getSelectedItem().equals("www.mobygames.com"))
+    if (getScraperComboBox().getSelectedItem().equals(WWW_MOBYGAMES_COM))
     {
       return getMobyGamesPanel().getScraperFields();
     }
@@ -98,6 +102,8 @@ public class ScraperDialog extends BaseDialog
       gbc_scraperInfoLabel.gridy = 0;
       scraperSelectionPanel.add(getScraperInfoLabel(), gbc_scraperInfoLabel);
       GridBagConstraints gbc_scraperComboBox = new GridBagConstraints();
+      gbc_scraperComboBox.anchor = GridBagConstraints.WEST;
+      gbc_scraperComboBox.weightx = 1.0;
       gbc_scraperComboBox.insets = new Insets(10, 0, 5, 5);
       gbc_scraperComboBox.gridx = 1;
       gbc_scraperComboBox.gridy = 0;
@@ -124,22 +130,22 @@ public class ScraperDialog extends BaseDialog
         {
           public void actionPerformed(ActionEvent arg0)
           {
-            if (scraperComboBox.getSelectedItem().equals("www.mobygames.com"))
+            if (scraperComboBox.getSelectedItem().equals(WWW_MOBYGAMES_COM))
             {
-              cardLayout.show(cardPanel, "moby");
+              cardLayout.show(cardPanel, MOBY);
               scraper.setScrapertoUse(SCRAPER.moby);
               getRootPane().setDefaultButton(getMobyGamesPanel().getConnectButton());
             }
             else
             {
-              cardLayout.show(cardPanel, "c64com");
+              cardLayout.show(cardPanel, C64COM);
               scraper.setScrapertoUse(SCRAPER.c64com);
               getRootPane().setDefaultButton(getC64comPanel().getConnectButton());
             }
           }
         });
-      scraperComboBox.addItem("www.mobygames.com");
-      scraperComboBox.addItem("www.c64.com");
+      scraperComboBox.addItem(WWW_MOBYGAMES_COM);
+      scraperComboBox.addItem(WWW_C64_COM);
     }
     return scraperComboBox;
   }

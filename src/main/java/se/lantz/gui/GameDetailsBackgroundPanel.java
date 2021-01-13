@@ -290,7 +290,6 @@ public class GameDetailsBackgroundPanel extends JPanel
       MainWindow.getInstance().setWaitCursor(false);
       if (scraperFields.isScreenshots())
       {
-
         List<BufferedImage> screenshots = scraperManager.getScreenshots();
         if (screenshots.size() > 2)
         {

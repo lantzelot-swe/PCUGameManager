@@ -3,6 +3,7 @@ package se.lantz.util;
 import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
+import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -827,14 +828,26 @@ public class FileManager
     g.drawImage(newImage, 0, 0, null);
     return newImage;
   }
+  
+  public static File createTempFileForScraper(BufferedInputStream inputStream) throws IOException
+  {
+    Files.createDirectories(TEMP_PATH);
+    //TODO: add to temp folder instead
+    File file = new File(TEMP_PATH +  File.separator +"scrapedFile.zip");
+    FileOutputStream fos = new FileOutputStream(file, false);
+    byte[] buffer = new byte[1024];
+    int len;
+    while ((len = inputStream.read(buffer)) != -1) {
+        fos.write(buffer, 0, len);
+    }
+    inputStream.close();
+    fos.close();
+    return unzipAndPickFirstEntry(file.getAbsolutePath());
+  }
 
-  public static File unzipAndPickFirstEntry(String zipFilePath, String destDir)
+  public static File unzipAndPickFirstEntry(String zipFilePath)
   {
     Path filePath = null;
-    File dir = new File(destDir);
-    // create output directory if it doesn't exist
-    if (!dir.exists())
-      dir.mkdirs();
     FileInputStream fis;
     //buffer for read and write data to file
     byte[] buffer = new byte[1024];
@@ -846,7 +859,7 @@ public class FileManager
       if (ze != null)
       {
         String fileName = ze.getName();
-        File newFile = new File(destDir + File.separator + fileName);
+        File newFile = new File(TEMP_PATH + File.separator + fileName);
         System.out.println("Unzipping to " + newFile.getAbsolutePath());
         //create directories for sub directories in zip
         new File(newFile.getParent()).mkdirs();

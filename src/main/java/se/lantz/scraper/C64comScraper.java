@@ -64,7 +64,22 @@ public class C64comScraper implements Scraper
   public void connect(String url) throws IOException
   {
     this.c64comGameUrl = "";
-    Jsoup.connect(url).method(Connection.Method.GET).execute();
+    //c64.com gives no errors for invalid urls. Check if there is an title to make sure it's valid
+    Connection.Response result = Jsoup.connect(url).method(Connection.Method.GET).execute();
+    Document doc = result.parse();     
+    //Fetch right frame 
+    Document mainFrameDocument = Jsoup.connect(doc.select("frame[name=text]").first().absUrl("src")).get();
+    //Fetch title
+    Elements queryElements = mainFrameDocument.select(titleCssQuery);
+    Element first = queryElements.first();
+    if (first != null)
+    {
+      if (first.text().isEmpty())
+      {
+        throw new IllegalArgumentException();
+      }     
+    }
+    
     this.c64comGameUrl = url;
     resetFields();
   }
@@ -172,32 +187,18 @@ public class C64comScraper implements Scraper
                 Response response = Jsoup.connect(url)
                   .header("Accept-Encoding", "gzip, deflate")
                   .userAgent("Mozilla/5.0 (Windows NT 6.1; WOW64; rv:23.0) Gecko/20100101 Firefox/23.0")
-  //                .referrer(URL_TO_PARSE)
                   .ignoreContentType(true)
                   .maxBodySize(0)
                   .timeout(600000)
                   .execute();
-  //                .bodyAsBytes();
                 
-                //TODO: add to temp folder instead
-                File file = new File("scrapedFile.zip");
-                BufferedInputStream inputStream = response.bodyStream();
-                FileOutputStream fos = new FileOutputStream(file);
-                byte[] buffer = new byte[1024];
-                int len;
-                while ((len = inputStream.read(buffer)) != -1) {
-                    fos.write(buffer, 0, len);
-                }
-                inputStream.close();
-                fos.close();
-                
-                //Unzip
-                scrapedFile = FileManager.unzipAndPickFirstEntry(file.getAbsolutePath(), ".");
+                //create a temp file and fetch the content
+                scrapedFile = FileManager.createTempFileForScraper(response.bodyStream());
                 logger.debug("File to include as game: {}", scrapedFile.getAbsolutePath());
               }
               catch (IOException e)
               {
-                logger.error("", e);
+                logger.error("Could not scrape game file for " + scrapedTitle , e);
               }
             }
           }

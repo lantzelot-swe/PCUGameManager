@@ -38,7 +38,7 @@ public class C64comOptionsPanel extends JPanel
   private JCheckBox titleCheckBox;
   private JCheckBox authorCheckBox;
   private JCheckBox yearCheckBox;
-  private JCheckBox descriptionCheckBox;
+  private JCheckBox gameCheckBox;
   private JCheckBox coverCheckBox;
   private JCheckBox screensCheckBox;
   private ScraperManager scraper;
@@ -194,12 +194,12 @@ public class C64comOptionsPanel extends JPanel
       gbc_yearCheckBox.gridx = 0;
       gbc_yearCheckBox.gridy = 3;
       fieldsPanel.add(getYearCheckBox(), gbc_yearCheckBox);
-      GridBagConstraints gbc_descriptionCheckBox = new GridBagConstraints();
-      gbc_descriptionCheckBox.insets = new Insets(0, 0, 5, 5);
-      gbc_descriptionCheckBox.anchor = GridBagConstraints.WEST;
-      gbc_descriptionCheckBox.gridx = 1;
-      gbc_descriptionCheckBox.gridy = 1;
-      fieldsPanel.add(getDescriptionCheckBox(), gbc_descriptionCheckBox);
+      GridBagConstraints gbc_gameCheckBox = new GridBagConstraints();
+      gbc_gameCheckBox.insets = new Insets(0, 0, 5, 5);
+      gbc_gameCheckBox.anchor = GridBagConstraints.WEST;
+      gbc_gameCheckBox.gridx = 1;
+      gbc_gameCheckBox.gridy = 1;
+      fieldsPanel.add(getGameCheckBox(), gbc_gameCheckBox);
       GridBagConstraints gbc_genreCheckBox = new GridBagConstraints();
       gbc_genreCheckBox.insets = new Insets(0, 0, 0, 5);
       gbc_genreCheckBox.anchor = GridBagConstraints.WEST;
@@ -258,15 +258,15 @@ public class C64comOptionsPanel extends JPanel
     return yearCheckBox;
   }
 
-  private JCheckBox getDescriptionCheckBox()
+  private JCheckBox getGameCheckBox()
   {
-    if (descriptionCheckBox == null)
+    if (gameCheckBox == null)
     {
-      descriptionCheckBox = new JCheckBox("Description");
-      descriptionCheckBox.setSelected(false);
-      descriptionCheckBox.setEnabled(false);
+      gameCheckBox = new JCheckBox("Game file");
+      gameCheckBox.setSelected(true);
+      gameCheckBox.setEnabled(false);
     }
-    return descriptionCheckBox;
+    return gameCheckBox;
   }
 
   private JCheckBox getCoverCheckBox()
@@ -296,7 +296,7 @@ public class C64comOptionsPanel extends JPanel
     titleCheckBox.setEnabled(enable);
     authorCheckBox.setEnabled(enable);
     yearCheckBox.setEnabled(enable);
-//    descriptionCheckBox.setEnabled(enable);
+    gameCheckBox.setEnabled(enable);
     coverCheckBox.setEnabled(enable);
     screensCheckBox.setEnabled(enable);
     genreCheckBox.setEnabled(enable);
@@ -310,12 +310,12 @@ public class C64comOptionsPanel extends JPanel
     returnValue.setAuthor(authorCheckBox.isSelected());
     returnValue.setYear(yearCheckBox.isSelected());
     returnValue.setGenre(genreCheckBox.isSelected());
+    //No description available
     returnValue.setDescription(false);
     returnValue.setCover(coverCheckBox.isSelected());
     returnValue.setScreenshots(screensCheckBox.isSelected());
     returnValue.setComposer(composerCheckBox.isSelected());
-    //TODO:add option
-    returnValue.setGame(true);
+    returnValue.setGame(gameCheckBox.isSelected());
     return returnValue;
   }
 
