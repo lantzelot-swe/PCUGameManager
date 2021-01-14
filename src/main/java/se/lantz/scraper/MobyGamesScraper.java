@@ -231,7 +231,6 @@ public class MobyGamesScraper implements Scraper
       {
         if (entry.getKey().contains(split[i]))
         {
-          System.out.println(entry.getKey() + "/" + entry.getValue());
           return entry.getValue();
         }
       }

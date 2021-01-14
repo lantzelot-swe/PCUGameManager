@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -26,7 +27,7 @@ import java.util.stream.Collectors;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
+import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream;
 
 import javax.imageio.ImageIO;
 
@@ -832,7 +833,6 @@ public class FileManager
   public static File createTempFileForScraper(BufferedInputStream inputStream) throws IOException
   {
     Files.createDirectories(TEMP_PATH);
-    //TODO: add to temp folder instead
     File file = new File(TEMP_PATH +  File.separator +"scrapedFile.zip");
     FileOutputStream fos = new FileOutputStream(file, false);
     byte[] buffer = new byte[1024];
@@ -854,13 +854,12 @@ public class FileManager
     try
     {
       fis = new FileInputStream(zipFilePath);
-      ZipInputStream zis = new ZipInputStream(fis);
-      ZipEntry ze = zis.getNextEntry();
+      ZipArchiveInputStream zis = new ZipArchiveInputStream(fis);
+      ZipEntry ze = zis.getNextZipEntry();
       if (ze != null)
       {
         String fileName = ze.getName();
         File newFile = new File(TEMP_PATH + File.separator + fileName);
-        System.out.println("Unzipping to " + newFile.getAbsolutePath());
         //create directories for sub directories in zip
         new File(newFile.getParent()).mkdirs();
         FileOutputStream fos = new FileOutputStream(newFile);
@@ -871,20 +870,16 @@ public class FileManager
         }
         fos.close();
         //close this ZipEntry
-        zis.closeEntry();
-        ze = zis.getNextEntry();
+        zis.close();
         filePath = newFile.toPath();
       }
-      //close last ZipEntry
-      zis.closeEntry();
-      zis.close();
       fis.close();
     }
     catch (IOException e)
     {
-      e.printStackTrace();
+      ExceptionHandler.handleException(e, "Could not unzip downloaded file");
     }
-    return filePath.toFile();
+    return filePath != null ? filePath.toFile() : null;
   }
 
 }
