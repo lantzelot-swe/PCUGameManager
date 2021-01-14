@@ -8,7 +8,6 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 import java.util.List;
@@ -18,9 +17,7 @@ import javax.swing.Action;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
-import javax.swing.JRootPane;
 import javax.swing.KeyStroke;
-import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 import javax.swing.border.TitledBorder;
 
@@ -35,7 +32,6 @@ import se.lantz.manager.ScraperManager;
 import se.lantz.model.MainViewModel;
 import se.lantz.model.data.GameListData;
 import se.lantz.model.data.ScraperFields;
-import se.lantz.util.FileManager;
 
 public class GameDetailsBackgroundPanel extends JPanel
 {
@@ -49,7 +45,9 @@ public class GameDetailsBackgroundPanel extends JPanel
   private SystemPanel systemPanel;
   private JPanel buttonPanel;
   private JButton saveButton;
-
+  private ScraperDialog scraperDialog = null;
+  private JButton runButton;
+  private JButton btnNewButton;
   private JPanel emptyPanel;
   private JPanel detailsPanel;
   private CardLayout cardLayout;
@@ -59,18 +57,20 @@ public class GameDetailsBackgroundPanel extends JPanel
     MainWindow.getInstance().setWaitCursor(false);
     cursorTimer.stop();
   };
-  private Action runGameAction = new AbstractAction("Run Game") {
-
-    @Override
-    public void actionPerformed(ActionEvent e)
+  private Action runGameAction = new AbstractAction("Run Game")
     {
-      if (runButton.isEnabled())
+
+      @Override
+      public void actionPerformed(ActionEvent e)
       {
-        MainWindow.getInstance().setWaitCursor(true);
-        cursorTimer.start();
-        model.runGameInVice();
+        if (runButton.isEnabled())
+        {
+          MainWindow.getInstance().setWaitCursor(true);
+          cursorTimer.start();
+          model.runGameInVice();
+        }
       }
-    }};
+    };
 
   private final ScraperManager scraperManager;
 
@@ -231,10 +231,21 @@ public class GameDetailsBackgroundPanel extends JPanel
     if (saveButton == null)
     {
       saveButton = new JButton("Save");
+      KeyStroke keySave = KeyStroke.getKeyStroke(KeyEvent.VK_S, KeyEvent.CTRL_DOWN_MASK);
+      Action performSave = new AbstractAction("Save")
+        {
+          public void actionPerformed(ActionEvent e)
+          {
+            saveButton.doClick();
+          }
+        };
+      saveButton.getActionMap().put("performSave", performSave);
+      saveButton.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(keySave, "performSave");
+
       saveButton.addActionListener(new ActionListener()
         {
           public void actionPerformed(ActionEvent e)
-          {    
+          {
             if (model.saveData())
             {
               getInfoPanel().getScreensPanel().resetWhenSaved();
@@ -260,10 +271,6 @@ public class GameDetailsBackgroundPanel extends JPanel
     }
     return scrapeButton;
   }
-
-  private ScraperDialog scraperDialog = null;
-  private JButton runButton;
-  private JButton btnNewButton;
 
   private void scrapeGamesInformation()
   {
@@ -323,13 +330,16 @@ public class GameDetailsBackgroundPanel extends JPanel
       }
     }
   }
-  private JButton getRunButton() {
-    if (runButton == null) {
-    	runButton = new JButton(runGameAction);
+
+  private JButton getRunButton()
+  {
+    if (runButton == null)
+    {
+      runButton = new JButton(runGameAction);
     }
     return runButton;
   }
-  
+
   public void runCurrentGame()
   {
     if (getRunButton().isEnabled())
@@ -337,14 +347,19 @@ public class GameDetailsBackgroundPanel extends JPanel
       getRunButton().doClick();
     }
   }
-  private JButton getBtnNewButton() {
-    if (btnNewButton == null) {
-    	btnNewButton = new JButton("VICE");
-    	btnNewButton.addActionListener(new ActionListener() {
-    	  public void actionPerformed(ActionEvent e) {
-    	    model.runVice();
-    	  }
-    	});
+
+  private JButton getBtnNewButton()
+  {
+    if (btnNewButton == null)
+    {
+      btnNewButton = new JButton("VICE");
+      btnNewButton.addActionListener(new ActionListener()
+        {
+          public void actionPerformed(ActionEvent e)
+          {
+            model.runVice();
+          }
+        });
     }
     return btnNewButton;
   }
