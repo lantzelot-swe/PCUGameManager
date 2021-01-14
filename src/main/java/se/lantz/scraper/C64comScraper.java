@@ -68,7 +68,7 @@ public class C64comScraper implements Scraper
   public void connect(String url) throws IOException
   {
     this.c64comGameUrl = "";
-    //c64.com gives no errors for invalid urls. Check if there is an title to make sure it's valid
+    //c64.com gives no errors for invalid urls. Check if there is an non-empty title to make sure it's valid
     Connection.Response result = Jsoup.connect(url).method(Connection.Method.GET).execute();
     Document doc = result.parse();     
     //Fetch right frame 
@@ -76,12 +76,9 @@ public class C64comScraper implements Scraper
     //Fetch title
     Elements queryElements = mainFrameDocument.select(titleCssQuery);
     Element first = queryElements.first();
-    if (first != null)
-    {
-      if (first.text().isEmpty())
-      {
-        throw new IllegalArgumentException();
-      }     
+    if (first == null || first.text().isEmpty())
+    { 
+      throw new IllegalArgumentException();     
     }
     
     this.c64comGameUrl = url;
