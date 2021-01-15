@@ -259,7 +259,7 @@ public class GamebaseScraper implements Scraper
           }
           else
           {
-            absoluteUrl = absoluteUrl.replace("_" + Integer.toString(i), "_" + Integer.toString(i + 1));
+            absoluteUrl = absoluteUrl.replace("_" + Integer.toString(i) + ".", "_" + Integer.toString(i + 1) + ".");
           }
         }
       }

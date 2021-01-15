@@ -286,8 +286,8 @@ public class C64comScraper implements Scraper
           URL imageUrl = new URL(absoluteUrl);
           screensList.add(ImageIO.read(imageUrl));
           //Replace number in url
-          absoluteUrl = absoluteUrl.replace("0" + Integer.toString(i), "0" + Integer.toString(i+1));
-        }       
+          absoluteUrl = absoluteUrl.replace("0" + Integer.toString(i) + ".", "0" + Integer.toString(i+1) + ".");
+        }
       }
     }
     catch (IOException e)
