@@ -22,10 +22,13 @@ public class ScraperDialog extends BaseDialog
 {
   private static final String MOBY = "moby";
   private static final String C64COM = "c64com";
+  private static final String GB64COM = "gb64com";
   private static final String WWW_C64_COM = "www.c64.com";
   private static final String WWW_MOBYGAMES_COM = "www.mobygames.com";
+  private static final String WWW_GAMEBASE_COM = "www.gb64.com";
   private MobyGamesOptionsPanel mobyGamesPanel;
   private C64comOptionsPanel c64comPanel;
+  private Gb64comOptionsPanel gb64comPanel;
   private final ScraperManager scraper;
   private CardLayout cardLayout = new CardLayout();
   private JPanel scraperSelectionPanel;
@@ -44,6 +47,7 @@ public class ScraperDialog extends BaseDialog
     cardPanel.setLayout(cardLayout);
     cardPanel.add(getMobyGamesPanel(), MOBY);
     cardPanel.add(getC64comPanel(), C64COM);
+    cardPanel.add(getGb64comPanel(), GB64COM);
     content.add(cardPanel, BorderLayout.CENTER);
     addContent(content);
     content.add(getScraperSelectionPanel(), BorderLayout.NORTH);
@@ -66,6 +70,15 @@ public class ScraperDialog extends BaseDialog
       c64comPanel = new C64comOptionsPanel(scraper, getOkButton());
     }
     return c64comPanel;
+  }
+  
+  private Gb64comOptionsPanel getGb64comPanel()
+  {
+    if (gb64comPanel == null)
+    {
+      gb64comPanel = new Gb64comOptionsPanel(scraper, getOkButton());
+    }
+    return gb64comPanel;
   }
 
   public ScraperFields getScraperFields()
@@ -136,16 +149,23 @@ public class ScraperDialog extends BaseDialog
               scraper.setScrapertoUse(SCRAPER.moby);
               getRootPane().setDefaultButton(getMobyGamesPanel().getConnectButton());
             }
-            else
+            else if (scraperComboBox.getSelectedItem().equals(WWW_C64_COM))
             {
               cardLayout.show(cardPanel, C64COM);
               scraper.setScrapertoUse(SCRAPER.c64com);
               getRootPane().setDefaultButton(getC64comPanel().getConnectButton());
             }
+            else
+            {
+              cardLayout.show(cardPanel, GB64COM);
+              scraper.setScrapertoUse(SCRAPER.gamebase);
+              getRootPane().setDefaultButton(getGb64comPanel().getConnectButton());
+            }
           }
         });
       scraperComboBox.addItem(WWW_MOBYGAMES_COM);
       scraperComboBox.addItem(WWW_C64_COM);
+      scraperComboBox.addItem(WWW_GAMEBASE_COM);
     }
     return scraperComboBox;
   }

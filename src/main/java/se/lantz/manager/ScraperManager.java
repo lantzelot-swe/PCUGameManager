@@ -9,16 +9,18 @@ import se.lantz.model.MainViewModel;
 import se.lantz.model.SystemModel;
 import se.lantz.model.data.ScraperFields;
 import se.lantz.scraper.C64comScraper;
+import se.lantz.scraper.GamebaseScraper;
 import se.lantz.scraper.MobyGamesScraper;
 import se.lantz.scraper.Scraper;
 
 public class ScraperManager
 {
   public enum SCRAPER {
-    moby, c64com
+    moby, c64com, gamebase
   }
   Scraper mobyScraper = new MobyGamesScraper();
   Scraper c64comScraper = new C64comScraper();
+  Scraper gamebaseScraper = new GamebaseScraper();
   Scraper usedScraper = mobyScraper;
 
   List<BufferedImage> screenshotsList = new ArrayList<>();
@@ -41,6 +43,9 @@ public class ScraperManager
       break;
     case c64com:
       usedScraper = c64comScraper;
+      break;
+    case gamebase:
+      usedScraper = gamebaseScraper;
       break;
     default:
       break;
