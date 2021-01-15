@@ -26,28 +26,25 @@ import se.lantz.util.FileManager;
 
 public class C64comScraper implements Scraper
 {
+  private static final String FRAME_NAME_TEXT = "frame[name=text]";
   private static final Logger logger = LoggerFactory.getLogger(C64comScraper.class);
-  private String c64comGameUrl = "http://www.c64.com/games/53";
-  
-  private String screenshotCssQuery = "html > body > table > tbody > tr > td:eq(0) > table > tbody > tr:eq(1) > td > table:eq(1) > tbody > tr > td:eq(4) > table > tbody > tr:eq(0) > td > img";
+  private String c64comGameUrl = "";
  
   private String baseForTitleAndYear = "html > body > table > tbody > tr > td:eq(0) > table > tbody > tr:eq(1) > td > table:eq(1) > tbody > tr > td:eq(4) > table > tbody > tr:eq(0) > td > table > tbody > tr:eq(1) > td";
   private String titleCssQuery = baseForTitleAndYear + " > span";
   private String yearCssQuery = baseForTitleAndYear + " > a:eq(2) > span";
   private String authorCssQuery = baseForTitleAndYear + " > a:eq(3) > span";
-  
   private String infoTableCssQuery = "html > body > table > tbody > tr > td:eq(0) > table > tbody > tr:eq(1) > td > table:eq(1) > tbody > tr > td:eq(4) > table > tbody > tr:eq(1) > td > table > tbody > tr > td > table:eq(2) > tbody";
-  
-  
+  private String screenshotCssQuery = "html > body > table > tbody > tr > td:eq(0) > table > tbody > tr:eq(1) > td > table:eq(1) > tbody > tr > td:eq(4) > table > tbody > tr:eq(0) > td > img";
+ 
   private String scrapedTitle;
   private int scrapedYear = 1985;
   private String scrapedAuthor;
   private List<String> scrapedMusicList = new ArrayList<>();
-  
   private String scrapedGenre;
   private BufferedImage scrapedCover;
   private File scrapedFile;
-  
+
   Map<String, String> genreMap = new HashMap<>();
   
   public C64comScraper()
@@ -72,7 +69,7 @@ public class C64comScraper implements Scraper
     Connection.Response result = Jsoup.connect(url).method(Connection.Method.GET).execute();
     Document doc = result.parse();     
     //Fetch right frame 
-    Document mainFrameDocument = Jsoup.connect(doc.select("frame[name=text]").first().absUrl("src")).get();
+    Document mainFrameDocument = Jsoup.connect(doc.select(FRAME_NAME_TEXT).first().absUrl("src")).get();
     //Fetch title
     Elements queryElements = mainFrameDocument.select(titleCssQuery);
     Element first = queryElements.first();
@@ -104,52 +101,24 @@ public class C64comScraper implements Scraper
       Connection.Response result = Jsoup.connect(c64comGameUrl).method(Connection.Method.GET).execute();
       doc = result.parse();     
       //Fetch right frame 
-      Document mainFrameDocument = Jsoup.connect(doc.select("frame[name=text]").first().absUrl("src")).get();
+      Document mainFrameDocument = Jsoup.connect(doc.select(FRAME_NAME_TEXT).first().absUrl("src")).get();
 
       if (fields.isTitle())
       {
-        //Fetch title
-        Elements queryElements = mainFrameDocument.select(titleCssQuery);
-        logger.debug("queryElements = " + queryElements);
-        Element first = queryElements.first();
-        if (first != null)
-        {
-          scrapedTitle = first.text();
-        }
-        logger.debug("scraped title: {}", scrapedTitle);
+        scrapeTitle(mainFrameDocument);
       }
       
       if (fields.isYear())
       {
-        //Fetch year
-        Elements yearElements = mainFrameDocument.select(yearCssQuery);
-        if (yearElements.first() != null)
-        {
-          try
-          {
-            scrapedYear = Integer.parseInt(yearElements.first().text().trim());
-          }
-          catch (Exception e)
-          {
-            logger.error("Could not scrape year for {}",  scrapedTitle);
-          }
-          
-        }
-        logger.debug("scraped year: {}", scrapedYear);
+        scrapeYear(mainFrameDocument);
       }
       
       if (fields.isAuthor())
       {
-        //Fetch author
-        Elements authorElements = mainFrameDocument.select(authorCssQuery);
-        if (authorElements.first() != null)
-        {
-          scrapedAuthor = authorElements.first().text();
-        }
-        logger.debug("scraped author: {}", scrapedAuthor);
+        scrapeAuthor(mainFrameDocument);
       }
       
-      //Fetch infotable and find music and genre
+      //Fetch infotable and find music, genre, cover and game
       Elements infoElements = mainFrameDocument.select(infoTableCssQuery);
       if (infoElements.first() != null)
       {
@@ -174,42 +143,12 @@ public class C64comScraper implements Scraper
           }
           if (fields.isCover() && info.startsWith("Inlay"))
           {
-            String url = child.select("td:eq(1) > a").first().attr("href");
-            //Select the right part 
-            url = url.substring(url.indexOf("'")+1);
-            url = url.substring(0, url.indexOf("'"));
-            url = url.substring(url.indexOf("=")+1);
-            url = "http://www.c64.com/games/" + url;
-            URL imageUrl = new URL(url);
-            scrapedCover = ImageIO.read(imageUrl);
-            logger.debug("Cover url: {}", url);
+            scrapeCover(child);
             continue;
           }
           if (fields.isGame() && info.equalsIgnoreCase("Download:"))
           {
-            Element gameElement = child.select("td:eq(1) > a").first();
-            if (gameElement.text().equalsIgnoreCase("Game"))
-            {
-              try
-              {
-                String url = gameElement.attr("abs:href");
-                Response response = Jsoup.connect(url)
-                  .header("Accept-Encoding", "gzip, deflate")
-                  .userAgent("Mozilla/5.0 (Windows NT 6.1; WOW64; rv:23.0) Gecko/20100101 Firefox/23.0")
-                  .ignoreContentType(true)
-                  .maxBodySize(0)
-                  .timeout(600000)
-                  .execute();
-                
-                //create a temp file and fetch the content
-                scrapedFile = FileManager.createTempFileForScraper(response.bodyStream());
-                logger.debug("File to include as game: {}", scrapedFile != null ? scrapedFile.getAbsolutePath() : null);
-              }
-              catch (Exception e)
-              {
-                logger.error("Could not scrape game file for " + scrapedTitle , e);
-              }
-            }
+            scrapeGame(child);
           }
         }
       }     
@@ -220,6 +159,97 @@ public class C64comScraper implements Scraper
     }
   }
   
+  private void scrapeTitle(Document mainFrameDocument)
+  {
+    //Fetch title
+    Elements queryElements = mainFrameDocument.select(titleCssQuery);
+    logger.debug("queryElements = {}", queryElements);
+    Element first = queryElements.first();
+    if (first != null)
+    {
+      scrapedTitle = first.text();
+    }
+    logger.debug("scraped title: {}", scrapedTitle);
+  }
+  
+  private void scrapeYear(Document mainFrameDocument)
+  {
+    //Fetch year
+    Elements yearElements = mainFrameDocument.select(yearCssQuery);
+    if (yearElements.first() != null)
+    {
+      try
+      {
+        scrapedYear = Integer.parseInt(yearElements.first().text().trim());
+      }
+      catch (Exception e)
+      {
+        logger.error("Could not scrape year for {}",  scrapedTitle);
+      }
+      
+    }
+    logger.debug("scraped year: {}", scrapedYear);
+  }
+  
+  private void scrapeAuthor(Document mainFrameDocument)
+  {
+    //Fetch author
+    Elements authorElements = mainFrameDocument.select(authorCssQuery);
+    if (authorElements.first() != null)
+    {
+      scrapedAuthor = authorElements.first().text();
+    }
+    logger.debug("scraped author: {}", scrapedAuthor);
+  }
+  
+  private void scrapeCover(Element element)
+  {
+    String url = element.select("td:eq(1) > a").first().attr("href");
+    //Select the right part 
+    url = url.substring(url.indexOf("'")+1);
+    url = url.substring(0, url.indexOf("'"));
+    url = url.substring(url.indexOf("=")+1);
+    url = "http://www.c64.com/games/" + url;
+    URL imageUrl;
+    try
+    {
+      imageUrl = new URL(url);
+      scrapedCover = ImageIO.read(imageUrl);
+    }
+    catch (IOException e)
+    {
+      logger.error("Could not scrape cover for " + scrapedTitle , e);
+    }
+    logger.debug("Cover url: {}", url);
+  }
+  
+  private void scrapeGame(Element element)
+  {
+    Element gameElement = element.select("td:eq(1) > a").first();
+    if (gameElement.text().equalsIgnoreCase("Game"))
+    {
+      try
+      {
+        String url = gameElement.attr("abs:href");
+        Response response = Jsoup.connect(url)
+          .header("Accept-Encoding", "gzip, deflate")
+          .userAgent("Mozilla/5.0 (Windows NT 6.1; WOW64; rv:23.0) Gecko/20100101 Firefox/23.0")
+          .ignoreContentType(true)
+          .maxBodySize(0)
+          .timeout(600000)
+          .execute();
+        
+        //create a temp file and fetch the content
+        scrapedFile = FileManager.createTempFileForScraper(response.bodyStream());
+        logger.debug("File to include as game: {}", scrapedFile != null ? scrapedFile.getAbsolutePath() : null);
+      }
+      catch (Exception e)
+      {
+        logger.error("Could not scrape game file for " + scrapedTitle , e);
+      }
+    }
+  }
+  
   private String mapGenre(String genreFromC64com)
   {
     //Map towards available genres, return first one found
@@ -227,7 +257,6 @@ public class C64comScraper implements Scraper
     {
       if (entry.getKey().contains(genreFromC64com))
       {
-        logger.debug(entry.getKey() + "/" + entry.getValue());
         return entry.getValue();
       }
     }   
@@ -244,7 +273,7 @@ public class C64comScraper implements Scraper
       Connection.Response result = Jsoup.connect(c64comGameUrl).method(Connection.Method.GET).execute();
       doc = result.parse();     
       //Fetch right frame 
-      Document mainFrameDocument = Jsoup.connect(doc.select("frame[name=text]").first().absUrl("src")).get();
+      Document mainFrameDocument = Jsoup.connect(doc.select(FRAME_NAME_TEXT).first().absUrl("src")).get();
       //Fetch the right element
       Elements coverElements = mainFrameDocument.select(screenshotCssQuery);
       if (coverElements.first() != null)

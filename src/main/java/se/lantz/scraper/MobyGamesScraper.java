@@ -268,7 +268,6 @@ public class MobyGamesScraper implements Scraper
         if (node instanceof TextNode)
         {
           String test = ((TextNode)node).text();
-          //TODO: Add more possible labels
           if (test.contains("Music") || test.contains("music"))
           {
             musicFound = true;

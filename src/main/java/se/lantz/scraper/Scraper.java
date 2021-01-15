@@ -6,10 +6,11 @@ import java.io.IOException;
 import java.util.List;
 
 import se.lantz.model.data.ScraperFields;
-
+/**
+ * Common interface implemented by all scrapers.
+ */
 public interface Scraper
 {
-
   void connect(String url) throws IOException;
 
   void scrapeInformation(ScraperFields fields);
@@ -33,5 +34,4 @@ public interface Scraper
   boolean isC64();
   
   File getGameFile();
-
 }
