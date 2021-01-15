@@ -180,13 +180,13 @@ public class C64comOptionsPanel extends JPanel
       gbc_composerCheckBox.anchor = GridBagConstraints.WEST;
       gbc_composerCheckBox.insets = new Insets(0, 0, 5, 5);
       gbc_composerCheckBox.gridx = 1;
-      gbc_composerCheckBox.gridy = 2;
+      gbc_composerCheckBox.gridy = 1;
       fieldsPanel.add(getComposerCheckBox(), gbc_composerCheckBox);
       GridBagConstraints gbc_coverCheckBox = new GridBagConstraints();
       gbc_coverCheckBox.anchor = GridBagConstraints.WEST;
       gbc_coverCheckBox.insets = new Insets(0, 0, 5, 5);
       gbc_coverCheckBox.gridx = 1;
-      gbc_coverCheckBox.gridy = 3;
+      gbc_coverCheckBox.gridy = 2;
       fieldsPanel.add(getCoverCheckBox(), gbc_coverCheckBox);
       GridBagConstraints gbc_yearCheckBox = new GridBagConstraints();
       gbc_yearCheckBox.insets = new Insets(0, 0, 5, 5);
@@ -195,10 +195,10 @@ public class C64comOptionsPanel extends JPanel
       gbc_yearCheckBox.gridy = 3;
       fieldsPanel.add(getYearCheckBox(), gbc_yearCheckBox);
       GridBagConstraints gbc_gameCheckBox = new GridBagConstraints();
-      gbc_gameCheckBox.insets = new Insets(0, 0, 5, 5);
+      gbc_gameCheckBox.insets = new Insets(0, 0, 0, 5);
       gbc_gameCheckBox.anchor = GridBagConstraints.WEST;
       gbc_gameCheckBox.gridx = 1;
-      gbc_gameCheckBox.gridy = 1;
+      gbc_gameCheckBox.gridy = 4;
       fieldsPanel.add(getGameCheckBox(), gbc_gameCheckBox);
       GridBagConstraints gbc_genreCheckBox = new GridBagConstraints();
       gbc_genreCheckBox.insets = new Insets(0, 0, 0, 5);
@@ -207,10 +207,10 @@ public class C64comOptionsPanel extends JPanel
       gbc_genreCheckBox.gridy = 4;
       fieldsPanel.add(getGenreCheckBox(), gbc_genreCheckBox);
       GridBagConstraints gbc_screensCheckBox = new GridBagConstraints();
-      gbc_screensCheckBox.insets = new Insets(0, 0, 0, 5);
+      gbc_screensCheckBox.insets = new Insets(0, 0, 5, 5);
       gbc_screensCheckBox.anchor = GridBagConstraints.WEST;
       gbc_screensCheckBox.gridx = 1;
-      gbc_screensCheckBox.gridy = 4;
+      gbc_screensCheckBox.gridy = 3;
       fieldsPanel.add(getScreensCheckBox(), gbc_screensCheckBox);
     }
     return fieldsPanel;

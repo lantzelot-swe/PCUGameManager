@@ -1,6 +1,7 @@
 package se.lantz.manager;
 
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -110,7 +111,11 @@ public class ScraperManager
     
     if (fields.isGame())
     {
-      infoModel.setGamesPath(usedScraper.getGameFile());
+      File scrapedFile = usedScraper.getGameFile();
+      if (scrapedFile != null)
+      {
+        infoModel.setGamesPath(scrapedFile);
+      }
     }
     //Set system based on the scraped URL
     if (usedScraper.isC64())

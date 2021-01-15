@@ -155,7 +155,7 @@ public class C64comScraper implements Scraper
     }
     catch (IOException e)
     {
-      ExceptionHandler.handleException(e, "Could not scrape info");
+      ExceptionHandler.handleException(e, "Could not scrape information");
     }
   }
   

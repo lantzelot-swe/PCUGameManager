@@ -31,35 +31,21 @@ public class MobyGamesScraper implements Scraper
   private static final Logger logger = LoggerFactory.getLogger(MobyGamesScraper.class);
 
   private String mobyGamesGameUrl = "";
-
   private String descriptionCssQuery = "#main > div > div:eq(2) > div";
-
   private String titleCssQuery = ".niceHeaderTitle > a";
-
   private String authorCssQuery = "#coreGameRelease > div:contains(Published)";
-
   private String yearCssQuery = "#coreGameRelease > div:contains(Released)";
-
   private String genreCssQuery = "#coreGameGenre > div > div:contains(Genre)";
-
   private String coverCssQuery = "#coreGameCover > a > img";
-
   private String screensCssQuery = ".thumbnail-image-wrapper > a";
 
   Map<String, String> genreMap = new HashMap<>();
-
   private String scrapedTitle = "";
-
   private String scrapedAuthor = "";
-
   private int scrapedYear = 1985;
-
   private String scrapedDescription = "";
-
   private String scrapedGenre = "";
-  
   private String scrapedComposer = "";
-
   private BufferedImage scrapedCover = null;
 
   public MobyGamesScraper()
@@ -81,7 +67,7 @@ public class MobyGamesScraper implements Scraper
     this.mobyGamesGameUrl = url;
     resetFields();
   }
-  
+
   private void resetFields()
   {
     scrapedTitle = "";
@@ -149,11 +135,11 @@ public class MobyGamesScraper implements Scraper
       {
         scrapedCover = scrapeCover(doc);
       }
-      
+
     }
     catch (IOException e)
     {
-      ExceptionHandler.handleException(e, "Could not scrape title");
+      ExceptionHandler.handleException(e, "Could not scrape information");
     }
   }
 
@@ -186,7 +172,7 @@ public class MobyGamesScraper implements Scraper
   {
     return scrapedGenre;
   }
-  
+
   @Override
   public String getComposer()
   {
@@ -252,7 +238,7 @@ public class MobyGamesScraper implements Scraper
     }
     return value;
   }
-  
+
   public String scrapeComposer(Document doc)
   {
     String value = "";
@@ -267,7 +253,7 @@ public class MobyGamesScraper implements Scraper
       {
         if (node instanceof TextNode)
         {
-          String test = ((TextNode)node).text();
+          String test = ((TextNode) node).text();
           if (test.contains("Music") || test.contains("music"))
           {
             musicFound = true;
@@ -275,7 +261,7 @@ public class MobyGamesScraper implements Scraper
         }
         else if (node instanceof Element && musicFound)
         {
-          value = ((Element)node).text();
+          value = ((Element) node).text();
           if (!value.isEmpty())
           {
             break;
@@ -379,7 +365,7 @@ public class MobyGamesScraper implements Scraper
     }
     return null;
   }
-  
+
   @Override
   public boolean isC64()
   {
