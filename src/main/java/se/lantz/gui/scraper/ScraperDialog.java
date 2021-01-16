@@ -164,8 +164,8 @@ public class ScraperDialog extends BaseDialog
           }
         });
       scraperComboBox.addItem(WWW_MOBYGAMES_COM);
-      scraperComboBox.addItem(WWW_C64_COM);
       scraperComboBox.addItem(WWW_GAMEBASE_COM);
+      scraperComboBox.addItem(WWW_C64_COM);
     }
     return scraperComboBox;
   }
