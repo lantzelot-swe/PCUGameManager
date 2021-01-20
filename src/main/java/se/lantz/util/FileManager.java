@@ -12,7 +12,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
-import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -27,10 +26,10 @@ import java.util.stream.Collectors;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 import java.util.zip.ZipEntry;
-import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream;
 
 import javax.imageio.ImageIO;
 
+import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -199,11 +198,12 @@ public class FileManager
 
   private void renameFiles()
   {
-    String oldTitle = generateFileNameFromTitle(infoModel.getTitleInDb());
-    if (!infoModel.getCoverFile().isEmpty())
+    String coverFile = infoModel.getCoverFile();
+    String oldCoverFile = infoModel.getOldCoverFile();
+    if (!coverFile.isEmpty() && !oldCoverFile.isEmpty())
     {
-      File oldCover = new File(COVERS + oldTitle + "-cover.png");
-      File newCover = new File(COVERS + infoModel.getCoverFile());
+      File oldCover = new File(COVERS + oldCoverFile);
+      File newCover = new File(COVERS + coverFile);
       if (oldCover.renameTo(newCover))
       {
         logger.debug("Renamed cover {} to {}", oldCover.getName(), newCover.getName());
@@ -213,10 +213,12 @@ public class FileManager
         logger.debug("Could NOT rename cover {} to {}", oldCover.getName(), newCover.getName());
       }
     }
-    if (!infoModel.getScreens1File().isEmpty())
+    String screens1File = infoModel.getScreens1File();
+    String oldScreens1File = infoModel.getOldScreens1File();
+    if (!screens1File.isEmpty() && !oldScreens1File.isEmpty())
     {
-      File oldScreen1 = new File(SCREENS + oldTitle + "-00.png");
-      File newScreen1 = new File(SCREENS + infoModel.getScreens1File());
+      File oldScreen1 = new File(SCREENS + oldScreens1File);
+      File newScreen1 = new File(SCREENS + screens1File);
       if (oldScreen1.renameTo(newScreen1))
       {
         logger.debug("Renamed screen1 {} to {}", oldScreen1.getName(), newScreen1.getName());
@@ -226,10 +228,12 @@ public class FileManager
         logger.debug("Could NOT rename screen1 {} to {}", oldScreen1.getName(), newScreen1.getName());
       }
     }
-    if (!infoModel.getScreens2File().isEmpty())
+    String screens2File = infoModel.getScreens2File();
+    String oldScreens2File = infoModel.getOldScreens2File();
+    if (!screens2File.isEmpty() && !oldScreens2File.isEmpty())
     {
-      File oldScreen2 = new File(SCREENS + oldTitle + "-01.png");
-      File newScreen2 = new File(SCREENS + infoModel.getScreens2File());
+      File oldScreen2 = new File(SCREENS + oldScreens2File);
+      File newScreen2 = new File(SCREENS + screens2File);
       if (oldScreen2.renameTo(newScreen2))
       {
         logger.debug("Renamed screen2 {} to {}", oldScreen2.getName(), newScreen2.getName());
@@ -239,11 +243,12 @@ public class FileManager
         logger.debug("Could NOT rename screen2 {} to {}", oldScreen2.getName(), newScreen2.getName());
       }
     }
-    if (!infoModel.getGamesFile().isEmpty())
+    String gamesFile = infoModel.getGamesFile();
+    String oldGamesFile = infoModel.getOldGamesFile();
+    if (!gamesFile.isEmpty() && !oldGamesFile.isEmpty())
     {
-      String fileEnding = infoModel.getGamesFile().substring(infoModel.getGamesFile().indexOf("."));
-      File oldGame = new File(GAMES + oldTitle + fileEnding);
-      File newGame = new File(GAMES + infoModel.getGamesFile());
+      File oldGame = new File(GAMES + oldGamesFile);
+      File newGame = new File(GAMES + gamesFile);
       if (oldGame.renameTo(newGame))
       {
         logger.debug("Renamed game {} to {}", oldGame.getName(), newGame.getName());

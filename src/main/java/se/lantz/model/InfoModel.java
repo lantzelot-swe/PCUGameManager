@@ -28,6 +28,11 @@ public class InfoModel extends AbstractModel
   private BufferedImage screen2Image;
   
   private Path gamesPath;
+  
+  private String oldGamesFile = "";
+  private String oldCoverFile = "";
+  private String oldScreens1File = "";
+  private String oldScreens2File = "";
 
   public String getTitle()
   {
@@ -264,10 +269,16 @@ public class InfoModel extends AbstractModel
     }
   }
   
-  public void updateFileNames()
+  public boolean updateFileNames()
   {
     if (isNewGame() || isTitleChanged())
     {
+      //Keep track of the old names, used when renaming files when saving
+      oldCoverFile = getCoverFile();
+      oldScreens1File = getScreens1File();
+      oldScreens2File = getScreens2File();
+      oldGamesFile = getGamesFile();
+      
       disableChangeNotification(true);
       String fileName = FileManager.generateFileNameFromTitle(this.title);
       if (!getCoverFile().isEmpty() || getCoverImage() != null)
@@ -288,7 +299,9 @@ public class InfoModel extends AbstractModel
         setGamesFile(fileName + fileEnding);
       }
       disableChangeNotification(false);
+      return true;
     }
+    return false;
   }
   
   public boolean isNewGame()
@@ -302,11 +315,35 @@ public class InfoModel extends AbstractModel
   }
   
   
-  public void resetImages()
+  public void resetImagesAndOldFileNames()
   {
     this.coverImage = null;
     this.screen1Image = null;
     this.screen2Image = null;
     this.gamesPath = null;
+    this.oldGamesFile = "";
+    this.oldCoverFile = "";
+    this.oldScreens1File = "";
+    this.oldScreens2File = "";
+  }
+
+  public String getOldGamesFile()
+  {
+    return oldGamesFile;
+  }
+
+  public String getOldCoverFile()
+  {
+    return oldCoverFile;
+  }
+
+  public String getOldScreens1File()
+  {
+    return oldScreens1File;
+  }
+
+  public String getOldScreens2File()
+  {
+    return oldScreens2File;
   }
 }

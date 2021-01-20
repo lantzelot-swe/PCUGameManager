@@ -151,7 +151,7 @@ public class MainViewModel extends AbstractModel
     infoModel.setScreens1File(details.getScreen1());
     infoModel.setScreens2File(details.getScreen2());
     //Reset and images that where added previously
-    infoModel.resetImages();
+    infoModel.resetImagesAndOldFileNames();
 
     joy1Model.setConfigStringFromDb(details.getJoy1());
 
@@ -364,7 +364,7 @@ public class MainViewModel extends AbstractModel
 
       fileManager.saveFiles();
       //Reset and images that where added previously
-      infoModel.resetImages();
+      infoModel.resetImagesAndOldFileNames();
       //Reset all models
       infoModel.resetDataChanged();
       joy1Model.resetDataChanged();
