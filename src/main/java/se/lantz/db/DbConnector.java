@@ -132,7 +132,7 @@ public class DbConnector
   public List<GameListData> fetchAllGames()
   {
     List<GameListData> returnList = new ArrayList<>();
-    String sql = "SELECT title, rowid, Favorite FROM gameinfo ORDER BY title ASC";
+    String sql = "SELECT title, rowid, Favorite FROM gameinfo ORDER BY title COLLATE NOCASE ASC";
     try (Connection conn = this.connect(); Statement stmt = conn.createStatement();
       ResultSet rs = stmt.executeQuery(sql))
     {
@@ -159,7 +159,7 @@ public class DbConnector
     StringBuilder sqlBuilder = new StringBuilder();
     sqlBuilder.append("SELECT title, rowid, favorite FROM gameinfo ");
     sqlBuilder.append(view.getSqlQuery());
-    sqlBuilder.append(" ORDER BY title ASC");
+    sqlBuilder.append(" ORDER BY title COLLATE NOCASE ASC");
 
     logger.debug("Generated View SQL: {}", sqlBuilder);
     try (Connection conn = this.connect(); Statement stmt = conn.createStatement();
