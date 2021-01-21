@@ -860,7 +860,7 @@ public class FileManager
     {
       fis = new FileInputStream(zipFilePath);
       ZipArchiveInputStream zis = new ZipArchiveInputStream(fis);
-      ZipEntry ze = zis.getNextZipEntry();
+      ZipEntry ze = getFirstMatchingZipEntry(zis);
       if (ze != null)
       {
         String fileName = ze.getName();
@@ -885,6 +885,16 @@ public class FileManager
       ExceptionHandler.handleException(e, "Could not unzip downloaded file");
     }
     return filePath != null ? filePath.toFile() : null;
+  }
+  
+  private static ZipEntry getFirstMatchingZipEntry(ZipArchiveInputStream zis) throws IOException
+  {
+    ZipEntry ze = zis.getNextZipEntry();
+    if (ze != null && ze.getName().endsWith(".NFO"))
+    {
+      ze = zis.getNextZipEntry();
+    }
+    return ze;
   }
 
 }
