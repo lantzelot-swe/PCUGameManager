@@ -87,6 +87,10 @@ public class ScraperDialog extends BaseDialog
     {
       return getMobyGamesPanel().getScraperFields();
     }
+    else if (getScraperComboBox().getSelectedItem().equals(WWW_GAMEBASE_COM))
+    {
+      return getGb64comPanel().getScraperFields();
+    }
     else
     {
       return getC64comPanel().getScraperFields();
