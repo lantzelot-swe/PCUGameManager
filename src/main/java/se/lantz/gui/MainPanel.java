@@ -105,6 +105,7 @@ public class MainPanel extends JPanel
   public void addNewGame()
   {
     getListPanel().addNewGame();
+    repaintAfterModifications();
   }
 
   public void deleteCurrentGame()

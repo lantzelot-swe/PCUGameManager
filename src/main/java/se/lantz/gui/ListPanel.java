@@ -274,6 +274,7 @@ public class ListPanel extends JPanel
                 super.setSelectionInterval(anchor, lead);
                 mainPanel.getGameDetailsBackgroundPanel().updateSelectedGame(list.getSelectedValue());
                 uiModel.removeNewGameListData();
+                mainPanel.repaintAfterModifications();
               }
               else
               {

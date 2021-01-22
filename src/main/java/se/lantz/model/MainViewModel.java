@@ -392,6 +392,8 @@ public class MainViewModel extends AbstractModel
     else
     {
       dbConnector.deleteGame(currentGameId);
+      //Update all games count, will be reset if its All that is loaded
+      allGamesCount--;
       //Reload the current view
       reloadCurrentGameView();
     }
@@ -449,6 +451,9 @@ public class MainViewModel extends AbstractModel
   public void addNewGameListData()
   {
     gameListModel.addElement(new GameListData("New Game", "", 0));
+    selectedGameView.setGameCount(gameListModel.getSize());
+    //Update all games count 
+    allGamesCount++;
   }
 
   public void removeNewGameListData()
@@ -456,6 +461,9 @@ public class MainViewModel extends AbstractModel
     if (gameListModel.get(gameListModel.getSize() - 1).getGameId().isEmpty())
     {
       gameListModel.remove(gameListModel.getSize() - 1);
+      selectedGameView.setGameCount(gameListModel.getSize());
+      //Update all games count 
+      allGamesCount--;
       resetDataChanged();
     }
   }
