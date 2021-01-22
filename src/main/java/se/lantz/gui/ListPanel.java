@@ -377,7 +377,7 @@ public class ListPanel extends JPanel
     if (!uiModel.isDataChanged())
     {
       uiModel.toggleFavorite(list.getSelectedValue());
-
+      mainPanel.repaintAfterModifications();
     }
   }
 }

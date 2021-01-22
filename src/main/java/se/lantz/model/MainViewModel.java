@@ -34,6 +34,8 @@ public class MainViewModel extends AbstractModel
 
   private GameView selectedGameView;
   private int allGamesCount = 0;
+  private int favoritesCount = 0;
+  private GameView favoritesView;
 
   private InfoModel infoModel = new InfoModel();
   private JoystickModel joy1Model = new JoystickModel(true);
@@ -92,11 +94,13 @@ public class MainViewModel extends AbstractModel
     selectedGameView = new GameView(GameView.ALL_GAMES_ID);
     selectedGameView.setName("All Games");
     selectedGameView.setSqlQuery("");
-    gameViewModel.addElement(selectedGameView);
+    
     //Add favorites view
-    GameView favoritesView = new GameView(GameView.FAVORITES_ID);
+    favoritesView = new GameView(GameView.FAVORITES_ID);
     favoritesView.setName("Favorites");
     favoritesView.setSqlQuery(" WHERE Favorite = 1");
+    
+    gameViewModel.addElement(selectedGameView);
     gameViewModel.addElement(favoritesView);
 
     List<GameView> gameViewList = dbConnector.loadGameViews();
@@ -238,6 +242,16 @@ public class MainViewModel extends AbstractModel
       if (gameView.getGameViewId() == GameView.ALL_GAMES_ID)
       {
         this.allGamesCount = gamesList.size();
+        //Update favorites count
+        favoritesCount = 0;
+        for (GameListData gameListData : gamesList)
+        {
+          if (gameListData.isFavorite())
+          {
+            favoritesCount++;
+          }
+        }
+        favoritesView.setGameCount(favoritesCount);
       }
       this.disableChangeNotification(false);
       logger.debug("...done.");
@@ -474,6 +488,14 @@ public class MainViewModel extends AbstractModel
     {
       dbConnector.toggleFavorite(data.getGameId(), data.getFavorite());
       data.toggleFavorite();
+      if (data.isFavorite())
+      {
+        favoritesView.setGameCount(++favoritesCount);
+      }
+      else
+      {
+        favoritesView.setGameCount(--favoritesCount);
+      }
       gameListModel.notifyChange();
     }
   }
