@@ -329,7 +329,7 @@ public class ScreenshotsPanel extends JPanel
       GridBagConstraints gbc_changeCoverButton = new GridBagConstraints();
       gbc_changeCoverButton.weightx = 1.0;
       gbc_changeCoverButton.anchor = GridBagConstraints.NORTHWEST;
-      gbc_changeCoverButton.insets = new Insets(0, 5, 5, 0);
+      gbc_changeCoverButton.insets = new Insets(0, 5, 0, 5);
       gbc_changeCoverButton.gridx = 0;
       gbc_changeCoverButton.gridy = 2;
       coverPanel.add(getChangeCoverButton(), gbc_changeCoverButton);
