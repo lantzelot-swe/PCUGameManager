@@ -35,6 +35,7 @@ public class MainViewModel extends AbstractModel
   private GameView selectedGameView;
   private int allGamesCount = 0;
   private int favoritesCount = 0;
+  private GameView allGameView;
   private GameView favoritesView;
 
   private InfoModel infoModel = new InfoModel();
@@ -91,16 +92,18 @@ public class MainViewModel extends AbstractModel
   private void setupGameViews()
   {
     //Setup game views
-    selectedGameView = new GameView(GameView.ALL_GAMES_ID);
-    selectedGameView.setName("All Games");
-    selectedGameView.setSqlQuery("");
+    allGameView = new GameView(GameView.ALL_GAMES_ID);
+    
+    allGameView.setName("All Games");
+    allGameView.setSqlQuery("");   
+    selectedGameView = allGameView;
     
     //Add favorites view
     favoritesView = new GameView(GameView.FAVORITES_ID);
     favoritesView.setName("Favorites");
     favoritesView.setSqlQuery(" WHERE Favorite = 1");
     
-    gameViewModel.addElement(selectedGameView);
+    gameViewModel.addElement(allGameView);
     gameViewModel.addElement(favoritesView);
 
     List<GameView> gameViewList = dbConnector.loadGameViews();
@@ -408,6 +411,7 @@ public class MainViewModel extends AbstractModel
       dbConnector.deleteGame(currentGameId);
       //Update all games count, will be reset if its All that is loaded
       allGamesCount--;
+      allGameView.setGameCount(allGamesCount);
       //Reload the current view
       reloadCurrentGameView();
     }
@@ -468,6 +472,7 @@ public class MainViewModel extends AbstractModel
     selectedGameView.setGameCount(gameListModel.getSize());
     //Update all games count 
     allGamesCount++;
+    allGameView.setGameCount(allGamesCount);
   }
 
   public void removeNewGameListData()
@@ -478,6 +483,7 @@ public class MainViewModel extends AbstractModel
       selectedGameView.setGameCount(gameListModel.getSize());
       //Update all games count 
       allGamesCount--;
+      allGameView.setGameCount(allGamesCount);
       resetDataChanged();
     }
   }
