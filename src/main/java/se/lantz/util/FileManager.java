@@ -320,6 +320,10 @@ public class FileManager
     fw.write("T:" + gameDetails.getTitle() + "\n");
     fw.write("X:" + gameDetails.getSystem() + "\n");
     fw.write("D:en:" + gameDetails.getDescription() + "\n");
+    fw.write("D:de:" + (gameDetails.getDescriptionDe().isEmpty() ? gameDetails.getDescription() : gameDetails.getDescriptionDe()) + "\n");
+    fw.write("D:fr:" + (gameDetails.getDescriptionFr().isEmpty() ? gameDetails.getDescription() : gameDetails.getDescriptionFr()) + "\n");
+    fw.write("D:es:" + (gameDetails.getDescriptionEs().isEmpty() ? gameDetails.getDescription() : gameDetails.getDescriptionEs()) + "\n");
+    fw.write("D:it:" + (gameDetails.getDescriptionIt().isEmpty() ? gameDetails.getDescription() : gameDetails.getDescriptionIt()) + "\n");
     if (!gameDetails.getAuthor().isEmpty())
     {
       fw.write("A:" + gameDetails.getAuthor() + "\n");
@@ -329,6 +333,7 @@ public class FileManager
       fw.write("M:" + gameDetails.getComposer() + "\n");
     }
     fw.write("E:" + gameDetails.getGenre() + "\n");
+    fw.write("Y:" + gameDetails.getYear() + "\n");
     if (favFormat)
     {
       String folderName = generateFileNameFromTitle(gameDetails.getTitle());

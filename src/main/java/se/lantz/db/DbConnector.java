@@ -72,6 +72,10 @@ public class DbConnector
     columnList.add(DbConstants.COMPOSER);
     columnList.add(DbConstants.GENRE);
     columnList.add(DbConstants.DESC);
+    columnList.add(DbConstants.DESC_DE);
+    columnList.add(DbConstants.DESC_FR);
+    columnList.add(DbConstants.DESC_ES);
+    columnList.add(DbConstants.DESC_IT);
     columnList.add(DbConstants.GAME);
     columnList.add(DbConstants.COVER);
     columnList.add(DbConstants.SCREEN1);
@@ -88,6 +92,8 @@ public class DbConnector
       createNewDb();
       logger.debug("Database missing, new db created.");
     }
+    //To be backwards compatible with 1.0 db, update if missing
+    addLanguageColumnsIfMissing();
   }
 
   private void createNewDb()
@@ -103,6 +109,49 @@ public class DbConnector
     catch (SQLException e)
     {
       ExceptionHandler.handleException(e, "Could not cretate db tables");
+    }
+  }
+  
+  private void addLanguageColumnsIfMissing()
+  { 
+    String tableInfoSql = "PRAGMA table_info(gameinfo)";
+    String addDeSql = "ALTER TABLE gameinfo ADD COLUMN Description_de STRING;";
+    String addFrSql = "ALTER TABLE gameinfo ADD COLUMN Description_fr STRING;";
+    String addEsSql = "ALTER TABLE gameinfo ADD COLUMN Description_es STRING;";
+    String addItSql = "ALTER TABLE gameinfo ADD COLUMN Description_it STRING;";
+    
+    try (Connection conn = this.connect(); PreparedStatement stmnt = conn.prepareStatement(tableInfoSql);
+      ResultSet rs = stmnt.executeQuery();
+      Statement addDestmnt = conn.createStatement();
+      Statement addFrstmnt = conn.createStatement();
+      Statement addEsstmnt = conn.createStatement();
+      Statement addItstmnt = conn.createStatement();
+      )
+    {
+      boolean columnsAvailable = false;
+      while (rs.next())
+      {
+        //Check if one of the language columns are available
+        if (rs.getString("Name").equals("Description_de"))
+        {
+          columnsAvailable = true;
+          break;
+        }
+      }
+      
+      if (!columnsAvailable)
+      {
+        logger.debug("Language columns are missing in the database, adding columns.");
+        addDestmnt.executeUpdate(addDeSql);
+        addFrstmnt.executeUpdate(addFrSql);
+        addEsstmnt.executeUpdate(addEsSql);
+        addItstmnt.executeUpdate(addItSql);
+        logger.debug("Language columns added.");
+      }
+    }
+    catch (SQLException e)
+    {
+      ExceptionHandler.handleException(e, "Could not update db for language columns");
     }
   }
 
@@ -568,6 +617,10 @@ public class DbConnector
       returnValue.setComposer(rs.getString(DbConstants.COMPOSER));
       returnValue.setGenre(rs.getString(DbConstants.GENRE));
       returnValue.setDescription(rs.getString(DbConstants.DESC));
+      returnValue.setDescriptionDe(rs.getString(DbConstants.DESC_DE));
+      returnValue.setDescriptionFr(rs.getString(DbConstants.DESC_FR));
+      returnValue.setDescriptionEs(rs.getString(DbConstants.DESC_ES));
+      returnValue.setDescriptionIt(rs.getString(DbConstants.DESC_IT));
       returnValue.setGame(rs.getString(DbConstants.GAME));
       returnValue.setCover(rs.getString(DbConstants.COVER));
       returnValue.setScreen1(rs.getString(DbConstants.SCREEN1));
@@ -631,6 +684,14 @@ public class DbConnector
     st.append(details.getGenre());
     st.append(COMMA);
     st.append(details.getDescription());
+    st.append(COMMA);
+    st.append(details.getDescriptionDe());
+    st.append(COMMA);
+    st.append(details.getDescriptionFr());
+    st.append(COMMA);
+    st.append(details.getDescriptionEs());
+    st.append(COMMA);
+    st.append(details.getDescriptionIt());
     st.append(COMMA);
     st.append(details.getGame());
     st.append(COMMA);
@@ -702,6 +763,22 @@ public class DbConnector
     sqlBuilder.append(DbConstants.DESC);
     sqlBuilder.append("=\"");
     sqlBuilder.append(details.getDescription());
+    sqlBuilder.append("\",");
+    sqlBuilder.append(DbConstants.DESC_DE);
+    sqlBuilder.append("=\"");
+    sqlBuilder.append(details.getDescriptionDe());
+    sqlBuilder.append("\",");
+    sqlBuilder.append(DbConstants.DESC_FR);
+    sqlBuilder.append("=\"");
+    sqlBuilder.append(details.getDescriptionFr());
+    sqlBuilder.append("\",");
+    sqlBuilder.append(DbConstants.DESC_ES);
+    sqlBuilder.append("=\"");
+    sqlBuilder.append(details.getDescriptionEs());
+    sqlBuilder.append("\",");
+    sqlBuilder.append(DbConstants.DESC_IT);
+    sqlBuilder.append("=\"");
+    sqlBuilder.append(details.getDescriptionIt());
     sqlBuilder.append("\",");
     sqlBuilder.append(DbConstants.GAME);
     sqlBuilder.append("=\"");

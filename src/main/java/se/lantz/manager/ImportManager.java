@@ -148,6 +148,10 @@ public class ImportManager
     String composer = "";
     String genre = "";
     String description = "";
+    String description_de = "";
+    String description_fr = "";
+    String description_es = "";
+    String description_it = "";
     String gamefile = "";
     String coverfile = "";
     String screen1file = "";
@@ -182,6 +186,22 @@ public class ImportManager
       else if (line.startsWith("D:en"))
       {
         description = line.replace("\"", "\"\"").substring(5);
+      }
+      else if (line.startsWith("D:de"))
+      {
+        description_de = line.replace("\"", "\"\"").substring(5);
+      }
+      else if (line.startsWith("D:fr"))
+      {
+        description_fr = line.replace("\"", "\"\"").substring(5);
+      }
+      else if (line.startsWith("D:es"))
+      {
+        description_es = line.replace("\"", "\"\"").substring(5);
+      }
+      else if (line.startsWith("D:it"))
+      {
+        description_it = line.replace("\"", "\"\"").substring(5);
       }
       else if (line.startsWith("F:"))
       {
@@ -241,6 +261,25 @@ public class ImportManager
         verticalShift = line.substring(2);
       }
     }
+    
+    //Check if other languages are the same as english. If that's the case don't import it, leave it empty.
+    if (description_de.equals(description))
+    {
+      description_de = "";
+    }
+    if (description_fr.equals(description))
+    {
+      description_fr = "";
+    }
+    if (description_es.equals(description))
+    {
+      description_es = "";
+    }
+    if (description_it.equals(description))
+    {
+      description_it = "";
+    }
+      
     // Construct a data row
     List<String> list = Arrays.asList(title,
                                       year,
@@ -248,6 +287,10 @@ public class ImportManager
                                       composer,
                                       genre,
                                       description,
+                                      description_de,
+                                      description_fr,
+                                      description_es,
+                                      description_it,
                                       gamefile,
                                       coverfile,
                                       screen1file,
@@ -293,10 +336,10 @@ public class ImportManager
 
     String[] splittedForPaths = dbRowData.split("\",\"");
 
-    gameName = splittedForPaths[6];
-    coverName = splittedForPaths[7];
-    screen1Name = splittedForPaths[8];
-    screen2Name = splittedForPaths[9];
+    gameName = splittedForPaths[10];
+    coverName = splittedForPaths[11];
+    screen1Name = splittedForPaths[12];
+    screen2Name = splittedForPaths[13];
     //Copy!
 
     Path coverPath = srcCoversFolder.resolve(coverName);

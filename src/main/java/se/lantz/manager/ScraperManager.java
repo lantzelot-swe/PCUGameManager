@@ -99,6 +99,11 @@ public class ScraperManager
       {
         infoModel.setGenre(genre);
       }
+      else
+      {
+        //Use first one as default
+        infoModel.setGenre("adventure");
+      }
     }
     if (fields.isComposer())
     {

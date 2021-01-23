@@ -5,18 +5,21 @@ import se.lantz.model.JoystickModel;
 /**
  * The data structure representing a specific game.
  * 
- * @author Mikael
+ * @author lantzelot
  *
  */
 public class GameDetails
 {
-
   private String title = "";
   private int year = 1986;
   private String author = "";
   private String composer = "";
   private String genre = "";
   private String description = "";
+  private String description_de = "";
+  private String description_fr = "";
+  private String description_es = "";
+  private String description_it = "";
   private String game = "";
   private String cover = "";
   private String screen1 = "";
@@ -51,6 +54,46 @@ public class GameDetails
   public void setDescription(String description)
   {
     this.description = description == null ? "" : description;
+  }
+  
+  public String getDescriptionDe()
+  {
+    return description_de;
+  }
+
+  public void setDescriptionDe(String description)
+  {
+    this.description_de = description == null ? "" : description;
+  }
+  
+  public String getDescriptionFr()
+  {
+    return description_fr;
+  }
+
+  public void setDescriptionFr(String description)
+  {
+    this.description_fr = description == null ? "" : description;
+  }
+  
+  public String getDescriptionEs()
+  {
+    return description_es;
+  }
+
+  public void setDescriptionEs(String description)
+  {
+    this.description_es = description == null ? "" : description;
+  }
+  
+  public String getDescriptionIt()
+  {
+    return description_it;
+  }
+
+  public void setDescriptionIt(String description)
+  {
+    this.description_it = description == null ? "" : description;
   }
 
   public int getYear()

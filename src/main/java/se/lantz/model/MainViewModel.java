@@ -149,6 +149,10 @@ public class MainViewModel extends AbstractModel
 
     infoModel.setTitle(details.getTitle());
     infoModel.setDescription(details.getDescription());
+    infoModel.setDescriptionDe(details.getDescriptionDe());
+    infoModel.setDescriptionFr(details.getDescriptionFr());
+    infoModel.setDescriptionEs(details.getDescriptionEs());
+    infoModel.setDescriptionIt(details.getDescriptionIt());
     infoModel.setYear(details.getYear());
     infoModel.setAuthor(details.getAuthor());
     infoModel.setGenre(details.getGenre());
@@ -355,6 +359,10 @@ public class MainViewModel extends AbstractModel
       updatedGame.setComposer(infoModel.getComposer().replace("\"", "\"\""));
       updatedGame.setGenre(infoModel.getGenre());
       updatedGame.setDescription(infoModel.getDescription().replace("\"", "\"\""));
+      updatedGame.setDescriptionDe(infoModel.getDescriptionDe().replace("\"", "\"\""));
+      updatedGame.setDescriptionFr(infoModel.getDescriptionFr().replace("\"", "\"\""));
+      updatedGame.setDescriptionEs(infoModel.getDescriptionEs().replace("\"", "\"\""));
+      updatedGame.setDescriptionIt(infoModel.getDescriptionIt().replace("\"", "\"\""));
       updatedGame.setGame(infoModel.getGamesFile());
       updatedGame.setCover(infoModel.getCoverFile());
       updatedGame.setScreen1(infoModel.getScreens1File());

@@ -13,6 +13,10 @@ public class InfoModel extends AbstractModel
   //Use this when saving cover/screen/game files: If the title has been changed the files shall be renamed.
   private String titleInDb = "";
   private String description = "";
+  private String description_de = "";
+  private String description_fr = "";
+  private String description_es = "";
+  private String description_it  = "";
   private int year = 0;
   private String genre = "";
   private String composer = "";
@@ -71,6 +75,74 @@ public class InfoModel extends AbstractModel
     //Replace all double spaces, tabs and newlines
     this.description = description.replaceAll("\\s\\s+", " ");
     this.description = this.description.replace("\t", " ");
+    if (!Objects.equals(old, description))
+    {
+      notifyChange();
+    }
+  }
+  
+  public String getDescriptionDe()
+  {
+    return description_de;
+  }
+
+  public void setDescriptionDe(String description)
+  {
+    String old = getDescriptionDe();
+    //Replace all double spaces, tabs and newlines
+    this.description_de = description.replaceAll("\\s\\s+", " ");
+    this.description_de = this.description_de.replace("\t", " ");
+    if (!Objects.equals(old, description))
+    {
+      notifyChange();
+    }
+  }
+  
+  public String getDescriptionFr()
+  {
+    return description_fr;
+  }
+
+  public void setDescriptionFr(String description)
+  {
+    String old = getDescriptionFr();
+    //Replace all double spaces, tabs and newlines
+    this.description_fr = description.replaceAll("\\s\\s+", " ");
+    this.description_fr = this.description_fr.replace("\t", " ");
+    if (!Objects.equals(old, description))
+    {
+      notifyChange();
+    }
+  }
+  
+  public String getDescriptionEs()
+  {
+    return description_es;
+  }
+
+  public void setDescriptionEs(String description)
+  {
+    String old = getDescriptionEs();
+    //Replace all double spaces, tabs and newlines
+    this.description_es = description.replaceAll("\\s\\s+", " ");
+    this.description_es = this.description_es.replace("\t", " ");
+    if (!Objects.equals(old, description))
+    {
+      notifyChange();
+    }
+  }
+  
+  public String getDescriptionIt()
+  {
+    return description_it;
+  }
+
+  public void setDescriptionIt(String description)
+  {
+    String old = getDescriptionIt();
+    //Replace all double spaces, tabs and newlines
+    this.description_it = description.replaceAll("\\s\\s+", " ");
+    this.description_it = this.description_it.replace("\t", " ");
     if (!Objects.equals(old, description))
     {
       notifyChange();

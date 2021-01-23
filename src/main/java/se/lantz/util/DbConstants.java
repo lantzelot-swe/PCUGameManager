@@ -8,6 +8,10 @@ public class DbConstants
   public static final String COMPOSER = "Composer";
   public static final String GENRE = "Genre";
   public static final String DESC = "Description";
+  public static final String DESC_DE = "Description_de";
+  public static final String DESC_FR = "Description_fr";
+  public static final String DESC_ES = "Description_es";
+  public static final String DESC_IT = "Description_it";
   public static final String GAME = "Gamefile";
   public static final String COVER = "Coverfile";
   public static final String SCREEN1 = "Screen1file";
