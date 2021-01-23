@@ -5,6 +5,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import se.lantz.gui.MainWindow;
 import se.lantz.model.InfoModel;
 import se.lantz.model.MainViewModel;
 import se.lantz.model.SystemModel;
@@ -91,6 +92,7 @@ public class ScraperManager
     if (fields.isDescription())
     {
       infoModel.setDescription(usedScraper.getDescription());
+      MainWindow.getInstance().getMainPanel().selectEnDescriptionTab();
     }
     if (fields.isGenre())
     {

@@ -174,4 +174,9 @@ public class MainPanel extends JPanel
       getGameDetailsBackgroundPanel().runCurrentGame();
     }
   }
+  
+  public void selectEnDescriptionTab()
+  {
+    getGameDetailsBackgroundPanel().getInfoPanel().selectEnDescriptionTab();
+  }
 }

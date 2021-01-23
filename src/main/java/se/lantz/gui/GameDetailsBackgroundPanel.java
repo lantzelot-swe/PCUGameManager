@@ -159,7 +159,7 @@ public class GameDetailsBackgroundPanel extends JPanel
     return settingsPanel;
   }
 
-  private InfoPanel getInfoPanel()
+  protected InfoPanel getInfoPanel()
   {
     if (infoPanel == null)
     {

@@ -401,4 +401,9 @@ public class InfoPanel extends JPanel
     }
     return descriptionItPanel;
   }
+  
+  public void selectEnDescriptionTab()
+  {
+    getDescriptionTabbedPane().setSelectedIndex(0);
+  }
 }
