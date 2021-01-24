@@ -367,27 +367,11 @@ public class MenuManager
       {
         exportManager.setGamesToExport(gamesList);
         exportManager.setExportFormat(exportSelectionDialog.isFavFormat());
-        final JFileChooser fileChooser = new JFileChooser();
-        fileChooser.setDialogTitle("Select a directory to export to");
-        fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-        String exportDir = FileManager.getConfiguredProperties().getProperty(EXPORT_DIR_PROPERTY);
-        if (exportDir == null)
-        {
-          exportDir = ".";
-        }
-        fileChooser.setCurrentDirectory(new File(exportDir));
-        fileChooser.setApproveButtonText("Export");
-        int value = fileChooser.showDialog(this.mainWindow, "Export");
-        if (value == JFileChooser.APPROVE_OPTION)
-        {
-          File selectedDir = fileChooser.getSelectedFile();
-          FileManager.getConfiguredProperties().put(EXPORT_DIR_PROPERTY, selectedDir.toPath().toString());
-          exportManager.setTargerDirectory(selectedDir);
-          ExportProgressDialog dialog = new ExportProgressDialog(this.mainWindow);
-          ExportWorker worker = new ExportWorker(exportManager, dialog);
-          worker.execute();
-          dialog.setVisible(true);
-        }
+        exportManager.setTargetDirectory(exportSelectionDialog.getTargetDirectory(), exportSelectionDialog.deleteBeforeExport());
+        ExportProgressDialog dialog = new ExportProgressDialog(this.mainWindow);
+        ExportWorker worker = new ExportWorker(exportManager, dialog);
+        worker.execute();
+        dialog.setVisible(true);
       }
     }
   }

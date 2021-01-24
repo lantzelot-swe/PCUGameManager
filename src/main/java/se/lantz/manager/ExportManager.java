@@ -6,6 +6,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.Comparator;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -25,6 +26,7 @@ public class ExportManager
   private File targetDir;
   private MainViewModel uiModel;
   private boolean favFormat = false;
+  private boolean deleteBeforeExport = false;
 
   public ExportManager(MainViewModel uiModel)
   {
@@ -36,9 +38,25 @@ public class ExportManager
     this.gamesList = gamesList;
   }
 
-  public void setTargerDirectory(File targetDir)
+  public void setTargetDirectory(File targetDir, boolean delete)
   {
+    this.deleteBeforeExport  = delete;
     Path targetDirPath = targetDir.toPath().resolve("games");
+    if (delete)
+    {
+      try
+      {
+        if (Files.exists(targetDirPath))
+        {
+          Files.walk(targetDirPath).sorted(Comparator.reverseOrder()).map(Path::toFile).forEach(File::delete);
+        }
+      }
+      catch (IOException e)
+      {
+        ExceptionHandler.handleException(e, "Could not delete games folder");
+      }
+    }
+    
     this.targetDir = targetDirPath.toFile();
     try
     {
@@ -49,7 +67,7 @@ public class ExportManager
       ExceptionHandler.handleException(e, "Could not create " + targetDirPath);
     }
   }
-
+  
   public void readFromDb(StringBuilder infoBuilder)
   {
     gameDetailsList = uiModel.readGameDetailsForExport(infoBuilder, gamesList);
@@ -57,10 +75,19 @@ public class ExportManager
 
   public void createGameInfoFiles(StringBuilder infoBuilder)
   {
+    if (deleteBeforeExport)
+    {
+      infoBuilder.append("Deleted existing games folder before creating new game files\n");
+    }
     for (GameDetails gameDetails : gameDetailsList)
     {
       uiModel.exportGameInfoFile(gameDetails, targetDir, this.favFormat, infoBuilder);
     }
+  }
+  
+  public void deleteSelectedGamesFolder()
+  {
+    
   }
 
   public void setExportFormat(boolean favFormat)
@@ -152,5 +179,6 @@ public class ExportManager
     gameDetailsList.clear();
     targetDir = null;
     favFormat = false;
+    deleteBeforeExport = false;
   }
 }

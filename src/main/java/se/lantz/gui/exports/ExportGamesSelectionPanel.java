@@ -6,6 +6,7 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -28,6 +29,8 @@ import se.lantz.model.data.GameView;
 import javax.swing.JRadioButton;
 import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
+import se.lantz.gui.SelectDirPanel;
+import javax.swing.JCheckBox;
 
 public class ExportGamesSelectionPanel extends JPanel
 {
@@ -52,9 +55,16 @@ public class ExportGamesSelectionPanel extends JPanel
   private JRadioButton maxiFormatRadioButton;
   private JRadioButton favFormatRadioButton;
   private final ButtonGroup formatGroup = new ButtonGroup();
+  private JPanel outputDirPanel;
+  private JLabel outputDirLabel;
+  private SelectDirPanel selectDirPanel;
+  private JCheckBox deleteCheckBox;
+  private JButton exportButton;
 
-  public ExportGamesSelectionPanel()
+  public ExportGamesSelectionPanel(JButton exportButton)
   {
+    this.exportButton = exportButton;
+    exportButton.setEnabled(false);
     uiModel = new MainViewModel();
     GridBagLayout gridBagLayout = new GridBagLayout();
     setLayout(gridBagLayout);
@@ -174,9 +184,7 @@ public class ExportGamesSelectionPanel extends JPanel
                 selectedListModel.addElement(gameListData);
               }
             }
-            sortSelectedList();
-            getWarningLabel().setVisible(selectedListModel.getSize() > 226);
-            getCountLabel().setText(Integer.toString(selectedListModel.getSize()));
+            updateAfterEditingSelectedList();
           }
         });
       addButton.setEnabled(false);
@@ -200,14 +208,20 @@ public class ExportGamesSelectionPanel extends JPanel
             {
               selectedListModel.removeElement(gameListData);
             }
-            sortSelectedList();
-            getWarningLabel().setVisible(selectedListModel.getSize() > MAX_GAMES);
-            getCountLabel().setText(Integer.toString(selectedListModel.getSize()));
+            updateAfterEditingSelectedList();
           }
         });
       removeButton.setEnabled(false);
     }
     return removeButton;
+  }
+  
+  private void updateAfterEditingSelectedList()
+  {
+    sortSelectedList();
+    getWarningLabel().setVisible(selectedListModel.getSize() > MAX_GAMES);
+    exportButton.setEnabled(selectedListModel.getSize() > 0);
+    getCountLabel().setText(Integer.toString(selectedListModel.getSize()));
   }
 
   private JPanel getSelectedListPanel()
@@ -374,11 +388,13 @@ public class ExportGamesSelectionPanel extends JPanel
     {
       formatPanel = new JPanel();
       GridBagLayout gbl_formatPanel = new GridBagLayout();
+      gbl_formatPanel.rowWeights = new double[]{0.0, 0.0, 0.0, 1.0};
+      gbl_formatPanel.columnWeights = new double[]{1.0};
       formatPanel.setLayout(gbl_formatPanel);
       GridBagConstraints gbc_formatInfoLabel = new GridBagConstraints();
       gbc_formatInfoLabel.weightx = 1.0;
       gbc_formatInfoLabel.anchor = GridBagConstraints.WEST;
-      gbc_formatInfoLabel.insets = new Insets(10, 10, 5, 5);
+      gbc_formatInfoLabel.insets = new Insets(10, 10, 5, 0);
       gbc_formatInfoLabel.gridx = 0;
       gbc_formatInfoLabel.gridy = 0;
       formatPanel.add(getFormatInfoLabel(), gbc_formatInfoLabel);
@@ -397,6 +413,12 @@ public class ExportGamesSelectionPanel extends JPanel
       gbc_favFormatRadioButton.gridx = 0;
       gbc_favFormatRadioButton.gridy = 2;
       formatPanel.add(getFavFormatRadioButton(), gbc_favFormatRadioButton);
+      GridBagConstraints gbc_outputDirPanel = new GridBagConstraints();
+      gbc_outputDirPanel.insets = new Insets(10, 0, 0, 0);
+      gbc_outputDirPanel.fill = GridBagConstraints.BOTH;
+      gbc_outputDirPanel.gridx = 0;
+      gbc_outputDirPanel.gridy = 3;
+      formatPanel.add(getOutputDirPanel(), gbc_outputDirPanel);
     }
     return formatPanel;
   }
@@ -430,5 +452,63 @@ public class ExportGamesSelectionPanel extends JPanel
       formatGroup.add(favFormatRadioButton);
     }
     return favFormatRadioButton;
+  }
+  private JPanel getOutputDirPanel() {
+    if (outputDirPanel == null) {
+    	outputDirPanel = new JPanel();
+    	GridBagLayout gbl_outputDirPanel = new GridBagLayout();
+    	gbl_outputDirPanel.columnWidths = new int[]{0, 0};
+    	gbl_outputDirPanel.rowHeights = new int[]{0, 0, 0, 0};
+    	gbl_outputDirPanel.columnWeights = new double[]{1.0, Double.MIN_VALUE};
+    	gbl_outputDirPanel.rowWeights = new double[]{0.0, 1.0, 0.0, Double.MIN_VALUE};
+    	outputDirPanel.setLayout(gbl_outputDirPanel);
+    	GridBagConstraints gbc_outputDirLabel = new GridBagConstraints();
+    	gbc_outputDirLabel.anchor = GridBagConstraints.WEST;
+    	gbc_outputDirLabel.insets = new Insets(0, 10, 0, 0);
+    	gbc_outputDirLabel.gridx = 0;
+    	gbc_outputDirLabel.gridy = 0;
+    	outputDirPanel.add(getOutputDirLabel(), gbc_outputDirLabel);
+    	GridBagConstraints gbc_selectDirPanel = new GridBagConstraints();
+    	gbc_selectDirPanel.insets = new Insets(0, 5, 5, 0);
+    	gbc_selectDirPanel.fill = GridBagConstraints.BOTH;
+    	gbc_selectDirPanel.gridx = 0;
+    	gbc_selectDirPanel.gridy = 1;
+    	outputDirPanel.add(getSelectDirPanel(), gbc_selectDirPanel);
+    	GridBagConstraints gbc_deleteCheckBox = new GridBagConstraints();
+    	gbc_deleteCheckBox.insets = new Insets(0, 10, 0, 0);
+    	gbc_deleteCheckBox.anchor = GridBagConstraints.WEST;
+    	gbc_deleteCheckBox.gridx = 0;
+    	gbc_deleteCheckBox.gridy = 2;
+    	outputDirPanel.add(getDeleteCheckBox(), gbc_deleteCheckBox);
+    }
+    return outputDirPanel;
+  }
+  private JLabel getOutputDirLabel() {
+    if (outputDirLabel == null) {
+    	outputDirLabel = new JLabel("Select directory to export to:");
+    }
+    return outputDirLabel;
+  }
+  private SelectDirPanel getSelectDirPanel() {
+    if (selectDirPanel == null) {
+    	selectDirPanel = new SelectDirPanel(false);
+    }
+    return selectDirPanel;
+  }
+  private JCheckBox getDeleteCheckBox() {
+    if (deleteCheckBox == null) {
+    	deleteCheckBox = new JCheckBox("Delete existing games in the selected directory before exporting");
+    }
+    return deleteCheckBox;
+  }
+  
+  File getTargetDirectory()
+  {
+    return getSelectDirPanel().getTargetDirectory();
+  }
+  
+  boolean deleteBeforeExport()
+  {
+    return getDeleteCheckBox().isSelected();
   }
 }
