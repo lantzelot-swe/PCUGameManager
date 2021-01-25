@@ -47,4 +47,9 @@ public class ExportGamesDialog extends BaseDialog
   {
     return getExportGamesPanel().deleteBeforeExport();
   }
+  
+  public boolean addGamesSubDirectory()
+  {
+    return getExportGamesPanel().addGamesSubDirectory();
+  }
 }

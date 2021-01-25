@@ -38,17 +38,45 @@ public class ExportManager
     this.gamesList = gamesList;
   }
 
-  public void setTargetDirectory(File targetDir, boolean delete)
+  public void setTargetDirectory(File targetDir, boolean delete, boolean gamesDir)
   {
-    this.deleteBeforeExport  = delete;
-    Path targetDirPath = targetDir.toPath().resolve("games");
+    this.deleteBeforeExport = delete;
+    Path targetDirPath = targetDir.toPath();
+
     if (delete)
     {
       try
       {
         if (Files.exists(targetDirPath))
         {
-          Files.walk(targetDirPath).sorted(Comparator.reverseOrder()).map(Path::toFile).forEach(File::delete);
+          if (Files.exists(targetDirPath.resolve("games").resolve("games")))
+          {
+            //Delete entire games folder
+            Files.walk(targetDirPath.resolve("games")).sorted(Comparator.reverseOrder()).map(Path::toFile)
+              .forEach(File::delete);
+          }
+          else
+          {
+            //Delete covers, screens, and games folders and all tsg files
+            if (Files.exists(targetDirPath.resolve("covers")))
+            {
+              Files.walk(targetDirPath.resolve("covers")).sorted(Comparator.reverseOrder()).map(Path::toFile)
+                .forEach(File::delete);
+            }
+            if (Files.exists(targetDirPath.resolve("screens")))
+            {
+              Files.walk(targetDirPath.resolve("screens")).sorted(Comparator.reverseOrder()).map(Path::toFile)
+                .forEach(File::delete);
+            }
+            if (Files.exists(targetDirPath.resolve("games")))
+            {
+              Files.walk(targetDirPath.resolve("games")).sorted(Comparator.reverseOrder()).map(Path::toFile)
+                .forEach(File::delete);
+            }
+
+            Files.walk(targetDirPath, 1).filter(p -> p.toString().endsWith(".tsg")).map(Path::toFile)
+              .forEach(File::delete);
+          }
         }
       }
       catch (IOException e)
@@ -56,7 +84,12 @@ public class ExportManager
         ExceptionHandler.handleException(e, "Could not delete games folder");
       }
     }
-    
+
+    if (gamesDir)
+    {
+      targetDirPath = targetDirPath.resolve("games");
+    }
+
     this.targetDir = targetDirPath.toFile();
     try
     {
@@ -67,7 +100,7 @@ public class ExportManager
       ExceptionHandler.handleException(e, "Could not create " + targetDirPath);
     }
   }
-  
+
   public void readFromDb(StringBuilder infoBuilder)
   {
     gameDetailsList = uiModel.readGameDetailsForExport(infoBuilder, gamesList);
@@ -75,19 +108,15 @@ public class ExportManager
 
   public void createGameInfoFiles(StringBuilder infoBuilder)
   {
-    if (deleteBeforeExport)
-    {
-      infoBuilder.append("Deleted existing games folder before creating new game files\n");
-    }
     for (GameDetails gameDetails : gameDetailsList)
     {
       uiModel.exportGameInfoFile(gameDetails, targetDir, this.favFormat, infoBuilder);
     }
   }
-  
-  public void deleteSelectedGamesFolder()
+
+  public boolean isDeleteBeforeExport()
   {
-    
+    return deleteBeforeExport;
   }
 
   public void setExportFormat(boolean favFormat)

@@ -21,6 +21,10 @@ public class ExportWorker extends SwingWorker<Void, String>
   @Override
   protected Void doInBackground() throws Exception
   {
+    if (exportManager.isDeleteBeforeExport())
+    {
+      publish("Deleting existing games before exporting.\n");
+    }
     publish("Exporting from db...");
     StringBuilder infoBuilder = new StringBuilder();
     exportManager.readFromDb(infoBuilder);
