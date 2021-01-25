@@ -533,7 +533,7 @@ public class ExportGamesSelectionPanel extends JPanel
   {
     if (deleteCheckBox == null)
     {
-      deleteCheckBox = new JCheckBox("Delete existing games in the selected folder before exporting");
+      deleteCheckBox = new JCheckBox("Delete existing games in the selected directory before exporting");
       deleteCheckBox.setSelected(true);
     }
     return deleteCheckBox;
