@@ -282,24 +282,15 @@ public class FileManager
     return newNameString;
   }
 
-  public void exportGameInfoFile(GameDetails gameDetails, File targetDir, boolean favFormat, StringBuilder infoBuilder)
+  public void exportGameInfoFile(GameDetails gameDetails, File targetDir, StringBuilder infoBuilder)
   {
     try
     {
       String filename = generateFileNameFromTitle(gameDetails.getTitle());
-
       infoBuilder.append("Creating game info file for " + gameDetails.getTitle() + "\n");
-
-      if (favFormat)
-      {
-        filename = filename + ".tsg";
-      }
-      else
-      {
-        //Add -ms to comply with the maxi game tool.
-        filename = filename + "-ms.tsg";
-      }
-      writeGameInfoFile(filename, targetDir, gameDetails, favFormat);
+      //Add -ms to comply with the maxi game tool.
+      filename = filename + "-ms.tsg";
+      writeGameInfoFile(filename, targetDir, gameDetails);
     }
     catch (Exception e)
     {
@@ -309,8 +300,7 @@ public class FileManager
     }
   }
 
-  public void writeGameInfoFile(String fileName, File targetDir, GameDetails gameDetails, boolean favFormat)
-    throws IOException
+  public void writeGameInfoFile(String fileName, File targetDir, GameDetails gameDetails) throws IOException
   {
     Path outDirPath = targetDir.toPath();
     Path filePath = outDirPath.resolve(fileName);
@@ -320,10 +310,18 @@ public class FileManager
     fw.write("T:" + gameDetails.getTitle() + "\n");
     fw.write("X:" + gameDetails.getSystem() + "\n");
     fw.write("D:en:" + gameDetails.getDescription() + "\n");
-    fw.write("D:de:" + (gameDetails.getDescriptionDe().isEmpty() ? gameDetails.getDescription() : gameDetails.getDescriptionDe()) + "\n");
-    fw.write("D:fr:" + (gameDetails.getDescriptionFr().isEmpty() ? gameDetails.getDescription() : gameDetails.getDescriptionFr()) + "\n");
-    fw.write("D:es:" + (gameDetails.getDescriptionEs().isEmpty() ? gameDetails.getDescription() : gameDetails.getDescriptionEs()) + "\n");
-    fw.write("D:it:" + (gameDetails.getDescriptionIt().isEmpty() ? gameDetails.getDescription() : gameDetails.getDescriptionIt()) + "\n");
+    fw.write("D:de:" +
+      (gameDetails.getDescriptionDe().isEmpty() ? gameDetails.getDescription() : gameDetails.getDescriptionDe()) +
+      "\n");
+    fw.write("D:fr:" +
+      (gameDetails.getDescriptionFr().isEmpty() ? gameDetails.getDescription() : gameDetails.getDescriptionFr()) +
+      "\n");
+    fw.write("D:es:" +
+      (gameDetails.getDescriptionEs().isEmpty() ? gameDetails.getDescription() : gameDetails.getDescriptionEs()) +
+      "\n");
+    fw.write("D:it:" +
+      (gameDetails.getDescriptionIt().isEmpty() ? gameDetails.getDescription() : gameDetails.getDescriptionIt()) +
+      "\n");
     if (!gameDetails.getAuthor().isEmpty())
     {
       fw.write("A:" + gameDetails.getAuthor() + "\n");
@@ -334,35 +332,18 @@ public class FileManager
     }
     fw.write("E:" + gameDetails.getGenre() + "\n");
     fw.write("Y:" + gameDetails.getYear() + "\n");
-    if (favFormat)
+
+    fw.write("F:" + "games/" + gameDetails.getGame() + "\n");
+    fw.write("C:" + "covers/" + gameDetails.getCover() + "\n");
+    if (!gameDetails.getScreen1().isEmpty())
     {
-      String folderName = generateFileNameFromTitle(gameDetails.getTitle());
-      Path gamesfolderPath = outDirPath.resolve(folderName);
-      Files.createDirectories(gamesfolderPath);
-      fw.write("F:" + folderName + "/" + gameDetails.getGame() + "\n");
-      fw.write("C:" + folderName + "/" + gameDetails.getCover() + "\n");
-      if (!gameDetails.getScreen1().isEmpty())
-      {
-        fw.write("G:" + folderName + "/" + gameDetails.getScreen1() + "\n");
-      }
-      if (!gameDetails.getScreen2().isEmpty())
-      {
-        fw.write("G:" + folderName + "/" + gameDetails.getScreen2() + "\n");
-      }
+      fw.write("G:" + "screens/" + gameDetails.getScreen1() + "\n");
     }
-    else
+    if (!gameDetails.getScreen2().isEmpty())
     {
-      fw.write("F:" + "games/" + gameDetails.getGame() + "\n");
-      fw.write("C:" + "covers/" + gameDetails.getCover() + "\n");
-      if (!gameDetails.getScreen1().isEmpty())
-      {
-        fw.write("G:" + "screens/" + gameDetails.getScreen1() + "\n");
-      }
-      if (!gameDetails.getScreen2().isEmpty())
-      {
-        fw.write("G:" + "screens/" + gameDetails.getScreen2() + "\n");
-      }
+      fw.write("G:" + "screens/" + gameDetails.getScreen2() + "\n");
     }
+
     if (!gameDetails.getJoy1().isEmpty())
     {
       fw.write(gameDetails.getJoy1() + "\n");
@@ -839,16 +820,17 @@ public class FileManager
     g.drawImage(newImage, 0, 0, null);
     return newImage;
   }
-  
+
   public static File createTempFileForScraper(BufferedInputStream inputStream) throws IOException
   {
     Files.createDirectories(TEMP_PATH);
-    File file = new File(TEMP_PATH +  File.separator +"scrapedFile.zip");
+    File file = new File(TEMP_PATH + File.separator + "scrapedFile.zip");
     FileOutputStream fos = new FileOutputStream(file, false);
     byte[] buffer = new byte[1024];
     int len;
-    while ((len = inputStream.read(buffer)) != -1) {
-        fos.write(buffer, 0, len);
+    while ((len = inputStream.read(buffer)) != -1)
+    {
+      fos.write(buffer, 0, len);
     }
     inputStream.close();
     fos.close();
@@ -891,7 +873,7 @@ public class FileManager
     }
     return filePath != null ? filePath.toFile() : null;
   }
-  
+
   private static ZipEntry getFirstMatchingZipEntry(ZipArchiveInputStream zis) throws IOException
   {
     ZipEntry ze = zis.getNextZipEntry();

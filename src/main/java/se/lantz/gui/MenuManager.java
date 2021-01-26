@@ -366,7 +366,6 @@ public class MenuManager
       if (!gamesList.isEmpty())
       {
         exportManager.setGamesToExport(gamesList);
-        exportManager.setExportFormat(exportSelectionDialog.isFavFormat());
         exportManager.setTargetDirectory(exportSelectionDialog.getTargetDirectory(), exportSelectionDialog.deleteBeforeExport(), exportSelectionDialog.addGamesSubDirectory());
         ExportProgressDialog dialog = new ExportProgressDialog(this.mainWindow);
         ExportWorker worker = new ExportWorker(exportManager, dialog);

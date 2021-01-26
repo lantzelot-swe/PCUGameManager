@@ -11,7 +11,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -19,7 +18,6 @@ import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
-import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
 import javax.swing.UIManager;
@@ -51,10 +49,6 @@ public class ExportGamesSelectionPanel extends JPanel
   private JLabel warningLabel;
   private JLabel countLabel;
   private JPanel formatPanel;
-  private JLabel formatInfoLabel;
-  private JRadioButton maxiFormatRadioButton;
-  private JRadioButton favFormatRadioButton;
-  private final ButtonGroup formatGroup = new ButtonGroup();
   private JPanel outputDirPanel;
   private JLabel outputDirLabel;
   private SelectDirPanel selectDirPanel;
@@ -330,8 +324,7 @@ public class ExportGamesSelectionPanel extends JPanel
   {
     if (InfoLabel == null)
     {
-      String text = "Select which games to export.";
-      InfoLabel = new JLabel("Select games to export.");
+      InfoLabel = new JLabel("Select games to export:");
     }
     return InfoLabel;
   }
@@ -369,11 +362,6 @@ public class ExportGamesSelectionPanel extends JPanel
     return returnList;
   }
 
-  boolean isFavFormat()
-  {
-    return getFavFormatRadioButton().isSelected();
-  }
-
   private JLabel getCountLabel()
   {
     if (countLabel == null)
@@ -392,28 +380,6 @@ public class ExportGamesSelectionPanel extends JPanel
       gbl_formatPanel.rowWeights = new double[] { 0.0, 0.0, 0.0, 1.0 };
       gbl_formatPanel.columnWeights = new double[] { 1.0 };
       formatPanel.setLayout(gbl_formatPanel);
-      GridBagConstraints gbc_formatInfoLabel = new GridBagConstraints();
-      gbc_formatInfoLabel.weightx = 1.0;
-      gbc_formatInfoLabel.anchor = GridBagConstraints.WEST;
-      gbc_formatInfoLabel.insets = new Insets(10, 10, 5, 0);
-      gbc_formatInfoLabel.gridx = 0;
-      gbc_formatInfoLabel.gridy = 0;
-      formatPanel.add(getFormatInfoLabel(), gbc_formatInfoLabel);
-      GridBagConstraints gbc_maxiFormatRadioButton = new GridBagConstraints();
-      gbc_maxiFormatRadioButton.weightx = 1.0;
-      gbc_maxiFormatRadioButton.anchor = GridBagConstraints.WEST;
-      gbc_maxiFormatRadioButton.insets = new Insets(0, 5, 0, 0);
-      gbc_maxiFormatRadioButton.gridx = 0;
-      gbc_maxiFormatRadioButton.gridy = 1;
-      formatPanel.add(getMaxiFormatRadioButton(), gbc_maxiFormatRadioButton);
-      GridBagConstraints gbc_favFormatRadioButton = new GridBagConstraints();
-      gbc_favFormatRadioButton.weighty = 1.0;
-      gbc_favFormatRadioButton.weightx = 1.0;
-      gbc_favFormatRadioButton.insets = new Insets(0, 5, 5, 0);
-      gbc_favFormatRadioButton.anchor = GridBagConstraints.NORTHWEST;
-      gbc_favFormatRadioButton.gridx = 0;
-      gbc_favFormatRadioButton.gridy = 2;
-      formatPanel.add(getFavFormatRadioButton(), gbc_favFormatRadioButton);
       GridBagConstraints gbc_outputDirPanel = new GridBagConstraints();
       gbc_outputDirPanel.insets = new Insets(10, 0, 0, 0);
       gbc_outputDirPanel.fill = GridBagConstraints.BOTH;
@@ -422,54 +388,6 @@ public class ExportGamesSelectionPanel extends JPanel
       formatPanel.add(getOutputDirPanel(), gbc_outputDirPanel);
     }
     return formatPanel;
-  }
-
-  private JLabel getFormatInfoLabel()
-  {
-    if (formatInfoLabel == null)
-    {
-      formatInfoLabel = new JLabel("Select which format to export to:");
-    }
-    return formatInfoLabel;
-  }
-
-  private JRadioButton getMaxiFormatRadioButton()
-  {
-    if (maxiFormatRadioButton == null)
-    {
-      maxiFormatRadioButton = new JRadioButton("Separate folders for covers, screens and games");
-      maxiFormatRadioButton.addActionListener(new ActionListener()
-        {
-          public void actionPerformed(ActionEvent e)
-          {
-            getGamesFolderCheckBox().setEnabled(!favFormatRadioButton.isSelected());
-          }
-        });
-      maxiFormatRadioButton.setSelected(true);
-      formatGroup.add(maxiFormatRadioButton);
-    }
-    return maxiFormatRadioButton;
-  }
-
-  private JRadioButton getFavFormatRadioButton()
-  {
-    if (favFormatRadioButton == null)
-    {
-      favFormatRadioButton = new JRadioButton("Separate folder for each game");
-      favFormatRadioButton.addActionListener(new ActionListener()
-        {
-          public void actionPerformed(ActionEvent e)
-          {
-            getGamesFolderCheckBox().setEnabled(!favFormatRadioButton.isSelected());
-            if (favFormatRadioButton.isSelected())
-            {
-              getGamesFolderCheckBox().setSelected(true);
-            }
-          }
-        });
-      formatGroup.add(favFormatRadioButton);
-    }
-    return favFormatRadioButton;
   }
 
   private JPanel getOutputDirPanel()
@@ -499,13 +417,13 @@ public class ExportGamesSelectionPanel extends JPanel
       gbc_gamesFolderCheckBox.anchor = GridBagConstraints.WEST;
       gbc_gamesFolderCheckBox.insets = new Insets(0, 10, 0, 0);
       gbc_gamesFolderCheckBox.gridx = 0;
-      gbc_gamesFolderCheckBox.gridy = 2;
+      gbc_gamesFolderCheckBox.gridy = 3;
       outputDirPanel.add(getGamesFolderCheckBox(), gbc_gamesFolderCheckBox);
       GridBagConstraints gbc_deleteCheckBox = new GridBagConstraints();
       gbc_deleteCheckBox.insets = new Insets(0, 10, 0, 0);
       gbc_deleteCheckBox.anchor = GridBagConstraints.WEST;
       gbc_deleteCheckBox.gridx = 0;
-      gbc_deleteCheckBox.gridy = 3;
+      gbc_deleteCheckBox.gridy = 2;
       outputDirPanel.add(getDeleteCheckBox(), gbc_deleteCheckBox);
     }
     return outputDirPanel;

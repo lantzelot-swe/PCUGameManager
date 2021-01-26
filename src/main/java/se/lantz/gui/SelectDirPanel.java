@@ -12,6 +12,7 @@ import javax.swing.JFileChooser;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
+import javafx.scene.shape.Path;
 import se.lantz.util.FileManager;
 
 public class SelectDirPanel extends JPanel
@@ -57,7 +58,7 @@ public class SelectDirPanel extends JPanel
     }
     if (configuredDir == null)
     {
-      configuredDir = ".";
+      configuredDir = new File("export").getAbsolutePath();
     }
     targetDirectory = new File(configuredDir);
     getDirTextField().setText(configuredDir);
@@ -145,8 +146,7 @@ public class SelectDirPanel extends JPanel
     fileChooser.setDialogTitle("Select a directory to export to");
     fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
     fileChooser.setCurrentDirectory(new File(configuredDir));
-    fileChooser.setApproveButtonText("Export");
-    int value = fileChooser.showDialog(this, "Export");
+    int value = fileChooser.showDialog(this, "OK");
     if (value == JFileChooser.APPROVE_OPTION)
     {
       if (value == JFileChooser.APPROVE_OPTION)

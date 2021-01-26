@@ -33,11 +33,6 @@ public class ExportGamesDialog extends BaseDialog
     return getExportGamesPanel().getSelectedGames();
   }
   
-  public boolean isFavFormat()
-  {
-    return getExportGamesPanel().isFavFormat();
-  }
-  
   public File getTargetDirectory()
   {
     return getExportGamesPanel().getTargetDirectory();

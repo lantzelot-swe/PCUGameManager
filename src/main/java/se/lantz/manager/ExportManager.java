@@ -25,7 +25,6 @@ public class ExportManager
   private List<GameDetails> gameDetailsList;
   private File targetDir;
   private MainViewModel uiModel;
-  private boolean favFormat = false;
   private boolean deleteBeforeExport = false;
 
   public ExportManager(MainViewModel uiModel)
@@ -110,7 +109,7 @@ public class ExportManager
   {
     for (GameDetails gameDetails : gameDetailsList)
     {
-      uiModel.exportGameInfoFile(gameDetails, targetDir, this.favFormat, infoBuilder);
+      uiModel.exportGameInfoFile(gameDetails, targetDir, infoBuilder);
     }
   }
 
@@ -119,15 +118,11 @@ public class ExportManager
     return deleteBeforeExport;
   }
 
-  public void setExportFormat(boolean favFormat)
-  {
-    this.favFormat = favFormat;
-  }
+ 
 
   public void copyFiles(StringBuilder infoBuilder)
   {
-    if (!favFormat)
-    {
+    
       try
       {
         Path targetCoverPath = targetDir.toPath().resolve("covers");
@@ -144,24 +139,20 @@ public class ExportManager
         ExceptionHandler.handleException(e, " Could not create directories for covers, screens and games");
         return;
       }
-    }
+    
 
     for (GameDetails gameDetails : gameDetailsList)
     {
       Path coverPath = Paths.get("./covers/" + gameDetails.getCover());
-      String coverDir = favFormat ? FileManager.generateFileNameFromTitle(gameDetails.getTitle()) + "/" : "covers/";
-      Path targetCoverPath = targetDir.toPath().resolve(coverDir + gameDetails.getCover());
-
-      String screensDir = favFormat ? FileManager.generateFileNameFromTitle(gameDetails.getTitle()) + "/" : "screens/";
+      Path targetCoverPath = targetDir.toPath().resolve("covers/" + gameDetails.getCover());
+      
       Path screens1Path = Paths.get("./screens/" + gameDetails.getScreen1());
-      Path targetScreen1Path = targetDir.toPath().resolve(screensDir + gameDetails.getScreen1());
-
+      Path targetScreen1Path = targetDir.toPath().resolve("screens/" + gameDetails.getScreen1());
       Path screens2Path = Paths.get("./screens/" + gameDetails.getScreen2());
-      Path targetScreen2Path = targetDir.toPath().resolve(screensDir + gameDetails.getScreen2());
-
-      String gamesDir = favFormat ? FileManager.generateFileNameFromTitle(gameDetails.getTitle()) + "/" : "games/";
+      Path targetScreen2Path = targetDir.toPath().resolve("screens/" + gameDetails.getScreen2());
+      
       Path gamePath = Paths.get("./games/" + gameDetails.getGame());
-      Path targetGamePath = targetDir.toPath().resolve(gamesDir + gameDetails.getGame());
+      Path targetGamePath = targetDir.toPath().resolve("games/" + gameDetails.getGame());
 
       try
       {
@@ -207,7 +198,6 @@ public class ExportManager
     gamesList.clear();
     gameDetailsList.clear();
     targetDir = null;
-    favFormat = false;
     deleteBeforeExport = false;
   }
 }
