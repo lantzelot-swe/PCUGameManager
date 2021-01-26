@@ -64,7 +64,7 @@ public class ImportOptionsPanel extends JPanel
     add(getFavoriteCheckBox(), gbc_favoriteCheckBox);
     GridBagConstraints gbc_matchLabel = new GridBagConstraints();
     gbc_matchLabel.insets = new Insets(15, 10, 15, 10);
-    gbc_matchLabel.anchor = GridBagConstraints.NORTH;
+    gbc_matchLabel.anchor = GridBagConstraints.NORTHWEST;
     gbc_matchLabel.weighty = 1.0;
     gbc_matchLabel.weightx = 1.0;
     gbc_matchLabel.gridx = 0;

@@ -1,5 +1,6 @@
 package se.lantz.gui;
 
+import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -81,7 +82,7 @@ public class SelectDirPanel extends JPanel
     {
       dirTextField = new JTextField();
       dirTextField.setEditable(false);
-      dirTextField.setColumns(10);
+      dirTextField.setPreferredSize(new Dimension(500, dirTextField.getPreferredSize().height));
     }
     return dirTextField;
   }
