@@ -1,6 +1,7 @@
 package se.lantz.gui.imports;
 
 import java.awt.Frame;
+import java.nio.file.Path;
 
 import se.lantz.gui.BaseDialog;
 import se.lantz.manager.ImportManager;
@@ -33,5 +34,10 @@ public class ImportOptionsDialog extends BaseDialog
   public boolean getMarkAsFavorite()
   {
    return  getImportOptionsPanel().getMarkAsFavorite();
+  }
+  
+  public Path getImportDirectory()
+  {
+   return  getImportOptionsPanel().getImportDirectory();
   }
 }

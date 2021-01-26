@@ -57,36 +57,25 @@ public class ImportManager
     this.addAsFavorite = favorite;
   }
 
-  public boolean checkSelectedFolder(Path folder)
-  {
-
-    logger.debug("Selected folder: {}", folder);
-
+  public void setSelectedFolder(Path folder)
+  {    
+    //Assume games subdirectory
     srcParentFolder = folder.resolve("games");
     srcCoversFolder = srcParentFolder.resolve("covers");
     srcGamesFolder = srcParentFolder.resolve("games");
     srcScreensFolder = srcParentFolder.resolve("screens");
-
-    logger.debug("parent folder: {}", srcParentFolder);
-    logger.debug("covers folder: {}", srcCoversFolder);
-    logger.debug("games folder: {}", srcGamesFolder);
-    logger.debug("screens folder: {}", srcScreensFolder);
-
-    // Verify that subfolders are available
-    if (Files.exists(srcParentFolder, LinkOption.NOFOLLOW_LINKS) &&
+    
+    if (! (Files.exists(srcParentFolder, LinkOption.NOFOLLOW_LINKS) &&
       Files.exists(srcCoversFolder, LinkOption.NOFOLLOW_LINKS) &&
       Files.exists(srcGamesFolder, LinkOption.NOFOLLOW_LINKS) &&
-      Files.exists(srcScreensFolder, LinkOption.NOFOLLOW_LINKS))
+      Files.exists(srcScreensFolder, LinkOption.NOFOLLOW_LINKS)))
     {
-      logger.debug("A valid directory!");
-
-      return true;
-    }
-    else
-    {
-      logger.debug("An ivalid directory!");
-      return false;
-    }
+      //No games subdirectory
+      srcParentFolder = folder;
+      srcCoversFolder = folder.resolve("covers");
+      srcGamesFolder = folder.resolve("games");
+      srcScreensFolder = folder.resolve("screens");    
+    }   
   }
 
   public void readGameInfoFiles(StringBuilder infoBuilder)

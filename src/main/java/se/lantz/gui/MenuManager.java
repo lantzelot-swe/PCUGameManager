@@ -185,7 +185,7 @@ public class MenuManager
     KeyStroke keyStrokeToImportGames = KeyStroke.getKeyStroke(KeyEvent.VK_I, InputEvent.CTRL_DOWN_MASK);
     importItem.setAccelerator(keyStrokeToImportGames);
     importItem.setMnemonic('I');
-    importItem.addActionListener(e -> importGameList());
+    importItem.addActionListener(e -> importGames());
     return importItem;
   }
 
@@ -310,48 +310,23 @@ public class MenuManager
     return newVersionItem;
   }
 
-  private void importGameList()
+  private void importGames()
   {
-    final JFileChooser fileChooser = new JFileChooser();
-    fileChooser.setDialogTitle("Select directory containing a Carousel");
-    fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-    String importDir = FileManager.getConfiguredProperties().getProperty(IMPORT_DIR_PROPERTY);
-    if (importDir == null)
+    ImportOptionsDialog optionsDialog = new ImportOptionsDialog(this.mainWindow);
+    optionsDialog.pack();
+    optionsDialog.setLocationRelativeTo(this.mainWindow);
+    if (optionsDialog.showDialog())
     {
-      importDir = ".";
-    }
-    fileChooser.setCurrentDirectory(new File(importDir));
-    int value = fileChooser.showDialog(this.mainWindow, "Import");
-    if (value == JFileChooser.APPROVE_OPTION)
-    {
-      Path selectedPath = fileChooser.getSelectedFile().toPath();
-      FileManager.getConfiguredProperties().put(IMPORT_DIR_PROPERTY, selectedPath.toString());
-      if (importManager.checkSelectedFolder(selectedPath))
-      {
-        //Show options dialog
-        ImportOptionsDialog optionsDialog = new ImportOptionsDialog(this.mainWindow);
-        optionsDialog.pack();
-        optionsDialog.setLocationRelativeTo(this.mainWindow);
-        if (optionsDialog.showDialog())
-        {
-          importManager.setSelectedOption(optionsDialog.getSelectedOption());
-          importManager.setAddAsFavorite(optionsDialog.getMarkAsFavorite());
-          ImportProgressDialog dialog = new ImportProgressDialog(this.mainWindow);
-          ImportWorker worker = new ImportWorker(importManager, dialog);
-          worker.execute();
-          dialog.setVisible(true);
-          //Refresh current game view after import
-          uiModel.reloadCurrentGameView();
-          MainWindow.getInstance().repaintAfterModifications();
-        }
-      }
-      else
-      {
-        JOptionPane.showMessageDialog(this.mainWindow,
-                                      "The selected directory doesn't contain a valid carousel structure.",
-                                      "Import games",
-                                      JOptionPane.ERROR_MESSAGE);
-      }
+      importManager.setSelectedFolder(optionsDialog.getImportDirectory());
+      importManager.setSelectedOption(optionsDialog.getSelectedOption());
+      importManager.setAddAsFavorite(optionsDialog.getMarkAsFavorite());
+      ImportProgressDialog dialog = new ImportProgressDialog(this.mainWindow);
+      ImportWorker worker = new ImportWorker(importManager, dialog);
+      worker.execute();
+      dialog.setVisible(true);
+      //Refresh current game view after import
+      uiModel.reloadCurrentGameView();
+      MainWindow.getInstance().repaintAfterModifications();
     }
   }
 
