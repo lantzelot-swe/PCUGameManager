@@ -65,7 +65,7 @@ public class FileManager
   public void saveFiles()
   {
     //Check if title is different that in db, then rename existing files!
-    if (infoModel.isTitleChanged())
+    if (infoModel.isTitleChanged() || infoModel.isAnyScreenRenamed())
     {
       //Rename existing covers and screens and game file
       renameFiles();
@@ -109,6 +109,10 @@ public class FileManager
     {
       try
       {
+        if (screen1FileName.isEmpty())
+        {
+          screen1FileName = generateFileNameFromTitle(infoModel.getTitle()) + "-00.png";
+        }
         File outputfile = new File(SCREENS + screen1FileName);
         //Scale if not the right size
         screen1 = scaleImageTo320x200(screen1);
@@ -124,6 +128,10 @@ public class FileManager
     {
       try
       {
+        if (screen2FileName.isEmpty())
+        {
+          screen2FileName = generateFileNameFromTitle(infoModel.getTitle()) + "-01.png";
+        }
         File outputfile = new File(SCREENS + screen2FileName);
         //Scale if not the right size
         screen2 = scaleImageTo320x200(screen2);

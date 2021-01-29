@@ -268,6 +268,26 @@ public class ImportManager
     {
       description_it = "";
     }
+    
+//    //Don't allow same screen file for both entries
+//    if (screen1file.equals(screen2file))
+//    {
+//      if (screen1file.endsWith("-01.png"))
+//      {
+//        screen1file = "";
+//      }
+//      else 
+//      {
+//        screen2file = "";
+//      }
+//    }
+//    //Special handling of screens which may have wrong name or missing entry (screen 1 might be named 01.png, 
+//    //handle that as screen2 instead to get names set correctly)
+//    if (screen1file.endsWith("-01.png") && screen2file.isEmpty())
+//    {
+//      screen2file = screen1file;
+//      screen1file = ""; 
+//    }
       
     // Construct a data row
     List<String> list = Arrays.asList(title,
