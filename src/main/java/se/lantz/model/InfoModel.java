@@ -343,7 +343,7 @@ public class InfoModel extends AbstractModel
   
   public boolean updateFileNames()
   {
-    if (isNewGame() || isTitleChanged() || isWrongScreenNames())
+    if (isNewGame() || isTitleChanged() || screenNamesNeedsUpdate())
     {
       //Keep track of the old names, used when renaming files when saving
       oldCoverFile = getCoverFile();
@@ -386,8 +386,16 @@ public class InfoModel extends AbstractModel
     return !titleInDb.isEmpty() && !titleInDb.equalsIgnoreCase(title);
   }
   
-  public boolean isWrongScreenNames()
+  public boolean screenNamesNeedsUpdate()
   {
+    if (getScreens1File().isEmpty() && getScreen1Image() != null)
+    {
+      return true;
+    }
+    if (getScreens2File().isEmpty() && getScreen2Image() != null)
+    {
+      return true;
+    }
     //Must have names ending with -00.png and -01.png
     return (!getScreens1File().isEmpty() && !getScreens1File().endsWith("-00.png")) || ((!getScreens2File().isEmpty() && !getScreens2File().endsWith("-01.png")));
   }

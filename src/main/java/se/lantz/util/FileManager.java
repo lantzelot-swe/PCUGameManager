@@ -206,9 +206,10 @@ public class FileManager
 
   private void renameFiles()
   {
+    //Cover
     String coverFile = infoModel.getCoverFile();
     String oldCoverFile = infoModel.getOldCoverFile();
-    if (!coverFile.isEmpty() && !oldCoverFile.isEmpty())
+    if (!coverFile.isEmpty() && !oldCoverFile.isEmpty() && !coverFile.equals(oldCoverFile))
     {
       File oldCover = new File(COVERS + oldCoverFile);
       File newCover = new File(COVERS + coverFile);
@@ -221,9 +222,10 @@ public class FileManager
         logger.debug("Could NOT rename cover {} to {}", oldCover.getName(), newCover.getName());
       }
     }
+    //Screen 1
     String screens1File = infoModel.getScreens1File();
     String oldScreens1File = infoModel.getOldScreens1File();
-    if (!screens1File.isEmpty() && !oldScreens1File.isEmpty())
+    if (!screens1File.isEmpty() && !oldScreens1File.isEmpty() && !screens1File.equals(oldScreens1File))
     {
       File oldScreen1 = new File(SCREENS + oldScreens1File);
       File newScreen1 = new File(SCREENS + screens1File);
@@ -236,24 +238,43 @@ public class FileManager
         logger.debug("Could NOT rename screen1 {} to {}", oldScreen1.getName(), newScreen1.getName());
       }
     }
+    //Screen 2
     String screens2File = infoModel.getScreens2File();
     String oldScreens2File = infoModel.getOldScreens2File();
-    if (!screens2File.isEmpty() && !oldScreens2File.isEmpty())
+    
+    //Special case if the same screen has been used for both screens: Copy first to second in this case
+    if (!oldScreens1File.isEmpty() && !oldScreens2File.isEmpty() && oldScreens1File.equals(oldScreens2File))
     {
-      File oldScreen2 = new File(SCREENS + oldScreens2File);
-      File newScreen2 = new File(SCREENS + screens2File);
-      if (oldScreen2.renameTo(newScreen2))
+      try
       {
-        logger.debug("Renamed screen2 {} to {}", oldScreen2.getName(), newScreen2.getName());
+        Files.copy(new File(SCREENS + screens1File).toPath(), new File(SCREENS + screens2File).toPath());
+        logger.debug("Copied {} to {}",  screens1File, screens2File);
       }
-      else
+      catch (IOException e)
       {
-        logger.debug("Could NOT rename screen2 {} to {}", oldScreen2.getName(), newScreen2.getName());
+        logger.debug("Could not copy screen {} to {}", screens1File, screens2File);
       }
     }
+    else
+    {
+      if (!screens2File.isEmpty() && !oldScreens2File.isEmpty() && !screens2File.equals(oldScreens2File))
+      {
+          File oldScreen2 = new File(SCREENS + oldScreens2File);
+          File newScreen2 = new File(SCREENS + screens2File);
+          if (oldScreen2.renameTo(newScreen2))
+          {
+            logger.debug("Renamed screen2 {} to {}", oldScreen2.getName(), newScreen2.getName());
+          }
+          else
+          {
+            logger.debug("Could NOT rename screen2 {} to {}", oldScreen2.getName(), newScreen2.getName());
+          }   
+      }
+    }
+    //Gamefile
     String gamesFile = infoModel.getGamesFile();
     String oldGamesFile = infoModel.getOldGamesFile();
-    if (!gamesFile.isEmpty() && !oldGamesFile.isEmpty())
+    if (!gamesFile.isEmpty() && !oldGamesFile.isEmpty()  && !gamesFile.equals(oldGamesFile))
     {
       File oldGame = new File(GAMES + oldGamesFile);
       File newGame = new File(GAMES + gamesFile);
