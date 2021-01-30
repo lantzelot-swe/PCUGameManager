@@ -9,6 +9,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -21,6 +22,7 @@ import se.lantz.model.data.GameView;
 import se.lantz.model.data.ViewFilter;
 import se.lantz.util.DbConstants;
 import se.lantz.util.ExceptionHandler;
+import se.lantz.util.GameListDataComparator;
 
 public class DbConnector
 {
@@ -178,28 +180,6 @@ public class DbConnector
     return connection;
   }
 
-  public List<GameListData> fetchAllGames()
-  {
-    List<GameListData> returnList = new ArrayList<>();
-    String sql = "SELECT title, rowid, Favorite FROM gameinfo ORDER BY title COLLATE NOCASE ASC";
-    try (Connection conn = this.connect(); Statement stmt = conn.createStatement();
-      ResultSet rs = stmt.executeQuery(sql))
-    {
-      // loop through the result set
-      while (rs.next())
-      {
-        GameListData data =
-          new GameListData(rs.getString("Title"), Integer.toString(rs.getInt("rowid")), rs.getInt("Favorite"));
-        returnList.add(data);
-      }
-    }
-    catch (SQLException e)
-    {
-      ExceptionHandler.handleException(e, "Could not fetch all games.");
-    }
-    return returnList;
-  }
-
   public List<GameListData> fetchGamesByView(GameView view)
   {
     List<GameListData> returnList = new ArrayList<>();
@@ -226,6 +206,8 @@ public class DbConnector
     {
       ExceptionHandler.handleException(e, "Could not fetch games by view = " + view.getName());
     }
+    //Sort again since "NOCASE ASC" doesn't seem completely reliable
+    Collections.sort(returnList, new GameListDataComparator());
     return returnList;
   }
 

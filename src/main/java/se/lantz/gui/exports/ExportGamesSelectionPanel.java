@@ -29,6 +29,7 @@ import se.lantz.model.GameListModel;
 import se.lantz.model.MainViewModel;
 import se.lantz.model.data.GameListData;
 import se.lantz.model.data.GameView;
+import se.lantz.util.GameListDataComparator;
 
 public class ExportGamesSelectionPanel extends JPanel
 {
@@ -332,7 +333,7 @@ public class ExportGamesSelectionPanel extends JPanel
   private void sortSelectedList()
   {
     List<GameListData> gamesList = Collections.list(selectedListModel.elements()); // get a collection of the elements in the model
-    Collections.sort(gamesList);
+    Collections.sort(gamesList, new GameListDataComparator());
     selectedListModel.clear(); // remove all elements
     for (GameListData o : gamesList)
     {
