@@ -21,6 +21,7 @@ public class SystemModel extends AbstractModel
   private final static String BANK2 = "bank2";
   private final static String BANK3 = "bank3";
   private final static String BANK5 = "bank5";
+  private final static String BASIC = "basic";
   //TODO Support for 3K, 4K etc as aliases for Banks
  
   //TODO vertical shift
@@ -42,6 +43,7 @@ public class SystemModel extends AbstractModel
   private boolean bank2 = false;
   private boolean bank3 = false;
   private boolean bank5 = false;
+  private boolean basic = false;
   private int verticalShift = 0;
   
   public SystemModel()
@@ -125,6 +127,10 @@ public class SystemModel extends AbstractModel
       {
         list.add(BANK5);
       }
+    }
+    if (isBasic())
+    {
+      list.add(BASIC);
     }
     // Construct from config list
     StringBuilder builder = new StringBuilder();
@@ -243,6 +249,10 @@ public class SystemModel extends AbstractModel
       else if (flag.equals(BANK5))
       {
         setBank5(true);
+      }
+      else if (flag.equals(BASIC))
+      {
+        setBasic(true);
       }
       else
       {
@@ -534,6 +544,21 @@ public class SystemModel extends AbstractModel
     boolean old = isBank5();
     this.bank5 = bank5;
     if ((Boolean.compare(old, bank5) != 0))
+    {
+      notifyChange();
+    }
+  }
+  
+  public boolean isBasic()
+  {
+    return basic;
+  }
+
+  public void setBasic(boolean basic)
+  {
+    boolean old = isBasic();
+    this.basic = basic;
+    if ((Boolean.compare(old, basic) != 0))
     {
       notifyChange();
     }
