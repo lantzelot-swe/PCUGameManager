@@ -7,7 +7,6 @@ import java.awt.Insets;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.swing.ButtonGroup;
 import javax.swing.DefaultCellEditor;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -188,15 +187,21 @@ public class FilterPanel extends JPanel
       fieldTableComboBox.addItem(DbConstants.JOY1);
       fieldTableComboBox.addItem(DbConstants.JOY2);
       fieldTableComboBox.addItem(DbConstants.SYSTEM);
+      fieldTableComboBox.addItem(DbConstants.FAVORITE);
 
       fieldTableComboBox.addActionListener(e -> {
-        if (!fieldTableComboBox.getSelectedItem().equals(DbConstants.YEAR))
+
+        if (fieldTableComboBox.getSelectedItem().equals(DbConstants.FAVORITE))
         {
-          addStringOperators();
+          addBooleanOperators();
+        }
+        else if (fieldTableComboBox.getSelectedItem().equals(DbConstants.YEAR))
+        {
+          addIntOperators();
         }
         else
         {
-          addIntOperators();
+          addStringOperators();
         }
       });
     }
@@ -218,6 +223,12 @@ public class FilterPanel extends JPanel
     getOperatorTableComboBox().addItem(ViewFilter.IS);
     getOperatorTableComboBox().addItem(ViewFilter.BEFORE);
     getOperatorTableComboBox().addItem(ViewFilter.AFTER);
+  }
+
+  private void addBooleanOperators()
+  {
+    getOperatorTableComboBox().removeAllItems();
+    getOperatorTableComboBox().addItem(ViewFilter.IS);
   }
 
   private JComboBox<String> getOperatorTableComboBox()
@@ -250,13 +261,29 @@ public class FilterPanel extends JPanel
         {
           if (column == 0)
           {
-            if (!value.equals(DbConstants.YEAR) && getValueAt(row, 0).equals(DbConstants.YEAR))
-            {
-              setValueAt(ViewFilter.BEGINS_WITH_TEXT, row, 1);
-            }
-            if (value.equals(DbConstants.YEAR) && !getValueAt(row, 0).equals(DbConstants.YEAR))
+            if (value.equals(DbConstants.FAVORITE))
             {
               setValueAt(ViewFilter.IS, row, 1);
+              if (!getValueAt(row, 2).equals("false"))
+              {
+                setValueAt("true", row, 2);
+              }
+            }
+            else if (value.equals(DbConstants.YEAR))
+            {
+              setValueAt(ViewFilter.IS, row, 1);
+              try
+              {
+                Integer.parseInt((String) getValueAt(row, 2));
+              }
+              catch (NumberFormatException e)
+              {
+                setValueAt("1986", row, 2);
+              }
+            }
+            else if (getValueAt(row, 0).equals(DbConstants.YEAR) || getValueAt(row, 0).equals(DbConstants.FAVORITE))
+            {
+              setValueAt(ViewFilter.BEGINS_WITH_TEXT, row, 1);
             }
           }
           super.setValueAt(value, row, column);
@@ -287,7 +314,11 @@ public class FilterPanel extends JPanel
           if (column == 1)
           {
             String field = (String) table.getModel().getValueAt(row, 0);
-            if (field.equals(DbConstants.YEAR))
+            if (field.equals(DbConstants.FAVORITE))
+            {
+              addBooleanOperators();
+            }
+            else if (field.equals(DbConstants.YEAR))
             {
               addIntOperators();
             }
@@ -299,6 +330,9 @@ public class FilterPanel extends JPanel
           return super.getTableCellEditorComponent(table, value, isSelected, row, column);
         }
       });
+
+    TableColumn valueColumn = table.getColumnModel().getColumn(2);
+    valueColumn.setCellEditor(new ValueCellEditor());
 
     table.getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
     table.setColumnSelectionAllowed(false);

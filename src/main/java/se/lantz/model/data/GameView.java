@@ -112,7 +112,19 @@ public class GameView implements Comparable
         
      case ViewFilter.IS:
        builder.append(" = ");
-       builder.append(viewFilter.getFilterData());
+       //Handle Favorites where value is either true or false, mapped towards 1 and 0 in the db
+       if (viewFilter.getFilterData().equals("true"))
+       {
+         builder.append("1");
+       }
+       else if (viewFilter.getFilterData().equals("false"))
+       {
+         builder.append("0");
+       }
+       else
+       {
+         builder.append(viewFilter.getFilterData());
+       }
        break;
             
      case ViewFilter.BEFORE:
