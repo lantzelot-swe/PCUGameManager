@@ -115,7 +115,7 @@ public class FileManager
         }
         File outputfile = new File(SCREENS + screen1FileName);
         //Scale if not the right size
-        screen1 = scaleImageTo320x200(screen1);
+        screen1 = scaleImageTo320x200x32bit(screen1);
         ImageIO.write(screen1, "png", outputfile);
       }
       catch (IOException e)
@@ -134,7 +134,7 @@ public class FileManager
         }
         File outputfile = new File(SCREENS + screen2FileName);
         //Scale if not the right size
-        screen2 = scaleImageTo320x200(screen2);
+        screen2 = scaleImageTo320x200x32bit(screen2);
         ImageIO.write(screen2, "png", outputfile);
       }
       catch (IOException e)
@@ -805,7 +805,7 @@ public class FileManager
     }
   }
 
-  public static BufferedImage scaleImageTo320x200(BufferedImage originalImage)
+  public static BufferedImage scaleImageTo320x200x32bit(BufferedImage originalImage)
   {
     BufferedImage returnImage = originalImage;
     if (originalImage.getWidth() >= 544 && originalImage.getWidth() < 600 && originalImage.getHeight() >= 284)
@@ -822,6 +822,15 @@ public class FileManager
       Graphics g = copyOfImage.createGraphics();
       g.drawImage(newImage, 0, 0, null);
       return copyOfImage;
+    }
+    if (returnImage.getType() != BufferedImage.TYPE_INT_ARGB)
+    {
+      //Convert to 32 bit
+      BufferedImage copyOfImage =
+        new BufferedImage(returnImage.getWidth(null), returnImage.getHeight(null), BufferedImage.TYPE_INT_ARGB);
+      Graphics g = copyOfImage.createGraphics();
+      g.drawImage(returnImage, 0, 0, null);
+      returnImage = copyOfImage;
     }
     return returnImage;
   }

@@ -178,7 +178,7 @@ public class ScreenshotsPanel extends JPanel
       if (!screen1Image.equals(currentScreen1Image))
       {
         logger.debug("SETTING SCREEN 1 IMAGE");
-        getScreen1ImageLabel().setIcon(new ImageIcon(FileManager.scaleImageTo320x200(screen1Image)));
+        getScreen1ImageLabel().setIcon(new ImageIcon(FileManager.scaleImageTo320x200x32bit(screen1Image)));
         setEditButtonVisibilityAndResolution(screen1Image, getResolution1Label(), getEdit1Button());
         currentScreen1Image = screen1Image;
       }
@@ -209,7 +209,7 @@ public class ScreenshotsPanel extends JPanel
       if (!screen2Image.equals(currentScreen2Image))
       {
         logger.debug("SETTING SCREEN 2 IMAGE");
-        getScreen2ImageLabel().setIcon(new ImageIcon(FileManager.scaleImageTo320x200(screen2Image)));
+        getScreen2ImageLabel().setIcon(new ImageIcon(FileManager.scaleImageTo320x200x32bit(screen2Image)));
         setEditButtonVisibilityAndResolution(screen2Image, getResolution2Label(), getEdit2Button());
         currentScreen2Image = screen2Image;
       }
@@ -705,7 +705,7 @@ public class ScreenshotsPanel extends JPanel
         returnImage = ImageIO.read(files[0]);
 
         setEditButtonVisibility(returnImage, editButton);
-        imageLabel.setIcon(new ImageIcon(FileManager.scaleImageTo320x200(returnImage)));
+        imageLabel.setIcon(new ImageIcon(FileManager.scaleImageTo320x200x32bit(returnImage)));
       }
       catch (IOException e)
       {
