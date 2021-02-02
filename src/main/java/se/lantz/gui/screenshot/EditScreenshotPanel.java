@@ -206,7 +206,7 @@ public class EditScreenshotPanel extends JPanel
 
   private void updateLabelIcon()
   {
-    BufferedImage copyOfImage = new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_INT_RGB);
+    BufferedImage copyOfImage = new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_INT_ARGB);
     Graphics g = copyOfImage.createGraphics();
     g.drawImage(image, 0, 0, null);
     g.setColor(Color.red);
@@ -258,7 +258,7 @@ public class EditScreenshotPanel extends JPanel
     BufferedImage newImage = image
       .getSubimage(x, y, width, height);
     BufferedImage copyOfImage =
-      new BufferedImage(newImage.getWidth(), newImage.getHeight(), BufferedImage.TYPE_INT_RGB);
+      new BufferedImage(newImage.getWidth(), newImage.getHeight(), BufferedImage.TYPE_INT_ARGB);
     Graphics g = copyOfImage.createGraphics();
     g.drawImage(newImage, 0, 0, null);
     return newImage;

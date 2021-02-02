@@ -91,7 +91,7 @@ public class FileManager
       {
         Image coverToSave = cover.getScaledInstance(122, 175, Image.SCALE_SMOOTH);
         BufferedImage copyOfImage =
-          new BufferedImage(coverToSave.getWidth(null), coverToSave.getHeight(null), BufferedImage.TYPE_INT_RGB);
+          new BufferedImage(coverToSave.getWidth(null), coverToSave.getHeight(null), BufferedImage.TYPE_INT_ARGB);
         Graphics g = copyOfImage.createGraphics();
         g.drawImage(coverToSave, 0, 0, null);
         g.dispose();
@@ -818,7 +818,7 @@ public class FileManager
       // Scale to right size.
       Image newImage = returnImage.getScaledInstance(320, 200, Image.SCALE_SMOOTH);
       BufferedImage copyOfImage =
-        new BufferedImage(newImage.getWidth(null), newImage.getHeight(null), BufferedImage.TYPE_INT_RGB);
+        new BufferedImage(newImage.getWidth(null), newImage.getHeight(null), BufferedImage.TYPE_INT_ARGB);
       Graphics g = copyOfImage.createGraphics();
       g.drawImage(newImage, 0, 0, null);
       return copyOfImage;
@@ -832,7 +832,7 @@ public class FileManager
     BufferedImage newImage = originalImage
       .getSubimage((originalImage.getWidth() - 320) / 2, ((originalImage.getHeight() - 200) / 2) - 1, 320, 200);
     BufferedImage copyOfImage =
-      new BufferedImage(newImage.getWidth(), newImage.getHeight(), BufferedImage.TYPE_INT_RGB);
+      new BufferedImage(newImage.getWidth(), newImage.getHeight(), BufferedImage.TYPE_INT_ARGB);
     Graphics g = copyOfImage.createGraphics();
     g.drawImage(newImage, 0, 0, null);
     return newImage;
@@ -844,7 +844,7 @@ public class FileManager
     BufferedImage newImage = originalImage
       .getSubimage((originalImage.getWidth() - 448) / 2, ((originalImage.getHeight() - 280) / 2) - 1, 448, 280);
     BufferedImage copyOfImage =
-      new BufferedImage(newImage.getWidth(), newImage.getHeight(), BufferedImage.TYPE_INT_RGB);
+      new BufferedImage(newImage.getWidth(), newImage.getHeight(), BufferedImage.TYPE_INT_ARGB);
     Graphics g = copyOfImage.createGraphics();
     g.drawImage(newImage, 0, 0, null);
     return newImage;
