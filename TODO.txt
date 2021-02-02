@@ -4,5 +4,6 @@
 -Keep gameinfo screens from PCU when deleting all games.
 -Add option to only delete all games in the current game view.
 -Only pre-select the empty fields for a game when opening the scraper dialog.
+-Add REU support to system info flags from 1.5.1 release
 
 -Bug: prg files for vic-20?
