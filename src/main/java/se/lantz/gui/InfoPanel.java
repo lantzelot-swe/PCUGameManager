@@ -10,6 +10,7 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.beans.Beans;
 import java.util.Calendar;
+import java.util.List;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -22,6 +23,8 @@ import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingUtilities;
 
 import se.lantz.model.InfoModel;
+import se.lantz.util.DescriptionTranslater;
+
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 
@@ -419,7 +422,16 @@ public class InfoPanel extends JPanel
       translateButton = new JButton("Translate...");
       translateButton.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
-          //TODO
+          TranslationDialog dialog = new TranslationDialog(model);
+          dialog.pack();
+          dialog.setLocationRelativeTo(translateButton);
+          if (dialog.showDialog())
+          {
+            //Update model with translated text
+            String fromLanguage = dialog.getSelectedFromLanguage();
+            List<String> toLanguagesList = dialog.getSelectedToLanguages();
+            model.translateDescription(fromLanguage, toLanguagesList);
+          }
         }
       });
     }

@@ -2,9 +2,13 @@ package se.lantz.model;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Objects;
 
+import se.lantz.util.DescriptionTranslater;
+import se.lantz.util.ExceptionHandler;
 import se.lantz.util.FileManager;
 
 public class InfoModel extends AbstractModel
@@ -436,5 +440,64 @@ public class InfoModel extends AbstractModel
   public String getOldScreens2File()
   {
     return oldScreens2File;
+  }
+  
+  public void translateDescription(String from, List<String> toList)
+  {
+    this.disableChangeNotification(true);
+    String textToTranslate = "";
+    switch (from)
+    {
+    case "en":
+      textToTranslate = getDescription();
+      break;
+    case "de":
+      textToTranslate = getDescriptionDe();
+      break;
+    case "fr":
+      textToTranslate = getDescriptionFr();
+      break;
+    case "es":
+      textToTranslate = getDescriptionEs();
+      break;
+    case "it":
+      textToTranslate = getDescriptionIt();
+      break;
+    default:
+      break;
+    }
+    for (String to : toList)
+    {
+      try
+      {
+        String translatedText = DescriptionTranslater.translate(from, to, textToTranslate);
+        switch (to)
+        {
+        case "en":
+          setDescription(translatedText);
+          break;
+        case "de":
+          setDescriptionDe(translatedText);
+          break;
+        case "fr":
+          setDescriptionFr(translatedText);
+          break;
+        case "es":
+          setDescriptionEs(translatedText);
+          break;
+        case "it":
+          setDescriptionIt(translatedText);
+          break;
+        default:
+          break;
+        }
+      }
+      catch (IOException e)
+      {
+        ExceptionHandler.handleException(e, "Could not translate description");
+      }
+    }
+    this.disableChangeNotification(false);
+    this.notifyChange();
   }
 }
