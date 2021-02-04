@@ -2,13 +2,9 @@ package se.lantz.model;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.IOException;
 import java.nio.file.Path;
-import java.util.List;
 import java.util.Objects;
 
-import se.lantz.util.DescriptionTranslater;
-import se.lantz.util.ExceptionHandler;
 import se.lantz.util.FileManager;
 
 public class InfoModel extends AbstractModel
@@ -20,7 +16,7 @@ public class InfoModel extends AbstractModel
   private String description_de = "";
   private String description_fr = "";
   private String description_es = "";
-  private String description_it  = "";
+  private String description_it = "";
   private int year = 0;
   private String genre = "";
   private String composer = "";
@@ -29,14 +25,14 @@ public class InfoModel extends AbstractModel
   private String coverFile = "";
   private String screens1File = "";
   private String screens2File = "";
-  
+
   //These images have there original sizes. Scale cover to 122x175 once storing it
   private BufferedImage coverImage;
   private BufferedImage screen1Image;
   private BufferedImage screen2Image;
-  
+
   private Path gamesPath;
-  
+
   private String oldGamesFile = "";
   private String oldCoverFile = "";
   private String oldScreens1File = "";
@@ -46,13 +42,13 @@ public class InfoModel extends AbstractModel
   {
     return title;
   }
-  
+
   public void setTitleFromDb(String title)
   {
     titleInDb = title;
     this.title = title;
   }
-  
+
   public String getTitleInDb()
   {
     return titleInDb;
@@ -63,7 +59,7 @@ public class InfoModel extends AbstractModel
     String old = getTitle();
     this.title = title;
     if (!Objects.equals(old, title))
-    {     
+    {
       notifyChange();
     }
   }
@@ -84,7 +80,7 @@ public class InfoModel extends AbstractModel
       notifyChange();
     }
   }
-  
+
   public String getDescriptionDe()
   {
     return description_de;
@@ -101,7 +97,7 @@ public class InfoModel extends AbstractModel
       notifyChange();
     }
   }
-  
+
   public String getDescriptionFr()
   {
     return description_fr;
@@ -118,7 +114,7 @@ public class InfoModel extends AbstractModel
       notifyChange();
     }
   }
-  
+
   public String getDescriptionEs()
   {
     return description_es;
@@ -135,7 +131,7 @@ public class InfoModel extends AbstractModel
       notifyChange();
     }
   }
-  
+
   public String getDescriptionIt()
   {
     return description_it;
@@ -318,12 +314,12 @@ public class InfoModel extends AbstractModel
       notifyChange();
     }
   }
-  
+
   public Path getGamesPath()
   {
     return gamesPath;
   }
-  
+
   public void setGamesPath(File file)
   {
     Path old = getGamesPath();
@@ -333,18 +329,18 @@ public class InfoModel extends AbstractModel
     String fileEnding = file.getName().substring(file.getName().indexOf("."));
     if (fileEnding.endsWith(".gz") || fileEnding.endsWith(".GZ"))
     {
-      setGamesFile(fileName + fileEnding); 
+      setGamesFile(fileName + fileEnding);
     }
     else
     {
-      setGamesFile(fileName + fileEnding +".gz"); 
+      setGamesFile(fileName + fileEnding + ".gz");
     }
     if (!Objects.equals(old, gamesPath))
     {
       notifyChange();
     }
   }
-  
+
   public boolean updateFileNames()
   {
     if (isNewGame() || isTitleChanged() || screenNamesNeedsUpdate())
@@ -354,7 +350,7 @@ public class InfoModel extends AbstractModel
       oldScreens1File = getScreens1File();
       oldScreens2File = getScreens2File();
       oldGamesFile = getGamesFile();
-      
+
       disableChangeNotification(true);
       String fileName = FileManager.generateFileNameFromTitle(this.title);
       if (!getCoverFile().isEmpty() || getCoverImage() != null)
@@ -379,17 +375,17 @@ public class InfoModel extends AbstractModel
     }
     return false;
   }
-  
+
   public boolean isNewGame()
   {
     return titleInDb.isEmpty();
   }
-  
+
   public boolean isTitleChanged()
   {
     return !titleInDb.isEmpty() && !titleInDb.equalsIgnoreCase(title);
   }
-  
+
   public boolean screenNamesNeedsUpdate()
   {
     if (getScreens1File().isEmpty() && getScreen1Image() != null)
@@ -401,15 +397,15 @@ public class InfoModel extends AbstractModel
       return true;
     }
     //Must have names ending with -00.png and -01.png
-    return (!getScreens1File().isEmpty() && !getScreens1File().endsWith("-00.png")) || ((!getScreens2File().isEmpty() && !getScreens2File().endsWith("-01.png")));
+    return (!getScreens1File().isEmpty() && !getScreens1File().endsWith("-00.png")) ||
+      ((!getScreens2File().isEmpty() && !getScreens2File().endsWith("-01.png")));
   }
-  
+
   public boolean isAnyScreenRenamed()
   {
     return !oldScreens1File.isEmpty() || !oldScreens2File.isEmpty();
   }
-  
-  
+
   public void resetImagesAndOldFileNames()
   {
     this.coverImage = null;
@@ -440,64 +436,5 @@ public class InfoModel extends AbstractModel
   public String getOldScreens2File()
   {
     return oldScreens2File;
-  }
-  
-  public void translateDescription(String from, List<String> toList)
-  {
-    this.disableChangeNotification(true);
-    String textToTranslate = "";
-    switch (from)
-    {
-    case "en":
-      textToTranslate = getDescription();
-      break;
-    case "de":
-      textToTranslate = getDescriptionDe();
-      break;
-    case "fr":
-      textToTranslate = getDescriptionFr();
-      break;
-    case "es":
-      textToTranslate = getDescriptionEs();
-      break;
-    case "it":
-      textToTranslate = getDescriptionIt();
-      break;
-    default:
-      break;
-    }
-    for (String to : toList)
-    {
-      try
-      {
-        String translatedText = DescriptionTranslater.translate(from, to, textToTranslate);
-        switch (to)
-        {
-        case "en":
-          setDescription(translatedText);
-          break;
-        case "de":
-          setDescriptionDe(translatedText);
-          break;
-        case "fr":
-          setDescriptionFr(translatedText);
-          break;
-        case "es":
-          setDescriptionEs(translatedText);
-          break;
-        case "it":
-          setDescriptionIt(translatedText);
-          break;
-        default:
-          break;
-        }
-      }
-      catch (IOException e)
-      {
-        ExceptionHandler.handleException(e, "Could not translate description");
-      }
-    }
-    this.disableChangeNotification(false);
-    this.notifyChange();
   }
 }

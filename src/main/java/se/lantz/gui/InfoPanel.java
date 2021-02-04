@@ -22,6 +22,9 @@ import javax.swing.SpinnerModel;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingUtilities;
 
+import se.lantz.gui.translation.TranslationDialog;
+import se.lantz.gui.translation.TranslationProgressDialog;
+import se.lantz.gui.translation.TranslationWorker;
 import se.lantz.model.InfoModel;
 import se.lantz.util.DescriptionTranslater;
 
@@ -427,10 +430,12 @@ public class InfoPanel extends JPanel
           dialog.setLocationRelativeTo(translateButton);
           if (dialog.showDialog())
           {
-            //Update model with translated text
-            String fromLanguage = dialog.getSelectedFromLanguage();
-            List<String> toLanguagesList = dialog.getSelectedToLanguages();
-            model.translateDescription(fromLanguage, toLanguagesList);
+            TranslationProgressDialog progressDialog = new TranslationProgressDialog(MainWindow.getInstance());
+            progressDialog.pack();
+            progressDialog.setLocationRelativeTo(MainWindow.getInstance());
+            TranslationWorker worker = new TranslationWorker(model, progressDialog, dialog.getSelectedFromLanguage(), dialog.getSelectedToLanguages());
+            worker.execute();
+            progressDialog.setVisible(true);
           }
         }
       });
