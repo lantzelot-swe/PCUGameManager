@@ -1,6 +1,5 @@
 -Add Lemon as a scraper site.
 -Allow for saving without a cover or one missing screenshot. Use "missing" for it instead. Makes it easier to add games where you don't have a cover for example.
--Add translation feature to automatically translate the description field. As a separate function for each game and when you scrape. An option to translate all games in one batch perhaps (not sure how the google scripts would cope with that, there is a cap at 5000 executions per day)
 -Keep gameinfo screens from PCU when deleting all games.
 -Add option to only delete all games in the current game view.
 -Only pre-select the empty fields for a game when opening the scraper dialog.
