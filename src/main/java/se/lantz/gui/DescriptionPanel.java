@@ -65,6 +65,7 @@ public class DescriptionPanel extends JPanel
   protected JTextArea getDescriptionTextArea() {
     if (descriptionTextArea == null) {
     	descriptionTextArea = new JTextArea();
+    	descriptionTextArea.setBorder(null);
     	descriptionTextArea.setFont(new JLabel().getFont());
       descriptionTextArea.setWrapStyleWord(true);
       descriptionTextArea.setLineWrap(true);
@@ -166,6 +167,7 @@ public class DescriptionPanel extends JPanel
   private JScrollPane getDescriptionScrollPane() {
     if (descriptionScrollPane == null) {
     	descriptionScrollPane = new JScrollPane();
+    	descriptionScrollPane.setBorder(null);
     	descriptionScrollPane.setPreferredSize(new Dimension(290, 150));
     	descriptionScrollPane.setViewportView(getDescriptionTextArea());
     }

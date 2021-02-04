@@ -11,6 +11,7 @@ import java.awt.event.KeyEvent;
 import java.beans.Beans;
 import java.util.Calendar;
 
+import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSpinner;
@@ -21,6 +22,8 @@ import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingUtilities;
 
 import se.lantz.model.InfoModel;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
 
 public class InfoPanel extends JPanel
 {
@@ -34,6 +37,7 @@ public class InfoPanel extends JPanel
   private JLabel yearLabel;
   private JSpinner yearField;
   private JLabel genreLabel;
+  private JButton translateButton;
   private GenreComboBox genreComboBox;
   private ScreenshotsPanel screensPanel;
   private JTabbedPane descriptionTabbedPane;
@@ -127,11 +131,17 @@ public class InfoPanel extends JPanel
     gbc_screensPanel.gridheight = 9;
     gbc_screensPanel.gridx = 2;
     gbc_screensPanel.gridy = 0;
-    this.add(getScreensPanel(), gbc_screensPanel);
+    add(getScreensPanel(), gbc_screensPanel);
+    GridBagConstraints gbc_translateButton = new GridBagConstraints();
+    gbc_translateButton.fill = GridBagConstraints.HORIZONTAL;
+    gbc_translateButton.insets = new Insets(20, 0, 5, 5);
+    gbc_translateButton.gridx = 1;
+    gbc_translateButton.gridy = 6;
+    add(getTranslateButton(), gbc_translateButton);
 
     if (!Beans.isDesignTime())
     {
-      model.addPropertyChangeListener((e) -> modelChanged());
+      model.addPropertyChangeListener(e -> modelChanged());
     }
   }
 
@@ -400,6 +410,20 @@ public class InfoPanel extends JPanel
       descriptionItPanel = new DescriptionPanel(model, DescriptionPanel.Language.it);
     }
     return descriptionItPanel;
+  }
+  
+  private JButton getTranslateButton()
+  {
+    if (translateButton == null)
+    {
+      translateButton = new JButton("Translate...");
+      translateButton.addActionListener(new ActionListener() {
+        public void actionPerformed(ActionEvent e) {
+          //TODO
+        }
+      });
+    }
+    return translateButton;
   }
   
   public void selectEnDescriptionTab()
