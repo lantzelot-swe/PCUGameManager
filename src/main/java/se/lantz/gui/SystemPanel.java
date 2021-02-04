@@ -66,6 +66,8 @@ public class SystemPanel extends JPanel
   private SystemModel model;
   private JCheckBox readOnlyCheckBox;
   private JLabel displayShiftValueLabel;
+  private JPanel audioReuPanel;
+  private JPanel reuPanel;
 
   public SystemPanel(SystemModel model)
   {
@@ -326,10 +328,32 @@ public class SystemPanel extends JPanel
     {
       cardPanel = new JPanel();
       cardPanel.setLayout(cardLayout);
-      cardPanel.add(getAudioPanel(), "audio");
+      cardPanel.add(getAudioReuPanel(), "audio");
       cardPanel.add(getRamPanel(), "ram");
     }
     return cardPanel;
+  }
+  
+  private JPanel getAudioReuPanel()
+  {
+    if (audioReuPanel == null)
+    {
+      audioReuPanel = new JPanel();
+      audioReuPanel.setLayout(new BorderLayout());
+      audioReuPanel.add(getAudioPanel(), BorderLayout.NORTH);
+      audioReuPanel.add(getReuPanel(), BorderLayout.CENTER);
+    }
+    return audioReuPanel;
+  }
+  
+  private JPanel getReuPanel()
+  {
+    if (reuPanel == null)
+    {
+      reuPanel = new JPanel();
+      reuPanel.setBorder(new TitledBorder(null, "REU", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+    }
+    return reuPanel;
   }
 
   private JPanel getAudioPanel()
