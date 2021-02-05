@@ -4,24 +4,27 @@ import java.util.ArrayList;
 
 public class SystemModel extends AbstractModel
 {
-  private final static String C64 = "64";
-  private final static String VIC = "vic";
-  private final static String PAL = "pal";
-  private final static String NTSC = "ntsc";
-  private final static String DRIVEICON = "driveicon";
-  private final static String ACCURATEDISK = "accuratedisk";
-  private final static String READONLY = "readonly";
-  private final static String FULLHEIGHT = "fullheight";
-  private final static String SID6581 = "sid6581";
-  private final static String SID8580 = "sid8580";
-  private final static String SID8580D = "sid8580D";
-  private final static String NOAUDIOSCALE = "noaudioscale";
-  private final static String BANK0 = "bank0";
-  private final static String BANK1 = "bank1";
-  private final static String BANK2 = "bank2";
-  private final static String BANK3 = "bank3";
-  private final static String BANK5 = "bank5";
-  private final static String BASIC = "basic";
+  private static final String C64 = "64";
+  private static final String VIC = "vic";
+  private static final String PAL = "pal";
+  private static final String NTSC = "ntsc";
+  private static final String DRIVEICON = "driveicon";
+  private static final String ACCURATEDISK = "accuratedisk";
+  private static final String READONLY = "readonly";
+  private static final String FULLHEIGHT = "fullheight";
+  private static final String SID6581 = "sid6581";
+  private static final String SID8580 = "sid8580";
+  private static final String SID8580D = "sid8580D";
+  private static final String NOAUDIOSCALE = "noaudioscale";
+  private static final String BANK0 = "bank0";
+  private static final String BANK1 = "bank1";
+  private static final String BANK2 = "bank2";
+  private static final String BANK3 = "bank3";
+  private static final String BANK5 = "bank5";
+  private static final String BASIC = "basic";
+  private static final String REU512K = "reu512";
+  private static final String REU2MB = "reu2048";
+  private static final String REU16MB = "reu16384";
   //TODO Support for 3K, 4K etc as aliases for Banks
  
   //TODO vertical shift
@@ -44,6 +47,9 @@ public class SystemModel extends AbstractModel
   private boolean bank3 = false;
   private boolean bank5 = false;
   private boolean basic = false;
+  private boolean reu512K = false;
+  private boolean reu2Mb = false;
+  private boolean reu16Mb = false;
   private int verticalShift = 0;
   
   public SystemModel()
@@ -103,6 +109,18 @@ public class SystemModel extends AbstractModel
       if (isNoAudioScale())
       {
         list.add(NOAUDIOSCALE);
+      }
+      if (isREU512K())
+      {
+        list.add(REU512K);
+      }
+      if (isREU2Mb())
+      {
+        list.add(REU2MB);
+      }
+      if (isREU16Mb())
+      {
+        list.add(REU16MB);
       }
     }
     else
@@ -173,6 +191,10 @@ public class SystemModel extends AbstractModel
     setBank2(false);
     setBank3(false);
     setBank5(false);
+    setBasic(false);
+    setREU512K(false);
+    setREU2Mb(false);
+    setREU16Mb(false);
   }
 
   public void setConfigString(String configString)
@@ -249,6 +271,18 @@ public class SystemModel extends AbstractModel
       else if (flag.equals(BANK5))
       {
         setBank5(true);
+      }
+      else if (flag.equals(REU512K))
+      {
+        setREU512K(true);
+      }
+      else if (flag.equals(REU2MB))
+      {
+        setREU2Mb(true);
+      }
+      else if (flag.equals(REU16MB))
+      {
+        setREU16Mb(true);
       }
       else if (flag.equals(BASIC))
       {
@@ -559,6 +593,51 @@ public class SystemModel extends AbstractModel
     boolean old = isBasic();
     this.basic = basic;
     if ((Boolean.compare(old, basic) != 0))
+    {
+      notifyChange();
+    }
+  }
+  
+  public boolean isREU512K()
+  {
+    return reu512K;
+  }
+
+  public void setREU512K(boolean reu)
+  {
+    boolean old = isREU512K();
+    this.reu512K = reu;
+    if ((Boolean.compare(old, reu) != 0))
+    {
+      notifyChange();
+    }
+  }
+  
+  public boolean isREU2Mb()
+  {
+    return reu2Mb;
+  }
+
+  public void setREU2Mb(boolean reu)
+  {
+    boolean old = isREU2Mb();
+    this.reu2Mb = reu;
+    if ((Boolean.compare(old, reu) != 0))
+    {
+      notifyChange();
+    }
+  }
+  
+  public boolean isREU16Mb()
+  {
+    return reu16Mb;
+  }
+
+  public void setREU16Mb(boolean reu)
+  {
+    boolean old = isREU16Mb();
+    this.reu16Mb = reu;
+    if ((Boolean.compare(old, reu) != 0))
     {
       notifyChange();
     }

@@ -63,11 +63,15 @@ public class SystemPanel extends JPanel
 
   private CardLayout cardLayout = new CardLayout(0, 0);
   private final ButtonGroup audioGroup = new ButtonGroup();
+  private final ButtonGroup reuGroup = new ButtonGroup();
   private SystemModel model;
   private JCheckBox readOnlyCheckBox;
   private JLabel displayShiftValueLabel;
   private JPanel audioReuPanel;
   private JPanel reuPanel;
+  private JCheckBox reu512kRadioButton;
+  private JCheckBox reu2mbRadioButton;
+  private JCheckBox reu16mbRadioButton;
 
   public SystemPanel(SystemModel model)
   {
@@ -147,6 +151,9 @@ public class SystemPanel extends JPanel
     getBank2CheckBox().setSelected(model.isBank2());
     getBank3CheckBox().setSelected(model.isBank3());
     getBank5CheckBox().setSelected(model.isBank5());
+    getReu512kRadioButton().setSelected(model.isREU512K());
+    getReu2mbRadioButton().setSelected(model.isREU2Mb());
+    getReu16mbRadioButton().setSelected(model.isREU16Mb());
 
     getConfigTextField().setText(model.getConfigString());
     getDisplayShiftComboBox().setSelectedItem(Integer.toString(model.getVerticalShift()));
@@ -352,6 +359,30 @@ public class SystemPanel extends JPanel
     {
       reuPanel = new JPanel();
       reuPanel.setBorder(new TitledBorder(null, "REU", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+      GridBagLayout gbl_reuPanel = new GridBagLayout();
+      gbl_reuPanel.columnWidths = new int[]{0, 0};
+      gbl_reuPanel.rowHeights = new int[]{0, 0, 0, 0};
+      gbl_reuPanel.columnWeights = new double[]{0.0, Double.MIN_VALUE};
+      gbl_reuPanel.rowWeights = new double[]{0.0, 0.0, 0.0, Double.MIN_VALUE};
+      reuPanel.setLayout(gbl_reuPanel);
+      GridBagConstraints gbc_reu512kRadioButton = new GridBagConstraints();
+      gbc_reu512kRadioButton.anchor = GridBagConstraints.WEST;
+      gbc_reu512kRadioButton.insets = new Insets(0, 0, 0, 5);
+      gbc_reu512kRadioButton.gridx = 0;
+      gbc_reu512kRadioButton.gridy = 0;
+      reuPanel.add(getReu512kRadioButton(), gbc_reu512kRadioButton);
+      GridBagConstraints gbc_reu2mbRadioButton = new GridBagConstraints();
+      gbc_reu2mbRadioButton.anchor = GridBagConstraints.WEST;
+      gbc_reu2mbRadioButton.insets = new Insets(0, 0, 0, 5);
+      gbc_reu2mbRadioButton.gridx = 0;
+      gbc_reu2mbRadioButton.gridy = 1;
+      reuPanel.add(getReu2mbRadioButton(), gbc_reu2mbRadioButton);
+      GridBagConstraints gbc_reu16mbRadioButton = new GridBagConstraints();
+      gbc_reu16mbRadioButton.anchor = GridBagConstraints.WEST;
+      gbc_reu16mbRadioButton.insets = new Insets(0, 0, 0, 5);
+      gbc_reu16mbRadioButton.gridx = 0;
+      gbc_reu16mbRadioButton.gridy = 2;
+      reuPanel.add(getReu16mbRadioButton(), gbc_reu16mbRadioButton);
     }
     return reuPanel;
   }
@@ -436,8 +467,9 @@ public class SystemPanel extends JPanel
       gbc_bank5CheckBox.gridy = 4;
       ramPanel.add(getBank5CheckBox(), gbc_bank5CheckBox);
       GridBagConstraints gbc_ramLabel = new GridBagConstraints();
+      gbc_ramLabel.weighty = 1.0;
       gbc_ramLabel.insets = new Insets(0, 5, 10, 5);
-      gbc_ramLabel.anchor = GridBagConstraints.WEST;
+      gbc_ramLabel.anchor = GridBagConstraints.NORTHWEST;
       gbc_ramLabel.weightx = 1.0;
       gbc_ramLabel.gridx = 0;
       gbc_ramLabel.gridy = 5;
@@ -884,5 +916,44 @@ public class SystemPanel extends JPanel
       displayShiftValueLabel = new JLabel(" ");
     }
     return displayShiftValueLabel;
+  }
+  private JCheckBox getReu512kRadioButton() {
+    if (reu512kRadioButton == null) {
+    	reu512kRadioButton = new JCheckBox("512K RAM Expansion Unit ");
+    	reu512kRadioButton.addActionListener(new ActionListener() {
+    	  public void actionPerformed(ActionEvent e) {
+    	    model.setREU512K(reu512kRadioButton.isSelected());
+    	    model.setREU2Mb(false);
+          model.setREU16Mb(false);
+    	  }
+    	});
+    }
+    return reu512kRadioButton;
+  }
+  private JCheckBox getReu2mbRadioButton() {
+    if (reu2mbRadioButton == null) {
+    	reu2mbRadioButton = new JCheckBox("2Mb RAM Expansion Unit");
+    	reu2mbRadioButton.addActionListener(new ActionListener() {
+        public void actionPerformed(ActionEvent e) {
+          model.setREU2Mb(reu2mbRadioButton.isSelected());
+          model.setREU512K(false);
+          model.setREU16Mb(false);
+        }
+      });
+    }
+    return reu2mbRadioButton;
+  }
+  private JCheckBox getReu16mbRadioButton() {
+    if (reu16mbRadioButton == null) {
+    	reu16mbRadioButton = new JCheckBox("16Mb RAM Expansion Unit");
+    	reu16mbRadioButton.addActionListener(new ActionListener() {
+        public void actionPerformed(ActionEvent e) {
+          model.setREU16Mb(reu16mbRadioButton.isSelected());
+          model.setREU512K(false);
+          model.setREU2Mb(false);
+        }
+      });
+    }
+    return reu16mbRadioButton;
   }
 }
