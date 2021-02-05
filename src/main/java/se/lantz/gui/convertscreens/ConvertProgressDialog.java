@@ -1,20 +1,20 @@
-package se.lantz.gui.exports;
+package se.lantz.gui.convertscreens;
 
 import java.awt.Frame;
 
 import javax.swing.JDialog;
 import javax.swing.WindowConstants;
 
-public class ExportProgressDialog extends JDialog
+public class ConvertProgressDialog extends JDialog
 {
   private static final long serialVersionUID = 1L;
 
-  private ExportProgressPanel panel;
+  private ConvertProgressPanel panel;
 
-  public ExportProgressDialog(Frame frame)
+  public ConvertProgressDialog(Frame frame)
   {
-    super(frame,"Export games", true);
-    this.add(getExportProgressPanel());
+    super(frame, "Convert screenshots", true);
+    this.add(getConvertProgressPanel());
     setSize(900, 600);
     setAlwaysOnTop(true);
     setLocationRelativeTo(frame);
@@ -23,20 +23,20 @@ public class ExportProgressDialog extends JDialog
 
   public void updateProgress(String infoText)
   {
-    getExportProgressPanel().updateProgress(infoText);
+    getConvertProgressPanel().updateProgress(infoText);
     this.repaint();
   }
-  
-  public void finish()
+
+  public void finish(int count, Exception e)
   {
-    getExportProgressPanel().finish();
+    getConvertProgressPanel().finish(count, e);
   }
 
-  public ExportProgressPanel getExportProgressPanel()
+  public ConvertProgressPanel getConvertProgressPanel()
   {
     if (panel == null)
     {
-      panel = new ExportProgressPanel();
+      panel = new ConvertProgressPanel();
       panel.getCloseButton().addActionListener(e -> setVisible(false));
     }
     return panel;

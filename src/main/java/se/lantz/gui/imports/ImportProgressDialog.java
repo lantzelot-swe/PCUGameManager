@@ -3,6 +3,7 @@ package se.lantz.gui.imports;
 import java.awt.Frame;
 
 import javax.swing.JDialog;
+import javax.swing.WindowConstants;
 
 public class ImportProgressDialog extends JDialog
 {
@@ -17,6 +18,7 @@ public class ImportProgressDialog extends JDialog
     setSize(900, 600);
     setAlwaysOnTop(true);
     setLocationRelativeTo(frame);
+    setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
   }
 
   public void updateProgress(String infoText)

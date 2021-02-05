@@ -3,30 +3,19 @@ package se.lantz.gui;
 import java.awt.Desktop;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
-import java.io.File;
 import java.io.IOException;
-import java.io.StringReader;
-import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URL;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Scanner;
 
-import javax.swing.JFileChooser;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
-import com.google.gson.stream.JsonReader;
-
+import se.lantz.gui.convertscreens.ConvertProgressDialog;
+import se.lantz.gui.convertscreens.ConvertWorker;
 import se.lantz.gui.dbbackup.BackupProgressDialog;
 import se.lantz.gui.dbbackup.BackupWorker;
 import se.lantz.gui.dbrestore.RestoreDbDialog;
@@ -44,7 +33,6 @@ import se.lantz.manager.ImportManager;
 import se.lantz.manager.RestoreManager;
 import se.lantz.model.MainViewModel;
 import se.lantz.model.data.GameListData;
-import se.lantz.util.ExceptionHandler;
 import se.lantz.util.FileManager;
 import se.lantz.util.VersionChecker;
 
@@ -63,13 +51,15 @@ public class MenuManager
   private JMenuItem runGameItem;
   private JMenuItem importItem;
   private JMenuItem exportItem;
-  
+
   private JMenuItem toggleFavoriteItem;
   private JMenuItem clearFavoritesItem;
 
   private JMenuItem backupDbItem;
   private JMenuItem restoreDbItem;
   private JMenuItem createEmptyDbItem;
+
+  private JMenuItem convertScreensItem;
 
   private JMenuItem helpItem;
   private JMenuItem aboutItem;
@@ -114,10 +104,12 @@ public class MenuManager
     editMenu = new JMenu("Edit");
     editMenu.add(getToggleFavoriteItem());
     editMenu.add(getClearFavoritesItem());
-    dbMenu = new JMenu("Database");
+    dbMenu = new JMenu("Tools");
     dbMenu.add(getBackupDbItem());
     dbMenu.add(getRestoreDbItem());
     dbMenu.add(getCreateEmptyDbItem());
+    dbMenu.addSeparator();
+    dbMenu.add(getConvertScreensItem());
     helpMenu = new JMenu("Help");
     helpMenu.add(getHelpItem());
     helpMenu.add(getCheckVersionItem());
@@ -167,7 +159,7 @@ public class MenuManager
     deleteGameItem.addActionListener(e -> mainWindow.getMainPanel().deleteCurrentGame());
     return deleteGameItem;
   }
-  
+
   JMenuItem getRunGameMenuItem()
   {
     runGameItem = new JMenuItem("Run Current Game");
@@ -204,7 +196,7 @@ public class MenuManager
     exitItem = new JMenuItem("Exit");
     KeyStroke keyStrokeExit = KeyStroke.getKeyStroke(KeyEvent.VK_F4, InputEvent.ALT_DOWN_MASK);
     exitItem.setAccelerator(keyStrokeExit);
-    
+
     exitItem.setMnemonic('x');
     exitItem.addActionListener(e -> {
       if (uiModel.isDataChanged())
@@ -227,7 +219,7 @@ public class MenuManager
     });
     return exitItem;
   }
-  
+
   private JMenuItem getToggleFavoriteItem()
   {
     toggleFavoriteItem = new JMenuItem("Add/remove from favorites");
@@ -239,7 +231,7 @@ public class MenuManager
     });
     return toggleFavoriteItem;
   }
-  
+
   private JMenuItem getClearFavoritesItem()
   {
     clearFavoritesItem = new JMenuItem("Clear all favorites");
@@ -271,6 +263,13 @@ public class MenuManager
     return createEmptyDbItem;
   }
 
+  private JMenuItem getConvertScreensItem()
+  {
+    convertScreensItem = new JMenuItem("Convert screenshots...");
+    convertScreensItem.addActionListener(e -> convertScreens());
+    return convertScreensItem;
+  }
+
   private JMenuItem getHelpItem()
   {
     helpItem = new JMenuItem("Help");
@@ -283,7 +282,10 @@ public class MenuManager
       }
       catch (IOException | URISyntaxException ex)
       {
-        JOptionPane.showMessageDialog(MainWindow.getInstance(), "Could not open help", "Help missing", JOptionPane.ERROR_MESSAGE);
+        JOptionPane.showMessageDialog(MainWindow.getInstance(),
+                                      "Could not open help",
+                                      "Help missing",
+                                      JOptionPane.ERROR_MESSAGE);
       }
     });
     return helpItem;
@@ -341,7 +343,9 @@ public class MenuManager
       if (!gamesList.isEmpty())
       {
         exportManager.setGamesToExport(gamesList);
-        exportManager.setTargetDirectory(exportSelectionDialog.getTargetDirectory(), exportSelectionDialog.deleteBeforeExport(), exportSelectionDialog.addGamesSubDirectory());
+        exportManager.setTargetDirectory(exportSelectionDialog.getTargetDirectory(),
+                                         exportSelectionDialog.deleteBeforeExport(),
+                                         exportSelectionDialog.addGamesSubDirectory());
         ExportProgressDialog dialog = new ExportProgressDialog(this.mainWindow);
         ExportWorker worker = new ExportWorker(exportManager, dialog);
         worker.execute();
@@ -393,11 +397,25 @@ public class MenuManager
       MainWindow.getInstance().selectViewAfterRestore();
     }
   }
-  
-  private void clearFavorites()
+
+  private void convertScreens()
   {
     String message =
-      "Are you sure you want to clear all games marked as favorites?";
+      "Do you want to check all screenshots in the database and convert them to use 32-bit color depths?\nThe PCU list selector screen requires 32-bit depths for the screenshots to be rendered properly.";
+    int option = JOptionPane.showConfirmDialog(MainWindow.getInstance()
+      .getMainPanel(), message, "Convert screenshots", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+    if (option == JOptionPane.YES_OPTION)
+    {
+      ConvertProgressDialog dialog = new ConvertProgressDialog(this.mainWindow);
+      ConvertWorker worker = new ConvertWorker(dialog);
+      worker.execute();
+      dialog.setVisible(true);
+    }
+  }
+
+  private void clearFavorites()
+  {
+    String message = "Are you sure you want to clear all games marked as favorites?";
     int option = JOptionPane.showConfirmDialog(MainWindow.getInstance()
       .getMainPanel(), message, "Clear all favorites", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
     if (option == JOptionPane.YES_OPTION)

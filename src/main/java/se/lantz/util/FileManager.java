@@ -241,14 +241,14 @@ public class FileManager
     //Screen 2
     String screens2File = infoModel.getScreens2File();
     String oldScreens2File = infoModel.getOldScreens2File();
-    
+
     //Special case if the same screen has been used for both screens: Copy first to second in this case
     if (!oldScreens1File.isEmpty() && !oldScreens2File.isEmpty() && oldScreens1File.equals(oldScreens2File))
     {
       try
       {
         Files.copy(new File(SCREENS + screens1File).toPath(), new File(SCREENS + screens2File).toPath());
-        logger.debug("Copied {} to {}",  screens1File, screens2File);
+        logger.debug("Copied {} to {}", screens1File, screens2File);
       }
       catch (IOException e)
       {
@@ -259,22 +259,22 @@ public class FileManager
     {
       if (!screens2File.isEmpty() && !oldScreens2File.isEmpty() && !screens2File.equals(oldScreens2File))
       {
-          File oldScreen2 = new File(SCREENS + oldScreens2File);
-          File newScreen2 = new File(SCREENS + screens2File);
-          if (oldScreen2.renameTo(newScreen2))
-          {
-            logger.debug("Renamed screen2 {} to {}", oldScreen2.getName(), newScreen2.getName());
-          }
-          else
-          {
-            logger.debug("Could NOT rename screen2 {} to {}", oldScreen2.getName(), newScreen2.getName());
-          }   
+        File oldScreen2 = new File(SCREENS + oldScreens2File);
+        File newScreen2 = new File(SCREENS + screens2File);
+        if (oldScreen2.renameTo(newScreen2))
+        {
+          logger.debug("Renamed screen2 {} to {}", oldScreen2.getName(), newScreen2.getName());
+        }
+        else
+        {
+          logger.debug("Could NOT rename screen2 {} to {}", oldScreen2.getName(), newScreen2.getName());
+        }
       }
     }
     //Gamefile
     String gamesFile = infoModel.getGamesFile();
     String oldGamesFile = infoModel.getOldGamesFile();
-    if (!gamesFile.isEmpty() && !oldGamesFile.isEmpty()  && !gamesFile.equals(oldGamesFile))
+    if (!gamesFile.isEmpty() && !oldGamesFile.isEmpty() && !gamesFile.equals(oldGamesFile))
     {
       File oldGame = new File(GAMES + oldGamesFile);
       File newGame = new File(GAMES + gamesFile);
@@ -920,6 +920,39 @@ public class FileManager
       ze = zis.getNextZipEntry();
     }
     return ze;
+  }
+
+  public static List<String> convertAllScreenshotsTo32Bit() throws IOException
+  {
+    List<String> convertedScreensList = new ArrayList<>();
+
+    Files.walk(Paths.get(SCREENS), 1).filter(Files::isRegularFile).forEach(source -> {
+      BufferedImage image = null;
+
+      File currentFile = (source.toFile());
+      try
+      {
+        image = ImageIO.read(currentFile);
+        if (image != null && image.getType() != BufferedImage.TYPE_INT_ARGB &&
+          image.getType() != BufferedImage.TYPE_4BYTE_ABGR)
+        {
+          //Convert to 32 bit
+          BufferedImage convertedImage =
+            new BufferedImage(image.getWidth(null), image.getHeight(null), BufferedImage.TYPE_INT_ARGB);
+          Graphics g = convertedImage.createGraphics();
+          g.drawImage(image, 0, 0, null);
+          //Write new file
+          ImageIO.write(convertedImage, "png", currentFile);
+          convertedScreensList.add(source.getFileName().toString());
+        }
+      }
+      catch (Exception e)
+      {
+        logger.error("can't read file: " + source.toString(), e);
+      }
+    });
+
+    return convertedScreensList;
   }
 
 }
