@@ -276,7 +276,7 @@ public class GameDetailsBackgroundPanel extends JPanel
   {
     if (scraperDialog == null)
     {
-      scraperDialog = new ScraperDialog(MainWindow.getInstance(), scraperManager);
+      scraperDialog = new ScraperDialog(MainWindow.getInstance(), scraperManager, model.getInfoModel());
       scraperDialog.pack();
       scraperDialog.setLocationRelativeTo(MainWindow.getInstance());
     }

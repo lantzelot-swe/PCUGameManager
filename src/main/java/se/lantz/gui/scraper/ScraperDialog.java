@@ -16,6 +16,7 @@ import javax.swing.JPanel;
 import se.lantz.gui.BaseDialog;
 import se.lantz.manager.ScraperManager;
 import se.lantz.manager.ScraperManager.SCRAPER;
+import se.lantz.model.InfoModel;
 import se.lantz.model.data.ScraperFields;
 
 public class ScraperDialog extends BaseDialog
@@ -35,10 +36,12 @@ public class ScraperDialog extends BaseDialog
   private JLabel scraperInfoLabel;
   private JComboBox scraperComboBox;
   private JPanel cardPanel;
+  private InfoModel model;
 
-  public ScraperDialog(Frame owner, ScraperManager scraper)
+  public ScraperDialog(Frame owner, ScraperManager scraper, InfoModel model)
   {
     super(owner);
+    this.model = model;
     setTitle("Scrape game information");
     this.scraper = scraper;
     JPanel content = new JPanel();
@@ -58,7 +61,7 @@ public class ScraperDialog extends BaseDialog
   {
     if (mobyGamesPanel == null)
     {
-      mobyGamesPanel = new MobyGamesOptionsPanel(scraper, getOkButton());
+      mobyGamesPanel = new MobyGamesOptionsPanel(scraper, getOkButton(), model);
     }
     return mobyGamesPanel;
   }
@@ -67,7 +70,7 @@ public class ScraperDialog extends BaseDialog
   {
     if (c64comPanel == null)
     {
-      c64comPanel = new C64comOptionsPanel(scraper, getOkButton());
+      c64comPanel = new C64comOptionsPanel(scraper, getOkButton(), model);
     }
     return c64comPanel;
   }
@@ -76,7 +79,7 @@ public class ScraperDialog extends BaseDialog
   {
     if (gb64comPanel == null)
     {
-      gb64comPanel = new Gb64comOptionsPanel(scraper, getOkButton());
+      gb64comPanel = new Gb64comOptionsPanel(scraper, getOkButton(), model);
     }
     return gb64comPanel;
   }
@@ -100,6 +103,9 @@ public class ScraperDialog extends BaseDialog
   @Override
   public boolean showDialog()
   {
+    getMobyGamesPanel().preSelectFields();
+    getC64comPanel().preSelectFields();
+    getGb64comPanel().preSelectFields();
     getMobyGamesPanel().getUrlTextField().requestFocusInWindow();
     this.getRootPane().setDefaultButton(getMobyGamesPanel().getConnectButton());
 

@@ -31,7 +31,6 @@ public class GameDetails
 
   public GameDetails()
   {
-    setTitle("New Game");
     setJoy1("J:1:" + JoystickModel.DEFAULT_CONFIG);
     setJoy2("J:2*:" + JoystickModel.DEFAULT_CONFIG);
   }

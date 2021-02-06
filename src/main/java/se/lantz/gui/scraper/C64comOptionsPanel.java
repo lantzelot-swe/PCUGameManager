@@ -26,6 +26,7 @@ import javax.swing.UIManager;
 import javax.swing.event.HyperlinkEvent;
 
 import se.lantz.manager.ScraperManager;
+import se.lantz.model.InfoModel;
 import se.lantz.model.data.ScraperFields;
 import se.lantz.util.ExceptionHandler;
 
@@ -50,11 +51,13 @@ public class C64comOptionsPanel extends JPanel
   private JButton okButton;
   private JCheckBox genreCheckBox;
   private JCheckBox composerCheckBox;
+  private InfoModel model;
 
-  public C64comOptionsPanel(ScraperManager scraper, JButton okButton)
+  public C64comOptionsPanel(ScraperManager scraper, JButton okButton, InfoModel model)
   {
     this.scraper = scraper;
     this.okButton = okButton;
+    this.model = model;
     GridBagLayout gridBagLayout = new GridBagLayout();
     setLayout(gridBagLayout);
     GridBagConstraints gbc_infoLabel = new GridBagConstraints();
@@ -385,5 +388,17 @@ public class C64comOptionsPanel extends JPanel
       composerCheckBox.setEnabled(false);
     }
     return composerCheckBox;
+  }
+  
+  public void preSelectFields()
+  {
+    getTitleCheckBox().setSelected(model.getTitle().isEmpty());
+    getAuthorCheckBox().setSelected(model.getAuthor().isEmpty());
+    getYearCheckBox().setSelected(model.getYear() == 1986 && model.isNewGame());
+    getGenreCheckBox().setSelected(model.getGenre().isEmpty());
+    getComposerCheckBox().setSelected(model.getComposer().isEmpty());
+    getCoverCheckBox().setSelected(model.getCoverFile().isEmpty() && model.getCoverImage() == null);
+    getScreensCheckBox().setSelected((model.getScreens1File().isEmpty() && model.getScreen1Image() == null) || (model.getScreens1File().isEmpty() && model.getScreen1Image() == null));
+    getGameCheckBox().setSelected(model.getGamesFile().isEmpty() && model.getGamesPath() == null);
   }
 }
