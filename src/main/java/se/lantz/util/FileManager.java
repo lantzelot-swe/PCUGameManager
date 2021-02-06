@@ -28,6 +28,7 @@ import java.util.zip.GZIPOutputStream;
 import java.util.zip.ZipEntry;
 
 import javax.imageio.ImageIO;
+import javax.swing.ListModel;
 
 import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream;
 import org.slf4j.Logger;
@@ -38,6 +39,7 @@ import se.lantz.model.InfoModel;
 import se.lantz.model.MainViewModel;
 import se.lantz.model.SystemModel;
 import se.lantz.model.data.GameDetails;
+import se.lantz.model.data.GameListData;
 
 public class FileManager
 {
@@ -664,19 +666,44 @@ public class FileManager
 
   public static void deleteAllFolderContent()
   {
-    deleteDirContent(new File(COVERS));
-    deleteDirContent(new File(SCREENS));
-    deleteDirContent(new File(GAMES));
+    deleteDirContent(new File(COVERS), false);
+    deleteDirContent(new File(SCREENS), false);
+    deleteDirContent(new File(GAMES), false);
   }
+  
 
-  private static void deleteDirContent(File dir)
+  private static void deleteDirContent(File dir, boolean deleteAll)
   {
     for (File file : dir.listFiles())
     {
-      if (!file.isDirectory())
+      if (!file.isDirectory() && (deleteAll || !file.getName().contains("THEC64")))
       {
         file.delete();
       }
+    }
+  }
+  
+  public static void deleteFilesForGame(GameDetails details)
+  {
+    if (!details.getCover().isEmpty())
+    {
+      File coverFile = new File(COVERS + details.getCover());
+      coverFile.delete();
+    }
+    if (!details.getScreen1().isEmpty())
+    {
+      File screens1File = new File(SCREENS + details.getScreen1());
+      screens1File.delete();
+    }
+    if (!details.getScreen2().isEmpty())
+    {
+      File screens2File = new File(SCREENS + details.getScreen2());
+      screens2File.delete();
+    }
+    if (!details.getGame().isEmpty())
+    {
+      File gameFile = new File(GAMES + details.getGame());
+      gameFile.delete();
     }
   }
 
@@ -701,7 +728,7 @@ public class FileManager
     try
     {
       File coversDir = new File(COVERS);
-      deleteDirContent(coversDir);
+      deleteDirContent(coversDir, true);
       copyDirectory(backupFolder.toPath().resolve("covers").toString(), coversDir.toPath().toString());
     }
     catch (IOException e)
@@ -716,7 +743,7 @@ public class FileManager
     try
     {
       File coversDir = new File(SCREENS);
-      deleteDirContent(coversDir);
+      deleteDirContent(coversDir, true);
       copyDirectory(backupFolder.toPath().resolve("screens").toString(), coversDir.toPath().toString());
     }
     catch (IOException e)
@@ -731,7 +758,7 @@ public class FileManager
     try
     {
       File coversDir = new File(GAMES);
-      deleteDirContent(coversDir);
+      deleteDirContent(coversDir, true);
       copyDirectory(backupFolder.toPath().resolve("games").toString(), coversDir.toPath().toString());
     }
     catch (IOException e)

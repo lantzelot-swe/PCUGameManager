@@ -122,7 +122,7 @@ public class MainPanel extends JPanel
       }
     }
   }
-
+  
   int showDeleteDialog()
   {
     String message = "Do you want to delete " + uiModel.getInfoModel().getTitle() + " from the database?";

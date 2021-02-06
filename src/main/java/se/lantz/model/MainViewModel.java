@@ -46,6 +46,7 @@ public class MainViewModel extends AbstractModel
   private FileManager fileManager = new FileManager(this);
 
   private String currentGameId = "";
+  private GameDetails currentGameDetails = null;
 
   private PropertyChangeListener duplicateListener;
 
@@ -131,45 +132,41 @@ public class MainViewModel extends AbstractModel
   {
     this.selectedData = selectedData;
     currentGameId = selectedData.getGameId();
-    GameDetails details = null;
     if (selectedData.getGameId().isEmpty())
     {
       //Create a default GameDetails and return
-      details = new GameDetails();
+      currentGameDetails = new GameDetails();
     }
     else
     {
       // Read from db, update all models after that.
-      details = dbConnector.getGameDetails(selectedData.getGameId());
+      currentGameDetails = dbConnector.getGameDetails(selectedData.getGameId());
     }
     disableChangeNotification(true);
 
     // Map to models
-    infoModel.setTitleFromDb(details.getTitle());
+    infoModel.setTitleFromDb(currentGameDetails.getTitle());
 
-    infoModel.setTitle(details.getTitle());
-    infoModel.setDescription(details.getDescription());
-    infoModel.setDescriptionDe(details.getDescriptionDe());
-    infoModel.setDescriptionFr(details.getDescriptionFr());
-    infoModel.setDescriptionEs(details.getDescriptionEs());
-    infoModel.setDescriptionIt(details.getDescriptionIt());
-    infoModel.setYear(details.getYear());
-    infoModel.setAuthor(details.getAuthor());
-    infoModel.setGenre(details.getGenre());
-    infoModel.setComposer(details.getComposer());
-    infoModel.setGamesFile(details.getGame());
-    infoModel.setCoverFile(details.getCover());
-    infoModel.setScreens1File(details.getScreen1());
-    infoModel.setScreens2File(details.getScreen2());
+    infoModel.setTitle(currentGameDetails.getTitle());
+    infoModel.setDescription(currentGameDetails.getDescription());
+    infoModel.setDescriptionDe(currentGameDetails.getDescriptionDe());
+    infoModel.setDescriptionFr(currentGameDetails.getDescriptionFr());
+    infoModel.setDescriptionEs(currentGameDetails.getDescriptionEs());
+    infoModel.setDescriptionIt(currentGameDetails.getDescriptionIt());
+    infoModel.setYear(currentGameDetails.getYear());
+    infoModel.setAuthor(currentGameDetails.getAuthor());
+    infoModel.setGenre(currentGameDetails.getGenre());
+    infoModel.setComposer(currentGameDetails.getComposer());
+    infoModel.setGamesFile(currentGameDetails.getGame());
+    infoModel.setCoverFile(currentGameDetails.getCover());
+    infoModel.setScreens1File(currentGameDetails.getScreen1());
+    infoModel.setScreens2File(currentGameDetails.getScreen2());
     //Reset and images that where added previously
     infoModel.resetImagesAndOldFileNames();
-
-    joy1Model.setConfigStringFromDb(details.getJoy1());
-
-    joy2Model.setConfigStringFromDb(details.getJoy2());
-
-    systemModel.setConfigStringFromDb(details.getSystem());
-    systemModel.setVerticalShift(details.getVerticalShift());
+    joy1Model.setConfigStringFromDb(currentGameDetails.getJoy1());
+    joy2Model.setConfigStringFromDb(currentGameDetails.getJoy2());
+    systemModel.setConfigStringFromDb(currentGameDetails.getSystem());
+    systemModel.setVerticalShift(currentGameDetails.getVerticalShift());
 
     //Set empty title to trigger a change
     if (selectedData.getGameId().isEmpty())
@@ -416,6 +413,7 @@ public class MainViewModel extends AbstractModel
     }
     else
     {
+      FileManager.deleteFilesForGame(currentGameDetails);
       dbConnector.deleteGame(currentGameId);
       //Update all games count, will be reset if its All that is loaded
       allGamesCount--;
@@ -428,6 +426,25 @@ public class MainViewModel extends AbstractModel
   public void deleteAllGames()
   {
     dbConnector.deleteAllGames();
+    //Reload the current view
+    reloadCurrentGameView();
+  }
+  
+  public void deleteAllGamesInCurrentView()
+  {
+    //First delete all covers, screens and games 
+    for (int i = 0; i < getGameListModel().getSize(); i++)
+    {
+      GameListData currentData = getGameListModel().getElementAt(i);   
+      if (!currentData.getTitle().contains("THEC64"))
+      {
+        GameDetails details = dbConnector.getGameDetails(currentData.getGameId());
+        FileManager.deleteFilesForGame(details);
+        allGamesCount--;
+        allGameView.setGameCount(allGamesCount);
+      }
+    }
+    dbConnector.deleteAllGamesInView(getSelectedGameView());
     //Reload the current view
     reloadCurrentGameView();
   }

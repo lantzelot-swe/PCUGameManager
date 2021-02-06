@@ -33,21 +33,20 @@ import se.lantz.manager.ImportManager;
 import se.lantz.manager.RestoreManager;
 import se.lantz.model.MainViewModel;
 import se.lantz.model.data.GameListData;
+import se.lantz.model.data.GameView;
 import se.lantz.util.FileManager;
 import se.lantz.util.VersionChecker;
 
 public class MenuManager
 {
-
-  private static final String IMPORT_DIR_PROPERTY = "importDir";
-  private static final String EXPORT_DIR_PROPERTY = "exportDir";
   private JMenu fileMenu;
   private JMenu editMenu;
-  private JMenu dbMenu;
+  private JMenu toolsMenu;
   private JMenu helpMenu;
 
   private JMenuItem addGameItem;
   private JMenuItem deleteGameItem;
+
   private JMenuItem runGameItem;
   private JMenuItem importItem;
   private JMenuItem exportItem;
@@ -57,7 +56,8 @@ public class MenuManager
 
   private JMenuItem backupDbItem;
   private JMenuItem restoreDbItem;
-  private JMenuItem createEmptyDbItem;
+  private JMenuItem deleteAllGamesItem;
+  private JMenuItem deleteGamesForViewItem;
 
   private JMenuItem convertScreensItem;
 
@@ -104,12 +104,14 @@ public class MenuManager
     editMenu = new JMenu("Edit");
     editMenu.add(getToggleFavoriteItem());
     editMenu.add(getClearFavoritesItem());
-    dbMenu = new JMenu("Tools");
-    dbMenu.add(getBackupDbItem());
-    dbMenu.add(getRestoreDbItem());
-    dbMenu.add(getCreateEmptyDbItem());
-    dbMenu.addSeparator();
-    dbMenu.add(getConvertScreensItem());
+    toolsMenu = new JMenu("Tools");
+    toolsMenu.add(getBackupDbItem());
+    toolsMenu.add(getRestoreDbItem());
+    toolsMenu.addSeparator();
+    toolsMenu.add(getDeleteAllGamesItem());
+    toolsMenu.add(getDeleteGamesForViewMenuItem());
+    toolsMenu.addSeparator();
+    toolsMenu.add(getConvertScreensItem());
     helpMenu = new JMenu("Help");
     helpMenu.add(getHelpItem());
     helpMenu.add(getCheckVersionItem());
@@ -133,7 +135,7 @@ public class MenuManager
     List<JMenu> menuList = new ArrayList<JMenu>();
     menuList.add(fileMenu);
     menuList.add(editMenu);
-    menuList.add(dbMenu);
+    menuList.add(toolsMenu);
     menuList.add(helpMenu);
     return menuList;
   }
@@ -158,6 +160,14 @@ public class MenuManager
 
     deleteGameItem.addActionListener(e -> mainWindow.getMainPanel().deleteCurrentGame());
     return deleteGameItem;
+  }
+
+  JMenuItem getDeleteGamesForViewMenuItem()
+  {
+    deleteGamesForViewItem = new JMenuItem("Delete all games in current view");
+
+    deleteGamesForViewItem.addActionListener(e -> deleteAllGamesInView());
+    return deleteGamesForViewItem;
   }
 
   JMenuItem getRunGameMenuItem()
@@ -256,11 +266,11 @@ public class MenuManager
     return restoreDbItem;
   }
 
-  private JMenuItem getCreateEmptyDbItem()
+  private JMenuItem getDeleteAllGamesItem()
   {
-    createEmptyDbItem = new JMenuItem("Delete all games");
-    createEmptyDbItem.addActionListener(e -> deleteAllGames());
-    return createEmptyDbItem;
+    deleteAllGamesItem = new JMenuItem("Delete all games");
+    deleteAllGamesItem.addActionListener(e -> deleteAllGames());
+    return deleteAllGamesItem;
   }
 
   private JMenuItem getConvertScreensItem()
@@ -383,7 +393,7 @@ public class MenuManager
   private void deleteAllGames()
   {
     String message =
-      "Do you want to delete all games from the database? A backup will added to the backups folder before deleting.\nCover, screenshot and game files will also be deleted.";
+      "Do you want to delete all games from the database? A backup will added to the backups folder before deleting.\nCovers, screenshots and game files will also be deleted.";
     int option = JOptionPane.showConfirmDialog(MainWindow.getInstance()
       .getMainPanel(), message, "Delete all games", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
     if (option == JOptionPane.YES_OPTION)
@@ -395,6 +405,27 @@ public class MenuManager
       //Trigger a reload of game views
       uiModel.reloadGameViews();
       MainWindow.getInstance().selectViewAfterRestore();
+    }
+  }
+
+  private void deleteAllGamesInView()
+  {
+    if (uiModel.getSelectedGameView().getGameViewId() == GameView.ALL_GAMES_ID)
+    {
+      deleteAllGames();
+    }
+    else
+    {
+      String message =
+        "Do you want to delete all games in the current game view?\nCovers, screenshots and game files will also be deleted.";
+      int option = JOptionPane.showConfirmDialog(MainWindow.getInstance()
+        .getMainPanel(), message, "Delete all games in view", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+      if (option == JOptionPane.YES_OPTION)
+      {
+        MainWindow.getInstance().getMainPanel().clearGameListSelection();
+        uiModel.deleteAllGamesInCurrentView();    
+        MainWindow.getInstance().getMainPanel().repaintAfterModifications();
+      }
     }
   }
 
