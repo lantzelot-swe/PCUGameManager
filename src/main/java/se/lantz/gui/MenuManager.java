@@ -392,13 +392,15 @@ public class MenuManager
 
   private void deleteAllGames()
   {
-    String message =
-      "Do you want to delete all games from the database? A backup will added to the backups folder before deleting.\nCovers, screenshots and game files will also be deleted.";
-    int option = JOptionPane.showConfirmDialog(MainWindow.getInstance()
-      .getMainPanel(), message, "Delete all games", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
-    if (option == JOptionPane.YES_OPTION)
+    DeleteDialog dialog = new DeleteDialog(true);
+    dialog.pack();
+    dialog.setLocationRelativeTo(MainWindow.getInstance());
+    if (dialog.showDialog())
     {
-      backupDb();
+      if (dialog.isCreatebackup())
+      {
+        backupDb();
+      }
       MainWindow.getInstance().getMainPanel().clearGameListSelection();
       uiModel.deleteAllGames();
       FileManager.deleteAllFolderContent();
@@ -416,14 +418,17 @@ public class MenuManager
     }
     else
     {
-      String message =
-        "Do you want to delete all games in the current game view?\nCovers, screenshots and game files will also be deleted.";
-      int option = JOptionPane.showConfirmDialog(MainWindow.getInstance()
-        .getMainPanel(), message, "Delete all games in view", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
-      if (option == JOptionPane.YES_OPTION)
+      DeleteDialog dialog = new DeleteDialog(true);
+      dialog.pack();
+      dialog.setLocationRelativeTo(MainWindow.getInstance());
+      if (dialog.showDialog())
       {
+        if (dialog.isCreatebackup())
+        {
+          backupDb();
+        }
         MainWindow.getInstance().getMainPanel().clearGameListSelection();
-        uiModel.deleteAllGamesInCurrentView();    
+        uiModel.deleteAllGamesInCurrentView();
         MainWindow.getInstance().getMainPanel().repaintAfterModifications();
       }
     }
