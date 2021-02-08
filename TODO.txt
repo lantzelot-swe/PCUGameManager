@@ -1,3 +1,4 @@
 -Add Lemon as a scraper site.
 -Allow for saving without a cover or one missing screenshot. Use "missing" for it instead. Makes it easier to add games where you don't have a cover for example.
+-Add "VIC-20" for vic-20 game list screens when deleting a view/all games to not delete those.
 -Bug: prg files for vic-20?
