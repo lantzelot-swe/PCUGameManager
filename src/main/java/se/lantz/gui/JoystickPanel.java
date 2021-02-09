@@ -133,7 +133,7 @@ public class JoystickPanel extends JPanel
       String text = "Use port " + portnumber + " as Primary joystick";
       if (portnumber == 2)
       {
-        text = text + " (Default setting, only change if required by game)";
+        text = text + " (Default setting)";
       }
       primaryJoyCheckBox = new JCheckBox(text);
       primaryJoyCheckBox.addItemListener((e) -> model.setPrimary(primaryJoyCheckBox.isSelected()));
