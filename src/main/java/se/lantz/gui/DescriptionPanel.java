@@ -66,7 +66,7 @@ public class DescriptionPanel extends JPanel
     if (descriptionTextArea == null) {
     	descriptionTextArea = new JTextArea();
     	descriptionTextArea.setBorder(null);
-    	descriptionTextArea.setFont(new JLabel().getFont());
+    	descriptionTextArea.setFont(new JLabel().getFont().deriveFont(11.0f));
       descriptionTextArea.setWrapStyleWord(true);
       descriptionTextArea.setLineWrap(true);
 

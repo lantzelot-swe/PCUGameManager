@@ -32,8 +32,8 @@ public class PCUGameManager
     SwingUtilities.invokeLater(() -> {
 
       MainWindow mainWindow = MainWindow.getInstance();
-      mainWindow.setSize(1500, 960);
-      mainWindow.setMinimumSize(new Dimension(1400, 960));
+      mainWindow.setSize(1366, 740);
+      mainWindow.setMinimumSize(new Dimension(1366, 700));
       mainWindow.setVisible(true);
       mainWindow.setLocationRelativeTo(null);
       mainWindow.initialize();

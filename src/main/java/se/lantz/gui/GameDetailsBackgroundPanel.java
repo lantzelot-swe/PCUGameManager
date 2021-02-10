@@ -28,6 +28,9 @@ import se.lantz.gui.scraper.ScraperDialog;
 import se.lantz.gui.scraper.ScraperProgressDialog;
 import se.lantz.gui.scraper.ScraperWorker;
 import se.lantz.gui.scraper.ScreenshotsSelectionDialog;
+import se.lantz.gui.translation.TranslationDialog;
+import se.lantz.gui.translation.TranslationProgressDialog;
+import se.lantz.gui.translation.TranslationWorker;
 import se.lantz.manager.ScraperManager;
 import se.lantz.model.MainViewModel;
 import se.lantz.model.data.GameListData;
@@ -40,7 +43,7 @@ public class GameDetailsBackgroundPanel extends JPanel
   private static final Logger logger = LoggerFactory.getLogger(GameDetailsBackgroundPanel.class);
   private final MainViewModel model;
   private JPanel settingsPanel;
-  private InfoPanel infoPanel;
+  private InfoBackgroundPanel infoPanel;
   private CombinedJoystickPanel joystickPanel;
   private SystemPanel systemPanel;
   private JPanel buttonPanel;
@@ -52,6 +55,7 @@ public class GameDetailsBackgroundPanel extends JPanel
   private JPanel detailsPanel;
   private CardLayout cardLayout;
   private JButton scrapeButton;
+  private JButton translateButton;
   private Timer cursorTimer;
   private ActionListener defaultCursorAction = e -> {
     MainWindow.getInstance().setWaitCursor(false);
@@ -78,7 +82,7 @@ public class GameDetailsBackgroundPanel extends JPanel
   {
     this.model = model;
     this.scraperManager = new ScraperManager(model);
-    this.setMinimumSize(new Dimension(1275, 800));
+    this.setMinimumSize(new Dimension(1170, 750));
     cardLayout = new CardLayout();
     setLayout(cardLayout);
     add(getEmptyPanel(), EMPTY);
@@ -92,7 +96,7 @@ public class GameDetailsBackgroundPanel extends JPanel
 
   void focusTitleField()
   {
-    getInfoPanel().focusTitleField();
+    getInfoBackgroundPanel().focusTitleField();
   }
 
   void updateSelectedGame(GameListData data)
@@ -116,7 +120,7 @@ public class GameDetailsBackgroundPanel extends JPanel
       detailsPanel = new JPanel();
       detailsPanel.setLayout(new BorderLayout(0, 0));
       detailsPanel.add(getSettingsPanel(), BorderLayout.CENTER);
-      detailsPanel.add(getInfoPanel(), BorderLayout.NORTH);
+      detailsPanel.add(getInfoBackgroundPanel(), BorderLayout.NORTH);
       detailsPanel.add(getButtonPanel(), BorderLayout.SOUTH);
     }
     return detailsPanel;
@@ -159,11 +163,11 @@ public class GameDetailsBackgroundPanel extends JPanel
     return settingsPanel;
   }
 
-  protected InfoPanel getInfoPanel()
+  protected InfoBackgroundPanel getInfoBackgroundPanel()
   {
     if (infoPanel == null)
     {
-      infoPanel = new InfoPanel(model.getInfoModel());
+      infoPanel = new InfoBackgroundPanel(model.getInfoModel());
     }
     return infoPanel;
   }
@@ -202,11 +206,17 @@ public class GameDetailsBackgroundPanel extends JPanel
       gbc_scrapeButton.gridx = 0;
       gbc_scrapeButton.gridy = 0;
       buttonPanel.add(getScrapeButton(), gbc_scrapeButton);
-      GridBagConstraints gbc_btnNewButton = new GridBagConstraints();
-      gbc_btnNewButton.insets = new Insets(5, 10, 5, 5);
-      gbc_btnNewButton.gridx = 1;
-      gbc_btnNewButton.gridy = 0;
-      buttonPanel.add(getBtnNewButton(), gbc_btnNewButton);
+      GridBagConstraints gbc_translateButton = new GridBagConstraints();
+      gbc_translateButton.insets = new Insets(5, 10, 5, 5);
+      gbc_translateButton.gridx = 1;
+      gbc_translateButton.gridy = 0;
+      buttonPanel.add(getTranslateButton(), gbc_translateButton);
+      GridBagConstraints gbc_viceButton = new GridBagConstraints();
+      gbc_viceButton.anchor = GridBagConstraints.WEST;
+      gbc_viceButton.insets = new Insets(5, 10, 5, 5);
+      gbc_viceButton.gridx = 2;
+      gbc_viceButton.gridy = 0;
+      buttonPanel.add(getViceButton(), gbc_viceButton);
       GridBagConstraints gbc_saveButton = new GridBagConstraints();
       gbc_saveButton.weighty = 1.0;
       gbc_saveButton.anchor = GridBagConstraints.SOUTHEAST;
@@ -248,7 +258,7 @@ public class GameDetailsBackgroundPanel extends JPanel
           {
             if (model.saveData())
             {
-              getInfoPanel().getScreensPanel().resetWhenSaved();
+              getInfoBackgroundPanel().getScreensPanel().resetWhenSaved();
             }
           }
         });
@@ -348,7 +358,7 @@ public class GameDetailsBackgroundPanel extends JPanel
     }
   }
 
-  private JButton getBtnNewButton()
+  private JButton getViceButton()
   {
     if (btnNewButton == null)
     {
@@ -362,5 +372,30 @@ public class GameDetailsBackgroundPanel extends JPanel
         });
     }
     return btnNewButton;
+  }
+  
+  private JButton getTranslateButton()
+  {
+    if (translateButton == null)
+    {
+      translateButton = new JButton("Translate...");
+      translateButton.addActionListener(new ActionListener() {
+        public void actionPerformed(ActionEvent e) {
+          TranslationDialog dialog = new TranslationDialog(model.getInfoModel());
+          dialog.pack();
+          dialog.setLocationRelativeTo(MainWindow.getInstance());
+          if (dialog.showDialog())
+          {
+            TranslationProgressDialog progressDialog = new TranslationProgressDialog(MainWindow.getInstance());
+            progressDialog.pack();
+            progressDialog.setLocationRelativeTo(MainWindow.getInstance());
+            TranslationWorker worker = new TranslationWorker(model.getInfoModel(), progressDialog, dialog.getSelectedFromLanguage(), dialog.getSelectedToLanguages());
+            worker.execute();
+            progressDialog.setVisible(true);
+          }
+        }
+      });
+    }
+    return translateButton;
   }
 }

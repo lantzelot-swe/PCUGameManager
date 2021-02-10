@@ -49,13 +49,6 @@ public class JoystickBottomPanel extends JPanel
     gbc_cComboBox.gridx = 2;
     gbc_cComboBox.gridy = 0;
     add(getCComboBox(), gbc_cComboBox);
-    GridBagConstraints gbc_menuLabel = new GridBagConstraints();
-    gbc_menuLabel.weighty = 1.0;
-    gbc_menuLabel.anchor = GridBagConstraints.NORTH;
-    gbc_menuLabel.insets = new Insets(3, 15, 0, 5);
-    gbc_menuLabel.gridx = 3;
-    gbc_menuLabel.gridy = 0;
-    add(getMenuLabel(), gbc_menuLabel);
     if (!Beans.isDesignTime())
     {
       model.addPropertyChangeListener((e) -> modelChanged());
@@ -115,14 +108,5 @@ public class JoystickBottomPanel extends JPanel
         });
     }
     return cComboBox;
-  }
-
-  private JLabel getMenuLabel()
-  {
-    if (menuLabel == null)
-    {
-      menuLabel = new JLabel("Menu");
-    }
-    return menuLabel;
   }
 }

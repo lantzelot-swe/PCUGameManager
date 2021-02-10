@@ -1,5 +1,6 @@
 package se.lantz.gui;
 
+import java.beans.Beans;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -25,7 +26,10 @@ public class KeySelectionComboBox extends JComboBox<String>
   {
     super();
     this.model = model;
-    setupItemsAndCodes();
+    if (!Beans.isDesignTime())
+    {
+    	setupItemsAndCodes();
+    }
   }
 
   private void setupItemsAndCodes()

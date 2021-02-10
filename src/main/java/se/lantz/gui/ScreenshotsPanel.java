@@ -85,12 +85,12 @@ public class ScreenshotsPanel extends JPanel
     setLayout(gridBagLayout);
     GridBagConstraints gbc_coverPanel = new GridBagConstraints();
     gbc_coverPanel.fill = GridBagConstraints.BOTH;
-    gbc_coverPanel.insets = new Insets(10, 0, 5, 5);
+    gbc_coverPanel.insets = new Insets(5, 0, 0, 0);
     gbc_coverPanel.gridx = 1;
     gbc_coverPanel.gridy = 0;
     add(getCoverPanel(), gbc_coverPanel);
     GridBagConstraints gbc_screenshotPanel = new GridBagConstraints();
-    gbc_screenshotPanel.insets = new Insets(10, 0, 5, 5);
+    gbc_screenshotPanel.insets = new Insets(5, 0, 0, 5);
     gbc_screenshotPanel.anchor = GridBagConstraints.WEST;
     gbc_screenshotPanel.fill = GridBagConstraints.VERTICAL;
     gbc_screenshotPanel.gridx = 2;
@@ -388,7 +388,7 @@ public class ScreenshotsPanel extends JPanel
       gbc_screen1ImageLabel.weightx = 0.5;
       gbc_screen1ImageLabel.weighty = 1.0;
       gbc_screen1ImageLabel.anchor = GridBagConstraints.WEST;
-      gbc_screen1ImageLabel.insets = new Insets(0, 5, 5, 5);
+      gbc_screen1ImageLabel.insets = new Insets(0, 5, 0, 0);
       gbc_screen1ImageLabel.gridx = 0;
       gbc_screen1ImageLabel.gridy = 0;
       screenshotPanel.add(getScreen1ImageLabel(), gbc_screen1ImageLabel);
@@ -404,7 +404,7 @@ public class ScreenshotsPanel extends JPanel
       gbc_screen2ImageLabel.weighty = 1.0;
       gbc_screen2ImageLabel.anchor = GridBagConstraints.WEST;
       gbc_screen2ImageLabel.weightx = 0.5;
-      gbc_screen2ImageLabel.insets = new Insets(0, 5, 5, 0);
+      gbc_screen2ImageLabel.insets = new Insets(0, 5, 0, 0);
       gbc_screen2ImageLabel.gridx = 3;
       gbc_screen2ImageLabel.gridy = 0;
       screenshotPanel.add(getScreen2ImageLabel(), gbc_screen2ImageLabel);
@@ -415,7 +415,7 @@ public class ScreenshotsPanel extends JPanel
       screenshotPanel.add(getResolution1Label(), gbc_resolution1Label);
       GridBagConstraints gbc_crop1Button = new GridBagConstraints();
       gbc_crop1Button.anchor = GridBagConstraints.NORTHEAST;
-      gbc_crop1Button.insets = new Insets(0, 0, 3, 5);
+      gbc_crop1Button.insets = new Insets(0, 0, 3, 0);
       gbc_crop1Button.gridx = 2;
       gbc_crop1Button.gridy = 1;
       screenshotPanel.add(getEdit1Button(), gbc_crop1Button);
@@ -517,14 +517,14 @@ public class ScreenshotsPanel extends JPanel
       GridBagConstraints gbc_gameLabel = new GridBagConstraints();
       gbc_gameLabel.weightx = 1.0;
       gbc_gameLabel.anchor = GridBagConstraints.WEST;
-      gbc_gameLabel.insets = new Insets(5, 0, 0, 5);
+      gbc_gameLabel.insets = new Insets(0, 0, 0, 5);
       gbc_gameLabel.gridx = 0;
       gbc_gameLabel.gridy = 0;
       gamePanel.add(getGameLabel(), gbc_gameLabel);
       GridBagConstraints gbc_gameTextField = new GridBagConstraints();
       gbc_gameTextField.anchor = GridBagConstraints.NORTHWEST;
       gbc_gameTextField.weighty = 1.0;
-      gbc_gameTextField.insets = new Insets(1, 0, 5, 5);
+      gbc_gameTextField.insets = new Insets(1, 0, 0, 5);
       gbc_gameTextField.fill = GridBagConstraints.HORIZONTAL;
       gbc_gameTextField.gridx = 0;
       gbc_gameTextField.gridy = 1;
@@ -533,7 +533,7 @@ public class ScreenshotsPanel extends JPanel
       gbc_gameButton.weighty = 1.0;
       gbc_gameButton.anchor = GridBagConstraints.NORTHWEST;
       gbc_gameButton.weightx = 1.0;
-      gbc_gameButton.insets = new Insets(0, 0, 5, 5);
+      gbc_gameButton.insets = new Insets(0, 0, 0, 5);
       gbc_gameButton.gridx = 1;
       gbc_gameButton.gridy = 1;
       gamePanel.add(getGameButton(), gbc_gameButton);

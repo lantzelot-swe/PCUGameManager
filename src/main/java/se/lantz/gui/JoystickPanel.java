@@ -41,8 +41,8 @@ public class JoystickPanel extends JPanel
   {
     this.portnumber = portnumber;
     this.model = model;
-    this.setPreferredSize(new Dimension(460, 510));
-    this.setMinimumSize(new Dimension(460, 510));
+    this.setPreferredSize(new Dimension(390, 510));
+    this.setMinimumSize(new Dimension(390, 510));
     setBorder(new TitledBorder(null, "Port " + portnumber, TitledBorder.LEADING, TitledBorder.TOP, null, null));
     GridBagLayout gridBagLayout = new GridBagLayout();
     gridBagLayout.columnWeights = new double[] { 0.0, 1.0, 0.0 };
@@ -65,7 +65,7 @@ public class JoystickPanel extends JPanel
     add(getJoystickStickPanel(), gbc_joystickStickPanel);
     GridBagConstraints gbc_leftFireComboBox = new GridBagConstraints();
     gbc_leftFireComboBox.anchor = GridBagConstraints.WEST;
-    gbc_leftFireComboBox.insets = new Insets(90, 10, 5, 5);
+    gbc_leftFireComboBox.insets = new Insets(45, 5, 5, 5);
     gbc_leftFireComboBox.gridx = 0;
     gbc_leftFireComboBox.gridy = 2;
     add(getLeftFireComboBox(), gbc_leftFireComboBox);
@@ -79,19 +79,19 @@ public class JoystickPanel extends JPanel
     add(getImageLabel(), gbc_imageLabel);
     GridBagConstraints gbc_rightFireComboBox = new GridBagConstraints();
     gbc_rightFireComboBox.anchor = GridBagConstraints.EAST;
-    gbc_rightFireComboBox.insets = new Insets(90, 0, 5, 10);
+    gbc_rightFireComboBox.insets = new Insets(45, 0, 5, 5);
     gbc_rightFireComboBox.gridx = 2;
     gbc_rightFireComboBox.gridy = 2;
     add(getRightFireComboBox(), gbc_rightFireComboBox);
     GridBagConstraints gbc_tlComboBox = new GridBagConstraints();
     gbc_tlComboBox.anchor = GridBagConstraints.WEST;
-    gbc_tlComboBox.insets = new Insets(30, 10, 5, 5);
+    gbc_tlComboBox.insets = new Insets(30, 5, 5, 5);
     gbc_tlComboBox.gridx = 0;
     gbc_tlComboBox.gridy = 3;
     add(getTlComboBox(), gbc_tlComboBox);
     GridBagConstraints gbc_trComboBox = new GridBagConstraints();
     gbc_trComboBox.anchor = GridBagConstraints.EAST;
-    gbc_trComboBox.insets = new Insets(30, 0, 5, 10);
+    gbc_trComboBox.insets = new Insets(30, 0, 5, 5);
     gbc_trComboBox.gridx = 2;
     gbc_trComboBox.gridy = 3;
     add(getTrComboBox(), gbc_trComboBox);
@@ -103,8 +103,9 @@ public class JoystickPanel extends JPanel
     gbc_joystickBottomPanel.gridy = 5;
     add(getJoystickBottomPanel(), gbc_joystickBottomPanel);
     GridBagConstraints gbc_configPanel = new GridBagConstraints();
+    gbc_configPanel.anchor = GridBagConstraints.NORTH;
+    gbc_configPanel.weighty = 1.0;
     gbc_configPanel.fill = GridBagConstraints.HORIZONTAL;
-    gbc_configPanel.insets = new Insets(0, 0, 0, 5);
     gbc_configPanel.gridx = 0;
     gbc_configPanel.gridwidth = 3;
     gbc_configPanel.gridy = 6;
@@ -172,7 +173,7 @@ public class JoystickPanel extends JPanel
     {
       imageLabel = new JLabel();
       imageLabel.setHorizontalAlignment(SwingConstants.CENTER);
-      ImageIcon joyImage = new ImageIcon(getClass().getResource("/se/lantz/joystick2.png"));
+      ImageIcon joyImage = new ImageIcon(getClass().getResource("/se/lantz/joystick4.png"));
       imageLabel.setIcon(joyImage);
     }
     return imageLabel;
@@ -286,12 +287,12 @@ public class JoystickPanel extends JPanel
       configPanel.setLayout(gbl_configPanel);
       GridBagConstraints gbc_configLabel = new GridBagConstraints();
       gbc_configLabel.anchor = GridBagConstraints.WEST;
-      gbc_configLabel.insets = new Insets(0, 10, 0, 5);
+      gbc_configLabel.insets = new Insets(0, 5, 0, 5);
       gbc_configLabel.gridx = 0;
       gbc_configLabel.gridy = 0;
       configPanel.add(getConfigLabel(), gbc_configLabel);
       GridBagConstraints gbc_configTextField = new GridBagConstraints();
-      gbc_configTextField.insets = new Insets(0, 0, 0, 20);
+      gbc_configTextField.insets = new Insets(0, 0, 0, 5);
       gbc_configTextField.fill = GridBagConstraints.HORIZONTAL;
       gbc_configTextField.weightx = 1.0;
       gbc_configTextField.anchor = GridBagConstraints.NORTHWEST;
