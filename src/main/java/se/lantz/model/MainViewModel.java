@@ -23,6 +23,7 @@ import se.lantz.model.data.ScraperFields;
 import se.lantz.scraper.MobyGamesScraper;
 import se.lantz.scraper.Scraper;
 import se.lantz.util.FileManager;
+import se.lantz.util.TextComponentSupport;
 
 public class MainViewModel extends AbstractModel
 {
@@ -180,6 +181,8 @@ public class MainViewModel extends AbstractModel
     {
       resetDataChanged();
     }
+    //Reset The undo managers for a new game
+    TextComponentSupport.clearUndoManagers();
   }
 
   public StringBuilder importGameInfo(List<String> rowValues, ImportManager.Options option, boolean addAsFavorite)

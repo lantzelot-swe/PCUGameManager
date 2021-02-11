@@ -23,6 +23,7 @@ import javax.swing.JTextField;
 import javax.swing.border.TitledBorder;
 
 import se.lantz.model.SystemModel;
+import se.lantz.util.TextComponentSupport;
 
 public class SystemPanel extends JPanel
 {
@@ -150,7 +151,10 @@ public class SystemPanel extends JPanel
 		getReu2mbRadioButton().setSelected(model.isREU2Mb());
 		getReu16mbRadioButton().setSelected(model.isREU16Mb());
 
-		getConfigTextField().setText(model.getConfigString());
+		if (!getConfigTextField().getText().equals(model.getConfigString()))
+		{
+			getConfigTextField().setText(model.getConfigString());
+		}
 		getDisplayShiftComboBox().setSelectedItem(Integer.toString(model.getVerticalShift()));
 	}
 
@@ -242,8 +246,7 @@ public class SystemPanel extends JPanel
 		if (typePanel == null)
 		{
 			typePanel = new JPanel();
-			typePanel.setBorder(
-					new TitledBorder(null, "System Type", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+			typePanel.setBorder(new TitledBorder(null, "System Type", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 			GridBagLayout gbl_typePanel = new GridBagLayout();
 			typePanel.setLayout(gbl_typePanel);
 			GridBagConstraints gbc_palRadioButton = new GridBagConstraints();
@@ -268,8 +271,8 @@ public class SystemPanel extends JPanel
 		if (drivePanel == null)
 		{
 			drivePanel = new JPanel();
-			drivePanel.setBorder(
-					new TitledBorder(null, "Drive Emulation", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+			drivePanel
+					.setBorder(new TitledBorder(null, "Drive Emulation", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 			GridBagLayout gbl_drivePanel = new GridBagLayout();
 			drivePanel.setLayout(gbl_drivePanel);
 			GridBagConstraints gbc_driveIconCheckBox = new GridBagConstraints();
@@ -298,8 +301,7 @@ public class SystemPanel extends JPanel
 		if (displayPanel == null)
 		{
 			displayPanel = new JPanel();
-			displayPanel
-					.setBorder(new TitledBorder(null, "Display", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+			displayPanel.setBorder(new TitledBorder(null, "Display", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 			GridBagLayout gbl_displayPanel = new GridBagLayout();
 			displayPanel.setLayout(gbl_displayPanel);
 			GridBagConstraints gbc_fullHeightCheckBox = new GridBagConstraints();
@@ -544,6 +546,7 @@ public class SystemPanel extends JPanel
 				}
 			});
 			configTextField.setColumns(10);
+			TextComponentSupport.setupPopupAndUndoable(configTextField);
 		}
 		return configTextField;
 	}

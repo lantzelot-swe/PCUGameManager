@@ -11,16 +11,22 @@ import java.awt.event.KeyEvent;
 import java.beans.Beans;
 import java.util.Calendar;
 
+import javax.swing.Action;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JSpinner;
 import javax.swing.JTabbedPane;
+import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.KeyStroke;
 import javax.swing.SpinnerModel;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingUtilities;
+import javax.swing.text.DefaultEditorKit;
 
 import se.lantz.model.InfoModel;
+import se.lantz.util.TextComponentSupport;
 
 public class InfoPanel extends JPanel
 {
@@ -40,7 +46,7 @@ public class InfoPanel extends JPanel
 	public InfoPanel(InfoModel model)
 	{
 		this.model = model;
-		this.setPreferredSize(new Dimension(330,275));
+		this.setPreferredSize(new Dimension(330, 275));
 		GridBagLayout gridBagLayout = new GridBagLayout();
 		gridBagLayout.columnWeights = new double[]
 		{ 1.0, 0.0 };
@@ -139,6 +145,10 @@ public class InfoPanel extends JPanel
 		gbc_descriptionTabbedPane.gridy = 6;
 		add(descriptionTabbedPane, gbc_descriptionTabbedPane);
 
+		TextComponentSupport.setupPopupAndUndoable(getTitleField(), getAuthorField(), getComposerField(),
+				getDescriptionPanel().getDescriptionTextArea(), getDescriptionDePanel().getDescriptionTextArea(),
+				getDescriptionFrPanel().getDescriptionTextArea(), getDescriptionEsPanel().getDescriptionTextArea(),
+				getDescriptionItPanel().getDescriptionTextArea());
 		if (!Beans.isDesignTime())
 		{
 			model.addPropertyChangeListener(e -> modelChanged());
@@ -148,43 +158,48 @@ public class InfoPanel extends JPanel
 	private void modelChanged()
 	{
 		// Read from model
-		if (!getTitleField().hasFocus())
+		if (!getTitleField().hasFocus() && !getTitleField().getText().equals(model.getTitle()))
 		{
 			getTitleField().setText(model.getTitle());
 		}
-		if (!getDescriptionPanel().getDescriptionTextArea().hasFocus())
+		JTextArea descriptionTextArea = getDescriptionPanel().getDescriptionTextArea();
+		if (!descriptionTextArea.hasFocus() && !descriptionTextArea.getText().equals(model.getDescription()))
 		{
-			getDescriptionPanel().getDescriptionTextArea().setText(model.getDescription());
+			descriptionTextArea.setText(model.getDescription());
 		}
-		if (!getDescriptionDePanel().getDescriptionTextArea().hasFocus())
+		JTextArea descriptionDeTextArea = getDescriptionDePanel().getDescriptionTextArea();
+		if (!descriptionDeTextArea.hasFocus() && !descriptionDeTextArea.getText().equals(model.getDescriptionDe()))
 		{
-			getDescriptionDePanel().getDescriptionTextArea().setText(model.getDescriptionDe());
+			descriptionDeTextArea.setText(model.getDescriptionDe());
 		}
-		if (!getDescriptionFrPanel().getDescriptionTextArea().hasFocus())
+		JTextArea descriptionFrTextArea = getDescriptionFrPanel().getDescriptionTextArea();
+		if (!descriptionFrTextArea.hasFocus() && !descriptionFrTextArea.getText().equals(model.getDescriptionFr()))
 		{
-			getDescriptionFrPanel().getDescriptionTextArea().setText(model.getDescriptionFr());
+			descriptionFrTextArea.setText(model.getDescriptionFr());
 		}
-		if (!getDescriptionEsPanel().getDescriptionTextArea().hasFocus())
+		JTextArea descriptionEsTextArea = getDescriptionEsPanel().getDescriptionTextArea();
+		if (!descriptionEsTextArea.hasFocus() && !descriptionEsTextArea.getText().equals(model.getDescriptionEs()))
 		{
-			getDescriptionEsPanel().getDescriptionTextArea().setText(model.getDescriptionEs());
+			descriptionEsTextArea.setText(model.getDescriptionEs());
 		}
-		if (!getDescriptionItPanel().getDescriptionTextArea().hasFocus())
+		JTextArea descriptionItTextArea = getDescriptionItPanel().getDescriptionTextArea();
+		if (!descriptionItTextArea.hasFocus() && !descriptionItTextArea.getText().equals(model.getDescriptionIt()))
 		{
-			getDescriptionItPanel().getDescriptionTextArea().setText(model.getDescriptionIt());
+			descriptionItTextArea.setText(model.getDescriptionIt());
 		}
-		if (!getYearField().hasFocus())
+		if (!getYearField().hasFocus() && !getYearField().getValue().equals(model.getYear()))
 		{
 			getYearField().setValue(model.getYear());
 		}
-		if (!getGenreComboBox().hasFocus())
+		if (!getGenreComboBox().hasFocus() && !getGenreComboBox().getSelectedGenre().equals(model.getGenre()))
 		{
 			getGenreComboBox().setSelectedGenre(model.getGenre());
 		}
-		if (!getAuthorField().hasFocus())
+		if (!getAuthorField().hasFocus() && !getAuthorField().getText().equals(model.getAuthor()))
 		{
 			getAuthorField().setText(model.getAuthor());
 		}
-		if (!getComposerField().hasFocus())
+		if (!getComposerField().hasFocus() && !getComposerField().getText().equals(model.getComposer()))
 		{
 			getComposerField().setText(model.getComposer());
 		}
