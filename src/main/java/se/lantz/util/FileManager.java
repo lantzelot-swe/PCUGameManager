@@ -340,18 +340,19 @@ public class FileManager
 
     fw.write("T:" + gameDetails.getTitle() + "\n");
     fw.write("X:" + gameDetails.getSystem() + "\n");
-    fw.write("D:en:" + gameDetails.getDescription() + "\n");
+    String description = replaceMinus(gameDetails.getDescription());
+    fw.write("D:en:" + description + "\n");
     fw.write("D:de:" +
-      (gameDetails.getDescriptionDe().isEmpty() ? gameDetails.getDescription() : gameDetails.getDescriptionDe()) +
+      (gameDetails.getDescriptionDe().isEmpty() ? description : replaceMinus(gameDetails.getDescriptionDe())) +
       "\n");
     fw.write("D:fr:" +
-      (gameDetails.getDescriptionFr().isEmpty() ? gameDetails.getDescription() : gameDetails.getDescriptionFr()) +
+      (gameDetails.getDescriptionFr().isEmpty() ? description : replaceMinus(gameDetails.getDescriptionFr())) +
       "\n");
     fw.write("D:es:" +
-      (gameDetails.getDescriptionEs().isEmpty() ? gameDetails.getDescription() : gameDetails.getDescriptionEs()) +
+      (gameDetails.getDescriptionEs().isEmpty() ? description : replaceMinus(gameDetails.getDescriptionEs())) +
       "\n");
     fw.write("D:it:" +
-      (gameDetails.getDescriptionIt().isEmpty() ? gameDetails.getDescription() : gameDetails.getDescriptionIt()) +
+      (gameDetails.getDescriptionIt().isEmpty() ? description : replaceMinus(gameDetails.getDescriptionIt())) +
       "\n");
     if (!gameDetails.getAuthor().isEmpty())
     {
@@ -388,6 +389,11 @@ public class FileManager
       fw.write("V:" + gameDetails.getVerticalShift() + "\n");
     }
     fw.close();
+  }
+  
+  private String replaceMinus(String description)
+  {
+  	return description.replaceAll("-", " ");
   }
 
   public void runVice(boolean appendGame)

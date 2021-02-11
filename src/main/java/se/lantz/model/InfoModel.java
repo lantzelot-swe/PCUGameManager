@@ -75,6 +75,7 @@ public class InfoModel extends AbstractModel
     //Replace all double spaces, tabs and newlines
     this.description = description.replaceAll("\\s\\s+", " ");
     this.description = this.description.replace("\t", " ");
+    this.description = this.description.replace("-", " ");
     if (!Objects.equals(old, description))
     {
       notifyChange();
@@ -92,6 +93,7 @@ public class InfoModel extends AbstractModel
     //Replace all double spaces, tabs and newlines
     this.description_de = description.replaceAll("\\s\\s+", " ");
     this.description_de = this.description_de.replace("\t", " ");
+    this.description_de = this.description_de.replace("-", " ");
     if (!Objects.equals(old, description))
     {
       notifyChange();
@@ -109,6 +111,7 @@ public class InfoModel extends AbstractModel
     //Replace all double spaces, tabs and newlines
     this.description_fr = description.replaceAll("\\s\\s+", " ");
     this.description_fr = this.description_fr.replace("\t", " ");
+    this.description_fr = this.description_fr.replace("-", " ");
     if (!Objects.equals(old, description))
     {
       notifyChange();
@@ -126,6 +129,7 @@ public class InfoModel extends AbstractModel
     //Replace all double spaces, tabs and newlines
     this.description_es = description.replaceAll("\\s\\s+", " ");
     this.description_es = this.description_es.replace("\t", " ");
+    this.description_es = this.description_es.replace("-", " ");
     if (!Objects.equals(old, description))
     {
       notifyChange();
@@ -143,6 +147,7 @@ public class InfoModel extends AbstractModel
     //Replace all double spaces, tabs and newlines
     this.description_it = description.replaceAll("\\s\\s+", " ");
     this.description_it = this.description_it.replace("\t", " ");
+    this.description_it = this.description_it.replace("-", " ");
     if (!Objects.equals(old, description))
     {
       notifyChange();
