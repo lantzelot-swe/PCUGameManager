@@ -14,9 +14,11 @@ import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.KeyStroke;
 import javax.swing.Timer;
 import javax.swing.border.TitledBorder;
@@ -24,6 +26,7 @@ import javax.swing.border.TitledBorder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import se.lantz.gui.ScrollablePanel.ScrollableSizeHint;
 import se.lantz.gui.scraper.ScraperDialog;
 import se.lantz.gui.scraper.ScraperProgressDialog;
 import se.lantz.gui.scraper.ScraperWorker;
@@ -42,7 +45,7 @@ public class GameDetailsBackgroundPanel extends JPanel
   private static final String DETAILS = "details";
   private static final Logger logger = LoggerFactory.getLogger(GameDetailsBackgroundPanel.class);
   private final MainViewModel model;
-  private JPanel settingsPanel;
+  private ScrollablePanel settingsPanel;
   private InfoBackgroundPanel infoPanel;
   private CombinedJoystickPanel joystickPanel;
   private SystemPanel systemPanel;
@@ -82,7 +85,7 @@ public class GameDetailsBackgroundPanel extends JPanel
   {
     this.model = model;
     this.scraperManager = new ScraperManager(model);
-    this.setMinimumSize(new Dimension(1170, 750));
+    this.setMinimumSize(new Dimension(1165, 75));
     cardLayout = new CardLayout();
     setLayout(cardLayout);
     add(getEmptyPanel(), EMPTY);
@@ -119,7 +122,10 @@ public class GameDetailsBackgroundPanel extends JPanel
     {
       detailsPanel = new JPanel();
       detailsPanel.setLayout(new BorderLayout(0, 0));
-      detailsPanel.add(getSettingsPanel(), BorderLayout.CENTER);
+      JScrollPane scrollpane = new JScrollPane();
+      scrollpane.setBorder(BorderFactory.createEmptyBorder());
+      scrollpane.setViewportView(getSettingsPanel());
+      detailsPanel.add(scrollpane, BorderLayout.CENTER);
       detailsPanel.add(getInfoBackgroundPanel(), BorderLayout.NORTH);
       detailsPanel.add(getButtonPanel(), BorderLayout.SOUTH);
     }
@@ -139,9 +145,11 @@ public class GameDetailsBackgroundPanel extends JPanel
   {
     if (settingsPanel == null)
     {
-      settingsPanel = new JPanel();
-      GridBagLayout gbl_settingsPanel = new GridBagLayout();
-      settingsPanel.setLayout(gbl_settingsPanel);
+    	GridBagLayout gbl_settingsPanel = new GridBagLayout();
+      settingsPanel = new ScrollablePanel(gbl_settingsPanel);
+      settingsPanel.setPreferredSize(new Dimension(1120,425));
+      settingsPanel.setScrollableHeight(ScrollableSizeHint.STRETCH);
+      settingsPanel.setScrollableWidth(ScrollableSizeHint.STRETCH);
       GridBagConstraints gbc_systemPanel = new GridBagConstraints();
       gbc_systemPanel.weightx = 1.0;
       gbc_systemPanel.weighty = 1.0;
@@ -152,7 +160,7 @@ public class GameDetailsBackgroundPanel extends JPanel
       gbc_systemPanel.gridy = 0;
       settingsPanel.add(getSystemPanel(), gbc_systemPanel);
       GridBagConstraints gbc_joystickPanel = new GridBagConstraints();
-      gbc_joystickPanel.insets = new Insets(0, 10, 0, 0);
+      gbc_joystickPanel.insets = new Insets(0, 5, 0, 0);
       gbc_joystickPanel.weighty = 1.0;
       gbc_joystickPanel.anchor = GridBagConstraints.NORTH;
       gbc_joystickPanel.fill = GridBagConstraints.BOTH;

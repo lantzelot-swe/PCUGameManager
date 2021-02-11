@@ -29,6 +29,7 @@ public class CombinedJoystickPanel extends JPanel
     gbc_port1Panel.insets = new Insets(0, 0, 0, 5);
     gbc_port1Panel.gridx = 0;
     gbc_port1Panel.gridy = 0;
+    gbc_port1Panel.fill = GridBagConstraints.VERTICAL;
     add(getPort1Panel(), gbc_port1Panel);
     GridBagConstraints gbc_port2Panel = new GridBagConstraints();
     gbc_port2Panel.weighty = 1.0;
@@ -36,6 +37,7 @@ public class CombinedJoystickPanel extends JPanel
     gbc_port2Panel.anchor = GridBagConstraints.NORTHWEST;
     gbc_port2Panel.gridx = 1;
     gbc_port2Panel.gridy = 0;
+    gbc_port2Panel.fill = GridBagConstraints.VERTICAL;
     add(getPort2Panel(), gbc_port2Panel);
   }
 

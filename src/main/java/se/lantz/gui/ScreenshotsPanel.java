@@ -517,14 +517,14 @@ public class ScreenshotsPanel extends JPanel
       GridBagConstraints gbc_gameLabel = new GridBagConstraints();
       gbc_gameLabel.weightx = 1.0;
       gbc_gameLabel.anchor = GridBagConstraints.WEST;
-      gbc_gameLabel.insets = new Insets(0, 0, 0, 5);
+      gbc_gameLabel.insets = new Insets(5, 0, 0, 5);
       gbc_gameLabel.gridx = 0;
       gbc_gameLabel.gridy = 0;
       gamePanel.add(getGameLabel(), gbc_gameLabel);
       GridBagConstraints gbc_gameTextField = new GridBagConstraints();
       gbc_gameTextField.anchor = GridBagConstraints.NORTHWEST;
       gbc_gameTextField.weighty = 1.0;
-      gbc_gameTextField.insets = new Insets(1, 0, 0, 5);
+      gbc_gameTextField.insets = new Insets(1, 0, 10, 5);
       gbc_gameTextField.fill = GridBagConstraints.HORIZONTAL;
       gbc_gameTextField.gridx = 0;
       gbc_gameTextField.gridy = 1;
@@ -533,7 +533,7 @@ public class ScreenshotsPanel extends JPanel
       gbc_gameButton.weighty = 1.0;
       gbc_gameButton.anchor = GridBagConstraints.NORTHWEST;
       gbc_gameButton.weightx = 1.0;
-      gbc_gameButton.insets = new Insets(0, 0, 0, 5);
+      gbc_gameButton.insets = new Insets(0, 0, 10, 5);
       gbc_gameButton.gridx = 1;
       gbc_gameButton.gridy = 1;
       gamePanel.add(getGameButton(), gbc_gameButton);
@@ -556,7 +556,7 @@ public class ScreenshotsPanel extends JPanel
     {
       gameTextField = new JTextField();
       gameTextField.setEditable(false);
-      gameTextField.setPreferredSize(new Dimension(160, 20));
+      gameTextField.setPreferredSize(new Dimension(145, 20));
       new FileDrop(gameTextField, new FileDrop.Listener()
         {
           public void filesDropped(java.io.File[] files)
