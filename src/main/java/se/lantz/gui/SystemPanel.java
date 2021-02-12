@@ -23,6 +23,7 @@ import javax.swing.JTextField;
 import javax.swing.border.TitledBorder;
 
 import se.lantz.model.SystemModel;
+import se.lantz.util.CustomUndoPlainDocument;
 import se.lantz.util.TextComponentSupport;
 
 public class SystemPanel extends JPanel
@@ -527,6 +528,7 @@ public class SystemPanel extends JPanel
 		if (configTextField == null)
 		{
 			configTextField = new JTextField();
+			configTextField.setDocument(new CustomUndoPlainDocument());
 			configTextField.addFocusListener(new FocusListener()
 			{
 
