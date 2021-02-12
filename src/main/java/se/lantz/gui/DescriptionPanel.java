@@ -19,6 +19,7 @@ import javax.swing.event.DocumentListener;
 import javax.swing.text.DefaultStyledDocument;
 
 import se.lantz.model.InfoModel;
+import se.lantz.util.CustomUndoPlainDocument;
 
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
@@ -73,7 +74,7 @@ public class DescriptionPanel extends JPanel
 			descriptionTextArea.setWrapStyleWord(true);
 			descriptionTextArea.setLineWrap(true);
 
-			DefaultStyledDocument doc = new DefaultStyledDocument();
+			CustomUndoPlainDocument doc = new CustomUndoPlainDocument();
 			doc.addDocumentListener(new DocumentListener()
 			{
 				@Override

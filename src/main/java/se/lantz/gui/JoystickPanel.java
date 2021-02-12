@@ -19,6 +19,7 @@ import javax.swing.SwingConstants;
 import javax.swing.border.TitledBorder;
 
 import se.lantz.model.JoystickModel;
+import se.lantz.util.CustomUndoPlainDocument;
 import se.lantz.util.TextComponentSupport;
 
 public class JoystickPanel extends JPanel
@@ -256,6 +257,7 @@ public class JoystickPanel extends JPanel
 		if (configTextField == null)
 		{
 			configTextField = new JTextField();
+			configTextField.setDocument(new CustomUndoPlainDocument());
 			configTextField.setColumns(10);
 			configTextField.addFocusListener(new FocusListener()
 			{

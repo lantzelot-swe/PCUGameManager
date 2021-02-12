@@ -147,7 +147,7 @@ public class GameDetailsBackgroundPanel extends JPanel
     {
     	GridBagLayout gbl_settingsPanel = new GridBagLayout();
       settingsPanel = new ScrollablePanel(gbl_settingsPanel);
-      settingsPanel.setPreferredSize(new Dimension(1120,425));
+      settingsPanel.setPreferredSize(new Dimension(1120,400));
       settingsPanel.setScrollableHeight(ScrollableSizeHint.STRETCH);
       settingsPanel.setScrollableWidth(ScrollableSizeHint.STRETCH);
       GridBagConstraints gbc_systemPanel = new GridBagConstraints();

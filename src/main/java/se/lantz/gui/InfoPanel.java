@@ -26,6 +26,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.text.DefaultEditorKit;
 
 import se.lantz.model.InfoModel;
+import se.lantz.util.CustomUndoPlainDocument;
 import se.lantz.util.TextComponentSupport;
 
 public class InfoPanel extends JPanel
@@ -210,6 +211,7 @@ public class InfoPanel extends JPanel
 		if (titleField == null)
 		{
 			titleField = new JTextField();
+			titleField.setDocument(new CustomUndoPlainDocument());
 			titleField.addKeyListener(new KeyAdapter()
 			{
 				@Override
@@ -273,6 +275,7 @@ public class InfoPanel extends JPanel
 		if (authorField == null)
 		{
 			authorField = new JTextField();
+			authorField.setDocument(new CustomUndoPlainDocument());
 			authorField.addKeyListener(new KeyAdapter()
 			{
 				@Override
@@ -291,6 +294,7 @@ public class InfoPanel extends JPanel
 		if (composerField == null)
 		{
 			composerField = new JTextField();
+			composerField.setDocument(new CustomUndoPlainDocument());
 			composerField.addKeyListener(new KeyAdapter()
 			{
 				@Override

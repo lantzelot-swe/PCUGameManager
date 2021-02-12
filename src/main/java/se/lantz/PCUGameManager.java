@@ -1,6 +1,8 @@
 package se.lantz;
 
 import java.awt.Dimension;
+import java.awt.GraphicsDevice;
+import java.awt.GraphicsEnvironment;
 
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
@@ -32,8 +34,13 @@ public class PCUGameManager
     SwingUtilities.invokeLater(() -> {
 
       MainWindow mainWindow = MainWindow.getInstance();
-      mainWindow.setSize(1400, 850);
-      mainWindow.setMinimumSize(new Dimension(1300, 700));
+      
+      GraphicsDevice gd = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
+      int width = gd.getDisplayMode().getWidth();
+      int height = gd.getDisplayMode().getHeight();
+      
+      mainWindow.setSize(Math.min(width, 1500), Math.min(height-40, 825));
+      mainWindow.setMinimumSize(new Dimension(Math.min(width, 1300), Math.min(height-40, 700)));
       mainWindow.setVisible(true);
       mainWindow.setLocationRelativeTo(null);
       mainWindow.initialize();
