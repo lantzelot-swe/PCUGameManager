@@ -68,6 +68,7 @@ public class SystemPanel extends JPanel
 	private JCheckBox reu512kRadioButton;
 	private JCheckBox reu2mbRadioButton;
 	private JCheckBox reu16mbRadioButton;
+	private JLabel dummyLabel;
 
 	public SystemPanel(SystemModel model)
 	{
@@ -80,48 +81,54 @@ public class SystemPanel extends JPanel
 		gbc_radioPanel.insets = new Insets(0, 0, 5, 0);
 		gbc_radioPanel.fill = GridBagConstraints.BOTH;
 		gbc_radioPanel.gridx = 0;
-		gbc_radioPanel.gridy = 0;
+		gbc_radioPanel.gridy = 1;
 		add(getRadioPanel(), gbc_radioPanel);
 		GridBagConstraints gbc_typePanel = new GridBagConstraints();
 		gbc_typePanel.weightx = 0.5;
-		gbc_typePanel.insets = new Insets(0, 5, 5, 0);
+		gbc_typePanel.insets = new Insets(0, 5, 5, 5);
 		gbc_typePanel.fill = GridBagConstraints.BOTH;
 		gbc_typePanel.gridx = 0;
-		gbc_typePanel.gridy = 1;
+		gbc_typePanel.gridy = 2;
 		add(getTypePanel(), gbc_typePanel);
 		GridBagConstraints gbc_drivePanel = new GridBagConstraints();
-		gbc_drivePanel.insets = new Insets(0, 0, 5, 5);
+		gbc_drivePanel.insets = new Insets(0, 0, 5, 0);
 		gbc_drivePanel.weightx = 0.5;
 		gbc_drivePanel.fill = GridBagConstraints.BOTH;
 		gbc_drivePanel.gridx = 1;
-		gbc_drivePanel.gridy = 1;
+		gbc_drivePanel.gridy = 2;
 		add(getDrivePanel(), gbc_drivePanel);
 		GridBagConstraints gbc_displayPanel = new GridBagConstraints();
 		gbc_displayPanel.weightx = 1.0;
-		gbc_displayPanel.insets = new Insets(0, 5, 5, 5);
+		gbc_displayPanel.insets = new Insets(0, 5, 5, 0);
 		gbc_displayPanel.gridwidth = 2;
 		gbc_displayPanel.fill = GridBagConstraints.BOTH;
 		gbc_displayPanel.gridx = 0;
-		gbc_displayPanel.gridy = 2;
+		gbc_displayPanel.gridy = 3;
 		add(getDisplayPanel(), gbc_displayPanel);
 		GridBagConstraints gbc_cardPanel = new GridBagConstraints();
 		gbc_cardPanel.weightx = 1.0;
-		gbc_cardPanel.insets = new Insets(0, 5, 5, 5);
+		gbc_cardPanel.insets = new Insets(0, 5, 5, 0);
 		gbc_cardPanel.gridwidth = 2;
 		gbc_cardPanel.fill = GridBagConstraints.BOTH;
 		gbc_cardPanel.gridx = 0;
-		gbc_cardPanel.gridy = 3;
+		gbc_cardPanel.gridy = 4;
 		add(getCardPanel(), gbc_cardPanel);
 		GridBagConstraints gbc_configPanel = new GridBagConstraints();
-		gbc_configPanel.weighty = 1.0;
 		gbc_configPanel.anchor = GridBagConstraints.NORTH;
 		gbc_configPanel.gridwidth = 2;
 		gbc_configPanel.weightx = 1.0;
-		gbc_configPanel.insets = new Insets(0, 0, 0, 5);
-		gbc_configPanel.fill = GridBagConstraints.BOTH;
+		gbc_configPanel.insets = new Insets(0, 0, 0, 7);
+		gbc_configPanel.fill = GridBagConstraints.HORIZONTAL;
 		gbc_configPanel.gridx = 0;
-		gbc_configPanel.gridy = 4;
+		gbc_configPanel.gridy = 0;
 		add(getConfigPanel(), gbc_configPanel);
+		GridBagConstraints gbc_dummyLabel = new GridBagConstraints();
+		gbc_dummyLabel.gridwidth = 2;
+		gbc_dummyLabel.weighty = 1.0;
+		gbc_dummyLabel.insets = new Insets(0, 0, 0, 0);
+		gbc_dummyLabel.gridx = 0;
+		gbc_dummyLabel.gridy = 5;
+		add(getDummyLabel(), gbc_dummyLabel);
 		if (!Beans.isDesignTime())
 		{
 			model.addPropertyChangeListener(e -> modelChanged());
@@ -439,19 +446,16 @@ public class SystemPanel extends JPanel
 			GridBagLayout gbl_ramPanel = new GridBagLayout();
 			ramPanel.setLayout(gbl_ramPanel);
 			GridBagConstraints gbc_bank0CheckBox = new GridBagConstraints();
-			gbc_bank0CheckBox.weightx = 1.0;
 			gbc_bank0CheckBox.anchor = GridBagConstraints.WEST;
 			gbc_bank0CheckBox.gridx = 0;
 			gbc_bank0CheckBox.gridy = 0;
 			ramPanel.add(getBank0CheckBox(), gbc_bank0CheckBox);
 			GridBagConstraints gbc_bank1CheckBox = new GridBagConstraints();
-			gbc_bank1CheckBox.weightx = 1.0;
 			gbc_bank1CheckBox.anchor = GridBagConstraints.WEST;
 			gbc_bank1CheckBox.gridx = 0;
 			gbc_bank1CheckBox.gridy = 1;
 			ramPanel.add(getBank1CheckBox(), gbc_bank1CheckBox);
 			GridBagConstraints gbc_bank2CheckBox = new GridBagConstraints();
-			gbc_bank2CheckBox.weightx = 1.0;
 			gbc_bank2CheckBox.anchor = GridBagConstraints.NORTHWEST;
 			gbc_bank2CheckBox.gridx = 0;
 			gbc_bank2CheckBox.gridy = 2;
@@ -465,17 +469,17 @@ public class SystemPanel extends JPanel
 			GridBagConstraints gbc_bank5CheckBox = new GridBagConstraints();
 			gbc_bank5CheckBox.weightx = 1.0;
 			gbc_bank5CheckBox.anchor = GridBagConstraints.WEST;
-			gbc_bank5CheckBox.insets = new Insets(0, 0, 5, 0);
 			gbc_bank5CheckBox.gridx = 1;
 			gbc_bank5CheckBox.gridy = 1;
 			ramPanel.add(getBank5CheckBox(), gbc_bank5CheckBox);
 			GridBagConstraints gbc_ramLabel = new GridBagConstraints();
+			gbc_ramLabel.gridwidth = 2;
 			gbc_ramLabel.weighty = 1.0;
-			gbc_ramLabel.insets = new Insets(0, 5, 10, 5);
+			gbc_ramLabel.insets = new Insets(0, 5, 5, 5);
 			gbc_ramLabel.anchor = GridBagConstraints.NORTHWEST;
 			gbc_ramLabel.weightx = 1.0;
-			gbc_ramLabel.gridx = 1;
-			gbc_ramLabel.gridy = 2;
+			gbc_ramLabel.gridx = 0;
+			gbc_ramLabel.gridy = 3;
 			ramPanel.add(getRamLabel(), gbc_ramLabel);
 		}
 		return ramPanel;
@@ -489,10 +493,10 @@ public class SystemPanel extends JPanel
 			GridBagLayout gbl_configPanel = new GridBagLayout();
 			configPanel.setLayout(gbl_configPanel);
 			GridBagConstraints gbc_configLabel = new GridBagConstraints();
-			gbc_configLabel.gridheight = 2;
+			gbc_configLabel.gridheight = 1;
 			gbc_configLabel.weighty = 1.0;
 			gbc_configLabel.anchor = GridBagConstraints.NORTHWEST;
-			gbc_configLabel.insets = new Insets(5, 5, 5, 5);
+			gbc_configLabel.insets = new Insets(5, 6, 5, 5);
 			gbc_configLabel.gridx = 0;
 			gbc_configLabel.gridy = 0;
 			configPanel.add(getConfigLabel(), gbc_configLabel);
@@ -905,7 +909,7 @@ public class SystemPanel extends JPanel
 	{
 		if (reu512kRadioButton == null)
 		{
-			reu512kRadioButton = new JCheckBox("512K");
+			reu512kRadioButton = new JCheckBox("512 Kb");
 			reu512kRadioButton.addActionListener(new ActionListener()
 			{
 				public void actionPerformed(ActionEvent e)
@@ -923,7 +927,7 @@ public class SystemPanel extends JPanel
 	{
 		if (reu2mbRadioButton == null)
 		{
-			reu2mbRadioButton = new JCheckBox("2Mb");
+			reu2mbRadioButton = new JCheckBox("2 Mb");
 			reu2mbRadioButton.addActionListener(new ActionListener()
 			{
 				public void actionPerformed(ActionEvent e)
@@ -941,7 +945,7 @@ public class SystemPanel extends JPanel
 	{
 		if (reu16mbRadioButton == null)
 		{
-			reu16mbRadioButton = new JCheckBox("16Mb");
+			reu16mbRadioButton = new JCheckBox("16 Mb");
 			reu16mbRadioButton.addActionListener(new ActionListener()
 			{
 				public void actionPerformed(ActionEvent e)
@@ -954,4 +958,10 @@ public class SystemPanel extends JPanel
 		}
 		return reu16mbRadioButton;
 	}
+  private JLabel getDummyLabel() {
+    if (dummyLabel == null) {
+    	dummyLabel = new JLabel("");
+    }
+    return dummyLabel;
+  }
 }

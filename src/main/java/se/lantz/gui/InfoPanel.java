@@ -137,7 +137,7 @@ public class InfoPanel extends JPanel
 		descriptionTabbedPane.addTab("es", null, getDescriptionEsPanel(), null);
 		descriptionTabbedPane.addTab("it", null, getDescriptionItPanel(), null);
 		GridBagConstraints gbc_descriptionTabbedPane = new GridBagConstraints();
-		gbc_descriptionTabbedPane.insets = new Insets(0, 5, 10, 0);
+		gbc_descriptionTabbedPane.insets = new Insets(0, 5, 9, 0);
 		gbc_descriptionTabbedPane.gridwidth = 2;
 		gbc_descriptionTabbedPane.weighty = 1.0;
 		gbc_descriptionTabbedPane.fill = GridBagConstraints.BOTH;
