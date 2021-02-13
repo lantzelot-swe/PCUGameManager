@@ -5,6 +5,8 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,6 +14,7 @@ import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JTextField;
 
 import se.lantz.model.InfoModel;
 
@@ -32,11 +35,17 @@ public class TranslationPanel extends JPanel
   private JCheckBox esCheckBox;
   private JCheckBox itCheckBox;
   private InfoModel model;
+  private JPanel customPanel;
+  private JCheckBox customCheckBox;
+  private JTextField customTextField;
+  private JLabel infoLabel;
 
   public TranslationPanel(InfoModel model)
   {
     this.model = model;
     GridBagLayout gridBagLayout = new GridBagLayout();
+    gridBagLayout.rowWeights = new double[] { 0.0, 0.0, 0.0, 1.0 };
+    gridBagLayout.columnWeights = new double[] { 1.0, 0.0 };
     setLayout(gridBagLayout);
     GridBagConstraints gbc_selectFromLabel = new GridBagConstraints();
     gbc_selectFromLabel.anchor = GridBagConstraints.WEST;
@@ -57,14 +66,21 @@ public class TranslationPanel extends JPanel
     gbc_toLanguageLabel.gridy = 1;
     add(getToLanguageLabel(), gbc_toLanguageLabel);
     GridBagConstraints gbc_checkBoxPanel = new GridBagConstraints();
+    gbc_checkBoxPanel.insets = new Insets(0, 0, 5, 0);
     gbc_checkBoxPanel.fill = GridBagConstraints.BOTH;
     gbc_checkBoxPanel.gridwidth = 2;
     gbc_checkBoxPanel.weighty = 1.0;
     gbc_checkBoxPanel.weightx = 1.0;
-    gbc_checkBoxPanel.insets = new Insets(0, 0, 0, 5);
     gbc_checkBoxPanel.gridx = 0;
     gbc_checkBoxPanel.gridy = 2;
     add(getCheckBoxPanel(), gbc_checkBoxPanel);
+    GridBagConstraints gbc_customPanel = new GridBagConstraints();
+    gbc_customPanel.gridwidth = 2;
+    gbc_customPanel.insets = new Insets(0, 0, 0, 5);
+    gbc_customPanel.fill = GridBagConstraints.BOTH;
+    gbc_customPanel.gridx = 0;
+    gbc_customPanel.gridy = 3;
+    add(getCustomPanel(), gbc_customPanel);
   }
 
   private JLabel getSelectFromLabel()
@@ -208,6 +224,15 @@ public class TranslationPanel extends JPanel
     getItCheckBox().setEnabled(!getItCheckBox().getText().equals(selectedFromLanguage));
   }
 
+  private void disableCheckBoxes()
+  {
+    getEnCheckBox().setEnabled(false);
+    getDeCheckBox().setEnabled(false);
+    getFrCheckBox().setEnabled(false);
+    getEsCheckBox().setEnabled(false);
+    getItCheckBox().setEnabled(false);
+  }
+
   String getSelectedFromLanguage()
   {
     String selectedFromLanguage = getFromComboBox().getSelectedItem().toString();
@@ -219,26 +244,101 @@ public class TranslationPanel extends JPanel
   List<String> getSelectedToLanguages()
   {
     List<String> returnList = new ArrayList<>();
-    if (getEnCheckBox().isSelected() && getEnCheckBox().isEnabled())
+    if (getCustomCheckBox().isEnabled())
     {
-      returnList.add("en");
+      returnList.add(getCustomTextField().getText());
     }
-    if (getDeCheckBox().isSelected() && getDeCheckBox().isEnabled())
+    else
     {
-      returnList.add("de");
-    }
-    if (getFrCheckBox().isSelected() && getFrCheckBox().isEnabled())
-    {
-      returnList.add("fr");
-    }
-    if (getEsCheckBox().isSelected() && getEsCheckBox().isEnabled())
-    {
-      returnList.add("es");
-    }
-    if (getItCheckBox().isSelected() && getItCheckBox().isEnabled())
-    {
-      returnList.add("it");
+      if (getEnCheckBox().isSelected() && getEnCheckBox().isEnabled())
+      {
+        returnList.add("en");
+      }
+      if (getDeCheckBox().isSelected() && getDeCheckBox().isEnabled())
+      {
+        returnList.add("de");
+      }
+      if (getFrCheckBox().isSelected() && getFrCheckBox().isEnabled())
+      {
+        returnList.add("fr");
+      }
+      if (getEsCheckBox().isSelected() && getEsCheckBox().isEnabled())
+      {
+        returnList.add("es");
+      }
+      if (getItCheckBox().isSelected() && getItCheckBox().isEnabled())
+      {
+        returnList.add("it");
+      }
     }
     return returnList;
+  }
+
+  private JPanel getCustomPanel()
+  {
+    if (customPanel == null)
+    {
+      customPanel = new JPanel();
+      GridBagLayout gbl_customPanel = new GridBagLayout();
+      customPanel.setLayout(gbl_customPanel);
+      GridBagConstraints gbc_customCheckBox = new GridBagConstraints();
+      gbc_customCheckBox.gridx = 0;
+      gbc_customCheckBox.gridy = 0;
+      customPanel.add(getCustomCheckBox(), gbc_customCheckBox);
+      GridBagConstraints gbc_customTextField = new GridBagConstraints();
+      gbc_customTextField.insets = new Insets(0, 0, 0, 5);
+      gbc_customTextField.gridx = 1;
+      gbc_customTextField.gridy = 0;
+      customPanel.add(getCustomTextField(), gbc_customTextField);
+      GridBagConstraints gbc_infoLabel = new GridBagConstraints();
+      gbc_infoLabel.gridx = 2;
+      gbc_infoLabel.gridy = 0;
+      customPanel.add(getInfoLabel(), gbc_infoLabel);
+    }
+    return customPanel;
+  }
+
+  private JCheckBox getCustomCheckBox()
+  {
+    if (customCheckBox == null)
+    {
+      customCheckBox = new JCheckBox("Custom:");
+      customCheckBox.addItemListener(new ItemListener()
+        {
+          public void itemStateChanged(ItemEvent e)
+          {
+            if (customCheckBox.isSelected())
+            {
+              disableCheckBoxes();
+            }
+            else
+            {
+              enableCheckBoxes();
+            }
+          }
+        });
+
+    }
+    return customCheckBox;
+  }
+
+  private JTextField getCustomTextField()
+  {
+    if (customTextField == null)
+    {
+      customTextField = new JTextField();
+      customTextField.setToolTipText("Add language code according to ISO 639-1");
+      customTextField.setColumns(2);
+    }
+    return customTextField;
+  }
+
+  private JLabel getInfoLabel()
+  {
+    if (infoLabel == null)
+    {
+      infoLabel = new JLabel("(Translation will be added to the English field)");
+    }
+    return infoLabel;
   }
 }

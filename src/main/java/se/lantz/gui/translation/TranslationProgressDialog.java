@@ -63,6 +63,7 @@ public class TranslationProgressDialog extends JDialog
       language = "Italian";
       break;
     default:
+      language = lang;
       break;
     }
     getTextLabel().setText("Translating description to " + language + "...");

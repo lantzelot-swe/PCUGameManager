@@ -65,6 +65,10 @@ public class TranslationWorker extends SwingWorker<Void, String>
           dialog.updateProgress(toLanguage);
         });
         String translatedText = DescriptionTranslater.translate(fromLanguage, toLanguage, textToTranslate);
+        if (translatedText.startsWith("<!DOCTYPE"))
+        {
+          translatedText = "Sorry, no support for the selected language!";
+        }
         publish(toLanguage + "¤" + translatedText);
       }
       catch (IOException e)
@@ -99,6 +103,7 @@ public class TranslationWorker extends SwingWorker<Void, String>
         model.setDescriptionIt(split[1]);
         break;
       default:
+        model.setDescription(split[1]);
         break;
       }
     }

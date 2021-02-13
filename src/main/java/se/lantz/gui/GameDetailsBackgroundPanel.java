@@ -11,12 +11,15 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 import java.util.List;
+import java.util.Locale;
+import java.util.MissingResourceException;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JComponent;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.KeyStroke;
@@ -145,9 +148,9 @@ public class GameDetailsBackgroundPanel extends JPanel
   {
     if (settingsPanel == null)
     {
-    	GridBagLayout gbl_settingsPanel = new GridBagLayout();
+      GridBagLayout gbl_settingsPanel = new GridBagLayout();
       settingsPanel = new ScrollablePanel(gbl_settingsPanel);
-      settingsPanel.setPreferredSize(new Dimension(1120,400));
+      settingsPanel.setPreferredSize(new Dimension(1120, 400));
       settingsPanel.setScrollableHeight(ScrollableSizeHint.STRETCH);
       settingsPanel.setScrollableWidth(ScrollableSizeHint.STRETCH);
       GridBagConstraints gbc_systemPanel = new GridBagConstraints();
@@ -381,29 +384,61 @@ public class GameDetailsBackgroundPanel extends JPanel
     }
     return btnNewButton;
   }
-  
+
   private JButton getTranslateButton()
   {
     if (translateButton == null)
     {
       translateButton = new JButton("Translate...");
-      translateButton.addActionListener(new ActionListener() {
-        public void actionPerformed(ActionEvent e) {
-          TranslationDialog dialog = new TranslationDialog(model.getInfoModel());
-          dialog.pack();
-          dialog.setLocationRelativeTo(MainWindow.getInstance());
-          if (dialog.showDialog())
+      translateButton.addActionListener(new ActionListener()
+        {
+          public void actionPerformed(ActionEvent e)
           {
-            TranslationProgressDialog progressDialog = new TranslationProgressDialog(MainWindow.getInstance());
-            progressDialog.pack();
-            progressDialog.setLocationRelativeTo(MainWindow.getInstance());
-            TranslationWorker worker = new TranslationWorker(model.getInfoModel(), progressDialog, dialog.getSelectedFromLanguage(), dialog.getSelectedToLanguages());
-            worker.execute();
-            progressDialog.setVisible(true);
+            TranslationDialog dialog = new TranslationDialog(model.getInfoModel());
+            dialog.pack();
+            dialog.setLocationRelativeTo(MainWindow.getInstance());
+            if (dialog.showDialog())
+            {
+              //Check valid language
+              if (dialog.getSelectedToLanguages().size() == 1 &&
+                !isValidLanguage(dialog.getSelectedToLanguages().get(0)))
+              {
+                JOptionPane
+                  .showMessageDialog(MainWindow.getInstance(),
+                                     "\"" + dialog.getSelectedToLanguages().get(0) +
+                                       "\" is not a vaild language code. It must be a 2-letter code acording to ISO 639-1.\nAll languages might not be supported.",
+                                     "Invalid language code",
+                                     JOptionPane.ERROR_MESSAGE);
+              }
+              else
+              {
+                TranslationProgressDialog progressDialog = new TranslationProgressDialog(MainWindow.getInstance());
+                progressDialog.pack();
+                progressDialog.setLocationRelativeTo(MainWindow.getInstance());
+                TranslationWorker worker = new TranslationWorker(model.getInfoModel(),
+                                                                 progressDialog,
+                                                                 dialog.getSelectedFromLanguage(),
+                                                                 dialog.getSelectedToLanguages());
+                worker.execute();
+                progressDialog.setVisible(true);
+              }
+            }
           }
-        }
-      });
+        });
     }
     return translateButton;
+  }
+
+  private boolean isValidLanguage(String language)
+  {
+    Locale locale = new Locale.Builder().setLanguageTag(language).build();
+    try
+    {
+      return locale.getISO3Language() != null;
+    }
+    catch (MissingResourceException e)
+    {
+      return false;
+    }
   }
 }
