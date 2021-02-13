@@ -1,6 +1,7 @@
 package se.lantz.gui;
 
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -40,6 +41,11 @@ public class InfoPanel extends JPanel
 	private DescriptionPanel descriptionFrPanel;
 	private DescriptionPanel descriptionEsPanel;
 	private DescriptionPanel descriptionItPanel;
+	private DescriptionTabComponent enDescrTabComponent;
+	private DescriptionTabComponent deDescrTabComponent;
+	private DescriptionTabComponent frDescrTabComponent;
+	private DescriptionTabComponent esDescrTabComponent;
+	private DescriptionTabComponent itDescrTabComponent;
 	private InfoModel model;
 	JSpinner yearField;
 	GenreComboBox genreComboBox;
@@ -131,20 +137,14 @@ public class InfoPanel extends JPanel
 		gbc_genreCombobox.gridy = 3;
 		add(getGenreComboBox(), gbc_genreCombobox);
 
-		descriptionTabbedPane = new JTabbedPane(JTabbedPane.TOP);
-		descriptionTabbedPane.addTab("Description: en", null, getDescriptionPanel(), null);
-		descriptionTabbedPane.addTab("de", null, getDescriptionDePanel(), null);
-		descriptionTabbedPane.addTab("fr", null, getDescriptionFrPanel(), null);
-		descriptionTabbedPane.addTab("es", null, getDescriptionEsPanel(), null);
-		descriptionTabbedPane.addTab("it", null, getDescriptionItPanel(), null);
-		GridBagConstraints gbc_descriptionTabbedPane = new GridBagConstraints();
+		GridBagConstraints gbc_descriptionTabbedPane = new GridBagConstraints();	
 		gbc_descriptionTabbedPane.insets = new Insets(0, 5, 9, 0);
 		gbc_descriptionTabbedPane.gridwidth = 2;
 		gbc_descriptionTabbedPane.weighty = 1.0;
 		gbc_descriptionTabbedPane.fill = GridBagConstraints.BOTH;
 		gbc_descriptionTabbedPane.gridx = 0;
 		gbc_descriptionTabbedPane.gridy = 6;
-		add(descriptionTabbedPane, gbc_descriptionTabbedPane);
+		add(getDescriptionTabbedPane(), gbc_descriptionTabbedPane);
 
 		TextComponentSupport.setupPopupAndUndoable(getTitleField(), getAuthorField(), getComposerField(),
 				getDescriptionPanel().getDescriptionTextArea(), getDescriptionDePanel().getDescriptionTextArea(),
@@ -204,6 +204,26 @@ public class InfoPanel extends JPanel
 		{
 			getComposerField().setText(model.getComposer());
 		}
+	}
+	
+	private JTabbedPane getDescriptionTabbedPane()
+	{
+	  if (descriptionTabbedPane == null)
+	  {
+	    descriptionTabbedPane = new JTabbedPane(JTabbedPane.TOP);
+	    descriptionTabbedPane.addTab("", null, getDescriptionPanel(), "English");
+	    descriptionTabbedPane.addTab("", null, getDescriptionDePanel(), "German");
+	    descriptionTabbedPane.addTab("", null, getDescriptionFrPanel(), "French");
+	    descriptionTabbedPane.addTab("", null, getDescriptionEsPanel(), "Spanish");
+	    descriptionTabbedPane.addTab("", null, getDescriptionItPanel(), "Italian");
+
+	    descriptionTabbedPane.setTabComponentAt(0, getEnDescrTabComponent());
+	    descriptionTabbedPane.setTabComponentAt(1, getDeDescrTabComponent());
+	    descriptionTabbedPane.setTabComponentAt(2, getFrDescrTabComponent());
+	    descriptionTabbedPane.setTabComponentAt(3, getEsDescrTabComponent());
+	    descriptionTabbedPane.setTabComponentAt(4, getItDescrTabComponent());
+	  }
+	  return descriptionTabbedPane;
 	}
 
 	private JTextField getTitleField()
@@ -313,6 +333,9 @@ public class InfoPanel extends JPanel
 		if (descriptionPanel == null)
 		{
 			descriptionPanel = new DescriptionPanel(model, DescriptionPanel.Language.en);
+			descriptionPanel.addCharCountChangeListener(e -> {
+			  getEnDescrTabComponent().setBold(Integer.parseInt(e.getActionCommand()) > 0);
+			});
 		}
 		return descriptionPanel;
 	}
@@ -322,6 +345,9 @@ public class InfoPanel extends JPanel
 		if (descriptionDePanel == null)
 		{
 			descriptionDePanel = new DescriptionPanel(model, DescriptionPanel.Language.de);
+			descriptionDePanel.addCharCountChangeListener(e -> {
+        getDeDescrTabComponent().setBold(Integer.parseInt(e.getActionCommand()) > 0);
+      });
 		}
 		return descriptionDePanel;
 	}
@@ -331,6 +357,9 @@ public class InfoPanel extends JPanel
 		if (descriptionFrPanel == null)
 		{
 			descriptionFrPanel = new DescriptionPanel(model, DescriptionPanel.Language.fr);
+			descriptionFrPanel.addCharCountChangeListener(e -> {
+        getFrDescrTabComponent().setBold(Integer.parseInt(e.getActionCommand()) > 0);
+      });
 		}
 		return descriptionFrPanel;
 	}
@@ -340,6 +369,9 @@ public class InfoPanel extends JPanel
 		if (descriptionEsPanel == null)
 		{
 			descriptionEsPanel = new DescriptionPanel(model, DescriptionPanel.Language.es);
+			descriptionEsPanel.addCharCountChangeListener(e -> {
+        getEsDescrTabComponent().setBold(Integer.parseInt(e.getActionCommand()) > 0);
+      });
 		}
 		return descriptionEsPanel;
 	}
@@ -349,9 +381,62 @@ public class InfoPanel extends JPanel
 		if (descriptionItPanel == null)
 		{
 			descriptionItPanel = new DescriptionPanel(model, DescriptionPanel.Language.it);
+			descriptionItPanel.addCharCountChangeListener(e -> {
+        getItDescrTabComponent().setBold(Integer.parseInt(e.getActionCommand()) > 0);
+      });
 		}
 		return descriptionItPanel;
 	}
+	
+	private DescriptionTabComponent getEnDescrTabComponent()
+	{
+	  if (enDescrTabComponent == null)
+	  {
+	    enDescrTabComponent = new DescriptionTabComponent("Description:");
+	    enDescrTabComponent.setText("en");
+	  }
+	  return enDescrTabComponent;
+	}
+	
+	private DescriptionTabComponent getDeDescrTabComponent()
+  {
+    if (deDescrTabComponent == null)
+    {
+      deDescrTabComponent = new DescriptionTabComponent("");
+      deDescrTabComponent.setText("de");
+    }
+    return deDescrTabComponent;
+  }
+	
+	private DescriptionTabComponent getFrDescrTabComponent()
+  {
+    if (frDescrTabComponent == null)
+    {
+      frDescrTabComponent = new DescriptionTabComponent("");
+      frDescrTabComponent.setText("fr");
+    }
+    return frDescrTabComponent;
+  }
+	
+	private DescriptionTabComponent getEsDescrTabComponent()
+  {
+    if (esDescrTabComponent == null)
+    {
+      esDescrTabComponent = new DescriptionTabComponent("");
+      esDescrTabComponent.setText("es");
+    }
+    return esDescrTabComponent;
+  }
+	
+	private DescriptionTabComponent getItDescrTabComponent()
+  {
+    if (itDescrTabComponent == null)
+    {
+      itDescrTabComponent = new DescriptionTabComponent("");
+      itDescrTabComponent.setText("it");
+    }
+    return itDescrTabComponent;
+  }
 
 	public void selectEnDescriptionTab()
 	{

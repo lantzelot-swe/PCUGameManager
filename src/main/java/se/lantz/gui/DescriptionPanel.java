@@ -1,6 +1,8 @@
 package se.lantz.gui;
 
 import java.awt.LayoutManager;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.event.KeyAdapter;
@@ -40,6 +42,7 @@ public class DescriptionPanel extends JPanel
 	private JLabel charCountLabel;
 	private InfoModel model;
 	private Language language;
+  private ActionListener listener;
 
 	public DescriptionPanel(InfoModel model, Language language)
 	{
@@ -215,5 +218,14 @@ public class DescriptionPanel extends JPanel
 			getCharCountLabel().setIcon(null);
 		}
 		getCharCountLabel().setText(length + " characters (recommended max: 512)");
+		if (listener != null)
+		{
+		  listener.actionPerformed(new ActionEvent(this, 0, Integer.toString(length)));
+		}
+	}
+	
+	public void addCharCountChangeListener(ActionListener listener)
+	{
+    this.listener = listener;
 	}
 }
