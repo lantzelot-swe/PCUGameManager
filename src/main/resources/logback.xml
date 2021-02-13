@@ -13,7 +13,7 @@
 		<rollingPolicy
 			class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
 			<fileNamePattern>pcusb-%d{yyyy-MM-dd}_%i.log</fileNamePattern>
-			<maxHistory>5</maxHistory>
+			<maxHistory>3</maxHistory>
 			<totalSizeCap>30MB</totalSizeCap>
 			<timeBasedFileNamingAndTriggeringPolicy
 				class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
