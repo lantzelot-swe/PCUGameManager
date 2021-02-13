@@ -28,7 +28,6 @@ import java.util.zip.GZIPOutputStream;
 import java.util.zip.ZipEntry;
 
 import javax.imageio.ImageIO;
-import javax.swing.ListModel;
 
 import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream;
 import org.slf4j.Logger;
@@ -39,7 +38,6 @@ import se.lantz.model.InfoModel;
 import se.lantz.model.MainViewModel;
 import se.lantz.model.SystemModel;
 import se.lantz.model.data.GameDetails;
-import se.lantz.model.data.GameListData;
 
 public class FileManager
 {
@@ -343,17 +341,13 @@ public class FileManager
     String description = replaceMinus(gameDetails.getDescription());
     fw.write("D:en:" + description + "\n");
     fw.write("D:de:" +
-      (gameDetails.getDescriptionDe().isEmpty() ? description : replaceMinus(gameDetails.getDescriptionDe())) +
-      "\n");
+      (gameDetails.getDescriptionDe().isEmpty() ? description : replaceMinus(gameDetails.getDescriptionDe())) + "\n");
     fw.write("D:fr:" +
-      (gameDetails.getDescriptionFr().isEmpty() ? description : replaceMinus(gameDetails.getDescriptionFr())) +
-      "\n");
+      (gameDetails.getDescriptionFr().isEmpty() ? description : replaceMinus(gameDetails.getDescriptionFr())) + "\n");
     fw.write("D:es:" +
-      (gameDetails.getDescriptionEs().isEmpty() ? description : replaceMinus(gameDetails.getDescriptionEs())) +
-      "\n");
+      (gameDetails.getDescriptionEs().isEmpty() ? description : replaceMinus(gameDetails.getDescriptionEs())) + "\n");
     fw.write("D:it:" +
-      (gameDetails.getDescriptionIt().isEmpty() ? description : replaceMinus(gameDetails.getDescriptionIt())) +
-      "\n");
+      (gameDetails.getDescriptionIt().isEmpty() ? description : replaceMinus(gameDetails.getDescriptionIt())) + "\n");
     if (!gameDetails.getAuthor().isEmpty())
     {
       fw.write("A:" + gameDetails.getAuthor() + "\n");
@@ -390,10 +384,10 @@ public class FileManager
     }
     fw.close();
   }
-  
+
   private String replaceMinus(String description)
   {
-  	return description.replaceAll("-", " ");
+    return description.replaceAll("-", " ");
   }
 
   public void runVice(boolean appendGame)
@@ -676,7 +670,6 @@ public class FileManager
     deleteDirContent(new File(SCREENS), false);
     deleteDirContent(new File(GAMES), false);
   }
-  
 
   private static void deleteDirContent(File dir, boolean deleteAll)
   {
@@ -688,7 +681,7 @@ public class FileManager
       }
     }
   }
-  
+
   public static void deleteFilesForGame(GameDetails details)
   {
     if (!details.getCover().isEmpty())

@@ -17,9 +17,11 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 import se.lantz.model.InfoModel;
+import se.lantz.util.FileManager;
 
 public class TranslationPanel extends JPanel
 {
+  private static final String CUSTOM_LANGUAGE_PROPERTY = "customLanguage";
   private static final String EN = "English (en)";
   private static final String DE = "German (de)";
   private static final String FR = "French (fr)";
@@ -39,6 +41,7 @@ public class TranslationPanel extends JPanel
   private JCheckBox customCheckBox;
   private JTextField customTextField;
   private JLabel infoLabel;
+  private String customLanguage;
 
   public TranslationPanel(InfoModel model)
   {
@@ -81,6 +84,13 @@ public class TranslationPanel extends JPanel
     gbc_customPanel.gridx = 0;
     gbc_customPanel.gridy = 3;
     add(getCustomPanel(), gbc_customPanel);
+    
+    customLanguage = FileManager.getConfiguredProperties().getProperty(CUSTOM_LANGUAGE_PROPERTY);
+    if (customLanguage == null)
+    {
+      customLanguage = "";
+    }
+    getCustomTextField().setText(customLanguage);
   }
 
   private JLabel getSelectFromLabel()
@@ -270,6 +280,12 @@ public class TranslationPanel extends JPanel
       {
         returnList.add("it");
       }
+    }
+    
+    //Store custom language if entered
+    if (!getCustomTextField().getText().isEmpty())
+    {
+      FileManager.getConfiguredProperties().put(CUSTOM_LANGUAGE_PROPERTY, getCustomTextField().getText());
     }
     return returnList;
   }
