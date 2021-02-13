@@ -406,7 +406,7 @@ public class GameDetailsBackgroundPanel extends JPanel
                 JOptionPane
                   .showMessageDialog(MainWindow.getInstance(),
                                      "\"" + dialog.getSelectedToLanguages().get(0) +
-                                       "\" is not a vaild language code. It must be a 2-letter code acording to ISO 639-1.\nAll languages might not be supported.",
+                                       "\" is not a vaild language code. It must be a two-letter code from ISO 639-1.\nAll languages might not be supported.",
                                      "Invalid language code",
                                      JOptionPane.ERROR_MESSAGE);
               }

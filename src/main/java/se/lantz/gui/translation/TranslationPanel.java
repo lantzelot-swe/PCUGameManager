@@ -47,7 +47,7 @@ public class TranslationPanel extends JPanel
   {
     this.model = model;
     GridBagLayout gridBagLayout = new GridBagLayout();
-    gridBagLayout.rowWeights = new double[] { 0.0, 0.0, 0.0, 1.0 };
+    gridBagLayout.rowWeights = new double[] { 0.0, 0.0, 0.0 };
     gridBagLayout.columnWeights = new double[] { 1.0, 0.0 };
     setLayout(gridBagLayout);
     GridBagConstraints gbc_selectFromLabel = new GridBagConstraints();
@@ -63,8 +63,9 @@ public class TranslationPanel extends JPanel
     gbc_fromComboBox.gridy = 0;
     add(getFromComboBox(), gbc_fromComboBox);
     GridBagConstraints gbc_toLanguageLabel = new GridBagConstraints();
+    gbc_toLanguageLabel.anchor = GridBagConstraints.WEST;
     gbc_toLanguageLabel.gridwidth = 2;
-    gbc_toLanguageLabel.insets = new Insets(5, 5, 5, 0);
+    gbc_toLanguageLabel.insets = new Insets(5, 10, 5, 0);
     gbc_toLanguageLabel.gridx = 0;
     gbc_toLanguageLabel.gridy = 1;
     add(getToLanguageLabel(), gbc_toLanguageLabel);
@@ -77,13 +78,6 @@ public class TranslationPanel extends JPanel
     gbc_checkBoxPanel.gridx = 0;
     gbc_checkBoxPanel.gridy = 2;
     add(getCheckBoxPanel(), gbc_checkBoxPanel);
-    GridBagConstraints gbc_customPanel = new GridBagConstraints();
-    gbc_customPanel.gridwidth = 2;
-    gbc_customPanel.insets = new Insets(0, 0, 0, 5);
-    gbc_customPanel.fill = GridBagConstraints.BOTH;
-    gbc_customPanel.gridx = 0;
-    gbc_customPanel.gridy = 3;
-    add(getCustomPanel(), gbc_customPanel);
     
     customLanguage = FileManager.getConfiguredProperties().getProperty(CUSTOM_LANGUAGE_PROPERTY);
     if (customLanguage == null)
@@ -138,6 +132,8 @@ public class TranslationPanel extends JPanel
     {
       checkBoxPanel = new JPanel();
       GridBagLayout gbl_checkBoxPanel = new GridBagLayout();
+      gbl_checkBoxPanel.columnWeights = new double[]{0.0, 1.0};
+      gbl_checkBoxPanel.columnWidths = new int[]{0, 0};
       checkBoxPanel.setLayout(gbl_checkBoxPanel);
       GridBagConstraints gbc_enCheckBox = new GridBagConstraints();
       gbc_enCheckBox.anchor = GridBagConstraints.WEST;
@@ -152,7 +148,8 @@ public class TranslationPanel extends JPanel
       gbc_deCheckBox.gridy = 1;
       checkBoxPanel.add(getDeCheckBox(), gbc_deCheckBox);
       GridBagConstraints gbc_frCheckBox = new GridBagConstraints();
-      gbc_frCheckBox.anchor = GridBagConstraints.WEST;
+      gbc_frCheckBox.weighty = 1.0;
+      gbc_frCheckBox.anchor = GridBagConstraints.NORTHWEST;
       gbc_frCheckBox.insets = new Insets(0, 5, 5, 0);
       gbc_frCheckBox.gridx = 0;
       gbc_frCheckBox.gridy = 2;
@@ -160,16 +157,22 @@ public class TranslationPanel extends JPanel
       GridBagConstraints gbc_esCheckBox = new GridBagConstraints();
       gbc_esCheckBox.anchor = GridBagConstraints.WEST;
       gbc_esCheckBox.insets = new Insets(0, 5, 5, 0);
-      gbc_esCheckBox.gridx = 0;
-      gbc_esCheckBox.gridy = 3;
+      gbc_esCheckBox.gridx = 1;
+      gbc_esCheckBox.gridy = 0;
       checkBoxPanel.add(getEsCheckBox(), gbc_esCheckBox);
       GridBagConstraints gbc_itCheckBox = new GridBagConstraints();
-      gbc_itCheckBox.weighty = 1.0;
       gbc_itCheckBox.anchor = GridBagConstraints.NORTHWEST;
       gbc_itCheckBox.insets = new Insets(0, 5, 0, 0);
-      gbc_itCheckBox.gridx = 0;
-      gbc_itCheckBox.gridy = 4;
+      gbc_itCheckBox.gridx = 1;
+      gbc_itCheckBox.gridy = 1;
       checkBoxPanel.add(getItCheckBox(), gbc_itCheckBox);
+      GridBagConstraints gbc_customCheckBox = new GridBagConstraints();
+      gbc_customCheckBox.weighty = 1.0;
+      gbc_customCheckBox.anchor = GridBagConstraints.NORTHWEST;
+      gbc_customCheckBox.insets = new Insets(0, 5, 10, 0);
+      gbc_customCheckBox.gridx = 1;
+      gbc_customCheckBox.gridy = 2;
+      checkBoxPanel.add(getCustomPanel(), gbc_customCheckBox);
     }
     return checkBoxPanel;
   }
@@ -254,7 +257,7 @@ public class TranslationPanel extends JPanel
   List<String> getSelectedToLanguages()
   {
     List<String> returnList = new ArrayList<>();
-    if (getCustomCheckBox().isEnabled())
+    if (getCustomCheckBox().isSelected())
     {
       returnList.add(getCustomTextField().getText());
     }
@@ -298,17 +301,21 @@ public class TranslationPanel extends JPanel
       GridBagLayout gbl_customPanel = new GridBagLayout();
       customPanel.setLayout(gbl_customPanel);
       GridBagConstraints gbc_customCheckBox = new GridBagConstraints();
+      gbc_customCheckBox.anchor = GridBagConstraints.WEST;
       gbc_customCheckBox.gridx = 0;
       gbc_customCheckBox.gridy = 0;
       customPanel.add(getCustomCheckBox(), gbc_customCheckBox);
       GridBagConstraints gbc_customTextField = new GridBagConstraints();
+      gbc_customTextField.anchor = GridBagConstraints.WEST;
+      gbc_customTextField.weightx = 1.0;
       gbc_customTextField.insets = new Insets(0, 0, 0, 5);
       gbc_customTextField.gridx = 1;
       gbc_customTextField.gridy = 0;
       customPanel.add(getCustomTextField(), gbc_customTextField);
       GridBagConstraints gbc_infoLabel = new GridBagConstraints();
-      gbc_infoLabel.gridx = 2;
-      gbc_infoLabel.gridy = 0;
+      gbc_infoLabel.gridwidth = 2;
+      gbc_infoLabel.gridx = 0;
+      gbc_infoLabel.gridy = 1;
       customPanel.add(getInfoLabel(), gbc_infoLabel);
     }
     return customPanel;
@@ -318,7 +325,7 @@ public class TranslationPanel extends JPanel
   {
     if (customCheckBox == null)
     {
-      customCheckBox = new JCheckBox("Custom:");
+      customCheckBox = new JCheckBox("Language:");
       customCheckBox.addItemListener(new ItemListener()
         {
           public void itemStateChanged(ItemEvent e)
@@ -326,10 +333,14 @@ public class TranslationPanel extends JPanel
             if (customCheckBox.isSelected())
             {
               disableCheckBoxes();
+              getInfoLabel().setEnabled(true);
+              getCustomTextField().setEnabled(true);
             }
             else
             {
               enableCheckBoxes();
+              getInfoLabel().setEnabled(false);
+              getCustomTextField().setEnabled(false);
             }
           }
         });
@@ -343,8 +354,9 @@ public class TranslationPanel extends JPanel
     if (customTextField == null)
     {
       customTextField = new JTextField();
-      customTextField.setToolTipText("Add language code according to ISO 639-1");
+      customTextField.setToolTipText("Add two-letter language code (ISO 639-1)");
       customTextField.setColumns(2);
+      customTextField.setEnabled(false);
     }
     return customTextField;
   }
@@ -354,6 +366,7 @@ public class TranslationPanel extends JPanel
     if (infoLabel == null)
     {
       infoLabel = new JLabel("(Translation will be added to the English field)");
+      infoLabel.setEnabled(false);
     }
     return infoLabel;
   }
