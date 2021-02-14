@@ -7,6 +7,8 @@ import java.awt.Image;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 import java.beans.Beans;
 import java.io.File;
@@ -15,6 +17,7 @@ import java.io.IOException;
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JMenuItem;
@@ -72,6 +75,9 @@ public class ScreenshotsPanel extends JPanel
 			"bmp");
 	private JLabel resolution1Label;
 	private JLabel resolution2Label;
+	private JCheckBox multiCrtCheckBox;
+	private JLabel indexLabel;
+	private JTextField indexTextField;
 
 	public ScreenshotsPanel(InfoModel model)
 	{
@@ -502,6 +508,8 @@ public class ScreenshotsPanel extends JPanel
 		{
 			gamePanel = new JPanel();
 			GridBagLayout gbl_gamePanel = new GridBagLayout();
+			gbl_gamePanel.columnWidths = new int[]{0, 0, 0, 0, 0};
+			gbl_gamePanel.columnWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0};
 			gamePanel.setLayout(gbl_gamePanel);
 			GridBagConstraints gbc_gameLabel = new GridBagConstraints();
 			gbc_gameLabel.weightx = 1.0;
@@ -510,6 +518,28 @@ public class ScreenshotsPanel extends JPanel
 			gbc_gameLabel.gridx = 0;
 			gbc_gameLabel.gridy = 0;
 			gamePanel.add(getGameLabel(), gbc_gameLabel);
+			GridBagConstraints gbc_indexTextField = new GridBagConstraints();
+			gbc_indexTextField.insets = new Insets(1, 0, 0, 0);
+			gbc_indexTextField.weighty = 1.0;
+			gbc_indexTextField.anchor = GridBagConstraints.NORTHWEST;
+			gbc_indexTextField.weightx = 1.0;
+			gbc_indexTextField.gridx = 4;
+			gbc_indexTextField.gridy = 1;
+			gamePanel.add(getIndexTextField(), gbc_indexTextField);
+			GridBagConstraints gbc_indexLabel = new GridBagConstraints();
+			gbc_indexLabel.insets = new Insets(4, 0, 0, 0);
+			gbc_indexLabel.weighty = 1.0;
+			gbc_indexLabel.anchor = GridBagConstraints.NORTHWEST;
+			gbc_indexLabel.gridx = 3;
+			gbc_indexLabel.gridy = 1;
+			gamePanel.add(getIndexLabel(), gbc_indexLabel);
+			GridBagConstraints gbc_multiCrtCheckBox = new GridBagConstraints();
+			gbc_multiCrtCheckBox.weighty = 1.0;
+			gbc_multiCrtCheckBox.insets = new Insets(0, 10, 0, 5);
+			gbc_multiCrtCheckBox.anchor = GridBagConstraints.NORTHWEST;
+			gbc_multiCrtCheckBox.gridx = 2;
+			gbc_multiCrtCheckBox.gridy = 1;
+			gamePanel.add(getMultiCrtCheckBox(), gbc_multiCrtCheckBox);
 			GridBagConstraints gbc_gameTextField = new GridBagConstraints();
 			gbc_gameTextField.anchor = GridBagConstraints.NORTHWEST;
 			gbc_gameTextField.weighty = 1.0;
@@ -521,7 +551,6 @@ public class ScreenshotsPanel extends JPanel
 			GridBagConstraints gbc_gameButton = new GridBagConstraints();
 			gbc_gameButton.weighty = 1.0;
 			gbc_gameButton.anchor = GridBagConstraints.NORTHWEST;
-			gbc_gameButton.weightx = 1.0;
 			gbc_gameButton.insets = new Insets(0, 0, 10, 5);
 			gbc_gameButton.gridx = 1;
 			gbc_gameButton.gridy = 1;
@@ -813,5 +842,52 @@ public class ScreenshotsPanel extends JPanel
 			resolution2Label = new JLabel(" ");
 		}
 		return resolution2Label;
+	}
+	private JCheckBox getMultiCrtCheckBox() {
+		if (multiCrtCheckBox == null) {
+			multiCrtCheckBox = new JCheckBox("Multi CRT");
+			multiCrtCheckBox.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					getIndexLabel().setEnabled(multiCrtCheckBox.isSelected());
+					getIndexTextField().setEnabled(multiCrtCheckBox.isSelected());
+				}
+			});
+		}
+		return multiCrtCheckBox;
+	}
+	private JLabel getIndexLabel() {
+		if (indexLabel == null) {
+			indexLabel = new JLabel("Index:");
+			indexLabel.setEnabled(false);
+		}
+		return indexLabel;
+	}
+	private JTextField getIndexTextField() {
+		if (indexTextField == null) {
+			indexTextField = new JTextField();
+			indexTextField.setColumns(2);
+			indexTextField.setEnabled(false);
+			indexTextField.addKeyListener(new KeyAdapter() {
+			   public void keyTyped(KeyEvent e) {
+			      char c = e.getKeyChar();
+			      
+			      if (c != KeyEvent.VK_BACK_SPACE) {
+			      	if (indexTextField.getText().length() > 1)
+				      {
+			      		e.consume();  // ignore event
+				      }
+			      	try
+			      	{
+			      		Integer.parseInt(Character.toString(c));
+			      	}
+			      	catch (Exception ex)
+			      	{
+			      		e.consume();  // ignore event
+			      	}		         
+			      }
+			   }
+			});
+		}
+		return indexTextField;
 	}
 }
