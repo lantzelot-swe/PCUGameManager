@@ -431,12 +431,12 @@ public class GameDetailsBackgroundPanel extends JPanel
 
   private boolean isValidLanguage(String language)
   {
-    Locale locale = new Locale.Builder().setLanguageTag(language).build();
     try
     {
+    	Locale locale = new Locale.Builder().setLanguageTag(language).build();
       return locale.getISO3Language() != null;
     }
-    catch (MissingResourceException e)
+    catch (Exception e)
     {
       return false;
     }
