@@ -545,7 +545,7 @@ public class ScreenshotsPanel extends JPanel
 		{
 			gameTextField = new JTextField();
 			gameTextField.setEditable(false);
-			gameTextField.setPreferredSize(new Dimension(145, 20));
+			gameTextField.setPreferredSize(new Dimension(130, 20));
 			new FileDrop(gameTextField, new FileDrop.Listener()
 			{
 				public void filesDropped(java.io.File[] files)

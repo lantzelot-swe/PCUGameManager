@@ -172,25 +172,25 @@ public class ImportManager
       {
         genre = line.substring(2);
       }
-      else if (line.startsWith("D:en"))
+      else if (line.startsWith("D:en:"))
       {
         description = line.replace("\"", "\"\"").substring(5);
       }
-      else if (line.startsWith("D:de"))
+      else if (line.startsWith("D:de:"))
       {
         description_de = line.replace("\"", "\"\"").substring(5);
       }
-      else if (line.startsWith("D:fr"))
+      else if (line.startsWith("D:fr:"))
       {
         description_fr = line.replace("\"", "\"\"").substring(5);
       }
-      else if (line.startsWith("D:es"))
+      else if (line.startsWith("D:es:"))
       {
         description_es = line.replace("\"", "\"\"").substring(5);
       }
-      else if (line.startsWith("D:it"))
-      {
-        description_it = line.replace("\"", "\"\"").substring(5);
+      else if (line.startsWith("D:it:"))
+      {    	
+      	description_it = line.replace("\"", "\"\"").substring(5);    
       }
       else if (line.startsWith("F:"))
       {

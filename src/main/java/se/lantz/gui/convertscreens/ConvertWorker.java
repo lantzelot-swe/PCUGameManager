@@ -5,6 +5,7 @@ import java.util.concurrent.ExecutionException;
 
 import javax.swing.SwingWorker;
 
+import se.lantz.util.ExceptionHandler;
 import se.lantz.util.FileManager;
 
 public class ConvertWorker extends SwingWorker<Integer, String>

@@ -5,6 +5,7 @@ import java.util.List;
 import javax.swing.SwingWorker;
 
 import se.lantz.manager.BackupManager;
+import se.lantz.util.ExceptionHandler;
 
 public class BackupWorker extends SwingWorker<Void, String>
 {
@@ -52,6 +53,14 @@ public class BackupWorker extends SwingWorker<Void, String>
   @Override
   protected void done()
   {
+  	try
+		{
+			get();
+		} 
+  	catch (Exception e)
+		{
+			ExceptionHandler.handleException(e, "Error during db backup");
+		}
     dialog.finish();
   }
 }

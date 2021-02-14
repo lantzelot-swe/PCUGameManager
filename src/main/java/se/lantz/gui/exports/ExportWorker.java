@@ -5,6 +5,7 @@ import java.util.List;
 import javax.swing.SwingWorker;
 
 import se.lantz.manager.ExportManager;
+import se.lantz.util.ExceptionHandler;
 
 public class ExportWorker extends SwingWorker<Void, String>
 {
@@ -54,6 +55,14 @@ public class ExportWorker extends SwingWorker<Void, String>
   @Override
   protected void done()
   {
+  	try
+		{
+			get();
+		}
+  	catch (Exception e)
+		{
+			ExceptionHandler.handleException(e, "Error during export");
+		}
     dialog.finish();
   }
 }

@@ -831,7 +831,7 @@ public class DbConnector
 
   public void deleteAllGames()
   {
-    String sql = "DELETE FROM gameinfo WHERE title NOT LIKE '%THEC64%'";
+    String sql = "DELETE FROM gameinfo WHERE title NOT LIKE '%THEC64%' AND title NOT LIKE '%VIC-20%'";
     logger.debug("Generated DELETE String:\n{}", sql);
     try (Connection conn = this.connect(); PreparedStatement pstmt = conn.prepareStatement(sql))
     {
@@ -846,7 +846,7 @@ public class DbConnector
   
   public void deleteAllGamesInView(GameView view)
   {
-    String sql = "DELETE FROM gameinfo " + view.getSqlQuery() + " AND title NOT LIKE '%THEC64%'";
+    String sql = "DELETE FROM gameinfo " + view.getSqlQuery() + " AND title NOT LIKE '%THEC64%' AND title NOT LIKE '%VIC-20%'";
     logger.debug("Generated DELETE String:\n{}", sql);
     try (Connection conn = this.connect(); PreparedStatement pstmt = conn.prepareStatement(sql))
     {

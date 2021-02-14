@@ -1,10 +1,12 @@
 package se.lantz.gui.imports;
 
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 import javax.swing.SwingWorker;
 
 import se.lantz.manager.ImportManager;
+import se.lantz.util.ExceptionHandler;
 
 public class ImportWorker extends SwingWorker<Void, String>
 {
@@ -47,6 +49,14 @@ public class ImportWorker extends SwingWorker<Void, String>
   @Override
   protected void done()
   {
+  	try
+		{
+			get();
+		} 
+  	catch (Exception e)
+		{
+			ExceptionHandler.handleException(e, "Error during import");
+		}
     dialog.finish();
   }
 }

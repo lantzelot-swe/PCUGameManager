@@ -112,6 +112,14 @@ public class TranslationWorker extends SwingWorker<Void, String>
   @Override
   protected void done()
   {
+  	try
+		{
+			get();
+		} 
+  	catch (Exception e)
+		{
+			ExceptionHandler.handleException(e, "Error during translation");
+		}
     dialog.finish();
   }
 }

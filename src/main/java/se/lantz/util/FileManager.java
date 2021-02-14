@@ -675,7 +675,7 @@ public class FileManager
   {
     for (File file : dir.listFiles())
     {
-      if (!file.isDirectory() && (deleteAll || !file.getName().contains("THEC64")))
+      if (!file.isDirectory() && (deleteAll || !(file.getName().contains("THEC64") || file.getName().contains("VIC20"))))
       {
         file.delete();
       }

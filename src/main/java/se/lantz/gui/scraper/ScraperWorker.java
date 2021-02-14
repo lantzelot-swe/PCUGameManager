@@ -6,6 +6,7 @@ import javax.swing.SwingWorker;
 
 import se.lantz.manager.ScraperManager;
 import se.lantz.model.data.ScraperFields;
+import se.lantz.util.ExceptionHandler;
 
 public class ScraperWorker extends SwingWorker<Void, String>
 {
@@ -43,6 +44,14 @@ public class ScraperWorker extends SwingWorker<Void, String>
   @Override
   protected void done()
   {
+  	try
+		{
+			get();
+		} 
+  	catch (Exception e)
+		{
+			ExceptionHandler.handleException(e, "Error during scraping");
+		}
     dialog.finish();
   }
 }
