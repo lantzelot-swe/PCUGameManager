@@ -33,7 +33,7 @@ import se.lantz.util.GameListDataComparator;
 
 public class ExportGamesSelectionPanel extends JPanel
 {
-  private static final int MAX_GAMES = 226;
+  private static final int MAX_GAMES = 255;
   private JPanel listPanel;
   private JPanel buttonPanel;
   private JButton addButton;
