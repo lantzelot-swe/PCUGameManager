@@ -27,7 +27,9 @@ public class ImportWorker extends SwingWorker<Void, String>
     StringBuilder infoBuilder = new StringBuilder();
     importManager.readGameInfoFiles(infoBuilder);
     publish(infoBuilder.toString());
-    importManager.convertIntoDbRows();
+    infoBuilder = new StringBuilder();
+    importManager.convertIntoDbRows(infoBuilder);
+    publish(infoBuilder.toString());
     publish("Importing to db...");
     publish(importManager.insertRowsIntoDb().toString());
     publish("Copy screenshots, covers and game files...");
@@ -49,14 +51,14 @@ public class ImportWorker extends SwingWorker<Void, String>
   @Override
   protected void done()
   {
-  	try
-		{
-			get();
-		} 
-  	catch (Exception e)
-		{
-			ExceptionHandler.handleException(e, "Error during import");
-		}
+    try
+    {
+      get();
+    }
+    catch (Exception e)
+    {
+      ExceptionHandler.handleException(e, "Error during import");
+    }
     dialog.finish();
   }
 }

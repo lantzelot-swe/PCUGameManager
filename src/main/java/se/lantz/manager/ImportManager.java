@@ -51,21 +51,21 @@ public class ImportManager
   {
     this.selectedOption = option;
   }
-  
+
   public void setAddAsFavorite(boolean favorite)
   {
     this.addAsFavorite = favorite;
   }
 
   public void setSelectedFolder(Path folder)
-  {    
+  {
     //Assume games subdirectory
     srcParentFolder = folder.resolve("games");
     srcCoversFolder = srcParentFolder.resolve("covers");
     srcGamesFolder = srcParentFolder.resolve("games");
     srcScreensFolder = srcParentFolder.resolve("screens");
-    
-    if (! (Files.exists(srcParentFolder, LinkOption.NOFOLLOW_LINKS) &&
+
+    if (!(Files.exists(srcParentFolder, LinkOption.NOFOLLOW_LINKS) &&
       Files.exists(srcCoversFolder, LinkOption.NOFOLLOW_LINKS) &&
       Files.exists(srcGamesFolder, LinkOption.NOFOLLOW_LINKS) &&
       Files.exists(srcScreensFolder, LinkOption.NOFOLLOW_LINKS)))
@@ -74,8 +74,8 @@ public class ImportManager
       srcParentFolder = folder;
       srcCoversFolder = folder.resolve("covers");
       srcGamesFolder = folder.resolve("games");
-      srcScreensFolder = folder.resolve("screens");    
-    }   
+      srcScreensFolder = folder.resolve("screens");
+    }
   }
 
   public void readGameInfoFiles(StringBuilder infoBuilder)
@@ -118,10 +118,10 @@ public class ImportManager
     return (dotIndex == -1) ? "" : fileName.substring(dotIndex + 1);
   }
 
-  public void convertIntoDbRows()
+  public void convertIntoDbRows(StringBuilder infoBuilder)
   {
     // Construct a List of comma separated strings with all info correctly added.
-    gameInfoFilesMap.values().stream().forEach(this::extractInfoIntoRowString);
+    gameInfoFilesMap.values().stream().forEach(list -> extractInfoIntoRowString(list, infoBuilder));
   }
 
   public StringBuilder insertRowsIntoDb()
@@ -129,7 +129,7 @@ public class ImportManager
     return uiModel.importGameInfo(dbRowDataList, selectedOption, addAsFavorite);
   }
 
-  private void extractInfoIntoRowString(List<String> fileLines)
+  private void extractInfoIntoRowString(List<String> fileLines, StringBuilder infoBuilder)
   {
     String title = "";
     String year = "";
@@ -149,168 +149,155 @@ public class ImportManager
     String joy2config = "";
     String advanced = "";
     String verticalShift = "";
+    try
+    {
+      for (String line : fileLines)
+      {
+        if (line.startsWith("T:"))
+        {
+          title = line.substring(2);
+        }
+        else if (line.startsWith("Y:"))
+        {
+          year = line.substring(2);
+        }
+        else if (line.startsWith("A:"))
+        {
+          author = line.substring(2);
+        }
+        else if (line.startsWith("M:"))
+        {
+          composer = line.substring(2);
+        }
+        else if (line.startsWith("E:"))
+        {
+          genre = line.substring(2);
+        }
+        else if (line.startsWith("D:en:"))
+        {
+          description = line.replace("\"", "\"\"").substring(5);
+        }
+        else if (line.startsWith("D:de:"))
+        {
+          description_de = line.replace("\"", "\"\"").substring(5);
+        }
+        else if (line.startsWith("D:fr:"))
+        {
+          description_fr = line.replace("\"", "\"\"").substring(5);
+        }
+        else if (line.startsWith("D:es:"))
+        {
+          description_es = line.replace("\"", "\"\"").substring(5);
+        }
+        else if (line.startsWith("D:it:"))
+        {
+          description_it = line.replace("\"", "\"\"").substring(5);
+        }
+        else if (line.startsWith("F:"))
+        {
+          gamefile = line.substring(2);
+          if (gamefile.lastIndexOf("/") > -1)
+          {
+            gamefile = gamefile.substring(gamefile.lastIndexOf("/") + 1);
+          }
+        }
+        else if (line.startsWith("C:"))
+        {
+          coverfile = line.substring(2);
+          if (coverfile.lastIndexOf("/") > -1)
+          {
+            coverfile = coverfile.substring(coverfile.lastIndexOf("/") + 1);
+          }
+        }
+        else if (line.startsWith("G:"))
+        {
+          if (screen1file.isEmpty())
+          {
+            screen1file = line.substring(2);
+            if (screen1file.lastIndexOf("/") > -1)
+            {
+              screen1file = screen1file.substring(screen1file.lastIndexOf("/") + 1);
+            }
+          }
+          else
+          {
+            screen2file = line.substring(2);
+            if (screen2file.lastIndexOf("/") > -1)
+            {
+              screen2file = screen2file.substring(screen2file.lastIndexOf("/") + 1);
+            }
+          }
+        }
+        else if (line.startsWith("J:1"))
+        {
+          joy1config = line;
+        }
+        else if (line.startsWith("J:2"))
+        {
+          joy2config = line;
+        }
+        else if (line.startsWith("X:"))
+        {
+          advanced = line.substring(2);
+          //The maxi game tool sets the flag for accurate disk to "truedrive". This is not correct according
+          //to the The64 manual. Convert to the correct "accuratedisk"
+          if (advanced.contains("truedrive"))
+          {
+            advanced = advanced.replace("truedrive", "accuratedisk");
+          }
+        }
+        else if (line.startsWith("V:"))
+        {
+          verticalShift = line.substring(2);
+        }
+      }
 
-    for (String line : fileLines)
-    {
-      if (line.startsWith("T:"))
+      //Check if other languages are the same as english. If that's the case don't import it, leave it empty.
+      if (description_de.equals(description))
       {
-        title = line.substring(2);
+        description_de = "";
       }
-      else if (line.startsWith("Y:"))
+      if (description_fr.equals(description))
       {
-        year = line.substring(2);
+        description_fr = "";
       }
-      else if (line.startsWith("A:"))
+      if (description_es.equals(description))
       {
-        author = line.substring(2);
+        description_es = "";
       }
-      else if (line.startsWith("M:"))
+      if (description_it.equals(description))
       {
-        composer = line.substring(2);
+        description_it = "";
       }
-      else if (line.startsWith("E:"))
-      {
-        genre = line.substring(2);
-      }
-      else if (line.startsWith("D:en:"))
-      {
-        description = line.replace("\"", "\"\"").substring(5);
-      }
-      else if (line.startsWith("D:de:"))
-      {
-        description_de = line.replace("\"", "\"\"").substring(5);
-      }
-      else if (line.startsWith("D:fr:"))
-      {
-        description_fr = line.replace("\"", "\"\"").substring(5);
-      }
-      else if (line.startsWith("D:es:"))
-      {
-        description_es = line.replace("\"", "\"\"").substring(5);
-      }
-      else if (line.startsWith("D:it:"))
-      {    	
-      	description_it = line.replace("\"", "\"\"").substring(5);    
-      }
-      else if (line.startsWith("F:"))
-      {
-        gamefile = line.substring(2);
-        if (gamefile.lastIndexOf("/") > -1)
-        {
-          gamefile = gamefile.substring(gamefile.lastIndexOf("/") + 1);
-        }
-      }
-      else if (line.startsWith("C:"))
-      {
-        coverfile = line.substring(2);
-        if (coverfile.lastIndexOf("/") > -1)
-        {
-          coverfile = coverfile.substring(coverfile.lastIndexOf("/") + 1);
-        }
-      }
-      else if (line.startsWith("G:"))
-      {
-        if (screen1file.isEmpty())
-        {
-          screen1file = line.substring(2);
-          if (screen1file.lastIndexOf("/") > -1)
-          {
-            screen1file = screen1file.substring(screen1file.lastIndexOf("/") + 1);
-          }
-        }
-        else
-        {
-          screen2file = line.substring(2);
-          if (screen2file.lastIndexOf("/") > -1)
-          {
-            screen2file = screen2file.substring(screen2file.lastIndexOf("/") + 1);
-          }
-        }
-      }
-      else if (line.startsWith("J:1"))
-      {
-        joy1config = line;
-      }
-      else if (line.startsWith("J:2"))
-      {
-        joy2config = line;
-      }
-      else if (line.startsWith("X:"))
-      {
-        advanced = line.substring(2);
-        //The maxi game tool sets the flag for accurate disk to "truedrive". This is not correct according
-        //to the The64 manual. Convert to the correct "accuratedisk"
-        if (advanced.contains("truedrive"))
-        {
-          advanced = advanced.replace("truedrive", "accuratedisk");
-        }
-      }
-      else if (line.startsWith("V:"))
-      {
-        verticalShift = line.substring(2);
-      }
+
+      // Construct a data row
+      List<String> list = Arrays.asList(title,
+                                        year,
+                                        author,
+                                        composer,
+                                        genre,
+                                        description,
+                                        description_de,
+                                        description_fr,
+                                        description_es,
+                                        description_it,
+                                        gamefile,
+                                        coverfile,
+                                        screen1file,
+                                        screen2file,
+                                        joy1config,
+                                        joy2config,
+                                        advanced,
+                                        verticalShift);
+      String result = String.join("\",\"", list);
+      result = "\"" + result + "\"";
+      dbRowDataList.add(result);
     }
-    
-    //Check if other languages are the same as english. If that's the case don't import it, leave it empty.
-    if (description_de.equals(description))
+    catch (Exception e)
     {
-      description_de = "";
+      infoBuilder.append("ERROR: Could not read info file for \"" + title + "\"\n");
+      logger.error("IMPORT: Could not read info file for " + title, e);
     }
-    if (description_fr.equals(description))
-    {
-      description_fr = "";
-    }
-    if (description_es.equals(description))
-    {
-      description_es = "";
-    }
-    if (description_it.equals(description))
-    {
-      description_it = "";
-    }
-    
-//    //Don't allow same screen file for both entries
-//    if (screen1file.equals(screen2file))
-//    {
-//      if (screen1file.endsWith("-01.png"))
-//      {
-//        screen1file = "";
-//      }
-//      else 
-//      {
-//        screen2file = "";
-//      }
-//    }
-//    //Special handling of screens which may have wrong name or missing entry (screen 1 might be named 01.png, 
-//    //handle that as screen2 instead to get names set correctly)
-//    if (screen1file.endsWith("-01.png") && screen2file.isEmpty())
-//    {
-//      screen2file = screen1file;
-//      screen1file = ""; 
-//    }
-      
-    // Construct a data row
-    List<String> list = Arrays.asList(title,
-                                      year,
-                                      author,
-                                      composer,
-                                      genre,
-                                      description,
-                                      description_de,
-                                      description_fr,
-                                      description_es,
-                                      description_it,
-                                      gamefile,
-                                      coverfile,
-                                      screen1file,
-                                      screen2file,
-                                      joy1config,
-                                      joy2config,
-                                      advanced,
-                                      verticalShift);
-    String result = String.join("\",\"", list);
-    result = "\"" + result + "\"";
-    dbRowDataList.add(result);
   }
 
   private List<String> readFileInList(Path filePath, StringBuilder infoBuilder)
