@@ -77,7 +77,14 @@ public class DescriptionPanel extends JPanel
 			descriptionTextArea.setWrapStyleWord(true);
 			descriptionTextArea.setLineWrap(true);
 
-			CustomUndoPlainDocument doc = new CustomUndoPlainDocument();
+			CustomUndoPlainDocument doc = new CustomUndoPlainDocument()
+			{
+        @Override
+        public void updateModel()
+        {
+          updateDescriptionInModel();
+        }
+      };
 			doc.addDocumentListener(new DocumentListener()
 			{
 				@Override
@@ -116,27 +123,7 @@ public class DescriptionPanel extends JPanel
 				@Override
 				public void keyReleased(KeyEvent e)
 				{
-					JTextArea textField = (JTextArea) e.getSource();
-					switch (language)
-					{
-					case de:
-						model.setDescriptionDe(textField.getText());
-						break;
-					case en:
-						model.setDescription(textField.getText());
-						break;
-					case es:
-						model.setDescriptionEs(textField.getText());
-						break;
-					case fr:
-						model.setDescriptionFr(textField.getText());
-						break;
-					case it:
-						model.setDescriptionIt(textField.getText());
-						break;
-					default:
-						break;
-					}
+					updateDescriptionInModel();				
 				}
 			});
 			descriptionTextArea.addFocusListener(new FocusAdapter()
@@ -185,6 +172,31 @@ public class DescriptionPanel extends JPanel
 			});
 		}
 		return descriptionTextArea;
+	}
+	
+	private void updateDescriptionInModel()
+	{
+	  JTextArea textField = getDescriptionTextArea();
+    switch (language)
+    {
+    case de:
+      model.setDescriptionDe(textField.getText());
+      break;
+    case en:
+      model.setDescription(textField.getText());
+      break;
+    case es:
+      model.setDescriptionEs(textField.getText());
+      break;
+    case fr:
+      model.setDescriptionFr(textField.getText());
+      break;
+    case it:
+      model.setDescriptionIt(textField.getText());
+      break;
+    default:
+      break;
+    }
 	}
 
 	private JScrollPane getDescriptionScrollPane()

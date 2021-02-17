@@ -257,7 +257,14 @@ public class JoystickPanel extends JPanel
 		if (configTextField == null)
 		{
 			configTextField = new JTextField();
-			configTextField.setDocument(new CustomUndoPlainDocument());
+			configTextField.setDocument(new CustomUndoPlainDocument()
+			{
+        @Override
+        public void updateModel()
+        {
+          //Nothing
+        }
+      });
 			configTextField.setColumns(10);
 			configTextField.addFocusListener(new FocusListener()
 			{
@@ -265,8 +272,7 @@ public class JoystickPanel extends JPanel
 				@Override
 				public void focusGained(FocusEvent arg0)
 				{
-					// TODO Auto-generated method stub
-
+				  //Nothing
 				}
 
 				@Override
