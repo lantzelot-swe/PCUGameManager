@@ -236,6 +236,26 @@ public class ListPanel extends JPanel
       list = new JList<GameListData>()
         {
           @Override
+          public void ensureIndexIsVisible(int index)
+          {
+            //Don't allow scrolling to any other index if unsaved data
+            if (!uiModel.isDataChanged())
+            {
+              super.ensureIndexIsVisible(index);
+            }
+          }
+
+          @Override
+          public void setSelectedIndex(int index)
+          {
+            //Don't allow changing selection if unsaved data
+            if (!uiModel.isDataChanged())
+            {
+              super.setSelectedIndex(index);
+            }
+          }
+
+          @Override
           public void removeSelectionInterval(int start, int end)
           {
             //Don't allow clearing selection if unsaved data
@@ -291,8 +311,24 @@ public class ListPanel extends JPanel
       list.addKeyListener(new KeyAdapter()
         {
 
+          @Override
+          public void keyTyped(KeyEvent e)
+          {
+            if (uiModel.isDataChanged())
+            {
+              e.consume();
+              return;
+            }
+          }
+
           public void keyPressed(KeyEvent e)
           {
+            if (uiModel.isDataChanged())
+            {
+              e.consume();
+              return;
+            }
+            
             if (e.getKeyCode() == KeyEvent.VK_DOWN || e.getKeyCode() == KeyEvent.VK_UP)
             {
               delayDetailsUpdate = true;
@@ -305,6 +341,11 @@ public class ListPanel extends JPanel
 
           public void keyReleased(KeyEvent e)
           {
+            if (uiModel.isDataChanged())
+            {
+              e.consume();
+              return;
+            }
             if (e.getKeyCode() == KeyEvent.VK_DOWN || e.getKeyCode() == KeyEvent.VK_UP)
             {
               delayDetailsUpdate = false;
