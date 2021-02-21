@@ -178,7 +178,7 @@ public class GameDetailsBackgroundPanel extends JPanel
   {
     if (infoPanel == null)
     {
-      infoPanel = new InfoBackgroundPanel(model.getInfoModel());
+      infoPanel = new InfoBackgroundPanel(model);
     }
     return infoPanel;
   }

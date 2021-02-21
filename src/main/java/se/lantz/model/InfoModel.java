@@ -2,9 +2,13 @@ package se.lantz.model;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Objects;
 
+import javax.imageio.ImageIO;
+
+import se.lantz.util.ExceptionHandler;
 import se.lantz.util.FileManager;
 
 public class InfoModel extends AbstractModel
@@ -379,6 +383,38 @@ public class InfoModel extends AbstractModel
       return true;
     }
     return false;
+  }
+
+  public void updateCoverAndScreensIfEmpty(boolean isC64)
+  {
+    if (getCoverFile().isEmpty() && getCoverImage() == null)
+    {
+      try
+      {
+        String image = isC64 ? "/se/lantz/CoverMissing-C64.png" : "/se/lantz/CoverMissing-VIC20.png";
+        this.coverImage = ImageIO.read(getClass().getResource(image));
+      }
+      catch (IOException e)
+      {
+        ExceptionHandler.handleException(e, "Could not update cover with empty image");
+      }
+    }
+    if (getScreens1File().isEmpty() && getScreen1Image() == null)
+    {
+      //Use screen2 for 1 also
+      if (getScreen2Image() != null)
+      {
+        this.screen1Image = getScreen2Image();
+      }
+    }
+    else if (getScreens2File().isEmpty() && getScreen2Image() == null)
+    {
+      //Use screen1 for 2 also
+      if (getScreen1Image() != null)
+      {
+        this.screen2Image = getScreen1Image();
+      }
+    }
   }
 
   public boolean isNewGame()

@@ -349,6 +349,9 @@ public class MainViewModel extends AbstractModel
         return false;
       }
 
+      //Update with empty cover and/or screen before saving
+      infoModel.updateCoverAndScreensIfEmpty(getSystemModel().isC64());
+      
       //Update all file names to match title
       infoModel.updateFileNames();
       //Create game details
@@ -475,17 +478,14 @@ public class MainViewModel extends AbstractModel
     {
       missingFields.add("Title");
     }
-    if (infoModel.getCoverFile().isEmpty() && infoModel.getCoverImage() == null)
-    {
-      missingFields.add("Cover");
-    }
+    boolean missingScreen1 = false;
     if (infoModel.getScreens1File().isEmpty() && infoModel.getScreen1Image() == null)
     {
-      missingFields.add("Screenshot 1");
+      missingScreen1 = true;
     }
-    if (infoModel.getScreens2File().isEmpty() && infoModel.getScreen2Image() == null)
+    if (missingScreen1 && infoModel.getScreens2File().isEmpty() && infoModel.getScreen2Image() == null)
     {
-      missingFields.add("Screenshot 2");
+      missingFields.add("At least one screenshot");
     }
     if (infoModel.getGamesFile().isEmpty())
     {

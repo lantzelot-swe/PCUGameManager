@@ -5,16 +5,19 @@ import java.awt.BorderLayout;
 import javax.swing.JPanel;
 
 import se.lantz.model.InfoModel;
+import se.lantz.model.MainViewModel;
 
 public class InfoBackgroundPanel extends JPanel
 {
-	private InfoModel model;
+	private InfoModel infoModel;
 	private ScreenshotsPanel screensPanel;
 	private InfoPanel infoPanel2;
+  private MainViewModel model;
 
-	public InfoBackgroundPanel(InfoModel model)
+	public InfoBackgroundPanel(MainViewModel model)
 	{
 		this.model = model;
+    this.infoModel = model.getInfoModel();
 		BorderLayout borderLayout = new BorderLayout();
 		this.setLayout(borderLayout);
 		add(getInfoPanel2(), BorderLayout.WEST);
@@ -26,7 +29,7 @@ public class InfoBackgroundPanel extends JPanel
 	{
 		if (infoPanel2 == null)
 		{
-			infoPanel2 = new InfoPanel(model);
+			infoPanel2 = new InfoPanel(infoModel);
 		}
 		return infoPanel2;
 	}

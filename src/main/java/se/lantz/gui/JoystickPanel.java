@@ -180,7 +180,7 @@ public class JoystickPanel extends JPanel
 		{
 			imageLabel = new JLabel();
 			imageLabel.setHorizontalAlignment(SwingConstants.CENTER);
-			ImageIcon joyImage = new ImageIcon(getClass().getResource("/se/lantz/joystick4.png"));
+			ImageIcon joyImage = new ImageIcon(getClass().getResource("/se/lantz/joystick.png"));
 			imageLabel.setIcon(joyImage);
 		}
 		return imageLabel;
