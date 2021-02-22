@@ -299,7 +299,7 @@ public class ScreenshotsPanel extends JPanel
   {
     if (missingSceenshotIcon == null)
     {
-      missingSceenshotIcon = new ImageIcon(getClass().getResource("/se/lantz/MissingScreenshot.png"));
+      missingSceenshotIcon = new ImageIcon(getClass().getResource("/se/lantz/DropScreenshot.png"));
     }
     return missingSceenshotIcon;
   }

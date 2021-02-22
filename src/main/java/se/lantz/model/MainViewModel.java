@@ -476,7 +476,7 @@ public class MainViewModel extends AbstractModel
     List<String> missingFields = new ArrayList<>();
     if (infoModel.getTitle().isEmpty())
     {
-      missingFields.add("Title");
+      missingFields.add("Game title");
     }
     boolean missingScreen1 = false;
     if (infoModel.getScreens1File().isEmpty() && infoModel.getScreen1Image() == null)
