@@ -41,6 +41,8 @@ public class InfoModel extends AbstractModel
   private String oldCoverFile = "";
   private String oldScreens1File = "";
   private String oldScreens2File = "";
+  
+  private int duplicateIndex = 0;
 
   public String getTitle()
   {
@@ -171,6 +173,16 @@ public class InfoModel extends AbstractModel
     {
       notifyChange();
     }
+  }
+  
+  public int getDuplicateIndex()
+  {
+    return duplicateIndex;
+  }
+  
+  public void setDuplicateIndex(int index)
+  {
+    this.duplicateIndex = index;
   }
 
   public String getGenre()
@@ -334,7 +346,7 @@ public class InfoModel extends AbstractModel
     Path old = getGamesPath();
     this.gamesPath = file.toPath();
     //Set games name, always add ".gz"??
-    String fileName = FileManager.generateFileNameFromTitle(this.title);
+    String fileName = FileManager.generateFileNameFromTitle(this.title, getDuplicateIndex());
     String fileEnding = file.getName().substring(file.getName().indexOf("."));
     if (fileEnding.endsWith(".gz") || fileEnding.endsWith(".GZ"))
     {
@@ -361,7 +373,7 @@ public class InfoModel extends AbstractModel
       oldGamesFile = getGamesFile();
 
       disableChangeNotification(true);
-      String fileName = FileManager.generateFileNameFromTitle(this.title);
+      String fileName = FileManager.generateFileNameFromTitle(this.title, getDuplicateIndex());
       if (!getCoverFile().isEmpty() || getCoverImage() != null)
       {
         setCoverFile(fileName + "-cover.png");

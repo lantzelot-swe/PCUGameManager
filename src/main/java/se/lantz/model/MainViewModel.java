@@ -48,9 +48,6 @@ public class MainViewModel extends AbstractModel
 
   private String currentGameId = "";
   private GameDetails currentGameDetails = null;
-
-  private PropertyChangeListener duplicateListener;
-
   private PropertyChangeListener requiredFieldsListener;
 
   private GameListData selectedData;
@@ -162,6 +159,7 @@ public class MainViewModel extends AbstractModel
     infoModel.setCoverFile(currentGameDetails.getCover());
     infoModel.setScreens1File(currentGameDetails.getScreen1());
     infoModel.setScreens2File(currentGameDetails.getScreen2());
+    infoModel.setDuplicateIndex(currentGameDetails.getDuplicateIndex());
     //Reset and images that where added previously
     infoModel.resetImagesAndOldFileNames();
     joy1Model.setConfigStringFromDb(currentGameDetails.getJoy1());
@@ -293,11 +291,6 @@ public class MainViewModel extends AbstractModel
     getSystemModel().addPropertyChangeListener(saveChangeListener);
   }
 
-  public void addDuplicateGameListener(PropertyChangeListener duplicateListener)
-  {
-    this.duplicateListener = duplicateListener;
-  }
-
   public void addRequireFieldsListener(PropertyChangeListener requiredFieldsListener)
   {
     this.requiredFieldsListener = requiredFieldsListener;
@@ -336,12 +329,12 @@ public class MainViewModel extends AbstractModel
   {
     if (isDataChanged())
     {
-      if ((infoModel.isNewGame() || infoModel.isTitleChanged()) && dbConnector.isGameInDb(infoModel.getTitle()))
+      if (infoModel.isNewGame() || infoModel.isTitleChanged())
       {
-        duplicateListener.propertyChange(new PropertyChangeEvent(this, "duplicate", null, infoModel.getTitle()));
-        return false;
+        //Update duplicate index 
+        infoModel.setDuplicateIndex(dbConnector.getGameDuplicateIndexToUse(infoModel.getTitle()));
       }
-
+      
       if (!validateRequiredFields().isEmpty())
       {
         //Validate that all required fields are set here!!
@@ -356,6 +349,7 @@ public class MainViewModel extends AbstractModel
       infoModel.updateFileNames();
       //Create game details
       GameDetails updatedGame = new GameDetails();
+      updatedGame.setDuplicateIndex(infoModel.getDuplicateIndex());
       updatedGame.setTitle(infoModel.getTitle().replace("\"", "\"\""));
       updatedGame.setAuthor(infoModel.getAuthor().replace("\"", "\"\""));
       updatedGame.setYear(infoModel.getYear());

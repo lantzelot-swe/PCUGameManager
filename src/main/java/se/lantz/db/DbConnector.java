@@ -95,7 +95,7 @@ public class DbConnector
       logger.debug("Database missing, new db created.");
     }
     //To be backwards compatible with 1.0 db, update if missing
-    addLanguageColumnsIfMissing();
+    addLanguageAndDuplicateColumnsIfMissing();
   }
 
   private void createNewDb()
@@ -114,13 +114,14 @@ public class DbConnector
     }
   }
   
-  private void addLanguageColumnsIfMissing()
+  private void addLanguageAndDuplicateColumnsIfMissing()
   { 
     String tableInfoSql = "PRAGMA table_info(gameinfo)";
     String addDeSql = "ALTER TABLE gameinfo ADD COLUMN Description_de STRING;";
     String addFrSql = "ALTER TABLE gameinfo ADD COLUMN Description_fr STRING;";
     String addEsSql = "ALTER TABLE gameinfo ADD COLUMN Description_es STRING;";
     String addItSql = "ALTER TABLE gameinfo ADD COLUMN Description_it STRING;";
+    String addDuplicateSql = "ALTER TABLE gameinfo ADD COLUMN Duplicate INTEGER DEFAULT 0;";
     
     try (Connection conn = this.connect(); PreparedStatement stmnt = conn.prepareStatement(tableInfoSql);
       ResultSet rs = stmnt.executeQuery();
@@ -128,17 +129,22 @@ public class DbConnector
       Statement addFrstmnt = conn.createStatement();
       Statement addEsstmnt = conn.createStatement();
       Statement addItstmnt = conn.createStatement();
+      Statement addDuplicatestmnt = conn.createStatement();
       )
     {
       boolean columnsAvailable = false;
+      boolean duplicateAvailable = false;
       while (rs.next())
       {
         //Check if one of the language columns are available
         if (rs.getString("Name").equals("Description_de"))
         {
           columnsAvailable = true;
-          break;
         }
+        if (rs.getString("Name").equals("Duplicate"))
+        {
+          duplicateAvailable = true;
+        }        
       }
       
       if (!columnsAvailable)
@@ -150,10 +156,16 @@ public class DbConnector
         addItstmnt.executeUpdate(addItSql);
         logger.debug("Language columns added.");
       }
+      if (!duplicateAvailable)
+      {
+        logger.debug("Duplicate column is missing in the database, adding column.");
+        addDuplicatestmnt.executeUpdate(addDuplicateSql);
+        logger.debug("Duplicate column added.");
+      }
     }
     catch (SQLException e)
     {
-      ExceptionHandler.handleException(e, "Could not update db for language columns");
+      ExceptionHandler.handleException(e, "Could not update db for language and duplicate columns");
     }
   }
 
@@ -490,7 +502,8 @@ public class DbConnector
       st.append(column);
       st.append(",");
     }
-    st.delete(st.length() - 1, st.length());
+    st.append(DbConstants.DUPLICATE_INDEX);
+//    st.delete(st.length() - 1, st.length());
     st.append(") VALUES (");
 
     for (String rowData : rowValues)
@@ -504,6 +517,8 @@ public class DbConnector
       {
         st.append(",0");
       }
+      //Append duplicate index as 0
+      st.append(",0");
       st.append("),(");
     }
     st.delete(st.length() - 3, st.length());
@@ -564,7 +579,7 @@ public class DbConnector
       }
       sqlBuilder.append(" WHERE title = ");
       sqlBuilder.append(title);
-      sqlBuilder.append("\" COLLATE NOCASE;");
+      sqlBuilder.append("\" AND Duplicate = 0 COLLATE NOCASE;");
       String sql = sqlBuilder.toString();
       logger.debug("Generated UPDATE String:\n{}", sql);
       try (Connection conn = this.connect(); PreparedStatement pstmt = conn.prepareStatement(sql))
@@ -611,6 +626,7 @@ public class DbConnector
       returnValue.setJoy2(rs.getString(DbConstants.JOY2));
       returnValue.setSystem(rs.getString(DbConstants.SYSTEM));
       returnValue.setVerticalShift(rs.getInt(DbConstants.VERTICALSHIFT));
+      returnValue.setDuplicateIndex(rs.getInt(DbConstants.DUPLICATE_INDEX));
       logger.debug("SELECT Executed successfully");
     }
     catch (SQLException e)
@@ -620,26 +636,34 @@ public class DbConnector
     return returnValue;
   }
 
-  public boolean isGameInDb(String title)
+  public int getGameDuplicateIndexToUse(String title)
   {
     StringBuilder sqlBuilder = new StringBuilder();
-    sqlBuilder.append("SELECT COUNT(*) FROM gameinfo WHERE title LIKE \"");
+//    sqlBuilder.append("SELECT COUNT(*) FROM gameinfo WHERE title LIKE \"");
+    sqlBuilder.append("SELECT Duplicate FROM gameinfo WHERE title LIKE \"");
     sqlBuilder.append(title);
     sqlBuilder.append("\";");
     String sql = sqlBuilder.toString();
     logger.debug("Checking if game is in db already: {}", sql);
-
+    int returnIndex = 0;
     try (Connection conn = this.connect(); PreparedStatement pstmt = conn.prepareStatement(sql))
     {
       ResultSet rs = pstmt.executeQuery();
-      rs.next();
-      return rs.getInt(1) > 0;
+      while (rs.next())
+      {
+        returnIndex = Math.max(returnIndex, rs.getInt(DbConstants.DUPLICATE_INDEX));
+      }
+      if (returnIndex > 0)
+      {
+        //Add one as next index to use
+        returnIndex++;
+      }
     }
     catch (SQLException e)
     {
       ExceptionHandler.handleException(e, "Could not check for duplicate in db.");
     }
-    return true;
+    return returnIndex;
   }
 
   public int createNewGame(GameDetails details)
@@ -652,7 +676,8 @@ public class DbConnector
       st.append(column);
       st.append(",");
     }
-    st.delete(st.length() - 1, st.length());
+    st.append(DbConstants.DUPLICATE_INDEX);
+//    st.delete(st.length() - 1, st.length());
     st.append(") VALUES (\"");
 
     st.append(details.getTitle());
@@ -690,7 +715,8 @@ public class DbConnector
     st.append(details.getSystem());
     st.append("\",");
     st.append(details.getVerticalShift());
-    st.append(",0");
+    st.append(",0,");
+    st.append(details.getDuplicateIndex());
     st.append(");");
 
     String sql = st.toString();
@@ -793,6 +819,10 @@ public class DbConnector
     sqlBuilder.append(DbConstants.VERTICALSHIFT);
     sqlBuilder.append("=");
     sqlBuilder.append(details.getVerticalShift());
+    sqlBuilder.append(",");
+    sqlBuilder.append(DbConstants.DUPLICATE_INDEX);
+    sqlBuilder.append("=");
+    sqlBuilder.append(details.getDuplicateIndex());
     sqlBuilder.append(" WHERE rowId = ");
     sqlBuilder.append(rowId);
     sqlBuilder.append(";");

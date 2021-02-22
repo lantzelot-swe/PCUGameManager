@@ -28,6 +28,7 @@ public class GameDetails
   private String joy2 = "";
   private String system = "";
   private int verticalshift = 0;
+  private int duplicateIndex = 0;
 
   public GameDetails()
   {
@@ -213,5 +214,15 @@ public class GameDetails
   public void setVerticalShift(int shift)
   {
     this.verticalshift = shift;
+  }
+  
+  public int getDuplicateIndex()
+  {
+    return duplicateIndex;
+  }
+
+  public void setDuplicateIndex(int index)
+  {
+    this.duplicateIndex = index;
   }
 }

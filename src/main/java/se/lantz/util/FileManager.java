@@ -111,7 +111,7 @@ public class FileManager
       {
         if (screen1FileName.isEmpty())
         {
-          screen1FileName = generateFileNameFromTitle(infoModel.getTitle()) + "-00.png";
+          screen1FileName = generateFileNameFromTitle(infoModel.getTitle(), infoModel.getDuplicateIndex()) + "-00.png";
         }
         File outputfile = new File(SCREENS + screen1FileName);
         //Scale if not the right size
@@ -130,7 +130,7 @@ public class FileManager
       {
         if (screen2FileName.isEmpty())
         {
-          screen2FileName = generateFileNameFromTitle(infoModel.getTitle()) + "-01.png";
+          screen2FileName = generateFileNameFromTitle(infoModel.getTitle(), infoModel.getDuplicateIndex()) + "-01.png";
         }
         File outputfile = new File(SCREENS + screen2FileName);
         //Scale if not the right size
@@ -289,7 +289,7 @@ public class FileManager
     }
   }
 
-  public static String generateFileNameFromTitle(String title)
+  public static String generateFileNameFromTitle(String title, int duplicateIndex)
   {
     // All uppercase letters
     // No spaces or special characters
@@ -307,6 +307,12 @@ public class FileManager
       title.chars().mapToObj(item -> (char) item).filter(character -> !forbiddenCharsList.contains(character))
         .map(Character::toUpperCase).collect(Collectors.toList());
     String newNameString = newName.stream().map(String::valueOf).collect(Collectors.joining());
+    if (duplicateIndex > 0)
+    {
+      //Just add the duplicate index if there are several games with the same name
+      newNameString = newNameString + "-" + duplicateIndex;
+    }
+    
     logger.debug("Game title: \"{}\" ---- New fileName: \"{}\"", title, newNameString);
     return newNameString;
   }
@@ -315,7 +321,7 @@ public class FileManager
   {
     try
     {
-      String filename = generateFileNameFromTitle(gameDetails.getTitle());
+      String filename = generateFileNameFromTitle(gameDetails.getTitle(), gameDetails.getDuplicateIndex());
       infoBuilder.append("Creating game info file for " + gameDetails.getTitle() + "\n");
       //Add -ms to comply with the maxi game tool.
       filename = filename + "-ms.tsg";

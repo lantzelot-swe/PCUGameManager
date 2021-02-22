@@ -6,7 +6,6 @@ import java.util.List;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
-import javax.swing.SwingUtilities;
 
 import se.lantz.model.MainViewModel;
 
@@ -28,7 +27,6 @@ public class MainPanel extends JPanel
       listPanel.checkSaveChangeStatus();
     });
 
-    uiModel.addDuplicateGameListener(e -> showDuplicateDialog(e.getNewValue().toString()));
     uiModel.addRequireFieldsListener(e -> showRequiredFieldsDialog((List<String>) e.getNewValue()));
   }
 
@@ -60,16 +58,6 @@ public class MainPanel extends JPanel
                                          "Unsaved Changes",
                                          JOptionPane.YES_NO_CANCEL_OPTION,
                                          JOptionPane.QUESTION_MESSAGE);
-  }
-
-  private void showDuplicateDialog(String title)
-  {
-    JOptionPane.showMessageDialog(MainPanel.this,
-                                  "A game already exists with the name \"" + title + "\". Give it another name.",
-                                  "Game exists",
-                                  JOptionPane.INFORMATION_MESSAGE);
-    //Request focus to the title field
-    getGameDetailsBackgroundPanel().focusTitleField();
   }
 
   private void showRequiredFieldsDialog(List<String> missingFields)

@@ -21,7 +21,8 @@ public class DbConstants
   public static final String SYSTEM = "System";
   public static final String VERTICALSHIFT = "VerticalShift";
   public static final String FAVORITE = "Favorite";
-
+  public static final String DUPLICATE_INDEX = "Duplicate";
+  
   private DbConstants()
   {
     //No instance allowed
