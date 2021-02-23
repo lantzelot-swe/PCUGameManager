@@ -101,6 +101,11 @@ public final class MainWindow extends JFrame
     return menuBar;
   }
   
+  public void reloadCurrentGameView()
+  {
+    getMainPanel().reloadCurrentGameView();
+  }
+  
   public void repaintAfterModifications()
   {
     getMainPanel().repaintAfterModifications();

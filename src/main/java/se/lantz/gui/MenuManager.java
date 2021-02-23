@@ -50,7 +50,8 @@ public class MenuManager
   private JMenuItem runGameItem;
   private JMenuItem importItem;
   private JMenuItem exportItem;
-
+  private JMenuItem refreshItem;
+  
   private JMenuItem toggleFavoriteItem;
   private JMenuItem clearFavoritesItem;
 
@@ -100,6 +101,8 @@ public class MenuManager
     fileMenu.add(getImportItem());
     fileMenu.add(getExportItem());
     fileMenu.addSeparator();
+    fileMenu.add(getRefreshItem());
+    fileMenu.addSeparator();
     fileMenu.add(getExitItem());
     editMenu = new JMenu("Edit");
     editMenu.add(getToggleFavoriteItem());
@@ -127,6 +130,7 @@ public class MenuManager
       exportItem.setEnabled(okToEnable);
       toggleFavoriteItem.setEnabled(okToEnable);
       runGameItem.setEnabled(!uiModel.getInfoModel().getGamesFile().isEmpty());
+      refreshItem.setEnabled(okToEnable);
     });
   }
 
@@ -199,6 +203,16 @@ public class MenuManager
     exportItem.setMnemonic('E');
     exportItem.addActionListener(e -> exportGames());
     return exportItem;
+  }
+  
+  private JMenuItem getRefreshItem()
+  {
+    refreshItem = new JMenuItem("Reload current game view");
+    KeyStroke keyStrokeToReloadGameView = KeyStroke.getKeyStroke(KeyEvent.VK_F5, 0);
+    refreshItem.setAccelerator(keyStrokeToReloadGameView);
+    refreshItem.setMnemonic('G');
+    refreshItem.addActionListener(e -> reloadView());
+    return refreshItem;
   }
 
   private JMenuItem getExitItem()
@@ -362,6 +376,11 @@ public class MenuManager
         dialog.setVisible(true);
       }
     }
+  }
+  
+  private void reloadView()
+  {
+    this.mainWindow.reloadCurrentGameView();
   }
 
   private void backupDb()

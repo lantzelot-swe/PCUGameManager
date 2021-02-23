@@ -421,4 +421,14 @@ public class ListPanel extends JPanel
       mainPanel.repaintAfterModifications();
     }
   }
+  
+  public void reloadCurrentGameView()
+  {
+    GameListData selectedData = getList().getSelectedValue(); 
+    getList().clearSelection();
+    uiModel.reloadCurrentGameView();
+    SwingUtilities.invokeLater(() -> {
+      getList().setSelectedValue(selectedData, true);
+    });
+  }
 }

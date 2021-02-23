@@ -167,4 +167,9 @@ public class MainPanel extends JPanel
   {
     getGameDetailsBackgroundPanel().getInfoBackgroundPanel().selectEnDescriptionTab();
   }
+  
+  public void reloadCurrentGameView()
+  {
+    getListPanel().reloadCurrentGameView();
+  }
 }
