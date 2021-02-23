@@ -20,12 +20,13 @@ import org.slf4j.LoggerFactory;
 
 import se.lantz.model.MainViewModel;
 import se.lantz.util.ExceptionHandler;
+import se.lantz.util.FileManager;
 
 public class ImportManager
 {
   public enum Options
   {
-    SKIP, OVERWRITE;
+    SKIP, OVERWRITE, ADD;
   }
 
   private static final Logger logger = LoggerFactory.getLogger(ImportManager.class);
@@ -148,7 +149,13 @@ public class ImportManager
     String joy1config = "";
     String joy2config = "";
     String advanced = "";
-    String verticalShift = "";
+    String verticalShift = "0";
+    //Add info about old file names so that they can be copied properly
+    String oldGameFile = "";
+    String oldCoverFile = "";
+    String oldScreen1File = "";
+    String oldScreen2File = "";
+    
     try
     {
       for (String line : fileLines)
@@ -195,36 +202,36 @@ public class ImportManager
         }
         else if (line.startsWith("F:"))
         {
-          gamefile = line.substring(2);
-          if (gamefile.lastIndexOf("/") > -1)
+          oldGameFile = line.substring(2);
+          if (oldGameFile.lastIndexOf("/") > -1)
           {
-            gamefile = gamefile.substring(gamefile.lastIndexOf("/") + 1);
+            oldGameFile = oldGameFile.substring(oldGameFile.lastIndexOf("/") + 1);
           }
         }
         else if (line.startsWith("C:"))
         {
-          coverfile = line.substring(2);
-          if (coverfile.lastIndexOf("/") > -1)
+          oldCoverFile = line.substring(2);
+          if (oldCoverFile.lastIndexOf("/") > -1)
           {
-            coverfile = coverfile.substring(coverfile.lastIndexOf("/") + 1);
+            oldCoverFile = oldCoverFile.substring(oldCoverFile.lastIndexOf("/") + 1);
           }
         }
         else if (line.startsWith("G:"))
         {
-          if (screen1file.isEmpty())
+          if (oldScreen1File.isEmpty())
           {
-            screen1file = line.substring(2);
-            if (screen1file.lastIndexOf("/") > -1)
+            oldScreen1File = line.substring(2);
+            if (oldScreen1File.lastIndexOf("/") > -1)
             {
-              screen1file = screen1file.substring(screen1file.lastIndexOf("/") + 1);
+              oldScreen1File = oldScreen1File.substring(oldScreen1File.lastIndexOf("/") + 1);
             }
           }
           else
           {
-            screen2file = line.substring(2);
-            if (screen2file.lastIndexOf("/") > -1)
+            oldScreen2File = line.substring(2);
+            if (oldScreen2File.lastIndexOf("/") > -1)
             {
-              screen2file = screen2file.substring(screen2file.lastIndexOf("/") + 1);
+              oldScreen2File = oldScreen2File.substring(oldScreen2File.lastIndexOf("/") + 1);
             }
           }
         }
@@ -269,6 +276,18 @@ public class ImportManager
       {
         description_it = "";
       }
+      //Generate proper names for files
+      int duplicateIndex = 0;
+      if (selectedOption == Options.ADD)
+      {
+        duplicateIndex = uiModel.getDbConnector().getGameDuplicateIndexToUse(title);
+      }
+      String fileName = FileManager.generateFileNameFromTitle(title, duplicateIndex);   
+      coverfile = fileName + "-cover.png";
+      screen1file = fileName + "-00.png";
+      screen2file = fileName + "-01.png";
+      String fileEnding = oldGameFile.substring(oldGameFile.indexOf("."));
+      gamefile = fileName + fileEnding;
 
       // Construct a data row
       List<String> list = Arrays.asList(title,
@@ -288,9 +307,14 @@ public class ImportManager
                                         joy1config,
                                         joy2config,
                                         advanced,
-                                        verticalShift);
+                                        verticalShift,
+                                        oldCoverFile,
+                                        oldScreen1File,
+                                        oldScreen2File,
+                                        oldGameFile);
       String result = String.join("\",\"", list);
-      result = "\"" + result + "\"";
+      //Add duplicateIndex so that it can be added properly when importing
+      result = "\"" + result + "\"," + Integer.toString(duplicateIndex);
       dbRowDataList.add(result);
     }
     catch (Exception e)
@@ -329,6 +353,10 @@ public class ImportManager
     String screen1Name = "";
     String screen2Name = "";
     String gameName = "";
+    String oldCoverName = "";
+    String oldScreen1Name = "";
+    String oldScreen2Name = "";
+    String oldGameName = "";
 
     String[] splittedForPaths = dbRowData.split("\",\"");
 
@@ -336,18 +364,23 @@ public class ImportManager
     coverName = splittedForPaths[11];
     screen1Name = splittedForPaths[12];
     screen2Name = splittedForPaths[13];
-    //Copy!
+    //Old names  
+    oldCoverName = splittedForPaths[18];
+    oldScreen1Name = splittedForPaths[19];
+    oldScreen2Name = splittedForPaths[20];
+    oldGameName = splittedForPaths[21].split("\"")[0];
+ 
+   
+    Path coverPath = srcCoversFolder.resolve(oldCoverName);
+    Path targetCoverPath = Paths.get("./covers/" + coverName);
 
-    Path coverPath = srcCoversFolder.resolve(coverName);
-    Path targetPath = Paths.get("./covers/" + coverName);
-
-    Path screens1Path = srcScreensFolder.resolve(screen1Name);
+    Path screens1Path = srcScreensFolder.resolve(oldScreen1Name);
     Path targetScreen1Path = Paths.get("./screens/" + screen1Name);
 
-    Path screens2Path = srcScreensFolder.resolve(screen2Name);
+    Path screens2Path = srcScreensFolder.resolve(oldScreen2Name);
     Path targetScreen2Path = Paths.get("./screens/" + screen2Name);
 
-    Path gamePath = srcGamesFolder.resolve(gameName);
+    Path gamePath = srcGamesFolder.resolve(oldGameName);
     Path targetGamePath = Paths.get("./games/" + gameName);
 
     try
@@ -358,13 +391,17 @@ public class ImportManager
       {
         infoBuilder.append("Copying cover from ");
         infoBuilder.append(coverPath.toString());
+        infoBuilder.append(" to ");
+        infoBuilder.append(targetCoverPath.toString());
         infoBuilder.append("\n");
-        Files.copy(coverPath, targetPath, StandardCopyOption.REPLACE_EXISTING);
+        Files.copy(coverPath, targetCoverPath, StandardCopyOption.REPLACE_EXISTING);
       }
       if (!screen1Name.isEmpty())
       {
         infoBuilder.append("Copying screenshot from ");
         infoBuilder.append(screens1Path.toString());
+        infoBuilder.append(" to ");
+        infoBuilder.append(targetScreen1Path.toString());
         infoBuilder.append("\n");
         Files.copy(screens1Path, targetScreen1Path, StandardCopyOption.REPLACE_EXISTING);
       }
@@ -372,6 +409,8 @@ public class ImportManager
       {
         infoBuilder.append("Copying screenshot from ");
         infoBuilder.append(screens2Path.toString());
+        infoBuilder.append(" to ");
+        infoBuilder.append(targetScreen2Path.toString());
         infoBuilder.append("\n");
         Files.copy(screens2Path, targetScreen2Path, StandardCopyOption.REPLACE_EXISTING);
       }
@@ -379,6 +418,8 @@ public class ImportManager
       {
         infoBuilder.append("Copying game file from ");
         infoBuilder.append(gamePath.toString());
+        infoBuilder.append(" to ");
+        infoBuilder.append(targetGamePath.toString());
         infoBuilder.append("\n");
         Files.copy(gamePath, targetGamePath, StandardCopyOption.REPLACE_EXISTING);
       }

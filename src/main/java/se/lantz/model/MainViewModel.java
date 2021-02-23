@@ -69,6 +69,11 @@ public class MainViewModel extends AbstractModel
 
     resetDataChangedAfterInit();
   }
+  
+  public DbConnector getDbConnector()
+  {
+    return this.dbConnector;
+  }
 
   @Override
   public void disableChangeNotification(boolean disable)

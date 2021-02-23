@@ -1,5 +1,6 @@
 package se.lantz.gui.imports;
 
+import java.awt.Dimension;
 import java.awt.Frame;
 import java.nio.file.Path;
 
@@ -17,6 +18,7 @@ public class ImportOptionsDialog extends BaseDialog
     addContent(getImportOptionsPanel());
     getOkButton().setText("Import");
     this.setResizable(false);
+    this.setPreferredSize(new Dimension(450,330));
   }
 
   private ImportOptionsPanel getImportOptionsPanel() {

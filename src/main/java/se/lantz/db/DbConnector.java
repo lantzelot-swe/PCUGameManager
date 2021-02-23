@@ -114,23 +114,24 @@ public class DbConnector
     }
   }
   
+  public void validateMissingColumnsAfterRestore()
+  {
+    addLanguageAndDuplicateColumnsIfMissing();
+  }
+
   private void addLanguageAndDuplicateColumnsIfMissing()
-  { 
+  {
     String tableInfoSql = "PRAGMA table_info(gameinfo)";
     String addDeSql = "ALTER TABLE gameinfo ADD COLUMN Description_de STRING;";
     String addFrSql = "ALTER TABLE gameinfo ADD COLUMN Description_fr STRING;";
     String addEsSql = "ALTER TABLE gameinfo ADD COLUMN Description_es STRING;";
     String addItSql = "ALTER TABLE gameinfo ADD COLUMN Description_it STRING;";
     String addDuplicateSql = "ALTER TABLE gameinfo ADD COLUMN Duplicate INTEGER DEFAULT 0;";
-    
+
     try (Connection conn = this.connect(); PreparedStatement stmnt = conn.prepareStatement(tableInfoSql);
-      ResultSet rs = stmnt.executeQuery();
-      Statement addDestmnt = conn.createStatement();
-      Statement addFrstmnt = conn.createStatement();
-      Statement addEsstmnt = conn.createStatement();
-      Statement addItstmnt = conn.createStatement();
-      Statement addDuplicatestmnt = conn.createStatement();
-      )
+      ResultSet rs = stmnt.executeQuery(); Statement addDestmnt = conn.createStatement();
+      Statement addFrstmnt = conn.createStatement(); Statement addEsstmnt = conn.createStatement();
+      Statement addItstmnt = conn.createStatement(); Statement addDuplicatestmnt = conn.createStatement();)
     {
       boolean columnsAvailable = false;
       boolean duplicateAvailable = false;
@@ -144,9 +145,9 @@ public class DbConnector
         if (rs.getString("Name").equals("Duplicate"))
         {
           duplicateAvailable = true;
-        }        
+        }
       }
-      
+
       if (!columnsAvailable)
       {
         logger.debug("Language columns are missing in the database, adding columns.");
@@ -373,9 +374,11 @@ public class DbConnector
     case SKIP:
       skipExistingAndInsertMissingIntoGameInfoTable(rowValues, returnBuilder, addAsFavorite);
       break;
-
     case OVERWRITE:
       overwriteExistingAndInsertMissingIntoGameInfoTable(rowValues, returnBuilder, addAsFavorite);
+      break;
+    case ADD:
+      insertAllIntoGameInfoTable(rowValues, returnBuilder, addAsFavorite);
       break;
     default:
       break;
@@ -429,12 +432,19 @@ public class DbConnector
 
     if (existingRowValues.size() > 0)
     {
+      infoBuilder.append("Replacing ");
+      infoBuilder.append(existingRowValues.size());
+      infoBuilder.append(" games in the db\n");
       updateAllInGameInfoTable(existingRowValues, addAsFavorite);
     }
 
     if (newRowValues.size() > 0)
     {
       insertAllIntoGameInfoTable(newRowValues, infoBuilder, addAsFavorite);
+    }
+    else
+    {
+      infoBuilder.append("No games added.\n");
     }
   }
 
@@ -480,9 +490,16 @@ public class DbConnector
       }
     }
 
+    infoBuilder.append("Skipping ");
+    infoBuilder.append(rowValues.size() - newRowValues.size());
+    infoBuilder.append(" games.\n");
     if (newRowValues.size() > 0)
     {
       insertAllIntoGameInfoTable(newRowValues, infoBuilder, addAsFavorite);
+    }
+    else
+    {
+      infoBuilder.append("No games added.\n");
     }
     //Replace content of rowValues with the ones that was added. Only look at these in the next step of the import
     rowValues.clear();
@@ -495,6 +512,11 @@ public class DbConnector
     infoBuilder.append(rowValues.size());
     infoBuilder.append(" games to the db\n");
 
+    if (rowValues.isEmpty())
+    {
+      return;
+    }
+    
     StringBuilder st = new StringBuilder();
     st.append("INSERT INTO gameinfo (");
     for (String column : columnList)
@@ -503,12 +525,14 @@ public class DbConnector
       st.append(",");
     }
     st.append(DbConstants.DUPLICATE_INDEX);
-//    st.delete(st.length() - 1, st.length());
     st.append(") VALUES (");
 
     for (String rowData : rowValues)
     {
-      st.append(rowData);
+      //Strip  rowData from new filenames
+      String strippedRowData = stripRowDataFromOldFileNames(rowData);
+      String duplicateIndex = rowData.substring(rowData.lastIndexOf(",")+1);
+      st.append(strippedRowData);
       if (addAsFavorite)
       {
         st.append(",1");
@@ -517,8 +541,8 @@ public class DbConnector
       {
         st.append(",0");
       }
-      //Append duplicate index as 0
-      st.append(",0");
+      st.append(",");
+      st.append(duplicateIndex);
       st.append("),(");
     }
     st.delete(st.length() - 3, st.length());
@@ -538,6 +562,18 @@ public class DbConnector
     }
   }
 
+  private String stripRowDataFromOldFileNames(String rowData)
+  {
+    String[] splittedRowData = rowData.split(COMMA);
+    List<String> strippedDataList = new ArrayList<>();
+    //Remove last 4 entries
+    for (int i = 0; i < splittedRowData.length - 4; i++)
+    {
+      strippedDataList.add(splittedRowData[i]);
+    }
+    return String.join("\",\"", strippedDataList) + "\"";
+  }
+
   private void updateAllInGameInfoTable(List<String> rowValues, boolean addAsFavorite)
   {
     for (String rowValue : rowValues)
@@ -551,7 +587,7 @@ public class DbConnector
       {
         sqlBuilder.append(columnList.get(i));
         sqlBuilder.append(" = ");
-        if (i > 1)
+        if (i > 1 && i < columnList.size() - 2)
         {
           sqlBuilder.append("\"");
         }
@@ -672,7 +708,7 @@ public class DbConnector
       st.append(",");
     }
     st.append(DbConstants.DUPLICATE_INDEX);
-//    st.delete(st.length() - 1, st.length());
+    //    st.delete(st.length() - 1, st.length());
     st.append(") VALUES (\"");
 
     st.append(details.getTitle());
@@ -868,10 +904,11 @@ public class DbConnector
       ExceptionHandler.handleException(e, "Could not delete games in db.");
     }
   }
-  
+
   public void deleteAllGamesInView(GameView view)
   {
-    String sql = "DELETE FROM gameinfo " + view.getSqlQuery() + " AND title NOT LIKE '%THEC64%' AND title NOT LIKE '%VIC-20%'";
+    String sql =
+      "DELETE FROM gameinfo " + view.getSqlQuery() + " AND title NOT LIKE '%THEC64%' AND title NOT LIKE '%VIC-20%'";
     logger.debug("Generated DELETE String:\n{}", sql);
     try (Connection conn = this.connect(); PreparedStatement pstmt = conn.prepareStatement(sql))
     {
@@ -916,7 +953,7 @@ public class DbConnector
       ExceptionHandler.handleException(e, "Could not update favorite value in db.");
     }
   }
-  
+
   public void clearFavorites()
   {
     String sql = "UPDATE gameinfo SET Favorite = 0 where Favorite = 1;";
