@@ -639,7 +639,6 @@ public class DbConnector
   public int getGameDuplicateIndexToUse(String title)
   {
     StringBuilder sqlBuilder = new StringBuilder();
-//    sqlBuilder.append("SELECT COUNT(*) FROM gameinfo WHERE title LIKE \"");
     sqlBuilder.append("SELECT Duplicate FROM gameinfo WHERE title LIKE \"");
     sqlBuilder.append(title);
     sqlBuilder.append("\";");
@@ -651,12 +650,8 @@ public class DbConnector
       ResultSet rs = pstmt.executeQuery();
       while (rs.next())
       {
-        returnIndex = Math.max(returnIndex, rs.getInt(DbConstants.DUPLICATE_INDEX));
-      }
-      if (returnIndex > 0)
-      {
-        //Add one as next index to use
-        returnIndex++;
+        //Increase one to the available index since it's the one supposed to be used.
+        returnIndex = Math.max(returnIndex, rs.getInt(DbConstants.DUPLICATE_INDEX) + 1);
       }
     }
     catch (SQLException e)
