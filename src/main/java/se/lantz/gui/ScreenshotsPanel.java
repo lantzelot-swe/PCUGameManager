@@ -308,20 +308,10 @@ public class ScreenshotsPanel extends JPanel
   {
     if (missingC64CoverIcon == null)
     {
-      try
-      {
-        BufferedImage c64Image = ImageIO.read(getClass().getResource("/se/lantz/CoverMissing-C64.png"));
-        Image newImage = c64Image.getScaledInstance(130, 200, Image.SCALE_SMOOTH);
-        missingC64CoverIcon = new ImageIcon(newImage);
-        
-        BufferedImage vic20Image = ImageIO.read(getClass().getResource("/se/lantz/CoverMissing-VIC20.png"));
-        newImage = vic20Image.getScaledInstance(130, 200, Image.SCALE_SMOOTH);
-        missingVic20CoverIcon = new ImageIcon(newImage);
-      }
-      catch (IOException e)
-      {
-        ExceptionHandler.handleException(e, "could not load missing cover images");
-      }
+      Image newImage = FileManager.emptyC64Cover.getScaledInstance(130, 200, Image.SCALE_SMOOTH);
+      missingC64CoverIcon = new ImageIcon(newImage);
+      newImage = FileManager.emptyVic20Cover.getScaledInstance(130, 200, Image.SCALE_SMOOTH);
+      missingVic20CoverIcon = new ImageIcon(newImage);
     }
     return model.getSystemModel().isC64() ? missingC64CoverIcon : missingVic20CoverIcon;
   }

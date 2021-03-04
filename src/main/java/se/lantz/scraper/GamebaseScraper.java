@@ -29,7 +29,7 @@ import se.lantz.util.FileManager;
 public class GamebaseScraper implements Scraper
 {
   private static final Logger logger = LoggerFactory.getLogger(GamebaseScraper.class);
-  Map<String, String> genreMap = new HashMap<>();
+  private static Map<String, String> genreMap = new HashMap<>();
   private String gamebaseGameUrl;
   private String titleCssQuery =
     "body > table:eq(3) > tbody > tr > td.back > table > tbody > tr > td > table > tbody > tr:eq(0) > td > table > tbody > tr > td:eq(0) > font > b";
@@ -160,7 +160,7 @@ public class GamebaseScraper implements Scraper
 
   }
 
-  private String mapGenre(String genreFromGb64com)
+  public static String mapGenre(String genreFromGb64com)
   {
     //Strip subgenre
     String[] genres = genreFromGb64com.split("-");
@@ -173,7 +173,8 @@ public class GamebaseScraper implements Scraper
         return entry.getValue();
       }
     }
-    return "";
+    //Use the first one as default if none matches
+    return "adventure";
   }
 
   @Override

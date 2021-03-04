@@ -41,6 +41,8 @@ import se.lantz.model.data.GameDetails;
 
 public class FileManager
 {
+  public static BufferedImage emptyC64Cover;
+  public static BufferedImage emptyVic20Cover;
   private static final String GAMES = "./games/";
   private static final String SCREENS = "./screens/";
   private static final String COVERS = "./covers/";
@@ -54,6 +56,19 @@ public class FileManager
   private MainViewModel model;
   private InfoModel infoModel;
   private SystemModel systemModel;
+  
+  static
+  {
+    try
+    {
+      emptyC64Cover = ImageIO.read(FileManager.class.getResource("/se/lantz/CoverMissing-C64.png"));
+      emptyVic20Cover = ImageIO.read(FileManager.class.getResource("/se/lantz/CoverMissing-VIC20.png"));
+    }
+    catch (IOException e)
+    {
+      ExceptionHandler.handleException(e, "Could not read missing cover images.");
+    }
+  }
 
   public FileManager(MainViewModel model)
   {
@@ -173,7 +188,7 @@ public class FileManager
     }
   }
 
-  private void compressGzip(Path source, Path target) throws IOException
+  public static void compressGzip(Path source, Path target) throws IOException
   {
 
     try (GZIPOutputStream gos = new GZIPOutputStream(new FileOutputStream(target.toFile()));

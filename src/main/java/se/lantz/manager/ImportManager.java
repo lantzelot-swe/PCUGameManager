@@ -1,5 +1,9 @@
 package se.lantz.manager;
 
+import java.awt.Graphics;
+import java.awt.Image;
+import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -14,6 +18,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
+
+import javax.imageio.ImageIO;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -155,7 +161,7 @@ public class ImportManager
     String oldCoverFile = "";
     String oldScreen1File = "";
     String oldScreen2File = "";
-    
+
     try
     {
       for (String line : fileLines)
@@ -277,12 +283,8 @@ public class ImportManager
         description_it = "";
       }
       //Generate proper names for files
-      int duplicateIndex = 0;
-      if (selectedOption == Options.ADD)
-      {
-        duplicateIndex = uiModel.getDbConnector().getGameDuplicateIndexToUse(title);
-      }
-      String fileName = FileManager.generateFileNameFromTitle(title, duplicateIndex);   
+      int duplicateIndex = getDuplicateIndexForImportedGame(title);
+      String fileName = FileManager.generateFileNameFromTitle(title, duplicateIndex);
       coverfile = fileName + "-cover.png";
       screen1file = fileName + "-00.png";
       screen2file = fileName + "-01.png";
@@ -290,38 +292,160 @@ public class ImportManager
       gamefile = fileName + fileEnding;
 
       // Construct a data row
-      List<String> list = Arrays.asList(title,
-                                        year,
-                                        author,
-                                        composer,
-                                        genre,
-                                        description,
-                                        description_de,
-                                        description_fr,
-                                        description_es,
-                                        description_it,
-                                        gamefile,
-                                        coverfile,
-                                        screen1file,
-                                        screen2file,
-                                        joy1config,
-                                        joy2config,
-                                        advanced,
-                                        verticalShift,
-                                        oldCoverFile,
-                                        oldScreen1File,
-                                        oldScreen2File,
-                                        oldGameFile);
-      String result = String.join("\",\"", list);
-      //Add duplicateIndex so that it can be added properly when importing
-      result = "\"" + result + "\"," + Integer.toString(duplicateIndex);
-      dbRowDataList.add(result);
+      addToDbRowList(title,
+                     year,
+                     author,
+                     composer,
+                     genre,
+                     description,
+                     description_de,
+                     description_fr,
+                     description_es,
+                     description_it,
+                     gamefile,
+                     coverfile,
+                     screen1file,
+                     screen2file,
+                     joy1config,
+                     joy2config,
+                     advanced,
+                     verticalShift,
+                     oldCoverFile,
+                     oldScreen1File,
+                     oldScreen2File,
+                     oldGameFile,
+                     duplicateIndex);
     }
     catch (Exception e)
     {
       infoBuilder.append("ERROR: Could not read info file for \"" + title + "\"\n");
       logger.error("IMPORT: Could not read info file for " + title, e);
     }
+  }
+
+  public void addFromGamebaseImporter(String title,
+                                      String year,
+                                      String author,
+                                      String composer,
+                                      String genre,
+                                      String gamefile,
+                                      String coverfile,
+                                      String screen1file,
+                                      String screen2file,
+                                      String joy1config,
+                                      String joy2config,
+                                      String advanced)
+  {
+    //Generate proper names for files
+    int duplicateIndex = getDuplicateIndexForImportedGame(title);
+    String fileName = FileManager.generateFileNameFromTitle(title, duplicateIndex);
+    String newCoverfile = fileName + "-cover.png";
+    String newScreen1file = fileName + "-00.png";
+    String newScreen2file = fileName + "-01.png";
+    //Ignore first "." when finding file ending
+    String strippedGameFile = gamefile.substring(1);
+    String fileEnding = strippedGameFile.substring(strippedGameFile.indexOf("."));
+    String newGamefile = fileName + fileEnding;
+    addToDbRowList(title,
+                   year,
+                   author,
+                   composer,
+                   genre,
+                   "",
+                   "",
+                   "",
+                   "",
+                   "",
+                   newGamefile,
+                   newCoverfile,
+                   newScreen1file,
+                   newScreen2file,
+                   joy1config,
+                   joy2config,
+                   advanced,
+                   "0",
+                   coverfile,
+                   screen1file,
+                   screen2file,
+                   gamefile,
+                   duplicateIndex);
+  }
+
+  private void addToDbRowList(String title,
+                              String year,
+                              String author,
+                              String composer,
+                              String genre,
+                              String description,
+                              String description_de,
+                              String description_fr,
+                              String description_es,
+                              String description_it,
+                              String gamefile,
+                              String coverfile,
+                              String screen1file,
+                              String screen2file,
+                              String joy1config,
+                              String joy2config,
+                              String advanced,
+                              String verticalShift,
+                              String oldCoverFile,
+                              String oldScreen1File,
+                              String oldScreen2File,
+                              String oldGameFile,
+                              int duplicateIndex)
+  {
+    List<String> list = Arrays.asList(title,
+                                      year,
+                                      author,
+                                      composer,
+                                      genre,
+                                      description,
+                                      description_de,
+                                      description_fr,
+                                      description_es,
+                                      description_it,
+                                      gamefile,
+                                      coverfile,
+                                      screen1file,
+                                      screen2file,
+                                      joy1config,
+                                      joy2config,
+                                      advanced,
+                                      verticalShift,
+                                      oldCoverFile,
+                                      oldScreen1File,
+                                      oldScreen2File,
+                                      oldGameFile);
+    String result = String.join("\",\"", list);
+    //Add duplicateIndex so that it can be added properly when importing
+    result = "\"" + result + "\"," + Integer.toString(duplicateIndex);
+    dbRowDataList.add(result);
+  }
+
+  private int getDuplicateIndexForImportedGame(String title)
+  {
+    int duplicateIndex = 0;
+    if (selectedOption == Options.ADD)
+    {
+      duplicateIndex = uiModel.getDbConnector().getGameDuplicateIndexToUse(title);
+      //Check any duplicates in added rows also
+      duplicateIndex = duplicateIndex + getDbRowDuplicate(title);
+    }
+    return duplicateIndex;
+  }
+
+  private int getDbRowDuplicate(String title)
+  {
+    int returnValue = 0;
+    for (String dbRow : dbRowDataList)
+    {
+      if (dbRow.startsWith("\"" + title + "\","))
+      {
+        returnValue++;
+      }
+    }
+    return returnValue;
   }
 
   private List<String> readFileInList(Path filePath, StringBuilder infoBuilder)
@@ -369,8 +493,7 @@ public class ImportManager
     oldScreen1Name = splittedForPaths[19];
     oldScreen2Name = splittedForPaths[20];
     oldGameName = splittedForPaths[21].split("\"")[0];
- 
-   
+
     Path coverPath = srcCoversFolder.resolve(oldCoverName);
     Path targetCoverPath = Paths.get("./covers/" + coverName);
 
@@ -381,13 +504,19 @@ public class ImportManager
     Path targetScreen2Path = Paths.get("./screens/" + screen2Name);
 
     Path gamePath = srcGamesFolder.resolve(oldGameName);
+    if (oldGameName.startsWith("."))
+    {
+      //When importing from gamebase use current folder
+      gamePath = new File(oldGameName).toPath();
+    }
+    
     Path targetGamePath = Paths.get("./games/" + gameName);
 
     try
     {
       logger.debug("RowData = {}", dbRowData);
 
-      if (!coverName.isEmpty())
+      if (!oldCoverName.isEmpty())
       {
         infoBuilder.append("Copying cover from ");
         infoBuilder.append(coverPath.toString());
@@ -396,7 +525,19 @@ public class ImportManager
         infoBuilder.append("\n");
         Files.copy(coverPath, targetCoverPath, StandardCopyOption.REPLACE_EXISTING);
       }
-      if (!screen1Name.isEmpty())
+      else
+      {
+        //Use missing cover since none available
+        try
+        {
+          ImageIO.write(FileManager.emptyC64Cover, "png", targetCoverPath.toFile());
+        }
+        catch (IOException e)
+        {
+          ExceptionHandler.handleException(e, "Could not store cover");
+        }
+      }
+      if (!oldScreen1Name.isEmpty())
       {
         infoBuilder.append("Copying screenshot from ");
         infoBuilder.append(screens1Path.toString());
@@ -405,7 +546,7 @@ public class ImportManager
         infoBuilder.append("\n");
         Files.copy(screens1Path, targetScreen1Path, StandardCopyOption.REPLACE_EXISTING);
       }
-      if (!screen2Name.isEmpty())
+      if (!oldScreen2Name.isEmpty())
       {
         infoBuilder.append("Copying screenshot from ");
         infoBuilder.append(screens2Path.toString());
@@ -414,7 +555,7 @@ public class ImportManager
         infoBuilder.append("\n");
         Files.copy(screens2Path, targetScreen2Path, StandardCopyOption.REPLACE_EXISTING);
       }
-      if (!gameName.isEmpty())
+      if (!oldGameName.isEmpty())
       {
         infoBuilder.append("Copying game file from ");
         infoBuilder.append(gamePath.toString());

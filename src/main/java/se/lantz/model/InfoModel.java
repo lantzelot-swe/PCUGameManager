@@ -401,15 +401,7 @@ public class InfoModel extends AbstractModel
   {
     if (getCoverFile().isEmpty() && getCoverImage() == null)
     {
-      try
-      {
-        String image = isC64 ? "/se/lantz/CoverMissing-C64.png" : "/se/lantz/CoverMissing-VIC20.png";
-        this.coverImage = ImageIO.read(getClass().getResource(image));
-      }
-      catch (IOException e)
-      {
-        ExceptionHandler.handleException(e, "Could not update cover with empty image");
-      }
+      this.coverImage = isC64 ? FileManager.emptyC64Cover : FileManager.emptyVic20Cover;
     }
     if (getScreens1File().isEmpty() && getScreen1Image() == null)
     {
