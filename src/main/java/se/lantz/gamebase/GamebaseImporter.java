@@ -24,8 +24,8 @@ public class GamebaseImporter
 
   private final ImportManager importManager;
   //Just for test
-  private Path gbDatabasePath = Path.of("C://GameBase//Vic20_v03//");// Path.of("C://GameBase//GBC_V16//");
-  private boolean isC64 = false;//true;
+  private Path gbDatabasePath = Path.of("C://GameBase//GBC_V16//");//Path.of("C://GameBase//Vic20_v03//");
+  private boolean isC64 = true;//false;
 
   public GamebaseImporter(ImportManager importManager)
   {
@@ -46,7 +46,9 @@ public class GamebaseImporter
 //    importManager.setSelectedFolder(gbDatabasePath.getParent());
     importManager.setSelectedFolder(gbDatabasePath);
     //Just for test, use gbDatabasePath - "jdbc:ucanaccess:" + gbDatabasePath.toString()
-    String databaseURL = "jdbc:ucanaccess://C://GameBase//Vic20_v03//Vic20_v03.mdb";// "jdbc:ucanaccess://F://Github//PCUGameManager//GBC_v16.mdb";
+    String vic20Test = "jdbc:ucanaccess://C://GameBase//Vic20_v03//Vic20_v03.mdb";
+    
+    String databaseURL = "jdbc:ucanaccess://F://Github//PCUGameManager//GBC_v16.mdb";
 
     String joyBase = ":JU,JD,JL,JR,JF,JF,SP,EN,,F1,F3,F5,,,";
 
@@ -77,9 +79,9 @@ public class GamebaseImporter
       }
 
       sql =
-        "SELECT Games.Name, Musicians.Musician, Genres.Genre, Publishers.Publisher, Games.Filename, Games.ScrnshotFilename, Years.Year, Games.GA_Id, Games.Control, Games.V_PalNTSC, Games.V_TrueDriveEmu\r\n" +
+        "SELECT Games.Name, Musicians.Musician, Genres.Genre, Publishers.Publisher, Games.Filename, Games.ScrnshotFilename, Years.Year, Games.GA_Id, Games.Control, Games.V_PalNTSC, Games.V_TrueDriveEmu, Games.Gemus\r\n" +
           "FROM Years INNER JOIN (Publishers INNER JOIN ((Games INNER JOIN Musicians ON Games.MU_Id = Musicians.MU_Id) INNER JOIN Genres ON Games.GE_Id = Genres.GE_Id) ON Publishers.PU_Id = Games.PU_Id) ON Years.YE_Id = Games.YE_Id\r\n" +
-          "WHERE (((Games.Name)='Castle Dracula'));";
+          "WHERE (((Games.Name)='Birds, The'));";
 
       result = statement.executeQuery(sql);
       int gameCount = 0;
@@ -99,13 +101,14 @@ public class GamebaseImporter
           int control = result.getInt("Control");
           int palOrNtsc = result.getInt("V_PalNTSC");
           int trueDriveEmu = result.getInt("V_TrueDriveEmu");
+          String gemus = result.getString("Gemus");
 
           //Setup video mode
           //0=PAL, 1=BOTH, 2=NTSC, 3=PAL[+NTSC?]
           String video = (palOrNtsc == 2)  ? "ntsc" : "pal";
           advanced = advanced + "," + video;
           //Setup truedrive
-          if (trueDriveEmu > 0)
+          if (trueDriveEmu > 0 || "vte=yes".equalsIgnoreCase(gemus))
           {
             advanced = advanced + "," + "driveicon,accuratedisk";
           }
