@@ -13,6 +13,8 @@ import se.lantz.manager.ImportManager;
 
 import javax.swing.ButtonGroup;
 import javax.swing.JCheckBox;
+
+import se.lantz.gamebase.GamebaseOptions;
 import se.lantz.gui.SelectDirPanel;
 
 public class ImportOptionsPanel extends JPanel
@@ -24,12 +26,19 @@ public class ImportOptionsPanel extends JPanel
   private JLabel matchLabel;
   private JCheckBox favoriteCheckBox;
   private SelectDirPanel selectDirPanel;
+  private GameBaseOptionsPanel gbOptionsPanel;
   private JLabel selectDirLabel;
   private JRadioButton addRadioButton;
   private JPanel selectionPanel;
+  private boolean isCarouselImport;
 
   public ImportOptionsPanel()
   {
+    this(true);
+  }
+  public ImportOptionsPanel(boolean isCarouselImport)
+  {
+    this.isCarouselImport = isCarouselImport;
     GridBagLayout gridBagLayout = new GridBagLayout();
     setLayout(gridBagLayout);
     GridBagConstraints gbc_selectDirPanel = new GridBagConstraints();
@@ -38,7 +47,14 @@ public class ImportOptionsPanel extends JPanel
     gbc_selectDirPanel.fill = GridBagConstraints.BOTH;
     gbc_selectDirPanel.gridx = 0;
     gbc_selectDirPanel.gridy = 1;
-    add(getSelectDirPanel(), gbc_selectDirPanel);
+    if (isCarouselImport)
+    {
+      add(getSelectDirPanel(), gbc_selectDirPanel);
+    }
+    else
+    {
+      add(getGbOptionsPanel(), gbc_selectDirPanel);
+    }
     GridBagConstraints gbc_infoLabel = new GridBagConstraints();
     gbc_infoLabel.weightx = 1.0;
     gbc_infoLabel.insets = new Insets(15, 10, 5, 10);
@@ -131,9 +147,19 @@ public class ImportOptionsPanel extends JPanel
     }
     return selectDirPanel;
   }
+  private GameBaseOptionsPanel getGbOptionsPanel()
+  {
+    if (gbOptionsPanel == null) {
+      gbOptionsPanel = new GameBaseOptionsPanel();
+    }
+    return gbOptionsPanel;
+  }
+  
+  
   private JLabel getSelectDirLabel() {
     if (selectDirLabel == null) {
-    	selectDirLabel = new JLabel("Select a directory to import games from:");
+      String text = isCarouselImport ? "Select a directory containing a game carousel:" : "Select the gamebase database directory:"; 
+    	selectDirLabel = new JLabel(text);
     }
     return selectDirLabel;
   }
@@ -183,5 +209,10 @@ public class ImportOptionsPanel extends JPanel
       selectionPanel.add(getFavoriteCheckBox(), gbc_favoriteCheckBox);
     }
     return selectionPanel;
+  }
+  
+  public GamebaseOptions getSelectedGbOptions()
+  {
+    return getGbOptionsPanel().getSelectedGbOptions();
   }
 }

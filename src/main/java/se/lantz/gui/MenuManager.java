@@ -14,6 +14,8 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
 
+import se.lantz.gamebase.GamebaseImporter;
+import se.lantz.gamebase.GamebaseOptions;
 import se.lantz.gui.convertscreens.ConvertProgressDialog;
 import se.lantz.gui.convertscreens.ConvertWorker;
 import se.lantz.gui.dbbackup.BackupProgressDialog;
@@ -26,7 +28,8 @@ import se.lantz.gui.exports.ExportProgressDialog;
 import se.lantz.gui.exports.ExportWorker;
 import se.lantz.gui.imports.ImportOptionsDialog;
 import se.lantz.gui.imports.ImportProgressDialog;
-import se.lantz.gui.imports.ImportWorker;
+import se.lantz.gui.imports.CarouselImportWorker;
+import se.lantz.gui.imports.GamebaseImportWorker;
 import se.lantz.manager.BackupManager;
 import se.lantz.manager.ExportManager;
 import se.lantz.manager.ImportManager;
@@ -40,6 +43,7 @@ import se.lantz.util.VersionChecker;
 public class MenuManager
 {
   private JMenu fileMenu;
+  private JMenu importMenu;
   private JMenu editMenu;
   private JMenu toolsMenu;
   private JMenu helpMenu;
@@ -48,7 +52,8 @@ public class MenuManager
   private JMenuItem deleteGameItem;
 
   private JMenuItem runGameItem;
-  private JMenuItem importItem;
+  private JMenuItem importCarouselItem;
+  private JMenuItem importGamebaseItem;
   private JMenuItem exportItem;
   private JMenuItem refreshItem;
   
@@ -69,6 +74,7 @@ public class MenuManager
   private JMenuItem exitItem;
   private MainViewModel uiModel;
   private ImportManager importManager;
+  private GamebaseImporter gamebaseImporter;
   private ExportManager exportManager;
   private BackupManager backupManager;
   private RestoreManager restoreManager;
@@ -79,6 +85,7 @@ public class MenuManager
     this.uiModel = uiModel;
     this.mainWindow = mainWindow;
     this.importManager = new ImportManager(uiModel);
+    this.gamebaseImporter = new GamebaseImporter(importManager);
     this.exportManager = new ExportManager(uiModel);
     this.backupManager = new BackupManager(uiModel);
     this.restoreManager = new RestoreManager(uiModel);
@@ -98,7 +105,11 @@ public class MenuManager
     fileMenu.addSeparator();
     fileMenu.add(getRunGameMenuItem());
     fileMenu.addSeparator();
-    fileMenu.add(getImportItem());
+    importMenu = new JMenu("Import");
+    importMenu.setMnemonic('I');
+    fileMenu.add(importMenu);
+    importMenu.add(getImportCarouselItem());
+    importMenu.add(getImportGamebaseItem());
     fileMenu.add(getExportItem());
     fileMenu.addSeparator();
     fileMenu.add(getRefreshItem());
@@ -126,7 +137,8 @@ public class MenuManager
     uiModel.addSaveChangeListener(e -> {
       boolean okToEnable = !uiModel.isDataChanged();
       addGameItem.setEnabled(okToEnable);
-      importItem.setEnabled(okToEnable);
+      importCarouselItem.setEnabled(okToEnable);
+      importGamebaseItem.setEnabled(okToEnable);
       exportItem.setEnabled(okToEnable);
       toggleFavoriteItem.setEnabled(okToEnable);
       runGameItem.setEnabled(!uiModel.getInfoModel().getGamesFile().isEmpty());
@@ -185,15 +197,26 @@ public class MenuManager
     return runGameItem;
   }
 
-  private JMenuItem getImportItem()
+  private JMenuItem getImportCarouselItem()
   {
-    importItem = new JMenuItem("Import Games...");
+    importCarouselItem = new JMenuItem("Import Carousel folder...");
     KeyStroke keyStrokeToImportGames = KeyStroke.getKeyStroke(KeyEvent.VK_I, InputEvent.CTRL_DOWN_MASK);
-    importItem.setAccelerator(keyStrokeToImportGames);
-    importItem.setMnemonic('I');
-    importItem.addActionListener(e -> importGames());
-    return importItem;
+    importCarouselItem.setAccelerator(keyStrokeToImportGames);
+    importCarouselItem.setMnemonic('I');
+    importCarouselItem.addActionListener(e -> importCarouselGames());
+    return importCarouselItem;
   }
+  
+  private JMenuItem getImportGamebaseItem()
+  {
+    importGamebaseItem = new JMenuItem("Import from Gamebase...");
+    KeyStroke keyStrokeToImportGames = KeyStroke.getKeyStroke(KeyEvent.VK_G, InputEvent.CTRL_DOWN_MASK);
+    importGamebaseItem.setAccelerator(keyStrokeToImportGames);
+    importGamebaseItem.setMnemonic('G');
+    importGamebaseItem.addActionListener(e -> importGamebaseGames());
+    return importGamebaseItem;
+  }
+  
 
   private JMenuItem getExportItem()
   {
@@ -210,7 +233,7 @@ public class MenuManager
     refreshItem = new JMenuItem("Reload current game view");
     KeyStroke keyStrokeToReloadGameView = KeyStroke.getKeyStroke(KeyEvent.VK_F5, 0);
     refreshItem.setAccelerator(keyStrokeToReloadGameView);
-    refreshItem.setMnemonic('G');
+    refreshItem.setMnemonic('C');
     refreshItem.addActionListener(e -> reloadView());
     return refreshItem;
   }
@@ -336,9 +359,9 @@ public class MenuManager
     return newVersionItem;
   }
 
-  private void importGames()
+  private void importCarouselGames()
   {
-    ImportOptionsDialog optionsDialog = new ImportOptionsDialog(this.mainWindow);
+    ImportOptionsDialog optionsDialog = new ImportOptionsDialog(this.mainWindow, true);
     optionsDialog.pack();
     optionsDialog.setLocationRelativeTo(this.mainWindow);
     if (optionsDialog.showDialog())
@@ -347,7 +370,29 @@ public class MenuManager
       importManager.setSelectedOption(optionsDialog.getSelectedOption());
       importManager.setAddAsFavorite(optionsDialog.getMarkAsFavorite());
       ImportProgressDialog dialog = new ImportProgressDialog(this.mainWindow);
-      ImportWorker worker = new ImportWorker(importManager, dialog);
+      CarouselImportWorker worker = new CarouselImportWorker(importManager, dialog);
+      worker.execute();
+      dialog.setVisible(true);
+      //Refresh current game view after import
+      uiModel.reloadCurrentGameView();
+      MainWindow.getInstance().repaintAfterModifications();
+    }
+  }
+  
+  private void importGamebaseGames()
+  {
+    ImportOptionsDialog optionsDialog = new ImportOptionsDialog(this.mainWindow, false);
+    optionsDialog.pack();
+    optionsDialog.setLocationRelativeTo(this.mainWindow);
+    if (optionsDialog.showDialog())
+    {
+      //Set selected option in gamebaseImporter from the dialog.
+      gamebaseImporter.setImportOptions(optionsDialog.getSelectedGbOptions());
+      //Set options for how to handle games during import
+      importManager.setSelectedOption(optionsDialog.getSelectedOption());
+      importManager.setAddAsFavorite(optionsDialog.getMarkAsFavorite());
+      ImportProgressDialog dialog = new ImportProgressDialog(this.mainWindow);
+      GamebaseImportWorker worker = new GamebaseImportWorker(gamebaseImporter, importManager, dialog);
       worker.execute();
       dialog.setVisible(true);
       //Refresh current game view after import
