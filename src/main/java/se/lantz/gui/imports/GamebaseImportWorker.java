@@ -30,7 +30,7 @@ public class GamebaseImportWorker extends SwingWorker<Void, String>
     publish("Importing to db...");
     publish(importManager.insertRowsIntoDb().toString());
     publish("Copying screenshots, covers and game files...");
-    publish(importManager.copyFiles().toString());
+    publish(importManager.copyFiles(true).toString());
     importManager.clearAfterImport();
     publish("Done!");
     return null;

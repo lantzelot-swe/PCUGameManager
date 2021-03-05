@@ -24,7 +24,8 @@ public class GamebaseImporter
 
   private final ImportManager importManager;
   //Just for test
-  private Path gbDatabasePath = Path.of("C://GameBase//GBC_V16//");
+  private Path gbDatabasePath = Path.of("C://GameBase//Vic20_v03//");// Path.of("C://GameBase//GBC_V16//");
+  private boolean isC64 = false;//true;
 
   public GamebaseImporter(ImportManager importManager)
   {
@@ -34,24 +35,33 @@ public class GamebaseImporter
 
   public void setImportOptions(GamebaseOptions options)
   {
-    this.gbDatabasePath = options.getGamebaseDbFile();
+//    this.gbDatabasePath = options.getGamebaseDbFile();
+//    this.isC64 = options.isC64();
   }
 
   public StringBuilder importFromGamebase()
   {
     StringBuilder builder = new StringBuilder();
     //Use the folder where the gamebase mdb file is located in the import manager
-    importManager.setSelectedFolder(gbDatabasePath.getParent());
+//    importManager.setSelectedFolder(gbDatabasePath.getParent());
+    importManager.setSelectedFolder(gbDatabasePath);
     //Just for test, use gbDatabasePath - "jdbc:ucanaccess:" + gbDatabasePath.toString()
-    String databaseURL = "jdbc:ucanaccess://F://Github//PCUGameManager//GBC_v16.mdb";
+    String databaseURL = "jdbc:ucanaccess://C://GameBase//Vic20_v03//Vic20_v03.mdb";// "jdbc:ucanaccess://F://Github//PCUGameManager//GBC_v16.mdb";
 
     String joyBase = ":JU,JD,JL,JR,JF,JF,SP,EN,,F1,F3,F5,,,";
 
     String joy1config;
     String joy2config;
-
-    String advanced = "64,pal,sid6581";
-
+    //Setup advanced string (system, sid, pal, truedrive etc)
+    String advanced = "sid6581";
+    if (isC64)
+    {
+      advanced = "64," + advanced;
+    }
+    else
+    {
+      advanced = "vic," + advanced;
+    }
     try (Connection connection = DriverManager.getConnection(databaseURL))
     {
       Statement statement = connection.createStatement();
@@ -67,9 +77,9 @@ public class GamebaseImporter
       }
 
       sql =
-        "SELECT Games.Name, Musicians.Musician, Genres.Genre, Publishers.Publisher, Games.Filename, Games.ScrnshotFilename, Years.Year, Games.GA_Id, Games.Control\r\n" +
+        "SELECT Games.Name, Musicians.Musician, Genres.Genre, Publishers.Publisher, Games.Filename, Games.ScrnshotFilename, Years.Year, Games.GA_Id, Games.Control, Games.V_PalNTSC, Games.V_TrueDriveEmu\r\n" +
           "FROM Years INNER JOIN (Publishers INNER JOIN ((Games INNER JOIN Musicians ON Games.MU_Id = Musicians.MU_Id) INNER JOIN Genres ON Games.GE_Id = Genres.GE_Id) ON Publishers.PU_Id = Games.PU_Id) ON Years.YE_Id = Games.YE_Id\r\n" +
-          "WHERE (((Games.Name)='1942'));";
+          "WHERE (((Games.Name)='Castle Dracula'));";
 
       result = statement.executeQuery(sql);
       int gameCount = 0;
@@ -87,8 +97,21 @@ public class GamebaseImporter
           String genre = result.getString("Genre");
           String publisher = result.getString("Publisher");
           int control = result.getInt("Control");
+          int palOrNtsc = result.getInt("V_PalNTSC");
+          int trueDriveEmu = result.getInt("V_TrueDriveEmu");
 
-          //Fix joystick port
+          //Setup video mode
+          //0=PAL, 1=BOTH, 2=NTSC, 3=PAL[+NTSC?]
+          String video = (palOrNtsc == 2)  ? "ntsc" : "pal";
+          advanced = advanced + "," + video;
+          //Setup truedrive
+          if (trueDriveEmu > 0)
+          {
+            advanced = advanced + "," + "driveicon,accuratedisk";
+          }
+          
+          //Control: 0=JoyPort2, 1=JoyPort1, 2=Keyboard, 3=PaddlePort2, 4=PaddlePort1, 5=Mouse, 6=LightPen, 7=KoalaPad, 8=LightGun
+          //Setup joystick port
           if (control == 1)
           {
             //1 means joystick port 1 in the gb database
@@ -101,8 +124,8 @@ public class GamebaseImporter
             joy1config = "J:1" + joyBase;
             joy2config = "J:2*" + joyBase;
           }
-          //Fix game file
-          gamefile = getFileToInclude(gbDatabasePath, gamefile);
+          //Fix game file, but only for C64?
+          gamefile = getFileToInclude(gbDatabasePath, gamefile);//isC64 ? getFileToInclude(gbDatabasePath, gamefile) : gamefile;
 
           //Fix screenshots
           screen1 = gbDatabasePath.toString() + "\\screenshots\\" + screen1;

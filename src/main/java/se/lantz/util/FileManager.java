@@ -325,7 +325,7 @@ public class FileManager
     if (duplicateIndex > 0)
     {
       //Just add the duplicate index if there are several games with the same name
-      newNameString = newNameString + "-" + duplicateIndex;
+      newNameString = newNameString + "0" + duplicateIndex;
     }
     
     logger.debug("Game title: \"{}\" ---- New fileName: \"{}\"", title, newNameString);
@@ -494,13 +494,21 @@ public class FileManager
       }
       else
       {
-        if (gameFile.contains("crt"))
+        //For Vic-20 treat prg's as carts. TODO: many cart alternatives for Vic-20, see GEMUS for GB-VIC20.
+        if (!systemModel.isC64() && gameFile.contains("prg"))
         {
-          command.append("-cartcrt \"" + decompressIfNeeded(gameFile) + "\"");
+          command.append("-cartA \"" + gameFile + "\"");
         }
         else
         {
-          command.append("-autostart \"" + gameFile + "\"");
+          if (gameFile.contains("crt"))
+          {
+            command.append("-cartcrt \"" + decompressIfNeeded(gameFile) + "\"");
+          }
+          else
+          {
+            command.append("-autostart \"" + gameFile + "\"");
+          }
         }
       }
     }
@@ -849,6 +857,38 @@ public class FileManager
     catch (IOException e)
     {
       ExceptionHandler.handleException(e, "Could not delete temp folder");
+    }
+  }
+  
+  public static void scaleCoverImageAndSave(Path coverImagePath)
+  {
+    try
+    {
+      BufferedImage coverImage = ImageIO.read(coverImagePath.toFile());
+      Image newCover = coverImage.getScaledInstance(122, 175, Image.SCALE_SMOOTH);
+      BufferedImage copyOfImage =
+        new BufferedImage(newCover.getWidth(null), newCover.getHeight(null), BufferedImage.TYPE_INT_ARGB);
+      Graphics g = copyOfImage.createGraphics();
+      g.drawImage(newCover, 0, 0, null);
+      g.dispose();
+      ImageIO.write(copyOfImage, "png", coverImagePath.toFile());
+    }
+    catch (IOException e)
+    {
+      ExceptionHandler.handleException(e, "Could not scale and cover");
+    }
+  }
+  
+  public static void scaleScreenshotImageAndSave(Path screenshotImagePath)
+  {
+    try
+    {
+      BufferedImage screenImage = ImageIO.read(screenshotImagePath.toFile());
+      ImageIO.write(scaleImageTo320x200x32bit(screenImage), "png", screenshotImagePath.toFile());
+    }
+    catch (IOException e)
+    {
+      ExceptionHandler.handleException(e, "Could not scale and store screenshot");
     }
   }
 

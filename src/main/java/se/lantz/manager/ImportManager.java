@@ -463,15 +463,15 @@ public class ImportManager
     return lines;
   }
 
-  public StringBuilder copyFiles()
+  public StringBuilder copyFiles(boolean gamebaseImport)
   {
     StringBuilder infoBuilder = new StringBuilder();
     //Copy with the existing file names. At export convert to a name that works with the maxi tool if needed.
-    dbRowDataList.stream().forEach(dbRowData -> copyFiles(dbRowData, infoBuilder));
+    dbRowDataList.stream().forEach(dbRowData -> copyFiles(dbRowData, infoBuilder, gamebaseImport));
     return infoBuilder;
   }
 
-  public void copyFiles(String dbRowData, StringBuilder infoBuilder)
+  public void copyFiles(String dbRowData, StringBuilder infoBuilder, boolean gamebaseImport)
   {
     String coverName = "";
     String screen1Name = "";
@@ -504,7 +504,7 @@ public class ImportManager
     Path targetScreen2Path = Paths.get("./screens/" + screen2Name);
 
     Path gamePath = srcGamesFolder.resolve(oldGameName);
-    if (oldGameName.startsWith("."))
+    if (gamebaseImport)
     {
       //When importing from gamebase use current folder
       gamePath = new File(oldGameName).toPath();
@@ -524,6 +524,10 @@ public class ImportManager
         infoBuilder.append(targetCoverPath.toString());
         infoBuilder.append("\n");
         Files.copy(coverPath, targetCoverPath, StandardCopyOption.REPLACE_EXISTING);
+        if (gamebaseImport)
+        {
+          FileManager.scaleCoverImageAndSave(targetCoverPath);
+        }
       }
       else
       {
@@ -545,6 +549,10 @@ public class ImportManager
         infoBuilder.append(targetScreen1Path.toString());
         infoBuilder.append("\n");
         Files.copy(screens1Path, targetScreen1Path, StandardCopyOption.REPLACE_EXISTING);
+        if (gamebaseImport)
+        {
+          FileManager.scaleScreenshotImageAndSave(targetScreen1Path);
+        }
       }
       if (!oldScreen2Name.isEmpty())
       {
@@ -554,6 +562,10 @@ public class ImportManager
         infoBuilder.append(targetScreen2Path.toString());
         infoBuilder.append("\n");
         Files.copy(screens2Path, targetScreen2Path, StandardCopyOption.REPLACE_EXISTING);
+        if (gamebaseImport)
+        {
+          FileManager.scaleScreenshotImageAndSave(targetScreen2Path);
+        }
       }
       if (!oldGameName.isEmpty())
       {
