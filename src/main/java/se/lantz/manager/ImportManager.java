@@ -24,6 +24,8 @@ import javax.imageio.ImageIO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.collect.Lists;
+
 import se.lantz.model.MainViewModel;
 import se.lantz.util.ExceptionHandler;
 import se.lantz.util.FileManager;
@@ -428,10 +430,10 @@ public class ImportManager
     int duplicateIndex = 0;
     if (selectedOption == Options.ADD)
     {
-      duplicateIndex = uiModel.getDbConnector().getGameDuplicateIndexToUse(title);
-      //Check any duplicates in added rows also
-      duplicateIndex = duplicateIndex + getDbRowDuplicate(title);
+      duplicateIndex = uiModel.getDbConnector().getGameDuplicateIndexToUse(title);     
     }
+    //Check any duplicates in added rows, always use this otherwise duplicates uses same names.
+    duplicateIndex = duplicateIndex + getDbRowDuplicate(title);
     return duplicateIndex;
   }
 
@@ -462,12 +464,18 @@ public class ImportManager
     }
     return lines;
   }
+  
+  
+  public List<List<String>> getDbRowReadChunks()
+  {
+    return Lists.partition(dbRowDataList, 50);
+  }
 
-  public StringBuilder copyFiles(boolean gamebaseImport)
+  public StringBuilder copyFiles(boolean gamebaseImport, List<String> rowList)
   {
     StringBuilder infoBuilder = new StringBuilder();
     //Copy with the existing file names. At export convert to a name that works with the maxi tool if needed.
-    dbRowDataList.stream().forEach(dbRowData -> copyFiles(dbRowData, infoBuilder, gamebaseImport));
+    rowList.stream().forEach(dbRowData -> copyFiles(dbRowData, infoBuilder, gamebaseImport));
     return infoBuilder;
   }
 

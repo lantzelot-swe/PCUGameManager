@@ -32,7 +32,10 @@ public class CarouselImportWorker extends SwingWorker<Void, String>
     publish("Importing to db...");
     publish(importManager.insertRowsIntoDb().toString());
     publish("Copying screenshots, covers and game files...");
-    publish(importManager.copyFiles(false).toString());
+    for (List<String> rowList : importManager.getDbRowReadChunks())
+    {
+      publish(importManager.copyFiles(false, rowList).toString());
+    }
     importManager.clearAfterImport();
     publish("Done!");
     return null;

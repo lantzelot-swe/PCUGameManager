@@ -96,6 +96,11 @@ public class ImportProgressPanel extends JPanel
     //Check for errors
     String text = getTextArea().getText();
     int count = text.length() - text.replace("ERROR:", "").length();
+    int ignoreCount = text.length() - text.replace("Ignoring", "").length();
+    if (ignoreCount > 0)
+    {
+      getTextArea().append("\n" + ignoreCount/8 + " games ignored.\n");
+    }
     if (count > 0)
     {
       getTextArea().append("\nImport ended with " + count/6 + " errors. See log file for details.");

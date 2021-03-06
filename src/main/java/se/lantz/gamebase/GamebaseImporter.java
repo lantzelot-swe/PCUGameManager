@@ -13,6 +13,7 @@ import java.sql.Statement;
 
 import se.lantz.manager.ImportManager;
 import se.lantz.scraper.GamebaseScraper;
+import se.lantz.util.ExceptionHandler;
 import se.lantz.util.FileManager;
 
 public class GamebaseImporter
@@ -81,7 +82,7 @@ public class GamebaseImporter
       sql =
         "SELECT Games.Name, Musicians.Musician, Genres.Genre, Publishers.Publisher, Games.Filename, Games.ScrnshotFilename, Years.Year, Games.GA_Id, Games.Control, Games.V_PalNTSC, Games.V_TrueDriveEmu, Games.Gemus\r\n" +
           "FROM Years INNER JOIN (Publishers INNER JOIN ((Games INNER JOIN Musicians ON Games.MU_Id = Musicians.MU_Id) INNER JOIN Genres ON Games.GE_Id = Genres.GE_Id) ON Publishers.PU_Id = Games.PU_Id) ON Years.YE_Id = Games.YE_Id\r\n" +
-          "WHERE (((Games.Name)='Birds, The'));";
+          "WHERE (((Games.Name) LIKE 'alien attack'));";
 
       result = statement.executeQuery(sql);
       int gameCount = 0;
@@ -102,7 +103,13 @@ public class GamebaseImporter
           int palOrNtsc = result.getInt("V_PalNTSC");
           int trueDriveEmu = result.getInt("V_TrueDriveEmu");
           String gemus = result.getString("Gemus");
-
+                    
+          if (gamefile.isEmpty())
+          {
+            builder.append("Ignoring " + title + " (No game file available)\n");
+            continue;
+          }
+          
           //Setup video mode
           //0=PAL, 1=BOTH, 2=NTSC, 3=PAL[+NTSC?]
           String video = (palOrNtsc == 2)  ? "ntsc" : "pal";
@@ -127,8 +134,7 @@ public class GamebaseImporter
             joy1config = "J:1" + joyBase;
             joy2config = "J:2*" + joyBase;
           }
-          //Fix game file, but only for C64?
-          gamefile = getFileToInclude(gbDatabasePath, gamefile);//isC64 ? getFileToInclude(gbDatabasePath, gamefile) : gamefile;
+          
 
           //Fix screenshots
           screen1 = gbDatabasePath.toString() + "\\screenshots\\" + screen1;
@@ -152,6 +158,38 @@ public class GamebaseImporter
           {
             coverFile = gbDatabasePath.toString() + "\\extras\\" + coverFile;
           }
+          
+                   
+          //Get cartridge if available, easyflash is preferred
+          String cartridgeSql =
+            "SELECT Extras.Name, Extras.Path\r\n" + "FROM Games INNER JOIN Extras ON Games.GA_Id = Extras.GA_Id\r\n" +
+              "WHERE (((Games.GA_Id)=" + gameId + ") AND ((Extras.Name) Like \"*Cartridge*\"));";
+
+          sqlResult = statement.executeQuery(cartridgeSql);
+          String cartridgePath = "";
+          while (sqlResult.next())
+          {
+            if (cartridgePath.isEmpty())
+            {
+              cartridgePath = sqlResult.getString("Path");
+            }
+            //Pick easyflash if available
+            String name = sqlResult.getString("Name");
+            if (name.contains("EasyFlash"))
+            {
+              cartridgePath = sqlResult.getString("Path");
+            }
+          }
+          
+          if (!cartridgePath.isEmpty())
+          {
+            gamefile = gbDatabasePath.toString() + "\\extras\\" + cartridgePath;
+          }
+          
+          //Fix game file
+          gamefile = getFileToInclude(gbDatabasePath, gamefile);
+          
+          
           importManager.addFromGamebaseImporter(title,
                                                 year,
                                                 publisher,
@@ -169,6 +207,7 @@ public class GamebaseImporter
         catch (Exception e)
         {
           builder.append("ERROR: Could not fetch all info for " + title + ":\n" + e.toString() + "\n");
+          ExceptionHandler.handleException(e, "Could not fetch all info for " + title);
         }
       }
       builder.append("Read " + gameCount + " games from the gamebase db.\n");
@@ -176,6 +215,7 @@ public class GamebaseImporter
     catch (SQLException ex)
     {
       builder.append("ERROR: Query failed : " + ex.toString() + "\n");
+      ExceptionHandler.handleException(ex, "Query failed");
     }
     return builder;
   }
