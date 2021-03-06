@@ -1,8 +1,5 @@
 package se.lantz.manager;
 
-import java.awt.Graphics;
-import java.awt.Image;
-import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -32,6 +29,10 @@ import se.lantz.util.FileManager;
 
 public class ImportManager
 {
+  /**
+   * The size of each chunk when importing games
+   */
+  private static final int DB_ROW_CHUNK_SIZE = 50;
   public enum Options
   {
     SKIP, OVERWRITE, ADD;
@@ -133,11 +134,11 @@ public class ImportManager
     gameInfoFilesMap.values().stream().forEach(list -> extractInfoIntoRowString(list, infoBuilder));
   }
 
-  public StringBuilder insertRowsIntoDb()
+  public StringBuilder insertRowsIntoDb(List<String> rowList)
   {
-    return uiModel.importGameInfo(dbRowDataList, selectedOption, addAsFavorite);
+    return uiModel.importGameInfo(rowList, selectedOption, addAsFavorite);
   }
-
+ 
   private void extractInfoIntoRowString(List<String> fileLines, StringBuilder infoBuilder)
   {
     String title = "";
@@ -468,7 +469,7 @@ public class ImportManager
   
   public List<List<String>> getDbRowReadChunks()
   {
-    return Lists.partition(dbRowDataList, 50);
+    return Lists.partition(dbRowDataList, DB_ROW_CHUNK_SIZE);
   }
 
   public StringBuilder copyFiles(boolean gamebaseImport, List<String> rowList)
@@ -592,9 +593,12 @@ public class ImportManager
     }
   }
 
-  public void clearAfterImport()
+  public int clearAfterImport()
   {
+    int size = dbRowDataList.size();
     dbRowDataList.clear();
     gameInfoFilesMap.clear();
+    uiModel.cleanupAfterImport();
+    return size;
   }
 }

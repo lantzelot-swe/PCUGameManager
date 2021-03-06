@@ -192,6 +192,11 @@ public class MainViewModel extends AbstractModel
   {
     return dbConnector.importRowsInGameInfoTable(rowValues, option, addAsFavorite);
   }
+  
+  public void cleanupAfterImport()
+  {
+    dbConnector.cleanupAfterImport();
+  }
 
   public List<GameDetails> readGameDetailsForExport(StringBuilder infoBuilder, List<GameListData> gamesList)
   {

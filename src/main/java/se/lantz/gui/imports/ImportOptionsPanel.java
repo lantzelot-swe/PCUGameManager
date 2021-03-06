@@ -98,6 +98,11 @@ public class ImportOptionsPanel extends JPanel
     if (overwriteRadioButton == null) {
     	overwriteRadioButton = new JRadioButton("Overwrite with imported game");
     	buttonGroup.add(overwriteRadioButton);
+    	if (!this.isCarouselImport)
+    	{
+    	  //Too complex to overwrite several duplicates, don't allow it.
+    	  overwriteRadioButton.setVisible(false);
+    	}
     }
     return overwriteRadioButton;
   }

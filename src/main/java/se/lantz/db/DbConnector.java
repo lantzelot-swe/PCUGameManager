@@ -10,7 +10,9 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -65,6 +67,11 @@ public class DbConnector
   // @J+
   private static final Logger logger = LoggerFactory.getLogger(DbConnector.class);
   private List<String> columnList = new ArrayList<>();
+  /**
+   * Map keeping track of duplicate indexes when importing several games at once.
+   */
+  Map<String, Integer> duplicateMap = new HashMap<>();
+  List<String> addedRowsList = new ArrayList<>();
 
   public DbConnector()
   {
@@ -456,14 +463,23 @@ public class DbConnector
     //Check which are already available and sort them out of rowValues
     for (String rowValue : rowValues)
     {
-      String[] splittedRowValue = rowValue.split(COMMA);
+      String[] splittedRowValue = rowValue.split(COMMA);   
+      String title = splittedRowValue[0];
+      if (addedRowsList.contains(rowValue.substring(0, rowValue.indexOf(","))))
+      {
+        //Add game, another one has been added with the same title, no one was available in the db at that point.
+        infoBuilder.append("Not available, adding to db\n");
+        logger.debug("Game: {} is not available, adding to db", title);
+        newRowValues.add(rowValue);
+        continue;
+      }
       StringBuilder sqlBuilder = new StringBuilder();
       sqlBuilder.append("SELECT COUNT(*) FROM gameinfo WHERE title = ");
-      sqlBuilder.append(splittedRowValue[0]);
+      sqlBuilder.append(title);
       sqlBuilder.append("\" COLLATE NOCASE;");
       String sql = sqlBuilder.toString();
       infoBuilder.append("Checking game ");
-      infoBuilder.append(splittedRowValue[0].substring(1));
+      infoBuilder.append(title.substring(1));
       infoBuilder.append(": ");
       logger.debug("Checking game: {}", sql);
 
@@ -474,13 +490,13 @@ public class DbConnector
         if (rs.getInt(1) == 0)
         {
           infoBuilder.append("Not available, adding to db\n");
-          logger.debug("Game: {} is not available, adding to db", splittedRowValue[0]);
+          logger.debug("Game: {} is not available, adding to db", title);
           newRowValues.add(rowValue);
         }
         else
         {
           infoBuilder.append("Already available, skipping\n");
-          logger.debug("Game: {} is already available, skipping.", splittedRowValue[0]);
+          logger.debug("Game: {} is already available, skipping.", title);
         }
       }
       catch (SQLException e)
@@ -554,6 +570,8 @@ public class DbConnector
     {
       int value = pstmt.executeUpdate();
       logger.debug("Executed successfully, value = {}", value);
+      //Add game title to keep track of added games
+      rowValues.stream().forEach(row -> addedRowsList.add(row.substring(0, row.indexOf(','))));
     }
     catch (SQLException e)
     {
@@ -615,7 +633,16 @@ public class DbConnector
       }
       sqlBuilder.append(" WHERE title = ");
       sqlBuilder.append(title);
-      sqlBuilder.append("\" AND Duplicate = 0 COLLATE NOCASE;");
+      sqlBuilder.append("\" AND Duplicate = ");
+      //Keep track of multiple duplicate numbers, increase for each
+      int duplicateNumber = 0;
+      if (duplicateMap.containsKey(title))
+      {
+        duplicateNumber = duplicateMap.get(title);
+      }
+      duplicateMap.put(title, duplicateNumber + 1);
+      sqlBuilder.append(duplicateNumber);
+      sqlBuilder.append(" COLLATE NOCASE;");
       String sql = sqlBuilder.toString();
       logger.debug("Generated UPDATE String:\n{}", sql);
       try (Connection conn = this.connect(); PreparedStatement pstmt = conn.prepareStatement(sql))
@@ -966,5 +993,11 @@ public class DbConnector
     {
       ExceptionHandler.handleException(e, "Could not clear favorite values in db.");
     }
+  }
+  
+  public void cleanupAfterImport()
+  {
+    addedRowsList.clear();
+    duplicateMap.clear();
   }
 }

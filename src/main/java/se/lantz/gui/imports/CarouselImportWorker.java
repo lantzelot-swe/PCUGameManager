@@ -1,5 +1,6 @@
 package se.lantz.gui.imports;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.SwingWorker;
@@ -30,13 +31,17 @@ public class CarouselImportWorker extends SwingWorker<Void, String>
     importManager.convertIntoDbRows(infoBuilder);
     publish(infoBuilder.toString());
     publish("Importing to db...");
-    publish(importManager.insertRowsIntoDb().toString());
-    publish("Copying screenshots, covers and game files...");
     for (List<String> rowList : importManager.getDbRowReadChunks())
     {
-      publish(importManager.copyFiles(false, rowList).toString());
+      //Copy the list to avoid modifying it when reading several chunks
+      ArrayList<String> copyList = new ArrayList<>();
+      copyList.addAll(rowList);
+      publish(importManager.insertRowsIntoDb(copyList).toString());
+      publish("Copying screenshots, covers and game files...");
+      publish(importManager.copyFiles(false, copyList).toString());
     }
-    importManager.clearAfterImport();
+    int numberOfGamesProcessed = importManager.clearAfterImport();
+    publish("Imported " + numberOfGamesProcessed + " games.");
     publish("Done!");
     return null;
   }
