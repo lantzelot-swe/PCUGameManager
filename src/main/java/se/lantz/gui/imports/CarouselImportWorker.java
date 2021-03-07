@@ -41,7 +41,7 @@ public class CarouselImportWorker extends SwingWorker<Void, String>
       publish(importManager.copyFiles(false, copyList).toString());
     }
     int numberOfGamesProcessed = importManager.clearAfterImport();
-    publish("Imported " + numberOfGamesProcessed + " games.");
+    publish("Processed " + numberOfGamesProcessed + " games.");
     publish("Done!");
     return null;
   }
@@ -67,5 +67,6 @@ public class CarouselImportWorker extends SwingWorker<Void, String>
       ExceptionHandler.handleException(e, "Error during import");
     }
     dialog.finish();
+    importManager.clearAfterImport();
   }
 }

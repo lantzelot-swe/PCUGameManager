@@ -15,7 +15,7 @@ public class ImportProgressPanel extends JPanel
   private JProgressBar progressBar;
   private JTextArea textArea;
   private JScrollPane textScrollPane;
-  private JButton closeButton;
+  private JButton cancelButton;
 
   public ImportProgressPanel()
   {
@@ -36,11 +36,11 @@ public class ImportProgressPanel extends JPanel
     gbc_textScrollPane.gridx = 0;
     gbc_textScrollPane.gridy = 1;
     add(getTextScrollPane(), gbc_textScrollPane);
-    GridBagConstraints gbc_closeButton = new GridBagConstraints();
-    gbc_closeButton.insets = new Insets(0, 5, 5, 5);
-    gbc_closeButton.gridx = 0;
-    gbc_closeButton.gridy = 2;
-    add(getCloseButton(), gbc_closeButton);
+    GridBagConstraints gbc_cancelButton = new GridBagConstraints();
+    gbc_cancelButton.insets = new Insets(0, 5, 5, 5);
+    gbc_cancelButton.gridx = 0;
+    gbc_cancelButton.gridy = 2;
+    add(getCancelButton(), gbc_cancelButton);
   }
 
   private JProgressBar getProgressBar()
@@ -49,6 +49,7 @@ public class ImportProgressPanel extends JPanel
     {
       progressBar = new JProgressBar();
       progressBar.setIndeterminate(true);
+      progressBar.setStringPainted(true);
     }
     return progressBar;
   }
@@ -73,14 +74,13 @@ public class ImportProgressPanel extends JPanel
     return textScrollPane;
   }
 
-  JButton getCloseButton()
+  JButton getCancelButton()
   {
-    if (closeButton == null)
+    if (cancelButton == null)
     {
-      closeButton = new JButton("Close");
-      closeButton.setEnabled(false);
+      cancelButton = new JButton("Cancel");
     }
-    return closeButton;
+    return cancelButton;
   }
   
   void updateProgress(String infoText)
@@ -88,9 +88,16 @@ public class ImportProgressPanel extends JPanel
     getTextArea().append(infoText);
   }
   
+  void updateProgressBar(String valuestring, int maximum, int value)
+  {
+    getProgressBar().setString(valuestring);
+    getProgressBar().setIndeterminate(false);
+    getProgressBar().setMaximum(maximum);
+    getProgressBar().setValue(value);
+  }
+  
   public void finish()
   {
-    getCloseButton().setEnabled(true);
     getProgressBar().setIndeterminate(false);
     getProgressBar().setValue(getProgressBar().getMaximum());
     //Check for errors
@@ -99,7 +106,7 @@ public class ImportProgressPanel extends JPanel
     int ignoreCount = text.length() - text.replace("Ignoring", "").length();
     if (ignoreCount > 0)
     {
-      getTextArea().append("\n" + ignoreCount/8 + " games ignored.\n");
+      getTextArea().append("\n" + ignoreCount/8 + " games ignored (missing or corrupted game files).\n");
     }
     if (count > 0)
     {
@@ -107,7 +114,7 @@ public class ImportProgressPanel extends JPanel
     }
     else
     {
-      getTextArea().append("\nImport completed successfully.");
+      getTextArea().append("\nImport completed.");
     }
   }
 }

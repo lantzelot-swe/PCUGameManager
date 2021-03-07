@@ -10,6 +10,8 @@ public class ImportProgressDialog extends JDialog
   private static final long serialVersionUID = 1L;
 
   private ImportProgressPanel panel;
+  
+  private boolean cancelled = false;
 
   public ImportProgressDialog(Frame frame)
   {
@@ -27,9 +29,17 @@ public class ImportProgressDialog extends JDialog
     this.repaint();
   }
   
+  public void updateProgressBar(String valuestring, int maximum, int value)
+  {
+    getImportProgressPanel().updateProgressBar(valuestring, maximum, value);
+    this.repaint();
+  }
+  
   public void finish()
   {
     getImportProgressPanel().finish();
+    getImportProgressPanel().getCancelButton().setText("Close");
+    getImportProgressPanel().getCancelButton().addActionListener(e -> setVisible(false));
   }
 
   public ImportProgressPanel getImportProgressPanel()
@@ -37,8 +47,13 @@ public class ImportProgressDialog extends JDialog
     if (panel == null)
     {
       panel = new ImportProgressPanel();
-      panel.getCloseButton().addActionListener(e -> setVisible(false));
+      panel.getCancelButton().addActionListener(e -> cancelled = true);
     }
     return panel;
+  }
+  
+  public boolean isCancelled()
+  {
+    return cancelled;
   }
 }
