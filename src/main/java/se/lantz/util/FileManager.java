@@ -994,7 +994,7 @@ public class FileManager
     }
     catch (IOException e)
     {
-      ExceptionHandler.handleException(e, "Could not unzip downloaded file");
+      ExceptionHandler.logException(e, "Could not unzip file");
     }
     return filePath != null ? filePath.toFile() : null;
   }
