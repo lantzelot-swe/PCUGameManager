@@ -32,7 +32,7 @@ public class ImportManager
   /**
    * The size of each chunk when importing games
    */
-  private static final int DB_ROW_CHUNK_SIZE = 50;
+  public static final int DB_ROW_CHUNK_SIZE = 50;
   public enum Options
   {
     SKIP, OVERWRITE, ADD;

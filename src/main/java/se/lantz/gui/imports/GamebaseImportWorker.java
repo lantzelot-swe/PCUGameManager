@@ -2,29 +2,20 @@ package se.lantz.gui.imports;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
-
-import javax.swing.SwingWorker;
 
 import se.lantz.gamebase.GamebaseImporter;
 import se.lantz.gamebase.GbGameInfo;
 import se.lantz.manager.ImportManager;
-import se.lantz.util.ExceptionHandler;
 
-public class GamebaseImportWorker extends SwingWorker<Void, String>
+public class GamebaseImportWorker extends AbstractImportWorker
 {
   private ImportManager importManager;
-  private ImportProgressDialog dialog;
   private final GamebaseImporter gbInporter;
   
-  private volatile String progressValueString = "";
-  private volatile int progressMaximum = 0;
-  private volatile int progressValue = 0;
-
   public GamebaseImportWorker(GamebaseImporter gamebaseImporter, ImportManager importManager, ImportProgressDialog dialog)
   {
+    super(dialog);
     this.importManager = importManager;
-    this.dialog = dialog;
     this.gbInporter = gamebaseImporter;
   }
 
@@ -45,7 +36,7 @@ public class GamebaseImportWorker extends SwingWorker<Void, String>
         progressValueString = "Cancelled";
         progressMaximum = 1;
         progressValue = 1;
-        publish("Import cancelled, no games added to the db.");
+        publish("Import cancelled, no games where added to the db.");
         return null;
       }
       progressValue++;
@@ -57,6 +48,7 @@ public class GamebaseImportWorker extends SwingWorker<Void, String>
     progressMaximum = dbRowReadChunks.size() + 1;
     progressValue = 0;
     publish("Importing to db, copying covers, screens and game files...");
+    int chunkCount = 0;
     for (List<String> rowList : dbRowReadChunks)
     {
       if (dialog.isCancelled())
@@ -64,9 +56,17 @@ public class GamebaseImportWorker extends SwingWorker<Void, String>
         progressValueString = "Cancelled";
         progressMaximum = 1;
         progressValue = 1;
-        publish("Import cancelled, some games where added to the db.");
+        if (chunkCount == 0)
+        {
+          publish("Import cancelled, no games where added to the db.");
+        }
+        else
+        {
+          publish("Import cancelled, " + (chunkCount * ImportManager.DB_ROW_CHUNK_SIZE) + " games where added to the db.");
+        }
         return null;
       }
+      chunkCount++;
       progressValue++;
       //Copy the list to avoid modifying it when reading several chunks
       ArrayList<String> copyList = new ArrayList<>();
@@ -83,37 +83,9 @@ public class GamebaseImportWorker extends SwingWorker<Void, String>
   }
 
   @Override
-  protected void process(List<String> chunks)
-  {
-    for (String value : chunks)
-    {
-      if (value.isEmpty())
-      {
-        dialog.updateProgress("");
-      }
-      else
-      {
-        dialog.updateProgress(value + "\n");
-      }
-      if (!progressValueString.isEmpty())
-      {
-        dialog.updateProgressBar(progressValueString, progressMaximum, progressValue);
-      }
-    }
-  }
-
-  @Override
   protected void done()
   {
-    try
-    {
-      get();
-    }
-    catch (Exception e)
-    {
-      ExceptionHandler.handleException(e, "Error during import");
-    }
-    dialog.finish();
+    super.done();
     importManager.clearAfterImport();
     gbInporter.clearAfterImport();
   }

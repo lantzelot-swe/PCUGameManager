@@ -91,9 +91,16 @@ public class ImportProgressPanel extends JPanel
   void updateProgressBar(String valuestring, int maximum, int value)
   {
     getProgressBar().setString(valuestring);
-    getProgressBar().setIndeterminate(false);
-    getProgressBar().setMaximum(maximum);
-    getProgressBar().setValue(value);
+    if (maximum == 0 && value == 0)
+    {
+      getProgressBar().setIndeterminate(true);
+    }
+    else
+    {
+      getProgressBar().setIndeterminate(false);
+      getProgressBar().setMaximum(maximum);
+      getProgressBar().setValue(value);
+    }
   }
   
   public void finish()
