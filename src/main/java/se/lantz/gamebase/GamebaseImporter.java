@@ -31,10 +31,15 @@ public class GamebaseImporter
 
   private final ImportManager importManager;
   //Just for test
-  private Path gbDatabasePath = Path.of("C://GameBase//GBC_V16//");//Path.of("C://GameBase//Vic20_v03//");
-  private boolean isC64 = true;//false;
+  private Path gbDatabasePath;
+  private Path gbParentPath;
+  private boolean isC64 = true;
 
+  private String joyBase = ":JU,JD,JL,JR,JF,JF,SP,EN,,F1,F3,F5,,,";
   private List<GbGameInfo> gbGameInfoList = new ArrayList<>();
+  
+  private Options selectedOption = Options.FAVORITES;
+  private String titleQueryString = "";
 
   public GamebaseImporter(ImportManager importManager)
   {
@@ -44,8 +49,12 @@ public class GamebaseImporter
 
   public void setImportOptions(GamebaseOptions options)
   {
-    //    this.gbDatabasePath = options.getGamebaseDbFile();
-    //    this.isC64 = options.isC64();
+     this.gbDatabasePath = options.getGamebaseDbFile();
+     //TODO: Read Paths.ini and set directories for games, screens and extras based on that.
+     gbParentPath = gbDatabasePath.getParent();
+     this.isC64 = options.isC64();
+     this.selectedOption = options.getSelectedOption();
+     this.titleQueryString = options.getTitleQueryString();
   }
 
   public StringBuilder importFromGamebase()
@@ -53,34 +62,35 @@ public class GamebaseImporter
     gbGameInfoList.clear();
     StringBuilder builder = new StringBuilder();
     //Use the folder where the gamebase mdb file is located in the import manager
-    //    importManager.setSelectedFolder(gbDatabasePath.getParent());
-    importManager.setSelectedFolder(gbDatabasePath);
+    importManager.setSelectedFolder(gbParentPath);
     //Just for test, use gbDatabasePath - "jdbc:ucanaccess:" + gbDatabasePath.toString()
     String vic20Test = "jdbc:ucanaccess://C://GameBase//Vic20_v03//Vic20_v03.mdb";
 
-    String databaseURL = "jdbc:ucanaccess://F://Github//PCUGameManager//GBC_v16.mdb";
+    String databaseURL = "jdbc:ucanaccess://" + gbDatabasePath.toString();
 
-    String joyBase = ":JU,JD,JL,JR,JF,JF,SP,EN,,F1,F3,F5,,,";
+//    databaseURL = databaseURL.replaceAll("\\\\", "//");
 
     try (Connection connection = DriverManager.getConnection(databaseURL))
     {
       Statement statement = connection.createStatement();
-      //Get views
-      //
-      //      String sql = "SELECT * FROM ViewData";
-      //
-      //      ResultSet result = statement.executeQuery(sql);
-      //      while (result.next())
-      //      {
-      //        String title = result.getString("Title");
-      //        System.out.println("view: " + title);
-      //      }
-
+  
       String sql =
-        "SELECT TOP 300 Games.Name, Musicians.Musician, Genres.Genre, Publishers.Publisher, Games.Filename, Games.ScrnshotFilename, Years.Year, Games.GA_Id, Games.Control, Games.V_PalNTSC, Games.V_TrueDriveEmu, Games.Gemus\r\n" +
-          "FROM Years INNER JOIN (Publishers INNER JOIN ((Games INNER JOIN Musicians ON Games.MU_Id = Musicians.MU_Id) INNER JOIN Genres ON Games.GE_Id = Genres.GE_Id) ON Publishers.PU_Id = Games.PU_Id) ON Years.YE_Id = Games.YE_Id\r\n" +
-          "WHERE (((Games.Name) LIKE 'a*'));";
+        "SELECT Games.Name, Musicians.Musician, Genres.Genre, Publishers.Publisher, Games.Filename, Games.ScrnshotFilename, Years.Year, Games.GA_Id, Games.Control, Games.V_PalNTSC, Games.V_TrueDriveEmu, Games.Gemus\r\n" +
+          "FROM Years INNER JOIN (Publishers INNER JOIN ((Games INNER JOIN Musicians ON Games.MU_Id = Musicians.MU_Id) INNER JOIN Genres ON Games.GE_Id = Genres.GE_Id) ON Publishers.PU_Id = Games.PU_Id) ON Years.YE_Id = Games.YE_Id\r\n";
 
+      String condition = "";
+      switch (selectedOption)
+      {
+      case FAVORITES:
+        condition = "WHERE (((Games.Fav)=True));";
+        break;
+      case QUERY:
+        condition = "WHERE (((Games.Name) LIKE '" + titleQueryString + "'));";
+      default:
+        break;
+      }
+      sql = sql + condition;
+      
       ResultSet result = statement.executeQuery(sql);
       int gameCount = 0;
       while (result.next())
@@ -131,7 +141,7 @@ public class GamebaseImporter
           String screen2 = "";
           if (screen1 != null && !screen1.isEmpty())
           {
-            screen1 = gbDatabasePath.toString() + "\\screenshots\\" + screen1;
+            screen1 = gbParentPath.toString() + "\\screenshots\\" + screen1;
             screen2 = getScreen2(screen1);
           }
 
@@ -151,7 +161,7 @@ public class GamebaseImporter
           }
           if (!coverFile.isEmpty())
           {
-            coverFile = gbDatabasePath.toString() + "\\extras\\" + coverFile;
+            coverFile = gbParentPath.toString() + "\\extras\\" + coverFile;
           }
 
           //Get cartridge if available, easyflash is preferred
@@ -177,7 +187,7 @@ public class GamebaseImporter
 
           if (!cartridgePath.isEmpty())
           {
-            gamefile = gbDatabasePath.toString() + "\\extras\\" + cartridgePath;
+            gamefile = gbParentPath.toString() + "\\extras\\" + cartridgePath;
           }
 
           GbGameInfo info = new GbGameInfo(title,
@@ -224,7 +234,7 @@ public class GamebaseImporter
     {
       try
       {
-        String gameFile = getFileToInclude(gbDatabasePath, gbGameInfo.getGamefile());
+        String gameFile = getFileToInclude(gbParentPath, gbGameInfo.getGamefile());
         importManager.addFromGamebaseImporter(gbGameInfo.getTitle(),
                                               gbGameInfo.getYear(),
                                               gbGameInfo.getPublisher(),

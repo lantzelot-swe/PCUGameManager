@@ -6,6 +6,8 @@ public class GamebaseOptions
 {
   private Path gamebaseDbFile;
   private boolean c64 = true;
+  private String titleQueryString = "";
+
   private GamebaseImporter.Options selectedOption = GamebaseImporter.Options.FAVORITES;
 
   public GamebaseOptions()
@@ -41,6 +43,16 @@ public class GamebaseOptions
   public void setSelectedOption(GamebaseImporter.Options selectedOption)
   {
     this.selectedOption = selectedOption;
+  }
+
+  public String getTitleQueryString()
+  {
+    return titleQueryString;
+  }
+
+  public void setTitleQueryString(String titleQueryString)
+  {
+    this.titleQueryString = titleQueryString;
   }
 
 }

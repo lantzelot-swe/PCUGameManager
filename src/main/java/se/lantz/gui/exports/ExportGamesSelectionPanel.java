@@ -25,6 +25,7 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import se.lantz.gui.SelectDirPanel;
+import se.lantz.gui.SelectDirPanel.Mode;
 import se.lantz.model.GameListModel;
 import se.lantz.model.MainViewModel;
 import se.lantz.model.data.GameListData;
@@ -443,7 +444,7 @@ public class ExportGamesSelectionPanel extends JPanel
   {
     if (selectDirPanel == null)
     {
-      selectDirPanel = new SelectDirPanel(false);
+      selectDirPanel = new SelectDirPanel(Mode.EXPORT);
     }
     return selectDirPanel;
   }

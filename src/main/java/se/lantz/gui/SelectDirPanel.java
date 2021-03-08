@@ -16,6 +16,8 @@ import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.filechooser.FileFilter;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,20 +26,26 @@ import se.lantz.util.FileManager;
 
 public class SelectDirPanel extends JPanel
 {
+  public enum Mode
+  {
+    CAROUSEL_IMPORT, GB_IMPORT, EXPORT
+  }
+
   private static final Logger logger = LoggerFactory.getLogger(SelectDirPanel.class);
   private static final String IMPORT_DIR_PROPERTY = "importDir";
+  private static final String GB_IMPORT_DIR_PROPERTY = "gbImportDir";
   private static final String EXPORT_DIR_PROPERTY = "exportDir";
   private JTextField dirTextField;
   private JButton selectDirButton;
 
   private File targetDirectory;
-  private boolean importMode = true;
+  private Mode mode = Mode.CAROUSEL_IMPORT;
 
   private String configuredDir = "";
 
-  public SelectDirPanel(boolean importMode)
+  public SelectDirPanel(Mode mode)
   {
-    this.importMode = importMode;
+    this.mode = mode;
     GridBagLayout gridBagLayout = new GridBagLayout();
     setLayout(gridBagLayout);
     GridBagConstraints gbc_dirTextField = new GridBagConstraints();
@@ -56,21 +64,32 @@ public class SelectDirPanel extends JPanel
     gbc_selectDirButton.gridx = 1;
     gbc_selectDirButton.gridy = 0;
     add(getSelectDirButton(), gbc_selectDirButton);
-    if (importMode)
+    switch (mode)
     {
+    case CAROUSEL_IMPORT:
       configuredDir = FileManager.getConfiguredProperties().getProperty(IMPORT_DIR_PROPERTY);
       if (configuredDir == null)
       {
         configuredDir = new File(".").getAbsolutePath();
       }
-    }
-    else
-    {
+      break;
+
+    case GB_IMPORT:
+      configuredDir = FileManager.getConfiguredProperties().getProperty(GB_IMPORT_DIR_PROPERTY);
+      if (configuredDir == null)
+      {
+        configuredDir = new File(".").getAbsolutePath();
+      }
+      break;
+    case EXPORT:
       configuredDir = FileManager.getConfiguredProperties().getProperty(EXPORT_DIR_PROPERTY);
       if (configuredDir == null)
       {
         configuredDir = new File("export").getAbsolutePath();
       }
+      break;
+    default:
+      break;
     }
     targetDirectory = new File(configuredDir);
     getDirTextField().setText(configuredDir);
@@ -97,13 +116,19 @@ public class SelectDirPanel extends JPanel
 
           public void actionPerformed(ActionEvent e)
           {
-            if (importMode)
+            switch (mode)
             {
+            case CAROUSEL_IMPORT:
               selectImportDirectory();
-            }
-            else
-            {
+              break;
+            case GB_IMPORT:
+              selectGbImportFile();
+              break;
+            case EXPORT:
               selectExportDirectory();
+              break;
+            default:
+              break;
             }
           }
         });
@@ -138,6 +163,35 @@ public class SelectDirPanel extends JPanel
       }
     }
   }
+  
+  private void selectGbImportFile()
+  {
+    final JFileChooser fileChooser = new JFileChooser();
+    fileChooser.setDialogTitle("Select a Gamebase database file (.mdb)");
+    fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+    FileFilter filter = new FileNameExtensionFilter(".mdb file", "mdb");
+    fileChooser.setFileFilter(filter);
+    fileChooser.setCurrentDirectory(new File(configuredDir));
+    int value = fileChooser.showDialog(this, "OK");
+    if (value == JFileChooser.APPROVE_OPTION)
+    {
+      if (checkSelectedGbDirectory(fileChooser.getSelectedFile().toPath()))
+      {
+        targetDirectory = fileChooser.getSelectedFile();
+        configuredDir = targetDirectory.toPath().toString();
+        FileManager.getConfiguredProperties().put(GB_IMPORT_DIR_PROPERTY, configuredDir);
+        getDirTextField().setText(configuredDir);
+      }
+      else
+      {
+        JOptionPane
+          .showMessageDialog(this,
+                             "The selected directory doesn't contain a valid Gamebase database, the file \"Paths.ini\" is missing.",
+                             "Import Gamebase games",
+                             JOptionPane.ERROR_MESSAGE);
+      }
+    }
+  }
 
   private void selectExportDirectory()
   {
@@ -158,6 +212,12 @@ public class SelectDirPanel extends JPanel
   public File getTargetDirectory()
   {
     return targetDirectory;
+  }
+  
+  private boolean checkSelectedGbDirectory(Path gbFile)
+  {
+    Path iniPath = gbFile.getParent().resolve("Paths.ini");
+    return Files.exists(iniPath);
   }
 
   private boolean checkSelectedFolder(Path folder)

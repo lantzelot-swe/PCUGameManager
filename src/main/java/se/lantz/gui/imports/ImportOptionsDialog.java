@@ -25,7 +25,7 @@ public class ImportOptionsDialog extends BaseDialog
     else
     {
       setTitle("Import games from Gamebase");
-      this.setPreferredSize(new Dimension(450,600));
+      this.setPreferredSize(new Dimension(450,420));
     }
     addContent(getImportOptionsPanel());
     getOkButton().setText("Import");

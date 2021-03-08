@@ -16,6 +16,7 @@ import javax.swing.JCheckBox;
 
 import se.lantz.gamebase.GamebaseOptions;
 import se.lantz.gui.SelectDirPanel;
+import se.lantz.gui.SelectDirPanel.Mode;
 
 public class ImportOptionsPanel extends JPanel
 {
@@ -148,7 +149,7 @@ public class ImportOptionsPanel extends JPanel
   }
   private SelectDirPanel getSelectDirPanel() {
     if (selectDirPanel == null) {
-    	selectDirPanel = new SelectDirPanel(true);
+    	selectDirPanel = new SelectDirPanel(Mode.CAROUSEL_IMPORT);
     }
     return selectDirPanel;
   }
@@ -163,7 +164,7 @@ public class ImportOptionsPanel extends JPanel
   
   private JLabel getSelectDirLabel() {
     if (selectDirLabel == null) {
-      String text = isCarouselImport ? "Select a directory containing a game carousel:" : "Select the gamebase database directory:"; 
+      String text = isCarouselImport ? "Select a directory containing a game carousel:" : "Select a gamebase database file (.mdb):"; 
     	selectDirLabel = new JLabel(text);
     }
     return selectDirLabel;
