@@ -44,7 +44,7 @@ public class ImportOptionsPanel extends JPanel
     setLayout(gridBagLayout);
     GridBagConstraints gbc_selectDirPanel = new GridBagConstraints();
     gbc_selectDirPanel.weightx = 1.0;
-    gbc_selectDirPanel.insets = new Insets(0, 0, 5, 0);
+    gbc_selectDirPanel.insets = new Insets(0, 5, 5, 10);
     gbc_selectDirPanel.fill = GridBagConstraints.BOTH;
     gbc_selectDirPanel.gridx = 0;
     gbc_selectDirPanel.gridy = 1;
@@ -79,7 +79,7 @@ public class ImportOptionsPanel extends JPanel
     add(getMatchLabel(), gbc_matchLabel);
     GridBagConstraints gbc_selectDirLabel = new GridBagConstraints();
     gbc_selectDirLabel.weightx = 1.0;
-    gbc_selectDirLabel.insets = new Insets(10, 5, 5, 0);
+    gbc_selectDirLabel.insets = new Insets(10, 10, 0, 10);
     gbc_selectDirLabel.anchor = GridBagConstraints.NORTHWEST;
     gbc_selectDirLabel.gridx = 0;
     gbc_selectDirLabel.gridy = 0;

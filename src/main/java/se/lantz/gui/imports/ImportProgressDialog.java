@@ -39,6 +39,7 @@ public class ImportProgressDialog extends JDialog
   {
     getImportProgressPanel().finish();
     getImportProgressPanel().getCancelButton().setText("Close");
+    getImportProgressPanel().getCancelButton().setEnabled(true);
     getImportProgressPanel().getCancelButton().addActionListener(e -> setVisible(false));
   }
 
@@ -47,7 +48,10 @@ public class ImportProgressDialog extends JDialog
     if (panel == null)
     {
       panel = new ImportProgressPanel();
-      panel.getCancelButton().addActionListener(e -> cancelled = true);
+      panel.getCancelButton().addActionListener(e -> {
+        cancelled = true;
+        panel.getCancelButton().setEnabled(false);
+      });
     }
     return panel;
   }

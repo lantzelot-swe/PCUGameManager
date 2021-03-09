@@ -22,7 +22,8 @@ public class GamebaseImportWorker extends AbstractImportWorker
   @Override
   protected Void doInBackground() throws Exception
   {
-    publish("Reading from gamebase db... this may take a while, be patient!");
+    progressValueString = "Querying gamebase db...";
+    publish("Reading from gamebase db... this may take a while, be patient!");   
     publish(gbInporter.importFromGamebase().toString());
     progressValueString = "Checking game files...";
     
@@ -40,7 +41,7 @@ public class GamebaseImportWorker extends AbstractImportWorker
         return null;
       }
       progressValue++;
-      progressValueString = String.format("Checking game files (%s of %s)", progressValue, progressMaximum);
+      progressValueString = String.format("Checking game files (batch %s of %s)", progressValue, progressMaximum);
       publish(gbInporter.checkGameFileForGbGames(gbInfoList).toString());    
     }
     
@@ -69,7 +70,7 @@ public class GamebaseImportWorker extends AbstractImportWorker
       }
       chunkCount++;
       progressValue++;
-      progressValueString = String.format("Importing to db and copying files (%s of %s)", progressValue, progressMaximum);
+      progressValueString = String.format("Importing to db and copying files (batch %s of %s)", progressValue, progressMaximum);
       //Copy the list to avoid modifying it when reading several chunks
       ArrayList<String> copyList = new ArrayList<>();
       copyList.addAll(rowList);

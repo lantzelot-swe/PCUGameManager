@@ -387,17 +387,23 @@ public class MenuManager
     if (optionsDialog.showDialog())
     {
       //Set selected option in gamebaseImporter from the dialog.
-      gamebaseImporter.setImportOptions(optionsDialog.getSelectedGbOptions());
-      //Set options for how to handle games during import
-      importManager.setSelectedOption(optionsDialog.getSelectedOption());
-      importManager.setAddAsFavorite(optionsDialog.getMarkAsFavorite());
-      ImportProgressDialog dialog = new ImportProgressDialog(this.mainWindow);
-      GamebaseImportWorker worker = new GamebaseImportWorker(gamebaseImporter, importManager, dialog);
-      worker.execute();
-      dialog.setVisible(true);
-      //Refresh current game view after import
-      uiModel.reloadCurrentGameView();
-      MainWindow.getInstance().repaintAfterModifications();
+      if (gamebaseImporter.setImportOptions(optionsDialog.getSelectedGbOptions()))
+      {
+        //Set options for how to handle games during import
+        importManager.setSelectedOption(optionsDialog.getSelectedOption());
+        importManager.setAddAsFavorite(optionsDialog.getMarkAsFavorite());
+        ImportProgressDialog dialog = new ImportProgressDialog(this.mainWindow);
+        GamebaseImportWorker worker = new GamebaseImportWorker(gamebaseImporter, importManager, dialog);
+        worker.execute();
+        dialog.setVisible(true);
+        //Refresh current game view after import
+        uiModel.reloadCurrentGameView();
+        MainWindow.getInstance().repaintAfterModifications();
+      }
+      else
+      {
+        JOptionPane.showMessageDialog(mainWindow, "Could not read Paths.ini, see log for details.", "Error", JOptionPane.ERROR_MESSAGE);
+      }
     }
   }
 

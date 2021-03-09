@@ -316,7 +316,7 @@ public class FileManager
     }
     // Do the conversion
     List<Character> forbiddenCharsList =
-      " ,:'’-.!+*<>()/[]".chars().mapToObj(item -> (char) item).collect(Collectors.toList());
+      " ,:'’-.!+*<>()/[]?".chars().mapToObj(item -> (char) item).collect(Collectors.toList());
 
     List<Character> newName =
       title.chars().mapToObj(item -> (char) item).filter(character -> !forbiddenCharsList.contains(character))

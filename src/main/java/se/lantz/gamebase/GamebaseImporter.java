@@ -4,13 +4,17 @@ import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import com.google.common.collect.Lists;
@@ -30,8 +34,9 @@ public class GamebaseImporter
   }
 
   private final ImportManager importManager;
-  //Just for test
+  //Path to to .mdb file
   private Path gbDatabasePath;
+  //Path to parent where games, screens and extras are
   private Path gbParentPath;
   private boolean isC64 = true;
 
@@ -47,14 +52,38 @@ public class GamebaseImporter
     importManager = null;
   }
 
-  public void setImportOptions(GamebaseOptions options)
+  public boolean setImportOptions(GamebaseOptions options)
   {
-     this.gbDatabasePath = options.getGamebaseDbFile();
-     //TODO: Read Paths.ini and set directories for games, screens and extras based on that.
-     gbParentPath = gbDatabasePath.getParent();
+     this.gbDatabasePath = options.getGamebaseDbFile();    
      this.isC64 = options.isC64();
      this.selectedOption = options.getSelectedOption();
      this.titleQueryString = options.getTitleQueryString();
+     return readPathsIni();
+  }
+  
+  /**
+   * This assumes that Games, Screenshots and Extras are located in the same parent folder. 
+   */
+  private boolean readPathsIni()
+  {
+    try
+    {
+      Path iniFile = this.gbDatabasePath.getParent().resolve("Paths.ini");
+      List<String> lines = Files.readAllLines(iniFile, StandardCharsets.ISO_8859_1);
+      for (String line : lines)
+      {
+        if (line.startsWith("1="))
+        {
+          this.gbParentPath = Paths.get(line.substring(2)).getParent();
+          return true;
+        }
+      }  
+    }
+    catch (IOException e)
+    {
+      ExceptionHandler.handleException(e, "Could not read file Paths.ini");
+    }
+    return false;
   }
 
   public StringBuilder importFromGamebase()
@@ -63,13 +92,19 @@ public class GamebaseImporter
     StringBuilder builder = new StringBuilder();
     //Use the folder where the gamebase mdb file is located in the import manager
     importManager.setSelectedFolder(gbParentPath);
-    //Just for test, use gbDatabasePath - "jdbc:ucanaccess:" + gbDatabasePath.toString()
-    String vic20Test = "jdbc:ucanaccess://C://GameBase//Vic20_v03//Vic20_v03.mdb";
 
     String databaseURL = "jdbc:ucanaccess://" + gbDatabasePath.toString();
-
-//    databaseURL = databaseURL.replaceAll("\\\\", "//");
-
+    
+    //Ucanaccess does not worjk properly standalone if this is not added
+    try
+    {
+      Class.forName("net.ucanaccess.jdbc.UcanaccessDriver");
+    }
+    catch (ClassNotFoundException e1)
+    {
+      ExceptionHandler.handleException(e1, "");
+    }
+    
     try (Connection connection = DriverManager.getConnection(databaseURL))
     {
       Statement statement = connection.createStatement();

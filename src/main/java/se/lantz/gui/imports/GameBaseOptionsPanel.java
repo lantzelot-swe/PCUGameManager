@@ -204,7 +204,7 @@ public class GameBaseOptionsPanel extends JPanel
   }
   private JRadioButton getVic20RadioButton() {
     if (vic20RadioButton == null) {
-    	vic20RadioButton = new JRadioButton("VIC-20");
+    	vic20RadioButton = new JRadioButton("Vic-20");
     	systemButtonGroup.add(vic20RadioButton);
     }
     return vic20RadioButton;

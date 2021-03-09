@@ -3,6 +3,9 @@ package se.lantz;
 import java.awt.Dimension;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
@@ -44,6 +47,19 @@ public class PCUGameManager
       mainWindow.setVisible(true);
       mainWindow.setLocationRelativeTo(null);
       mainWindow.initialize();
+      
+      //Make sure all folders are available
+      try
+      {
+        Files.createDirectories(Paths.get("./screens/"));
+        Files.createDirectories(Paths.get("./covers/"));
+        Files.createDirectories(Paths.get("./games/"));
+      }
+      catch (IOException e)
+      {
+        // TODO Auto-generated catch block
+        e.printStackTrace();
+      }
     });
   }
 
