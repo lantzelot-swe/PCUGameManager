@@ -40,11 +40,12 @@ public class GamebaseImportWorker extends AbstractImportWorker
         return null;
       }
       progressValue++;
+      progressValueString = String.format("Checking game files (%s of %s)", progressValue, progressMaximum);
       publish(gbInporter.checkGameFileForGbGames(gbInfoList).toString());    
     }
     
     List<List<String>> dbRowReadChunks = importManager.getDbRowReadChunks();
-    progressValueString = "Importing to db, copying covers, screens and game files...";
+    progressValueString = "Importing to db and copying files...";
     progressMaximum = dbRowReadChunks.size() + 1;
     progressValue = 0;
     publish("Importing to db, copying covers, screens and game files...");
@@ -68,6 +69,7 @@ public class GamebaseImportWorker extends AbstractImportWorker
       }
       chunkCount++;
       progressValue++;
+      progressValueString = String.format("Importing to db and copying files (%s of %s)", progressValue, progressMaximum);
       //Copy the list to avoid modifying it when reading several chunks
       ArrayList<String> copyList = new ArrayList<>();
       copyList.addAll(rowList);
