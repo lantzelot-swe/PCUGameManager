@@ -247,12 +247,11 @@ public class MainViewModel extends AbstractModel
     {
       this.disableChangeNotification(true);
       logger.debug("Fetching games for view {}...", gameView);
-      gameListModel.clear();
+
+      long start = System.currentTimeMillis();
       List<GameListData> gamesList = dbConnector.fetchGamesByView(gameView);
-      for (GameListData gameListData : gamesList)
-      {
-        gameListModel.addElement(gameListData);
-      }
+      logger.debug("Fetched all games from db in " + (System.currentTimeMillis() - start) + " ms");
+      gameListModel.addAllGames(gamesList);
       gameView.setGameCount(gamesList.size());
       if (gameView.getGameViewId() == GameView.ALL_GAMES_ID)
       {

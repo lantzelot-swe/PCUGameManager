@@ -14,7 +14,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import com.google.common.collect.Lists;
@@ -109,10 +108,9 @@ public class GamebaseImporter
     {
       Statement statement = connection.createStatement();
   
-      String sql =
-        "SELECT Games.Name, Musicians.Musician, Genres.Genre, Publishers.Publisher, Games.Filename, Games.ScrnshotFilename, Years.Year, Games.GA_Id, Games.Control, Games.V_PalNTSC, Games.V_TrueDriveEmu, Games.Gemus\r\n" +
-          "FROM Years INNER JOIN (Publishers INNER JOIN ((Games INNER JOIN Musicians ON Games.MU_Id = Musicians.MU_Id) INNER JOIN Genres ON Games.GE_Id = Genres.GE_Id) ON Publishers.PU_Id = Games.PU_Id) ON Years.YE_Id = Games.YE_Id\r\n";
-
+      String sql = "SELECT Games.Name, Musicians.Musician, PGenres.ParentGenre, Publishers.Publisher, Games.Filename, Games.ScrnshotFilename, Years.Year, Games.GA_Id, Games.Control, Games.V_PalNTSC, Games.V_TrueDriveEmu, Games.Gemus\r\n" + 
+        "FROM PGenres INNER JOIN (Years INNER JOIN (Publishers INNER JOIN ((Games INNER JOIN Musicians ON Games.MU_Id = Musicians.MU_Id) INNER JOIN Genres ON Games.GE_Id = Genres.GE_Id) ON Publishers.PU_Id = Games.PU_Id) ON Years.YE_Id = Games.YE_Id) ON PGenres.PG_Id = Genres.PG_Id\r\n";
+        
       String condition = "";
       switch (selectedOption)
       {
@@ -139,14 +137,16 @@ public class GamebaseImporter
           String gamefile = result.getString("Filename");
           String screen1 = result.getString("ScrnShotFileName");
           String musician = result.getString("Musician");
-          String genre = result.getString("Genre");
+          String genre = result.getString("ParentGenre");
           String publisher = result.getString("Publisher");
           int control = result.getInt("Control");
           int palOrNtsc = result.getInt("V_PalNTSC");
           int trueDriveEmu = result.getInt("V_TrueDriveEmu");
           String gemus = result.getString("Gemus");
 
-          if (gamefile.isEmpty())
+          //GB64 includes game files for all games, no extras available. GbVic20 can have empty 
+          //game files but available TAP or CART images
+          if (isC64 && gamefile.isEmpty())
           {
             builder.append("Ignoring " + title + " (No game file available)\n");
             continue;
@@ -184,45 +184,28 @@ public class GamebaseImporter
           genre = GamebaseScraper.mapGenre(genre);
 
           //Get cover
-          String coverFile = "";
-          String coverSql =
-            "SELECT Extras.Name, Extras.Path\r\n" + "FROM Games INNER JOIN Extras ON Games.GA_Id = Extras.GA_Id\r\n" +
-              "WHERE (((Games.GA_Id)=" + gameId + ") AND ((Extras.Name) Like \"Cover*\"));";
-
-          ResultSet sqlResult = statement.executeQuery(coverSql);
-          if (sqlResult.next())
-          {
-            coverFile = sqlResult.getString("Path");
-          }
-          if (!coverFile.isEmpty())
-          {
-            coverFile = gbParentPath.toString() + "\\extras\\" + coverFile;
-          }
-
+          String coverFile = getCoverPath(gameId, statement);
+         
           //Get cartridge if available, easyflash is preferred
-          String cartridgeSql =
-            "SELECT Extras.Name, Extras.Path\r\n" + "FROM Games INNER JOIN Extras ON Games.GA_Id = Extras.GA_Id\r\n" +
-              "WHERE (((Games.GA_Id)=" + gameId + ") AND ((Extras.Name) Like \"*Cartridge*\"));";
-
-          sqlResult = statement.executeQuery(cartridgeSql);
-          String cartridgePath = "";
-          while (sqlResult.next())
-          {
-            if (cartridgePath.isEmpty())
-            {
-              cartridgePath = sqlResult.getString("Path");
-            }
-            //Pick easyflash if available
-            String name = sqlResult.getString("Name");
-            if (name.contains("EasyFlash"))
-            {
-              cartridgePath = sqlResult.getString("Path");
-            }
-          }
-
+          String cartridgePath = getCartridgePath(gameId, statement);          
           if (!cartridgePath.isEmpty())
           {
             gamefile = gbParentPath.toString() + "\\extras\\" + cartridgePath;
+          }
+          //Check tap for VIC-20
+          if (!isC64 && gamefile.isEmpty())
+          {
+            String tapFile = getTapPath(gameId, statement);
+            if (!tapFile.isEmpty())
+            {
+              gamefile = gbParentPath.toString() + "\\extras\\" + tapFile;
+            }
+            
+            if (gamefile.isEmpty())
+            {
+              builder.append("Ignoring " + title + " (No game file available)\n");
+              continue;
+            }
           }
 
           GbGameInfo info = new GbGameInfo(title,
@@ -256,6 +239,85 @@ public class GamebaseImporter
     }
     return builder;
   }
+  
+  private String getCoverPath(int gameId, Statement statement) throws SQLException
+  {
+    String coverFile = "";
+    String coverSql =
+      "SELECT Extras.Name, Extras.Path, Extras.DisplayOrder\r\n" + "FROM Games INNER JOIN Extras ON Games.GA_Id = Extras.GA_Id\r\n" +
+        "WHERE (((Games.GA_Id)=" + gameId + ") AND ((Extras.Name) Like \"Cover*\"));";
+
+    ResultSet sqlResult = statement.executeQuery(coverSql);
+    int displayOrder = -1;
+    //Get the one with the lowest display order (probably the best one)
+    while (sqlResult.next())
+    {
+      int currentDisplayOrder = sqlResult.getInt("DisplayOrder");
+      if (displayOrder == -1 || currentDisplayOrder < displayOrder)
+      {
+        displayOrder = currentDisplayOrder;
+        coverFile = sqlResult.getString("Path");
+      }
+    }
+    if (!coverFile.isEmpty())
+    {
+      coverFile = gbParentPath.toString() + "\\extras\\" + coverFile;
+    }
+    return coverFile;
+  }
+  
+  private String getCartridgePath(int gameId, Statement statement) throws SQLException
+  {
+    //Get cartridge if available, easyflash is preferred
+    String cartridgeSql =
+      "SELECT Extras.Name, Extras.Path\r\n" + "FROM Games INNER JOIN Extras ON Games.GA_Id = Extras.GA_Id\r\n" +
+        "WHERE (((Games.GA_Id)=" + gameId + ") AND ((Extras.Name) Like ";
+    
+    if (isC64)
+    {
+      cartridgeSql = cartridgeSql + "\"*Cartridge*\"));";
+    }
+    else
+    {
+      cartridgeSql = cartridgeSql + "\"*CART\"));";
+    }
+    
+    ResultSet sqlResult = statement.executeQuery(cartridgeSql);
+    String cartridgePath = "";
+    while (sqlResult.next())
+    {
+      if (cartridgePath.isEmpty())
+      {
+        cartridgePath = sqlResult.getString("Path");
+      }
+      //Pick easyflash if available
+      String name = sqlResult.getString("Name");
+      if (name.contains("EasyFlash"))
+      {
+        cartridgePath = sqlResult.getString("Path");
+      }
+    }
+    return cartridgePath;
+  }
+  
+  private String getTapPath(int gameId, Statement statement) throws SQLException
+  {
+    //Get TAP file
+    String tapSql =
+      "SELECT Extras.Name, Extras.Path\r\n" + "FROM Games INNER JOIN Extras ON Games.GA_Id = Extras.GA_Id\r\n" +
+        "WHERE (((Games.GA_Id)=" + gameId + ") AND ((Extras.Name) Like \"*TAP*\"));";
+    
+    ResultSet sqlResult = statement.executeQuery(tapSql);
+    String cartridgePath = "";
+    if (sqlResult.next())
+    {
+      if (cartridgePath.isEmpty())
+      {
+        cartridgePath = sqlResult.getString("Path");
+      }
+    }
+    return cartridgePath;
+  }
 
   public List<List<GbGameInfo>> getGbGameInfoChunks()
   {
@@ -281,7 +343,8 @@ public class GamebaseImporter
                                               gbGameInfo.getScreen2(),
                                               gbGameInfo.getJoy1config(),
                                               gbGameInfo.getJoy2config(),
-                                              gbGameInfo.getAdvanced());
+                                              gbGameInfo.getAdvanced(),
+                                              isC64);
       }
       catch (Exception e)
       {
@@ -348,5 +411,6 @@ public class GamebaseImporter
   public void clearAfterImport()
   {
     gbGameInfoList.clear();
+    FileManager.deleteTempFolder();
   }
 }

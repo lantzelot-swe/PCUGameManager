@@ -18,8 +18,13 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.jar.Attributes;
 import java.util.jar.Manifest;
 import java.util.stream.Collectors;
@@ -56,7 +61,7 @@ public class FileManager
   private MainViewModel model;
   private InfoModel infoModel;
   private SystemModel systemModel;
-  
+  private static ExecutorService executor = Executors.newSingleThreadExecutor();
   static
   {
     try
@@ -327,7 +332,7 @@ public class FileManager
       //Just add the duplicate index if there are several games with the same name
       newNameString = newNameString + "0" + duplicateIndex;
     }
-    
+
     logger.debug("Game title: \"{}\" ---- New fileName: \"{}\"", title, newNameString);
     return newNameString;
   }
@@ -479,37 +484,40 @@ public class FileManager
 
     if (appendGame)
     {
+
       //Append game file
       Path gamePath = infoModel.getGamesPath();
       if (gamePath != null)
       {
-        if (gamePath.toString().contains("crt"))
-        {
-          command.append("-cartcrt \"" + gamePath.toString() + "\"");
-        }
-        else
-        {
-          command.append("-autostart \"" + gamePath.toString() + "\"");
-        }
+        appendCorrectFlagForGameFile(gamePath.toString(), command);
+        //        if (gamePath.toString().contains("crt"))
+        //        {
+        //          command.append("-cartcrt \"" + gamePath.toString() + "\"");
+        //        }
+        //        else
+        //        {
+        //          command.append("-autostart \"" + gamePath.toString() + "\"");
+        //        }
       }
       else
       {
-        //For Vic-20 treat prg's as carts. TODO: many cart alternatives for Vic-20, see GEMUS for GB-VIC20.
-        if (!systemModel.isC64() && gameFile.contains("prg"))
-        {
-          command.append("-cartA \"" + gameFile + "\"");
-        }
-        else
-        {
-          if (gameFile.contains("crt"))
-          {
-            command.append("-cartcrt \"" + decompressIfNeeded(gameFile) + "\"");
-          }
-          else
-          {
-            command.append("-autostart \"" + gameFile + "\"");
-          }
-        }
+        appendCorrectFlagForGameFile(gameFile, command);
+        //        //For Vic-20 treat prg's as carts. TODO: many cart alternatives for Vic-20, see GEMUS for GB-VIC20.
+        //        if (!systemModel.isC64() && gameFile.contains("prg"))
+        //        {
+        //          command.append("-cartA \"" + gameFile + "\"");
+        //        }
+        //        else
+        //        {
+        //          if (gameFile.contains("crt"))
+        //          {
+        //            command.append("-cartcrt \"" + decompressIfNeeded(gameFile) + "\"");
+        //          }
+        //          else
+        //          {
+        //            command.append("-autostart \"" + gameFile + "\"");
+        //          }
+        //        }
       }
     }
 
@@ -558,10 +566,62 @@ public class FileManager
     }
   }
 
+  private void appendCorrectFlagForGameFile(String gameFile, StringBuilder command)
+  {
+    Map<String, String> nameToFlagMap = new HashMap<>();
+    nameToFlagMap.put("a0", "-cartA ");
+    nameToFlagMap.put("a0", "-cartA ");
+    if (!systemModel.isC64())
+    {
+      //VIC-20
+      if (gameFile.contains("crt"))
+      {
+        //Get the file flag
+        String fileFlag = gameFile.substring(gameFile.lastIndexOf("-") + 1, gameFile.indexOf("crt.gz") - 1);
+        if (fileFlag.contains("a0"))
+        {
+          command.append("-cartA \"" + gameFile + "\"");
+        }
+        else if (fileFlag.contains("b0"))
+        {
+          command.append("-cartB \"" + gameFile + "\"");
+        }
+        else if (fileFlag.contains("20"))
+        {
+          command.append("-cart2 \"" + gameFile + "\"");
+        }
+        else if (fileFlag.contains("40"))
+        {
+          command.append("-cart4 \"" + gameFile + "\"");
+        }
+        else if (fileFlag.contains("60"))
+        {
+          command.append("-cart6 \"" + gameFile + "\"");
+        }
+      }
+      else
+      {
+          command.append("-autostart \"" + decompressIfNeeded(gameFile) + "\"");
+      }
+    }
+    else
+    {
+      //C64
+      if (gameFile.contains("crt"))
+      {
+        command.append("-cartcrt \"" + decompressIfNeeded(gameFile) + "\"");
+      }
+      else
+      {
+        command.append("-autostart \"" + gameFile + "\"");
+      }
+    }
+  }
+
   private String decompressIfNeeded(String path)
   {
     String returnPath = path;
-    if (path.contains("crt.gz") || path.contains("CRT.gz"))
+    if (path.contains("crt.gz") || path.contains("CRT.gz") || path.contains("prg.gz"))
     {
       Path targetFile = Paths.get("./temp/" + path.substring(path.lastIndexOf("/") + 1, path.lastIndexOf(".")));
       try
@@ -572,7 +632,7 @@ public class FileManager
       }
       catch (IOException e)
       {
-        ExceptionHandler.handleException(e, "Could not decomrpess file: " + path);
+        ExceptionHandler.handleException(e, "Could not decompress file: " + path);
       }
     }
     return returnPath;
@@ -704,7 +764,8 @@ public class FileManager
   {
     for (File file : dir.listFiles())
     {
-      if (!file.isDirectory() && (deleteAll || !(file.getName().contains("THEC64") || file.getName().contains("VIC20"))))
+      if (!file.isDirectory() &&
+        (deleteAll || !(file.getName().contains("THEC64") || file.getName().contains("VIC20"))))
       {
         file.delete();
       }
@@ -845,21 +906,24 @@ public class FileManager
     return returnValue;
   }
 
-  public static void deleteTempFolder()
+  public static Future<?> deleteTempFolder()
   {
-    try
-    {
-      if (Files.exists(TEMP_PATH))
+    //Delete temp folder. It may be very large, do it in a separate thread
+    return executor.submit(() -> {
+      try
       {
-        Files.walk(TEMP_PATH).sorted(Comparator.reverseOrder()).map(Path::toFile).forEach(File::delete);
+        if (Files.exists(TEMP_PATH))
+        {
+          Files.walk(TEMP_PATH).sorted(Comparator.reverseOrder()).map(Path::toFile).forEach(File::delete);
+        }
       }
-    }
-    catch (IOException e)
-    {
-      ExceptionHandler.handleException(e, "Could not delete temp folder");
-    }
+      catch (IOException e)
+      {
+        ExceptionHandler.logException(e, "Could not delete temp folder");
+      }
+    });
   }
-  
+
   public static void scaleCoverImageAndSave(Path coverImagePath)
   {
     try
@@ -878,7 +942,7 @@ public class FileManager
       ExceptionHandler.handleException(e, "Could not scale and cover");
     }
   }
-  
+
   public static void scaleScreenshotImageAndSave(Path screenshotImagePath)
   {
     try

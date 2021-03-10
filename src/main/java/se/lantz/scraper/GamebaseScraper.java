@@ -168,7 +168,7 @@ public class GamebaseScraper implements Scraper
     //Map towards available genres, return first one found
     for (Map.Entry<String, String> entry : genreMap.entrySet())
     {
-      if (entry.getKey().contains(parentGenre))
+      if (entry.getKey().toLowerCase().contains(parentGenre.toLowerCase()))
       {
         return entry.getValue();
       }

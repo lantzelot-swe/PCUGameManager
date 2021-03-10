@@ -337,7 +337,8 @@ public class ImportManager
                                       String screen2file,
                                       String joy1config,
                                       String joy2config,
-                                      String advanced)
+                                      String advanced,
+                                      boolean isC64)
   {
     //Generate proper names for files
     int duplicateIndex = getDuplicateIndexForImportedGame(title);
@@ -348,6 +349,11 @@ public class ImportManager
     //Ignore first "." when finding file ending
     String strippedGameFile = gamefile.substring(1);
     String fileEnding = strippedGameFile.substring(strippedGameFile.indexOf("."));
+    if (!isC64 && fileEnding.contains(".crt"))
+    {
+      //A Vic-20 cartridge. Add the flag indicating the cartridge type to the name
+      fileEnding = strippedGameFile.substring(strippedGameFile.indexOf("-"));
+    }
     String newGamefile = fileName + fileEnding;
     addToDbRowList(title,
                    year,

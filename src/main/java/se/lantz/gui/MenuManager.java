@@ -8,6 +8,10 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
@@ -37,6 +41,7 @@ import se.lantz.manager.RestoreManager;
 import se.lantz.model.MainViewModel;
 import se.lantz.model.data.GameListData;
 import se.lantz.model.data.GameView;
+import se.lantz.util.ExceptionHandler;
 import se.lantz.util.FileManager;
 import se.lantz.util.VersionChecker;
 
@@ -261,7 +266,15 @@ public class MenuManager
       }
       //Save properties before exit
       FileManager.storeProperties();
-      FileManager.deleteTempFolder();
+      Future<?> deleteTempFolder = FileManager.deleteTempFolder();
+      try
+      {
+        deleteTempFolder.get(10, TimeUnit.SECONDS);
+      }
+      catch (Exception e1)
+      {
+        ExceptionHandler.logException(e1, "Could not delete temp folder");
+      }
       System.exit(0);
     });
     return exitItem;
