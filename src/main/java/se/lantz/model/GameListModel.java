@@ -26,6 +26,7 @@ public class GameListModel extends DefaultListModel<GameListData>
   
   void addAllGames(List<GameListData> gamesList) 
   {
+    //Disable event fireing when adding multiple games 
     clear();
     disableIntervalChange = true;
     for (GameListData gameListData : gamesList)

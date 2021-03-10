@@ -41,7 +41,7 @@ public class GamebaseImporter
 
   private String joyBase = ":JU,JD,JL,JR,JF,JF,SP,EN,,F1,F3,F5,,,";
   private List<GbGameInfo> gbGameInfoList = new ArrayList<>();
-  
+
   private Options selectedOption = Options.FAVORITES;
   private String titleQueryString = "";
 
@@ -53,15 +53,15 @@ public class GamebaseImporter
 
   public boolean setImportOptions(GamebaseOptions options)
   {
-     this.gbDatabasePath = options.getGamebaseDbFile();    
-     this.isC64 = options.isC64();
-     this.selectedOption = options.getSelectedOption();
-     this.titleQueryString = options.getTitleQueryString();
-     return readPathsIni();
+    this.gbDatabasePath = options.getGamebaseDbFile();
+    this.isC64 = options.isC64();
+    this.selectedOption = options.getSelectedOption();
+    this.titleQueryString = options.getTitleQueryString();
+    return readPathsIni();
   }
-  
+
   /**
-   * This assumes that Games, Screenshots and Extras are located in the same parent folder. 
+   * This assumes that Games, Screenshots and Extras are located in the same parent folder.
    */
   private boolean readPathsIni()
   {
@@ -76,7 +76,7 @@ public class GamebaseImporter
           this.gbParentPath = Paths.get(line.substring(2)).getParent();
           return true;
         }
-      }  
+      }
     }
     catch (IOException e)
     {
@@ -93,8 +93,8 @@ public class GamebaseImporter
     importManager.setSelectedFolder(gbParentPath);
 
     String databaseURL = "jdbc:ucanaccess://" + gbDatabasePath.toString();
-    
-    //Ucanaccess does not worjk properly standalone if this is not added
+
+    //Ucanaccess does not work properly in standalone if this is not added
     try
     {
       Class.forName("net.ucanaccess.jdbc.UcanaccessDriver");
@@ -103,14 +103,15 @@ public class GamebaseImporter
     {
       ExceptionHandler.handleException(e1, "");
     }
-    
+
     try (Connection connection = DriverManager.getConnection(databaseURL))
     {
       Statement statement = connection.createStatement();
-  
-      String sql = "SELECT Games.Name, Musicians.Musician, PGenres.ParentGenre, Publishers.Publisher, Games.Filename, Games.ScrnshotFilename, Years.Year, Games.GA_Id, Games.Control, Games.V_PalNTSC, Games.V_TrueDriveEmu, Games.Gemus\r\n" + 
-        "FROM PGenres INNER JOIN (Years INNER JOIN (Publishers INNER JOIN ((Games INNER JOIN Musicians ON Games.MU_Id = Musicians.MU_Id) INNER JOIN Genres ON Games.GE_Id = Genres.GE_Id) ON Publishers.PU_Id = Games.PU_Id) ON Years.YE_Id = Games.YE_Id) ON PGenres.PG_Id = Genres.PG_Id\r\n";
-        
+
+      String sql =
+        "SELECT Games.Name, Musicians.Musician, PGenres.ParentGenre, Publishers.Publisher, Games.Filename, Games.ScrnshotFilename, Years.Year, Games.GA_Id, Games.Control, Games.V_PalNTSC, Games.V_TrueDriveEmu, Games.Gemus\r\n" +
+          "FROM PGenres INNER JOIN (Years INNER JOIN (Publishers INNER JOIN ((Games INNER JOIN Musicians ON Games.MU_Id = Musicians.MU_Id) INNER JOIN Genres ON Games.GE_Id = Genres.GE_Id) ON Publishers.PU_Id = Games.PU_Id) ON Years.YE_Id = Games.YE_Id) ON PGenres.PG_Id = Genres.PG_Id\r\n";
+
       String condition = "";
       switch (selectedOption)
       {
@@ -123,7 +124,7 @@ public class GamebaseImporter
         break;
       }
       sql = sql + condition;
-      
+
       ResultSet result = statement.executeQuery(sql);
       int gameCount = 0;
       while (result.next())
@@ -185,9 +186,9 @@ public class GamebaseImporter
 
           //Get cover
           String coverFile = getCoverPath(gameId, statement);
-         
+
           //Get cartridge if available, easyflash is preferred
-          String cartridgePath = getCartridgePath(gameId, statement);          
+          String cartridgePath = getCartridgePath(gameId, statement);
           if (!cartridgePath.isEmpty())
           {
             gamefile = gbParentPath.toString() + "\\extras\\" + cartridgePath;
@@ -200,7 +201,7 @@ public class GamebaseImporter
             {
               gamefile = gbParentPath.toString() + "\\extras\\" + tapFile;
             }
-            
+
             if (gamefile.isEmpty())
             {
               builder.append("Ignoring " + title + " (No game file available)\n");
@@ -239,13 +240,13 @@ public class GamebaseImporter
     }
     return builder;
   }
-  
+
   private String getCoverPath(int gameId, Statement statement) throws SQLException
   {
     String coverFile = "";
-    String coverSql =
-      "SELECT Extras.Name, Extras.Path, Extras.DisplayOrder\r\n" + "FROM Games INNER JOIN Extras ON Games.GA_Id = Extras.GA_Id\r\n" +
-        "WHERE (((Games.GA_Id)=" + gameId + ") AND ((Extras.Name) Like \"Cover*\"));";
+    String coverSql = "SELECT Extras.Name, Extras.Path, Extras.DisplayOrder\r\n" +
+      "FROM Games INNER JOIN Extras ON Games.GA_Id = Extras.GA_Id\r\n" + "WHERE (((Games.GA_Id)=" + gameId +
+      ") AND ((Extras.Name) Like \"Cover*\"));";
 
     ResultSet sqlResult = statement.executeQuery(coverSql);
     int displayOrder = -1;
@@ -265,14 +266,14 @@ public class GamebaseImporter
     }
     return coverFile;
   }
-  
+
   private String getCartridgePath(int gameId, Statement statement) throws SQLException
   {
     //Get cartridge if available, easyflash is preferred
     String cartridgeSql =
       "SELECT Extras.Name, Extras.Path\r\n" + "FROM Games INNER JOIN Extras ON Games.GA_Id = Extras.GA_Id\r\n" +
         "WHERE (((Games.GA_Id)=" + gameId + ") AND ((Extras.Name) Like ";
-    
+
     if (isC64)
     {
       cartridgeSql = cartridgeSql + "\"*Cartridge*\"));";
@@ -281,7 +282,7 @@ public class GamebaseImporter
     {
       cartridgeSql = cartridgeSql + "\"*CART\"));";
     }
-    
+
     ResultSet sqlResult = statement.executeQuery(cartridgeSql);
     String cartridgePath = "";
     while (sqlResult.next())
@@ -299,14 +300,14 @@ public class GamebaseImporter
     }
     return cartridgePath;
   }
-  
+
   private String getTapPath(int gameId, Statement statement) throws SQLException
   {
     //Get TAP file
     String tapSql =
       "SELECT Extras.Name, Extras.Path\r\n" + "FROM Games INNER JOIN Extras ON Games.GA_Id = Extras.GA_Id\r\n" +
         "WHERE (((Games.GA_Id)=" + gameId + ") AND ((Extras.Name) Like \"*TAP*\"));";
-    
+
     ResultSet sqlResult = statement.executeQuery(tapSql);
     String cartridgePath = "";
     if (sqlResult.next())
@@ -348,8 +349,10 @@ public class GamebaseImporter
       }
       catch (Exception e)
       {
-        builder.append("Ignoring " + gbGameInfo.getTitle() + ", Could not check game file (file is corrupt?). Game is not imported.\n");
-        ExceptionHandler.logException(e, "Could not check game file for " + gbGameInfo.getTitle() + ", game is not imported");
+        builder.append("Ignoring " + gbGameInfo.getTitle() +
+          ", Could not check game file (file is corrupt?). Game is not imported.\n");
+        ExceptionHandler
+          .logException(e, "Could not check game file for " + gbGameInfo.getTitle() + ", game is not imported");
       }
     }
     return builder;
@@ -407,7 +410,7 @@ public class GamebaseImporter
     FileManager.compressGzip(selectedFile.toPath(), compressedFilePath);
     return compressedFilePath.toString();
   }
-  
+
   public void clearAfterImport()
   {
     gbGameInfoList.clear();

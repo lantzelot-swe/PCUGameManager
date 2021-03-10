@@ -33,6 +33,7 @@ public class ImportManager
    * The size of each chunk when importing games
    */
   public static final int DB_ROW_CHUNK_SIZE = 50;
+
   public enum Options
   {
     SKIP, OVERWRITE, ADD;
@@ -138,7 +139,7 @@ public class ImportManager
   {
     return uiModel.importGameInfo(rowList, selectedOption, addAsFavorite);
   }
- 
+
   private void extractInfoIntoRowString(List<String> fileLines, StringBuilder infoBuilder)
   {
     String title = "";
@@ -437,7 +438,7 @@ public class ImportManager
     int duplicateIndex = 0;
     if (selectedOption == Options.ADD)
     {
-      duplicateIndex = uiModel.getDbConnector().getGameDuplicateIndexToUse(title);     
+      duplicateIndex = uiModel.getDbConnector().getGameDuplicateIndexToUse(title);
     }
     //Check any duplicates in added rows, always use this otherwise duplicates uses same names.
     duplicateIndex = duplicateIndex + getDbRowDuplicate(title);
@@ -471,8 +472,7 @@ public class ImportManager
     }
     return lines;
   }
-  
-  
+
   public List<List<String>> getDbRowReadChunks()
   {
     return Lists.partition(dbRowDataList, DB_ROW_CHUNK_SIZE);
@@ -524,7 +524,7 @@ public class ImportManager
       //When importing from gamebase use current folder
       gamePath = new File(oldGameName).toPath();
     }
-    
+
     Path targetGamePath = Paths.get("./games/" + gameName);
 
     try

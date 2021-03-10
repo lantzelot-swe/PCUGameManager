@@ -8,10 +8,8 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
@@ -19,7 +17,6 @@ import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
 
 import se.lantz.gamebase.GamebaseImporter;
-import se.lantz.gamebase.GamebaseOptions;
 import se.lantz.gui.convertscreens.ConvertProgressDialog;
 import se.lantz.gui.convertscreens.ConvertWorker;
 import se.lantz.gui.dbbackup.BackupProgressDialog;
@@ -30,10 +27,10 @@ import se.lantz.gui.dbrestore.RestoreWorker;
 import se.lantz.gui.exports.ExportGamesDialog;
 import se.lantz.gui.exports.ExportProgressDialog;
 import se.lantz.gui.exports.ExportWorker;
-import se.lantz.gui.imports.ImportOptionsDialog;
-import se.lantz.gui.imports.ImportProgressDialog;
 import se.lantz.gui.imports.CarouselImportWorker;
 import se.lantz.gui.imports.GamebaseImportWorker;
+import se.lantz.gui.imports.ImportOptionsDialog;
+import se.lantz.gui.imports.ImportProgressDialog;
 import se.lantz.manager.BackupManager;
 import se.lantz.manager.ExportManager;
 import se.lantz.manager.ImportManager;
@@ -61,7 +58,7 @@ public class MenuManager
   private JMenuItem importGamebaseItem;
   private JMenuItem exportItem;
   private JMenuItem refreshItem;
-  
+
   private JMenuItem toggleFavoriteItem;
   private JMenuItem clearFavoritesItem;
 
@@ -211,7 +208,7 @@ public class MenuManager
     importCarouselItem.addActionListener(e -> importCarouselGames());
     return importCarouselItem;
   }
-  
+
   private JMenuItem getImportGamebaseItem()
   {
     importGamebaseItem = new JMenuItem("Import from Gamebase...");
@@ -221,7 +218,6 @@ public class MenuManager
     importGamebaseItem.addActionListener(e -> importGamebaseGames());
     return importGamebaseItem;
   }
-  
 
   private JMenuItem getExportItem()
   {
@@ -232,7 +228,7 @@ public class MenuManager
     exportItem.addActionListener(e -> exportGames());
     return exportItem;
   }
-  
+
   private JMenuItem getRefreshItem()
   {
     refreshItem = new JMenuItem("Reload current game view");
@@ -391,7 +387,7 @@ public class MenuManager
       MainWindow.getInstance().repaintAfterModifications();
     }
   }
-  
+
   private void importGamebaseGames()
   {
     ImportOptionsDialog optionsDialog = new ImportOptionsDialog(this.mainWindow, false);
@@ -415,7 +411,10 @@ public class MenuManager
       }
       else
       {
-        JOptionPane.showMessageDialog(mainWindow, "Could not read Paths.ini, see log for details.", "Error", JOptionPane.ERROR_MESSAGE);
+        JOptionPane.showMessageDialog(mainWindow,
+                                      "Could not read Paths.ini, see log for details.",
+                                      "Error",
+                                      JOptionPane.ERROR_MESSAGE);
       }
     }
   }
@@ -441,7 +440,7 @@ public class MenuManager
       }
     }
   }
-  
+
   private void reloadView()
   {
     this.mainWindow.reloadCurrentGameView();
