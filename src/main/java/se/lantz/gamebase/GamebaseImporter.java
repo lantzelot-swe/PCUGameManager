@@ -246,8 +246,16 @@ public class GamebaseImporter
     String coverFile = "";
     String coverSql = "SELECT Extras.Name, Extras.Path, Extras.DisplayOrder\r\n" +
       "FROM Games INNER JOIN Extras ON Games.GA_Id = Extras.GA_Id\r\n" + "WHERE (((Games.GA_Id)=" + gameId +
-      ") AND ((Extras.Name) Like \"Cover*\"));";
+      ") AND ((Extras.Name) Like ";
 
+    if (isC64)
+    {
+      coverSql = coverSql + "\"Cover*\"));";
+    }
+    else
+    {
+      coverSql = coverSql + "\"*Box Front\" OR (Extras.Name) Like \"*Inlay*\"));";
+    }
     ResultSet sqlResult = statement.executeQuery(coverSql);
     int displayOrder = -1;
     //Get the one with the lowest display order (probably the best one)

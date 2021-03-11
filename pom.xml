@@ -138,6 +138,7 @@
 							</jre>
 							<splash>
 								<file>target/classes/PCUGameManager.bmp</file>
+								<waitForWindow>true</waitForWindow>
 								<timeout>30</timeout>
 							</splash>
 							<icon>target/classes/Icon.ico</icon>
