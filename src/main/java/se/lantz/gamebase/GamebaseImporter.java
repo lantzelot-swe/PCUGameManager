@@ -306,7 +306,7 @@ public class GamebaseImporter
     //Get TAP file
     String tapSql =
       "SELECT Extras.Name, Extras.Path\r\n" + "FROM Games INNER JOIN Extras ON Games.GA_Id = Extras.GA_Id\r\n" +
-        "WHERE (((Games.GA_Id)=" + gameId + ") AND ((Extras.Name) Like \"*TAP*\"));";
+        "WHERE (((Games.GA_Id)=" + gameId + ") AND ((Extras.Name) Like \"TAP\"));";
 
     ResultSet sqlResult = statement.executeQuery(tapSql);
     String cartridgePath = "";
