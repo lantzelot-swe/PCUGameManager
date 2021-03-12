@@ -25,7 +25,7 @@ import se.lantz.util.FileManager;
 
 public class GamebaseImporter
 {
-  private final int CHUNK_SIZE = 100;
+  private static final int CHUNK_SIZE = 100;
 
   public enum Options
   {
@@ -94,7 +94,7 @@ public class GamebaseImporter
 
     String databaseURL = "jdbc:ucanaccess://" + gbDatabasePath.toString();
 
-    //Ucanaccess does not work properly in standalone if this is not added
+    //Ucanaccess does not work properly in standalone installation if this is not added
     try
     {
       Class.forName("net.ucanaccess.jdbc.UcanaccessDriver");
@@ -120,6 +120,7 @@ public class GamebaseImporter
         break;
       case QUERY:
         condition = "WHERE (((Games.Name) LIKE '" + titleQueryString + "'));";
+        break;
       default:
         break;
       }
@@ -317,15 +318,12 @@ public class GamebaseImporter
         "WHERE (((Games.GA_Id)=" + gameId + ") AND ((Extras.Name) Like \"TAP\"));";
 
     ResultSet sqlResult = statement.executeQuery(tapSql);
-    String cartridgePath = "";
+    String tapPath = "";
     if (sqlResult.next())
     {
-      if (cartridgePath.isEmpty())
-      {
-        cartridgePath = sqlResult.getString("Path");
-      }
+      tapPath = sqlResult.getString("Path");
     }
-    return cartridgePath;
+    return tapPath;
   }
 
   public List<List<GbGameInfo>> getGbGameInfoChunks()
@@ -395,8 +393,7 @@ public class GamebaseImporter
     String returnValue = "";
 
     String screen2 = screen1.substring(0, screen1.lastIndexOf(".")) + "_1.png";
-    File screen2File = new File(screen2);
-    if (screen2File.exists())
+    if (new File(screen2).exists())
     {
       returnValue = screen2;
     }
@@ -410,9 +407,7 @@ public class GamebaseImporter
 
   private String getFileToInclude(Path gbPath, String filenameInGb) throws IOException
   {
-    Path gamePath = gbPath.resolve("games").resolve(filenameInGb);
-    File gameFile = gamePath.toFile();
-
+    File gameFile = gbPath.resolve("games").resolve(filenameInGb).toFile();
     File selectedFile = FileManager.createTempFileForScraper(new BufferedInputStream(new FileInputStream(gameFile)));
     Path compressedFilePath = selectedFile.toPath().getParent().resolve(selectedFile.getName() + ".gz");
     FileManager.compressGzip(selectedFile.toPath(), compressedFilePath);
