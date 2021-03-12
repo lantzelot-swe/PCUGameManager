@@ -184,6 +184,10 @@ public class FilterPanel extends JPanel
       fieldTableComboBox.addItem(DbConstants.GENRE);
       fieldTableComboBox.addItem(DbConstants.YEAR);
       fieldTableComboBox.addItem(DbConstants.DESC);
+      fieldTableComboBox.addItem(DbConstants.DESC_DE);
+      fieldTableComboBox.addItem(DbConstants.DESC_ES);
+      fieldTableComboBox.addItem(DbConstants.DESC_FR);
+      fieldTableComboBox.addItem(DbConstants.DESC_IT);
       fieldTableComboBox.addItem(DbConstants.JOY1);
       fieldTableComboBox.addItem(DbConstants.JOY2);
       fieldTableComboBox.addItem(DbConstants.SYSTEM);
@@ -216,6 +220,8 @@ public class FilterPanel extends JPanel
     getOperatorTableComboBox().addItem(ViewFilter.ENDS_WITH_TEXT);
     getOperatorTableComboBox().addItem(ViewFilter.CONTAINS_TEXT);
     getOperatorTableComboBox().addItem(ViewFilter.EQUALS_TEXT);
+    getOperatorTableComboBox().addItem(ViewFilter.EMPTY);
+    getOperatorTableComboBox().addItem(ViewFilter.NOT_EMPTY);
   }
 
   private void addIntOperators()

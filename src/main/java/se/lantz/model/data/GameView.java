@@ -14,9 +14,9 @@ public class GameView implements Comparable
   private String name = "";
   private List<ViewFilter> viewFilters = new ArrayList<>();
   private String sqlQuery = "";
-  
+
   private int gameViewId;
-  
+
   private int gameCount = -1;
 
   public GameView(int gameViewId)
@@ -62,11 +62,11 @@ public class GameView implements Comparable
   public void setViewFilters(List<ViewFilter> viewFilters)
   {
     this.viewFilters = viewFilters;
-    
+
     //Divide depending on operator
     List<ViewFilter> andFiltersList = new ArrayList<>();
     List<ViewFilter> orFiltersList = new ArrayList<>();
-    
+
     for (ViewFilter viewFilter : viewFilters)
     {
       if (viewFilter.isAndOperator())
@@ -78,7 +78,7 @@ public class GameView implements Comparable
         orFiltersList.add(viewFilter);
       }
     }
-      
+
     StringBuilder builder = new StringBuilder();
     builder.append("WHERE ");
     int index = 0;
@@ -103,39 +103,53 @@ public class GameView implements Comparable
         builder.append(viewFilter.getFilterData());
         builder.append("'");
         break;
-        
-     case ViewFilter.CONTAINS_TEXT:
-       builder.append(" LIKE '%");
-       builder.append(viewFilter.getFilterData());
-       builder.append("%'");
+
+      case ViewFilter.CONTAINS_TEXT:
+        builder.append(" LIKE '%");
+        builder.append(viewFilter.getFilterData());
+        builder.append("%'");
+        break;
+
+      case ViewFilter.EQUALS_TEXT:
+        builder.append(" LIKE '");
+        builder.append(viewFilter.getFilterData());
+        builder.append("'");
+        break;
+
+      case ViewFilter.NOT_EMPTY:
+        builder.append(" <> ''");
         break;
         
-     case ViewFilter.IS:
-       builder.append(" = ");
-       //Handle Favorites where value is either true or false, mapped towards 1 and 0 in the db
-       if (viewFilter.getFilterData().equals("true"))
-       {
-         builder.append("1");
-       }
-       else if (viewFilter.getFilterData().equals("false"))
-       {
-         builder.append("0");
-       }
-       else
-       {
-         builder.append(viewFilter.getFilterData());
-       }
-       break;
-            
-     case ViewFilter.BEFORE:
-       builder.append(" < ");
-       builder.append(viewFilter.getFilterData());
-       break;
-       
-     case ViewFilter.AFTER:
-       builder.append(" > ");
-       builder.append(viewFilter.getFilterData());
-       break;
+      case ViewFilter.EMPTY:
+        builder.append(" = ''");
+        break;
+
+      case ViewFilter.IS:
+        builder.append(" = ");
+        //Handle Favorites where value is either true or false, mapped towards 1 and 0 in the db
+        if (viewFilter.getFilterData().equals("true"))
+        {
+          builder.append("1");
+        }
+        else if (viewFilter.getFilterData().equals("false"))
+        {
+          builder.append("0");
+        }
+        else
+        {
+          builder.append(viewFilter.getFilterData());
+        }
+        break;
+
+      case ViewFilter.BEFORE:
+        builder.append(" < ");
+        builder.append(viewFilter.getFilterData());
+        break;
+
+      case ViewFilter.AFTER:
+        builder.append(" > ");
+        builder.append(viewFilter.getFilterData());
+        break;
       default:
         logger.debug("Unexpected value: {}", viewFilter.getOperator());
         break;
@@ -167,27 +181,41 @@ public class GameView implements Comparable
         builder.append(viewFilter.getFilterData());
         builder.append("'");
         break;
-        
-     case ViewFilter.CONTAINS_TEXT:
-       builder.append(" LIKE '%");
-       builder.append(viewFilter.getFilterData());
-       builder.append("%'");
+
+      case ViewFilter.CONTAINS_TEXT:
+        builder.append(" LIKE '%");
+        builder.append(viewFilter.getFilterData());
+        builder.append("%'");
+        break;
+
+      case ViewFilter.EQUALS_TEXT:
+        builder.append(" LIKE '");
+        builder.append(viewFilter.getFilterData());
+        builder.append("'");
+        break;
+
+      case ViewFilter.NOT_EMPTY:
+        builder.append(" <> ''");
         break;
         
-     case ViewFilter.IS:
-       builder.append(" = ");
-       builder.append(viewFilter.getFilterData());
-       break;
-            
-     case ViewFilter.BEFORE:
-       builder.append(" < ");
-       builder.append(viewFilter.getFilterData());
-       break;
-       
-     case ViewFilter.AFTER:
-       builder.append(" > ");
-       builder.append(viewFilter.getFilterData());
-       break;
+      case ViewFilter.EMPTY:
+        builder.append(" = ''");
+        break;
+
+      case ViewFilter.IS:
+        builder.append(" = ");
+        builder.append(viewFilter.getFilterData());
+        break;
+
+      case ViewFilter.BEFORE:
+        builder.append(" < ");
+        builder.append(viewFilter.getFilterData());
+        break;
+
+      case ViewFilter.AFTER:
+        builder.append(" > ");
+        builder.append(viewFilter.getFilterData());
+        break;
       default:
         logger.debug("Unexpected value: {}", viewFilter.getOperator());
         break;
@@ -209,7 +237,7 @@ public class GameView implements Comparable
   {
     this.gameViewId = gameViewId;
   }
-  
+
   public void setGameCount(int count)
   {
     this.gameCount = count;

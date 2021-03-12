@@ -1,5 +1,6 @@
 package se.lantz.manager;
 
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -508,6 +509,8 @@ public class ImportManager
     oldScreen1Name = splittedForPaths[19];
     oldScreen2Name = splittedForPaths[20];
     oldGameName = splittedForPaths[21].split("\"")[0];
+    
+    String advanced = splittedForPaths[16];
 
     Path coverPath = srcCoversFolder.resolve(oldCoverName);
     Path targetCoverPath = Paths.get("./covers/" + coverName);
@@ -549,7 +552,8 @@ public class ImportManager
         //Use missing cover since none available
         try
         {
-          ImageIO.write(FileManager.emptyC64Cover, "png", targetCoverPath.toFile());
+          BufferedImage emptyCover = advanced.contains("vic") ? FileManager.emptyVic20Cover : FileManager.emptyC64Cover;
+          ImageIO.write(emptyCover, "png", targetCoverPath.toFile());
         }
         catch (IOException e)
         {
