@@ -384,6 +384,11 @@ public class MainViewModel extends AbstractModel
         int rowId = dbConnector.createNewGame(updatedGame);
         currentGameId = Integer.toString(rowId);
         selectedData.setGameId(currentGameId);
+        if (getSelectedGameView().getGameViewId() == GameView.FAVORITES_ID)
+        {
+          //Mark as favorites
+          toggleFavorite(selectedData);
+        }
       }
       else
       {
