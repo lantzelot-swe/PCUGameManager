@@ -193,6 +193,7 @@ public class FilterPanel extends JPanel
       fieldTableComboBox.addItem(DbConstants.SYSTEM);
       fieldTableComboBox.addItem(DbConstants.FAVORITE);
       fieldTableComboBox.addItem(DbConstants.GAME);
+      fieldTableComboBox.addItem(DbConstants.VIEW_TAG);
 
       fieldTableComboBox.addActionListener(e -> {
 

@@ -121,6 +121,8 @@ public class GameView implements Comparable
         break;
         
       case ViewFilter.EMPTY:
+        builder.append(" is null or ");
+        builder.append(viewFilter.getField());
         builder.append(" = ''");
         break;
 
@@ -199,6 +201,8 @@ public class GameView implements Comparable
         break;
         
       case ViewFilter.EMPTY:
+        builder.append(" is null or ");
+        builder.append(viewFilter.getField());
         builder.append(" = ''");
         break;
 

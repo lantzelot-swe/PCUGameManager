@@ -7,6 +7,8 @@ import java.awt.Image;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 import java.beans.Beans;
 import java.io.File;
@@ -30,6 +32,7 @@ import org.slf4j.LoggerFactory;
 import se.lantz.gui.screenshot.EditScreenshotDialog;
 import se.lantz.model.InfoModel;
 import se.lantz.model.MainViewModel;
+import se.lantz.util.CustomUndoPlainDocument;
 import se.lantz.util.ExceptionHandler;
 import se.lantz.util.FileDrop;
 import se.lantz.util.FileManager;
@@ -77,6 +80,8 @@ public class ScreenshotsPanel extends JPanel
   private JLabel resolution1Label;
   private JLabel resolution2Label;
   private MainViewModel model;
+  private JLabel viewTagLabel;
+  private JTextField viewTagTextField;
 
   public ScreenshotsPanel(MainViewModel model)
   {
@@ -135,6 +140,7 @@ public class ScreenshotsPanel extends JPanel
     }
     // Read from model
     getGameTextField().setText(getGameFileName());
+    getViewTagTextField().setText(infomodel.getViewTag());
     reloadScreens();
   }
 
@@ -529,6 +535,12 @@ public class ScreenshotsPanel extends JPanel
       gbc_gameLabel.gridx = 0;
       gbc_gameLabel.gridy = 0;
       gamePanel.add(getGameLabel(), gbc_gameLabel);
+      GridBagConstraints gbc_viewTagLabel = new GridBagConstraints();
+      gbc_viewTagLabel.anchor = GridBagConstraints.WEST;
+      gbc_viewTagLabel.insets = new Insets(12, 0, 0, 3);
+      gbc_viewTagLabel.gridx = 2;
+      gbc_viewTagLabel.gridy = 0;
+      gamePanel.add(getViewTagLabel(), gbc_viewTagLabel);
       GridBagConstraints gbc_gameTextField = new GridBagConstraints();
       gbc_gameTextField.anchor = GridBagConstraints.NORTHWEST;
       gbc_gameTextField.weighty = 1.0;
@@ -538,13 +550,20 @@ public class ScreenshotsPanel extends JPanel
       gbc_gameTextField.gridy = 1;
       gamePanel.add(getGameTextField(), gbc_gameTextField);
       GridBagConstraints gbc_gameButton = new GridBagConstraints();
+      gbc_gameButton.weightx = 1.0;
       gbc_gameButton.weighty = 1.0;
       gbc_gameButton.anchor = GridBagConstraints.NORTHWEST;
-      gbc_gameButton.weightx = 1.0;
       gbc_gameButton.insets = new Insets(0, 0, 10, 5);
       gbc_gameButton.gridx = 1;
       gbc_gameButton.gridy = 1;
       gamePanel.add(getGameButton(), gbc_gameButton);
+      GridBagConstraints gbc_viewTagTextField = new GridBagConstraints();
+      gbc_viewTagTextField.insets = new Insets(0, 0, 0, 3);
+      gbc_viewTagTextField.anchor = GridBagConstraints.NORTHWEST;
+      gbc_viewTagTextField.fill = GridBagConstraints.HORIZONTAL;
+      gbc_viewTagTextField.gridx = 2;
+      gbc_viewTagTextField.gridy = 1;
+      gamePanel.add(getViewTagTextField(), gbc_viewTagTextField);
     }
     return gamePanel;
   }
@@ -564,7 +583,7 @@ public class ScreenshotsPanel extends JPanel
     {
       gameTextField = new JTextField();
       gameTextField.setEditable(false);
-      gameTextField.setPreferredSize(new Dimension(130, 20));
+      gameTextField.setPreferredSize(new Dimension(155, 20));
       new FileDrop(gameTextField, new FileDrop.Listener()
         {
           public void filesDropped(java.io.File[] files)
@@ -829,5 +848,41 @@ public class ScreenshotsPanel extends JPanel
       resolution2Label = new JLabel(" ");
     }
     return resolution2Label;
+  }
+
+  private JLabel getViewTagLabel()
+  {
+    if (viewTagLabel == null)
+    {
+      viewTagLabel = new JLabel("View tag");
+    }
+    return viewTagLabel;
+  }
+
+  private JTextField getViewTagTextField()
+  {
+    if (viewTagTextField == null)
+    {
+      viewTagTextField = new JTextField();
+      viewTagTextField.setColumns(10);
+      viewTagTextField.setDocument(new CustomUndoPlainDocument()
+      {
+        @Override
+        public void updateModel()
+        {
+          infomodel.setViewTag(viewTagTextField.getText());
+        }
+      });
+      viewTagTextField.addKeyListener(new KeyAdapter()
+      {
+        @Override
+        public void keyReleased(KeyEvent e)
+        {
+          JTextField textField = (JTextField) e.getSource();
+          infomodel.setViewTag(textField.getText());
+        }
+      });
+    }
+    return viewTagTextField;
   }
 }

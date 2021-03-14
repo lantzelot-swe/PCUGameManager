@@ -94,6 +94,7 @@ public class DbConnector
     columnList.add(DbConstants.SYSTEM);
     columnList.add(DbConstants.VERTICALSHIFT);
     columnList.add(DbConstants.FAVORITE);
+    columnList.add(DbConstants.VIEW_TAG);
     //Check if database file exists, if not create an empty db.
     File dbFile = new File("./" + DB_NAME);
     if (!dbFile.exists())
@@ -134,14 +135,16 @@ public class DbConnector
     String addEsSql = "ALTER TABLE gameinfo ADD COLUMN Description_es STRING;";
     String addItSql = "ALTER TABLE gameinfo ADD COLUMN Description_it STRING;";
     String addDuplicateSql = "ALTER TABLE gameinfo ADD COLUMN Duplicate INTEGER DEFAULT 0;";
+    String addViewTagSql = "ALTER TABLE gameinfo ADD COLUMN Viewtag STRING;";
 
     try (Connection conn = this.connect(); PreparedStatement stmnt = conn.prepareStatement(tableInfoSql);
       ResultSet rs = stmnt.executeQuery(); Statement addDestmnt = conn.createStatement();
       Statement addFrstmnt = conn.createStatement(); Statement addEsstmnt = conn.createStatement();
-      Statement addItstmnt = conn.createStatement(); Statement addDuplicatestmnt = conn.createStatement();)
+      Statement addItstmnt = conn.createStatement(); Statement addDuplicatestmnt = conn.createStatement(); Statement addViewtagstmnt = conn.createStatement())
     {
       boolean columnsAvailable = false;
       boolean duplicateAvailable = false;
+      boolean viewTagAvailable = false;
       while (rs.next())
       {
         //Check if one of the language columns are available
@@ -152,6 +155,10 @@ public class DbConnector
         if (rs.getString("Name").equals("Duplicate"))
         {
           duplicateAvailable = true;
+        }
+        if (rs.getString("Name").equals("Viewtag"))
+        {
+          viewTagAvailable = true;
         }
       }
 
@@ -170,10 +177,16 @@ public class DbConnector
         addDuplicatestmnt.executeUpdate(addDuplicateSql);
         logger.debug("Duplicate column added.");
       }
+      if (!viewTagAvailable)
+      {
+        logger.debug("Viewtag column is missing in the database, adding column.");
+        addViewtagstmnt.executeUpdate(addViewTagSql);
+        logger.debug("Viewtag column added.");
+      }
     }
     catch (SQLException e)
     {
-      ExceptionHandler.handleException(e, "Could not update db for language and duplicate columns");
+      ExceptionHandler.handleException(e, "Could not update db for language, duplicate columns and view tag");
     }
   }
 
@@ -558,6 +571,8 @@ public class DbConnector
         st.append(",0");
       }
       st.append(",");
+      //Append empty string for viewtag
+      st.append("\"\",");
       st.append(duplicateIndex);
       st.append("),(");
     }
@@ -601,17 +616,17 @@ public class DbConnector
       StringBuilder sqlBuilder = new StringBuilder();
       sqlBuilder.append("UPDATE gameinfo SET ");
       //Loop from 1 (year) to verticalshift, exclude favorite from loop
-      for (int i = 1; i < columnList.size() - 1; i++)
+      for (int i = 1; i < columnList.size() - 2; i++)
       {
         sqlBuilder.append(columnList.get(i));
         sqlBuilder.append(" = ");
-        if (i > 1 && i < columnList.size() - 2)
+        if (i > 1 && i < columnList.size() - 3)
         {
           sqlBuilder.append("\"");
         }
 
         sqlBuilder.append(splittedRowValueList.get(i));
-        if (i < columnList.size() - 2)
+        if (i < columnList.size() - 3)
         {
           if (i == 1)
           {
@@ -631,6 +646,7 @@ public class DbConnector
       {
         sqlBuilder.append(",Favorite = 0");
       }
+      
       sqlBuilder.append(" WHERE title = ");
       sqlBuilder.append(title);
       sqlBuilder.append("\" AND Duplicate = ");
@@ -690,6 +706,7 @@ public class DbConnector
       returnValue.setSystem(rs.getString(DbConstants.SYSTEM));
       returnValue.setVerticalShift(rs.getInt(DbConstants.VERTICALSHIFT));
       returnValue.setDuplicateIndex(rs.getInt(DbConstants.DUPLICATE_INDEX));
+      returnValue.setViewTag(rs.getString(DbConstants.VIEW_TAG));
       logger.debug("SELECT Executed successfully");
     }
     catch (SQLException e)
@@ -773,7 +790,9 @@ public class DbConnector
     st.append(details.getSystem());
     st.append("\",");
     st.append(details.getVerticalShift());
-    st.append(",0,");
+    st.append(",0,\"");
+    st.append(details.getViewTag());
+    st.append("\",");
     st.append(details.getDuplicateIndex());
     st.append(");");
 
@@ -873,6 +892,10 @@ public class DbConnector
     sqlBuilder.append(DbConstants.SYSTEM);
     sqlBuilder.append("=\"");
     sqlBuilder.append(details.getSystem());
+    sqlBuilder.append("\",");
+    sqlBuilder.append(DbConstants.VIEW_TAG);
+    sqlBuilder.append("=\"");
+    sqlBuilder.append(details.getViewTag());
     sqlBuilder.append("\",");
     sqlBuilder.append(DbConstants.VERTICALSHIFT);
     sqlBuilder.append("=");

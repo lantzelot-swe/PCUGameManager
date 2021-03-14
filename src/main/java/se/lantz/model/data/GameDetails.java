@@ -29,6 +29,7 @@ public class GameDetails
   private String system = "";
   private int verticalshift = 0;
   private int duplicateIndex = 0;
+  private String viewTag = "";
 
   public GameDetails()
   {
@@ -224,5 +225,15 @@ public class GameDetails
   public void setDuplicateIndex(int index)
   {
     this.duplicateIndex = index;
+  }
+
+  public String getViewTag()
+  {
+    return viewTag;
+  }
+
+  public void setViewTag(String viewTag)
+  {
+    this.viewTag = viewTag == null ? "" : viewTag;
   }
 }

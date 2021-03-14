@@ -43,6 +43,8 @@ public class InfoModel extends AbstractModel
   private String oldScreens2File = "";
   
   private int duplicateIndex = 0;
+  
+  private String viewTag = "";
 
   public String getTitle()
   {
@@ -481,5 +483,20 @@ public class InfoModel extends AbstractModel
   public String getOldScreens2File()
   {
     return oldScreens2File;
+  }
+
+  public String getViewTag()
+  {
+    return viewTag;
+  }
+
+  public void setViewTag(String viewTag)
+  {
+    String old = getViewTag();
+    this.viewTag = viewTag;
+    if (!Objects.equals(old, viewTag))
+    {
+      notifyChange();
+    }
   }
 }

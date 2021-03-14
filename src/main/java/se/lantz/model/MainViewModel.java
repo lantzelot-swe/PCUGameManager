@@ -165,6 +165,7 @@ public class MainViewModel extends AbstractModel
     infoModel.setScreens1File(currentGameDetails.getScreen1());
     infoModel.setScreens2File(currentGameDetails.getScreen2());
     infoModel.setDuplicateIndex(currentGameDetails.getDuplicateIndex());
+    infoModel.setViewTag(currentGameDetails.getViewTag());
     //Reset and images that where added previously
     infoModel.resetImagesAndOldFileNames();
     joy1Model.setConfigStringFromDb(currentGameDetails.getJoy1());
@@ -377,6 +378,7 @@ public class MainViewModel extends AbstractModel
       updatedGame.setJoy2(joy2Model.getConfigString());
       updatedGame.setSystem(systemModel.getConfigString());
       updatedGame.setVerticalShift(systemModel.getVerticalShift());
+      updatedGame.setViewTag(infoModel.getViewTag());
 
       if (currentGameId.isEmpty())
       {
