@@ -483,12 +483,7 @@ public class MenuManager
       {
         backupDb();
       }
-      MainWindow.getInstance().getMainPanel().clearGameListSelection();
-      uiModel.deleteAllGames();
-      FileManager.deleteAllFolderContent();
-      //Trigger a reload of game views
-      uiModel.reloadGameViews();
-      MainWindow.getInstance().selectViewAfterRestore();
+      startDeleteProgress(true);      
     }
   }
 
@@ -500,7 +495,7 @@ public class MenuManager
     }
     else
     {
-      DeleteDialog dialog = new DeleteDialog(true);
+      DeleteDialog dialog = new DeleteDialog(false);
       dialog.pack();
       dialog.setLocationRelativeTo(MainWindow.getInstance());
       if (dialog.showDialog())
@@ -509,11 +504,20 @@ public class MenuManager
         {
           backupDb();
         }
-        MainWindow.getInstance().getMainPanel().clearGameListSelection();
-        uiModel.deleteAllGamesInCurrentView();
-        MainWindow.getInstance().getMainPanel().repaintAfterModifications();
+        startDeleteProgress(false);
       }
     }
+  }
+  
+  private void startDeleteProgress(boolean deleteAll)
+  {
+    MainWindow.getInstance().getMainPanel().clearGameListSelection();
+    DeleteProgressDialog delDialog = new DeleteProgressDialog(MainWindow.getInstance());
+    delDialog.pack();
+    delDialog.setLocationRelativeTo(MainWindow.getInstance());
+    DeleteWorker worker = new DeleteWorker(delDialog, deleteAll, uiModel);
+    worker.execute();
+    delDialog.setVisible(true);
   }
 
   private void convertScreens()
