@@ -145,6 +145,12 @@ public class GamebaseImporter
           int palOrNtsc = result.getInt("V_PalNTSC");
           int trueDriveEmu = result.getInt("V_TrueDriveEmu");
           String gemus = result.getString("Gemus");
+          
+          //Year can start with 99 for unknown, use 9999 for unknown. Gamebase uses several different ones (e.g. 9994)
+          if (year.startsWith("99"))
+          {
+            year = "9999";
+          }
 
           //GB64 includes game files for all games, no extras available. GbVic20 can have empty 
           //game files but available TAP or CART images
