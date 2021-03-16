@@ -35,8 +35,11 @@ public class GamebaseImporter
   private final ImportManager importManager;
   //Path to to .mdb file
   private Path gbDatabasePath;
-  //Path to parent where games, screens and extras are
-  private Path gbParentPath;
+
+  private Path gbGamesPath;
+  private Path gbScreensPath;
+  private Path gbExtrasPath;
+  
   private boolean isC64 = true;
 
   private String joyBase = ":JU,JD,JL,JR,JF,JF,SP,EN,,F1,F3,F5,,,";
@@ -69,14 +72,30 @@ public class GamebaseImporter
     {
       Path iniFile = this.gbDatabasePath.getParent().resolve("Paths.ini");
       List<String> lines = Files.readAllLines(iniFile, StandardCharsets.ISO_8859_1);
+      //Is lines returned in the expected order?
       for (String line : lines)
       {
         if (line.startsWith("1="))
         {
-          this.gbParentPath = Paths.get(line.substring(2)).getParent();
-          return true;
+          if (this.gbGamesPath == null)
+          {
+            this.gbGamesPath = Paths.get(line.substring(2));
+          }
+          else if (this.gbScreensPath == null)
+          {
+            this.gbScreensPath = Paths.get(line.substring(2));
+          }
+          else if (this.gbExtrasPath == null)
+          {
+            this.gbExtrasPath = Paths.get(line.substring(2));
+          }
+          else
+          {
+            //Do nothing
+          }          
         }
       }
+      return true;
     }
     catch (IOException e)
     {
@@ -90,7 +109,7 @@ public class GamebaseImporter
     gbGameInfoList.clear();
     StringBuilder builder = new StringBuilder();
     //Use the folder where the gamebase mdb file is located in the import manager
-    importManager.setSelectedFolder(gbParentPath);
+    importManager.setSelectedFoldersForGamebase(gbGamesPath, gbScreensPath, gbExtrasPath.resolve("covers"));
 
     String databaseURL = "jdbc:ucanaccess://" + gbDatabasePath.toString();
 
@@ -184,7 +203,7 @@ public class GamebaseImporter
           String screen2 = "";
           if (screen1 != null && !screen1.isEmpty())
           {
-            screen1 = gbParentPath.toString() + "\\screenshots\\" + screen1;
+            screen1 = gbScreensPath.toString() + "\\" + screen1;
             screen2 = getScreen2(screen1);
           }
 
@@ -198,7 +217,7 @@ public class GamebaseImporter
           String cartridgePath = getCartridgePath(gameId, statement);
           if (!cartridgePath.isEmpty())
           {
-            gamefile = gbParentPath.toString() + "\\extras\\" + cartridgePath;
+            gamefile = gbExtrasPath.toString() + "\\" + cartridgePath;
           }
           //Check tap for VIC-20
           if (!isC64 && gamefile.isEmpty())
@@ -206,7 +225,7 @@ public class GamebaseImporter
             String tapFile = getTapPath(gameId, statement);
             if (!tapFile.isEmpty())
             {
-              gamefile = gbParentPath.toString() + "\\extras\\" + tapFile;
+              gamefile = gbExtrasPath.toString() + "\\" + tapFile;
             }
 
             if (gamefile.isEmpty())
@@ -277,7 +296,7 @@ public class GamebaseImporter
     }
     if (!coverFile.isEmpty())
     {
-      coverFile = gbParentPath.toString() + "\\extras\\" + coverFile;
+      coverFile = gbExtrasPath.toString() + "\\" + coverFile;
     }
     return coverFile;
   }
@@ -344,7 +363,7 @@ public class GamebaseImporter
     {
       try
       {
-        String gameFile = getFileToInclude(gbParentPath, gbGameInfo.getGamefile());
+        String gameFile = getFileToInclude(gbGamesPath, gbGameInfo.getGamefile());
         importManager.addFromGamebaseImporter(gbGameInfo.getTitle(),
                                               gbGameInfo.getYear(),
                                               gbGameInfo.getPublisher(),
@@ -413,7 +432,8 @@ public class GamebaseImporter
 
   private String getFileToInclude(Path gbPath, String filenameInGb) throws IOException
   {
-    File gameFile = gbPath.resolve("games").resolve(filenameInGb).toFile();
+    //TODO: check if gzipped, otherwise include anyway
+    File gameFile = gbPath.resolve(filenameInGb).toFile();
     File selectedFile = FileManager.createTempFileForScraper(new BufferedInputStream(new FileInputStream(gameFile)));
     Path compressedFilePath = selectedFile.toPath().getParent().resolve(selectedFile.getName() + ".gz");
     FileManager.compressGzip(selectedFile.toPath(), compressedFilePath);

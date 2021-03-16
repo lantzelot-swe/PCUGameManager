@@ -375,7 +375,7 @@ public class MenuManager
     optionsDialog.setLocationRelativeTo(this.mainWindow);
     if (optionsDialog.showDialog())
     {
-      importManager.setSelectedFolder(optionsDialog.getImportDirectory());
+      importManager.setSelectedFolderForCarousel(optionsDialog.getImportDirectory());
       importManager.setSelectedOption(optionsDialog.getSelectedOption());
       importManager.setAddAsFavorite(optionsDialog.getMarkAsFavorite());
       ImportProgressDialog dialog = new ImportProgressDialog(this.mainWindow);

@@ -68,8 +68,15 @@ public class ImportManager
   {
     this.addAsFavorite = favorite;
   }
+  
+  public void setSelectedFoldersForGamebase(Path gamesFolder, Path screensPath, Path coversPath)
+  {
+    srcGamesFolder = gamesFolder;
+    srcScreensFolder = screensPath;
+    srcCoversFolder = coversPath;
+  }
 
-  public void setSelectedFolder(Path folder)
+  public void setSelectedFolderForCarousel(Path folder)
   {
     //Assume games subdirectory
     srcParentFolder = folder.resolve("games");
@@ -509,7 +516,7 @@ public class ImportManager
     oldScreen1Name = splittedForPaths[19];
     oldScreen2Name = splittedForPaths[20];
     oldGameName = splittedForPaths[21].split("\"")[0];
-    
+
     String advanced = splittedForPaths[16];
 
     Path coverPath = srcCoversFolder.resolve(oldCoverName);
