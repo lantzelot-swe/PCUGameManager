@@ -445,6 +445,7 @@ public class GamebaseImporter
     if (!isC64)
     {
       String memoryBanks = "";
+      gemus = gemus.replaceAll("\\r\\n", "");
       switch (gemus)
       {
       case "memory=3k":
