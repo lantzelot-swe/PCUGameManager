@@ -1010,10 +1010,10 @@ public class FileManager
     return newImage;
   }
 
-  public static File createTempFileForScraper(BufferedInputStream inputStream) throws IOException
+  public static File createTempFileForScraper(BufferedInputStream inputStream, String gameFilename) throws IOException
   {
     Files.createDirectories(TEMP_PATH);
-    File file = new File(TEMP_PATH + File.separator + "scrapedFile.zip");
+    File file = new File(TEMP_PATH + File.separator + gameFilename + ".zip");
     FileOutputStream fos = new FileOutputStream(file, false);
     byte[] buffer = new byte[1024];
     int len;
@@ -1023,11 +1023,12 @@ public class FileManager
     }
     inputStream.close();
     fos.close();
-    return unzipAndPickFirstEntry(file.getAbsolutePath());
+    return unzipAndPickFirstEntry(file);
   }
 
-  public static File unzipAndPickFirstEntry(String zipFilePath)
+  public static File unzipAndPickFirstEntry(File file)
   {
+    String zipFilePath = file.getAbsolutePath();
     Path filePath = null;
     FileInputStream fis;
     //buffer for read and write data to file
@@ -1060,7 +1061,8 @@ public class FileManager
     {
       ExceptionHandler.logException(e, "Could not unzip file");
     }
-    return filePath != null ? filePath.toFile() : null;
+    //Return original file if no zip entry found, it's not zipped
+    return filePath != null ? filePath.toFile() : file;
   }
 
   private static ZipEntry getFirstMatchingZipEntry(ZipArchiveInputStream zis) throws IOException

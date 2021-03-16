@@ -15,6 +15,7 @@ public class GbGameInfo
   private String joy1config;
   private String joy2config;
   private String advanced;
+  private String description;
 
   public GbGameInfo(String title,
                     String year,
@@ -27,7 +28,8 @@ public class GbGameInfo
                     String screen2,
                     String joy1config,
                     String joy2config,
-                    String advanced)
+                    String advanced,
+                    String description)
   {
     this.title = title;
     this.year = year;
@@ -41,6 +43,7 @@ public class GbGameInfo
     this.joy1config = joy1config;
     this.joy2config = joy2config;
     this.advanced = advanced;
+    this.description = description;
   }
 
   public String getTitle()
@@ -163,4 +166,13 @@ public class GbGameInfo
     this.advanced = advanced;
   }
 
+  public String getDescription()
+  {
+    return description;
+  }
+
+  public void setDescription(String description)
+  {
+    this.description = description;
+  }
 }

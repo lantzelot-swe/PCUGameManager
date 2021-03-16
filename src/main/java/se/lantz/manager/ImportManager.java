@@ -49,6 +49,7 @@ public class ImportManager
 
   Map<Path, List<String>> gameInfoFilesMap = new HashMap<>();
   List<String> dbRowDataList = new ArrayList<>();
+  Map<String, Integer> gameFileNamesDuringImportMap = new HashMap<>();
 
   private MainViewModel uiModel;
   private Options selectedOption;
@@ -68,7 +69,7 @@ public class ImportManager
   {
     this.addAsFavorite = favorite;
   }
-  
+
   public void setSelectedFoldersForGamebase(Path gamesFolder, Path screensPath, Path coversPath)
   {
     srcGamesFolder = gamesFolder;
@@ -347,6 +348,7 @@ public class ImportManager
                                       String joy1config,
                                       String joy2config,
                                       String advanced,
+                                      String description,
                                       boolean isC64)
   {
     //Generate proper names for files
@@ -369,7 +371,7 @@ public class ImportManager
                    author,
                    composer,
                    genre,
-                   "",
+                   description,
                    "",
                    "",
                    "",
@@ -455,14 +457,15 @@ public class ImportManager
 
   private int getDbRowDuplicate(String title)
   {
+    String gamefileName = FileManager.generateFileNameFromTitle(title, 0);
     int returnValue = 0;
-    for (String dbRow : dbRowDataList)
+    Integer existingDuplicate = gameFileNamesDuringImportMap.get(gamefileName);
+    if (existingDuplicate != null)
     {
-      if (dbRow.startsWith("\"" + title + "\","))
-      {
-        returnValue++;
-      }
+      returnValue = existingDuplicate + 1;
     }
+    //Add last to keep track of all added games
+    gameFileNamesDuringImportMap.put(gamefileName, returnValue);
     return returnValue;
   }
 
@@ -615,6 +618,7 @@ public class ImportManager
     int size = dbRowDataList.size();
     dbRowDataList.clear();
     gameInfoFilesMap.clear();
+    gameFileNamesDuringImportMap.clear();
     uiModel.cleanupAfterImport();
     return size;
   }

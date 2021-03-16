@@ -72,28 +72,51 @@ public class GamebaseImporter
     {
       Path iniFile = this.gbDatabasePath.getParent().resolve("Paths.ini");
       List<String> lines = Files.readAllLines(iniFile, StandardCharsets.ISO_8859_1);
-      //Is lines returned in the expected order?
+      boolean games = false;
+      boolean pictures = false;
+      boolean extras = false;
       for (String line : lines)
       {
-        if (line.startsWith("1="))
+        if (line.equals("[Games]"))
         {
-          if (this.gbGamesPath == null)
-          {
-            this.gbGamesPath = Paths.get(line.substring(2));
-          }
-          else if (this.gbScreensPath == null)
-          {
-            this.gbScreensPath = Paths.get(line.substring(2));
-          }
-          else if (this.gbExtrasPath == null)
-          {
-            this.gbExtrasPath = Paths.get(line.substring(2));
-          }
-          else
-          {
-            //Do nothing
-          }          
+          games = true;
+          pictures = false;
+          extras = false;
+        }      
+        else if (line.equals("[Pictures]"))
+        {
+          games = false;
+          pictures = true;
+          extras = false;
+        }       
+        else if (line.equals("[Extras]"))
+        {
+          games = false;
+          pictures = false;
+          extras = true;
         }
+        else
+        {
+          if (line.startsWith("1="))
+          {
+            if (games)
+            {
+              this.gbGamesPath = Paths.get(line.substring(2));
+            }
+            else if (pictures)
+            {
+              this.gbScreensPath = Paths.get(line.substring(2));
+            }
+            else if (extras)
+            {
+              this.gbExtrasPath = Paths.get(line.substring(2));
+            }
+            else
+            {
+              //Do nothing
+            }          
+          }
+        }       
       }
       return true;
     }
@@ -182,6 +205,12 @@ public class GamebaseImporter
           //Setup advanced string (system, sid, pal, truedrive etc)
           String advanced = constructAdvancedString(palOrNtsc, trueDriveEmu, gemus);
 
+          //Description: add key-value pairs for Vic-20 since that holds important info about memory expansion
+          String description = "";
+          if (!isC64)
+          {
+            description = gemus;
+          }
           //Control: 0=JoyPort2, 1=JoyPort1, 2=Keyboard, 3=PaddlePort2, 4=PaddlePort1, 5=Mouse, 6=LightPen, 7=KoalaPad, 8=LightGun
           //Setup joystick port
           String joy1config;
@@ -246,7 +275,8 @@ public class GamebaseImporter
                                            screen2,
                                            joy1config,
                                            joy2config,
-                                           advanced);
+                                           advanced,
+                                           description);
 
           gbGameInfoList.add(info);
           gameCount++;
@@ -376,6 +406,7 @@ public class GamebaseImporter
                                               gbGameInfo.getJoy1config(),
                                               gbGameInfo.getJoy2config(),
                                               gbGameInfo.getAdvanced(),
+                                              gbGameInfo.getDescription(),
                                               isC64);
       }
       catch (Exception e)
@@ -406,9 +437,63 @@ public class GamebaseImporter
     String video = (palOrNtsc == 2) ? "ntsc" : "pal";
     advanced = advanced + "," + video;
     //Setup truedrive
-    if (trueDriveEmu > 0 || "vte=yes".equalsIgnoreCase(gemus))
+    if (trueDriveEmu > 0 || "vtde=yes".equalsIgnoreCase(gemus))
     {
       advanced = advanced + "," + "driveicon,accuratedisk";
+    }
+    //For Vic-20 setup memory banks
+    if (!isC64)
+    {
+      String memoryBanks = "";
+      switch (gemus)
+      {
+      case "memory=3k":
+        memoryBanks = "bank0";
+        break;
+      case "memory=8k":
+        memoryBanks = "bank1";
+        break;
+      case "memory=16k":
+        memoryBanks = "bank1,bank2";
+        break;
+      case "memory=24k":
+        memoryBanks = "bank1,bank2,bank3";
+        break;
+      case "cart=a0":
+        memoryBanks = "bank5";
+        break;
+      case "cart=a000":
+        memoryBanks = "bank5";
+        break;
+      case "cart=20":
+        memoryBanks = "bank1";
+        break;
+      case "cart=2000":
+        memoryBanks = "bank1";
+        break;
+      case "cart=40":
+        memoryBanks = "bank2";
+        break;
+      case "cart=4000":
+        memoryBanks = "bank2";
+        break;
+      case "cart=60":
+        memoryBanks = "bank3";
+        break;
+      case "cart=6000":
+        memoryBanks = "bank3";
+        break;
+      case "memory=all":
+        memoryBanks = "bank0,bank1,bank2,bank3,bank5";
+        break;
+      default:
+        break;
+      }
+
+      if (!memoryBanks.isEmpty())
+      {
+        advanced = advanced + "," + memoryBanks;
+      }
     }
     return advanced;
   }
@@ -432,9 +517,8 @@ public class GamebaseImporter
 
   private String getFileToInclude(Path gbPath, String filenameInGb) throws IOException
   {
-    //TODO: check if gzipped, otherwise include anyway
     File gameFile = gbPath.resolve(filenameInGb).toFile();
-    File selectedFile = FileManager.createTempFileForScraper(new BufferedInputStream(new FileInputStream(gameFile)));
+    File selectedFile = FileManager.createTempFileForScraper(new BufferedInputStream(new FileInputStream(gameFile)), gameFile.getName());
     Path compressedFilePath = selectedFile.toPath().getParent().resolve(selectedFile.getName() + ".gz");
     FileManager.compressGzip(selectedFile.toPath(), compressedFilePath);
     return compressedFilePath.toString();

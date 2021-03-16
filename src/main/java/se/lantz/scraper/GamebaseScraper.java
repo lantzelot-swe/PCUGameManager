@@ -285,7 +285,7 @@ public class GamebaseScraper implements Scraper
         URLConnection conn = url.openConnection();
         InputStream inputStream = conn.getInputStream();
         //create a temp file and fetch the content
-        scrapedFile = FileManager.createTempFileForScraper(new BufferedInputStream(inputStream));
+        scrapedFile = FileManager.createTempFileForScraper(new BufferedInputStream(inputStream), "ScrapedFile");
         logger.debug("File to include as game: {}", scrapedFile != null ? scrapedFile.getAbsolutePath() : null);
       }
       catch (Exception e)

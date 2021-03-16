@@ -164,6 +164,7 @@ public class SystemPanel extends JPanel
       getConfigTextField().setText(model.getConfigString());
     }
     getDisplayShiftComboBox().setSelectedItem(Integer.toString(model.getVerticalShift()));
+    calculateTotalRam();
   }
 
   private JPanel getRadioPanel()
