@@ -2,4 +2,5 @@
 - Add option to include all game entries where the game file is missing when importing from gamebase, using the default files above.
 - Search function, how does that work in gamebase?
 - Select multiple games to be able to delete them. What should happen when you select two or more, show blank right side?
+- Multiple selection can also allow you to mark several games at once as favorites.
 - Game view -> Gamelist
