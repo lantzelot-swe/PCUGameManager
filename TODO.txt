@@ -1,3 +1,5 @@
 - Add a default "missing" vsf file for C64 and Vic-20 that can be used for importing game entries from gamebase where a game file is missing
 - Add option to include all game entries where the game file is missing when importing from gamebase, using the default files above.
-- Search function? How does that work in gamebase?
+- Search function, how does that work in gamebase?
+- Select multiple games to be able to delete them. What should happen when you select two or more, show blank right side?
+- Game view -> Gamelist
