@@ -160,7 +160,7 @@ public class MenuManager
 
   JMenuItem getAddGameMenuItem()
   {
-    addGameItem = new JMenuItem("Add New Game");
+    addGameItem = new JMenuItem("Add new game");
     KeyStroke keyStrokeToAddGame = KeyStroke.getKeyStroke(KeyEvent.VK_N, InputEvent.CTRL_DOWN_MASK);
     addGameItem.setAccelerator(keyStrokeToAddGame);
     addGameItem.setMnemonic('N');
@@ -171,7 +171,7 @@ public class MenuManager
 
   JMenuItem getDeleteGameMenuItem()
   {
-    deleteGameItem = new JMenuItem("Delete Current Game");
+    deleteGameItem = new JMenuItem("Delete selected game(s)");
     KeyStroke keyStrokeToAddGame = KeyStroke.getKeyStroke(KeyEvent.VK_D, InputEvent.CTRL_DOWN_MASK);
     deleteGameItem.setAccelerator(keyStrokeToAddGame);
     deleteGameItem.setMnemonic('D');
@@ -190,7 +190,7 @@ public class MenuManager
 
   JMenuItem getRunGameMenuItem()
   {
-    runGameItem = new JMenuItem("Run Current Game");
+    runGameItem = new JMenuItem("Run selected game");
     KeyStroke keyStrokeToRunGame = KeyStroke.getKeyStroke(KeyEvent.VK_R, InputEvent.CTRL_DOWN_MASK);
     runGameItem.setAccelerator(keyStrokeToRunGame);
     runGameItem.setMnemonic('R');
@@ -221,7 +221,7 @@ public class MenuManager
 
   private JMenuItem getExportItem()
   {
-    exportItem = new JMenuItem("Export Games...");
+    exportItem = new JMenuItem("Export games...");
     KeyStroke keyStrokeToExportGames = KeyStroke.getKeyStroke(KeyEvent.VK_E, InputEvent.CTRL_DOWN_MASK);
     exportItem.setAccelerator(keyStrokeToExportGames);
     exportItem.setMnemonic('E');

@@ -10,6 +10,7 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.List;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -169,6 +170,14 @@ public class ListPanel extends JPanel
     return listViewComboBox;
   }
 
+  List<GameListData> getSelectedGameListData()
+  {
+    return getList().getSelectedValuesList();
+  }
+  boolean isSingleGameSelected()
+  {
+    return getList().getSelectedIndices().length == 1;
+  }
   int getSelectedIndexInList()
   {
     return getList().getSelectedIndex();
@@ -264,10 +273,20 @@ public class ListPanel extends JPanel
               super.removeSelectionInterval(start, end);
             }
           }
+          
+          @Override
+          public void addSelectionInterval(int anchor, int lead) 
+          {
+            if (!uiModel.isDataChanged())
+            {
+              super.addSelectionInterval(anchor, lead);
+            }
+          }
 
           @Override
           public void setSelectionInterval(int anchor, int lead)
           {
+            System.out.println("anchor=" + anchor + ", lead=" + lead);
             if (!uiModel.isDataChanged())
             {
               super.setSelectionInterval(anchor, lead);
@@ -304,7 +323,7 @@ public class ListPanel extends JPanel
             }
           }
         };
-      list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+      list.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
 
       //If the user holds down "down" or "up" (scrolling in the list) the details is not
       //updated until the key is released
@@ -328,7 +347,7 @@ public class ListPanel extends JPanel
               e.consume();
               return;
             }
-            
+
             if (e.getKeyCode() == KeyEvent.VK_DOWN || e.getKeyCode() == KeyEvent.VK_UP)
             {
               delayDetailsUpdate = true;
@@ -357,19 +376,20 @@ public class ListPanel extends JPanel
             }
           }
         });
-      list.addMouseListener(new MouseAdapter() {
-
-        @Override
-        public void mouseClicked(MouseEvent e)
+      list.addMouseListener(new MouseAdapter()
         {
-          if (SwingUtilities.isLeftMouseButton(e) && e.getClickCount() == 2)
+
+          @Override
+          public void mouseClicked(MouseEvent e)
           {
-            //trigger run game...
-            MainWindow.getInstance().getMainPanel().runCurrentGame();
+            if (SwingUtilities.isLeftMouseButton(e) && e.getClickCount() == 2 && list.getSelectionModel().getSelectedItemsCount() == 1)
+            {
+              //trigger run game...
+              MainWindow.getInstance().getMainPanel().runCurrentGame();
+            }
           }
-        }
-        
-      });
+
+        });
       list.addListSelectionListener(e -> {
         if (!e.getValueIsAdjusting() || pageButtonPressed)
         {
@@ -392,8 +412,10 @@ public class ListPanel extends JPanel
 
   private void updateSelectedGame()
   {
-    SwingUtilities
-      .invokeLater(() -> mainPanel.getGameDetailsBackgroundPanel().updateSelectedGame(list.getSelectedValue()));
+    SwingUtilities.invokeLater(() -> {
+      boolean singelSelected = list.getSelectionModel().getSelectedItemsCount() == 1;
+      mainPanel.getGameDetailsBackgroundPanel().updateSelectedGame(singelSelected ? list.getSelectedValue() : null);
+    });
   }
 
   void checkSaveChangeStatus()
@@ -417,14 +439,17 @@ public class ListPanel extends JPanel
   {
     if (!uiModel.isDataChanged())
     {
-      uiModel.toggleFavorite(list.getSelectedValue());
+      for (GameListData  glData : list.getSelectedValuesList())
+      {
+        uiModel.toggleFavorite(glData);
+      }
       mainPanel.repaintAfterModifications();
     }
   }
-  
+
   public void reloadCurrentGameView()
   {
-    GameListData selectedData = getList().getSelectedValue(); 
+    GameListData selectedData = getList().getSelectedValue();
     getList().clearSelection();
     uiModel.reloadCurrentGameView();
     SwingUtilities.invokeLater(() -> {

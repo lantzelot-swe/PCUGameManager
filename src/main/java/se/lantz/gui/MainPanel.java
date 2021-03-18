@@ -8,6 +8,7 @@ import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 
 import se.lantz.model.MainViewModel;
+import se.lantz.model.data.GameListData;
 
 public class MainPanel extends JPanel
 {
@@ -98,22 +99,38 @@ public class MainPanel extends JPanel
 
   public void deleteCurrentGame()
   {
+    List<GameListData> selectedGameListData = getListPanel().getSelectedGameListData();
+    
+    
     if (getListPanel().getSelectedIndexInList() > -1)
     {
-      int value = showDeleteDialog();
+      int value = showDeleteDialog(selectedGameListData.size());
       if (value == JOptionPane.YES_OPTION)
       {
         int currentSelectedIndex = getListPanel().getSelectedIndexInList();
-        uiModel.deleteCurrentGame();
+        for (GameListData gameListData : selectedGameListData)
+        {
+          getGameDetailsBackgroundPanel().updateSelectedGame(gameListData);
+          uiModel.deleteCurrentGame();
+        }        
         repaintAfterModifications();
         getListPanel().setSelectedIndexInList(currentSelectedIndex);
       }
     }
   }
   
-  int showDeleteDialog()
+  int showDeleteDialog(int numberOfGamesSelected)
   {
-    String message = "Do you want to delete " + uiModel.getInfoModel().getTitle() + " from the database?";
+    String message = "";
+    if (numberOfGamesSelected == 1)
+    {
+      message = "Do you want to delete " + uiModel.getInfoModel().getTitle() + " from the database?";
+      
+    }
+    else
+    {
+      message = "Do you want to delete " + numberOfGamesSelected + " games from the database?";
+    }
     if (uiModel.isNewGameSelected())
     {
       message = "Do you want to delete the new game entry?";
@@ -157,7 +174,7 @@ public class MainPanel extends JPanel
   
   public void runCurrentGame()
   {
-    if (getListPanel().getSelectedIndexInList() > -1)
+    if (getListPanel().isSingleGameSelected() && getListPanel().getSelectedIndexInList() > -1)
     {
       getGameDetailsBackgroundPanel().runCurrentGame();
     }

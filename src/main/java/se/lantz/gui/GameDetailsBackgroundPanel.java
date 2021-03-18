@@ -12,7 +12,6 @@ import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 import java.util.List;
 import java.util.Locale;
-import java.util.MissingResourceException;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -433,7 +432,7 @@ public class GameDetailsBackgroundPanel extends JPanel
   {
     try
     {
-    	Locale locale = new Locale.Builder().setLanguageTag(language).build();
+      Locale locale = new Locale.Builder().setLanguageTag(language).build();
       return locale.getISO3Language() != null;
     }
     catch (Exception e)
