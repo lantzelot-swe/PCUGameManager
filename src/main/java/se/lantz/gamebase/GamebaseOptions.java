@@ -7,6 +7,7 @@ public class GamebaseOptions
   private Path gamebaseDbFile;
   private boolean c64 = true;
   private String titleQueryString = "";
+  private boolean includeMissingGameFileEntries = false;
 
   private GamebaseImporter.Options selectedOption = GamebaseImporter.Options.FAVORITES;
 
@@ -53,6 +54,16 @@ public class GamebaseOptions
   public void setTitleQueryString(String titleQueryString)
   {
     this.titleQueryString = titleQueryString;
+  }
+
+  public boolean isIncludeMissingGameFileEntries()
+  {
+    return includeMissingGameFileEntries;
+  }
+
+  public void setIncludeMissingGameFileEntries(boolean includeMissingGameFileEntries)
+  {
+    this.includeMissingGameFileEntries = includeMissingGameFileEntries;
   }
 
 }

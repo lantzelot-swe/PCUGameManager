@@ -16,6 +16,7 @@ import javax.swing.ButtonGroup;
 import javax.swing.JTextField;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import javax.swing.JCheckBox;
 
 public class GameBaseOptionsPanel extends JPanel
 {
@@ -32,6 +33,7 @@ public class GameBaseOptionsPanel extends JPanel
   private JRadioButton vic20RadioButton;
   private JLabel systemLabel;
   private final ButtonGroup systemButtonGroup = new ButtonGroup();
+  private JCheckBox includeMissingCheckBox;
 
   public GameBaseOptionsPanel()
   {
@@ -57,7 +59,6 @@ public class GameBaseOptionsPanel extends JPanel
     add(getSystemPanel(), gbc_systemPanel);
     GridBagConstraints gbc_gameOptionsPanel = new GridBagConstraints();
     gbc_gameOptionsPanel.anchor = GridBagConstraints.NORTH;
-    gbc_gameOptionsPanel.weighty = 1.0;
     gbc_gameOptionsPanel.gridx = 0;
     gbc_gameOptionsPanel.gridy = 4;
     add(getGameOptionsPanel(), gbc_gameOptionsPanel);
@@ -66,6 +67,13 @@ public class GameBaseOptionsPanel extends JPanel
     gbc_optionsLabel.gridx = 0;
     gbc_optionsLabel.gridy = 3;
     add(getOptionsLabel(), gbc_optionsLabel);
+    GridBagConstraints gbc_includeMissingCheckBox = new GridBagConstraints();
+    gbc_includeMissingCheckBox.anchor = GridBagConstraints.NORTH;
+    gbc_includeMissingCheckBox.weighty = 1.0;
+    gbc_includeMissingCheckBox.insets = new Insets(5, 0, 0, 0);
+    gbc_includeMissingCheckBox.gridx = 0;
+    gbc_includeMissingCheckBox.gridy = 5;
+    add(getIncludeMissingCheckBox(), gbc_includeMissingCheckBox);
 
   }
   
@@ -86,7 +94,8 @@ public class GameBaseOptionsPanel extends JPanel
     {
       options.setSelectedOption(Options.QUERY);
       options.setTitleQueryString(getTitleQueryTextField().getText());
-    }
+    }    
+    options.setIncludeMissingGameFileEntries(includeMissingCheckBox.isSelected());   
     return options;
   }
   private SelectDirPanel getSelectDirPanel() {
@@ -116,7 +125,7 @@ public class GameBaseOptionsPanel extends JPanel
     	gbc_queryRadioButton.gridy = 2;
     	gameOptionsPanel.add(getQueryRadioButton(), gbc_queryRadioButton);
     	GridBagConstraints gbc_titleQueryTextField = new GridBagConstraints();
-    	gbc_titleQueryTextField.insets = new Insets(0, 20, 0, 10);
+    	gbc_titleQueryTextField.insets = new Insets(0, 20, 5, 10);
     	gbc_titleQueryTextField.anchor = GridBagConstraints.WEST;
     	gbc_titleQueryTextField.fill = GridBagConstraints.HORIZONTAL;
     	gbc_titleQueryTextField.gridx = 0;
@@ -214,5 +223,11 @@ public class GameBaseOptionsPanel extends JPanel
     	systemLabel = new JLabel("Which system is the gamebase db for?");
     }
     return systemLabel;
+  }
+  private JCheckBox getIncludeMissingCheckBox() {
+    if (includeMissingCheckBox == null) {
+    	includeMissingCheckBox = new JCheckBox("Include game entries with missing game file");
+    }
+    return includeMissingCheckBox;
   }
 }

@@ -558,6 +558,8 @@ public class DbConnector
 
     for (String rowData : rowValues)
     {
+      //Check old gamename, if empty add a view tag for it.
+      String oldGameName = getOldGameName(rowData);
       //Strip  rowData from new filenames
       String strippedRowData = stripRowDataFromOldFileNames(rowData);
       String duplicateIndex = rowData.substring(rowData.lastIndexOf(",")+1);
@@ -571,8 +573,16 @@ public class DbConnector
         st.append(",0");
       }
       st.append(",");
-      //Append empty string for viewtag
-      st.append("\"\",");
+      
+      if (oldGameName.isEmpty())
+      {
+        st.append("\"missing\",");
+      }
+      else
+      {
+        //Append empty string for viewtag
+        st.append("\"\",");
+      }
       st.append(duplicateIndex);
       st.append("),(");
     }
@@ -605,6 +615,12 @@ public class DbConnector
       strippedDataList.add(splittedRowData[i]);
     }
     return String.join("\",\"", strippedDataList) + "\"";
+  }
+  
+  private String getOldGameName(String rowData)
+  {
+    String[] splittedRowData = rowData.split(COMMA);
+    return splittedRowData[21].split("\"")[0];
   }
 
   private void updateAllInGameInfoTable(List<String> rowValues, boolean addAsFavorite)

@@ -3,6 +3,7 @@ package se.lantz.manager;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.LinkOption;
@@ -19,6 +20,7 @@ import java.util.stream.Stream;
 
 import javax.imageio.ImageIO;
 
+import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -357,15 +359,27 @@ public class ImportManager
     String newCoverfile = fileName + "-cover.png";
     String newScreen1file = fileName + "-00.png";
     String newScreen2file = fileName + "-01.png";
-    //Ignore first "." when finding file ending
-    String strippedGameFile = gamefile.substring(1);
-    String fileEnding = strippedGameFile.substring(strippedGameFile.indexOf("."));
-    if (!isC64 && fileEnding.contains(".crt"))
+    
+    String newGamefile = "";
+    if (gamefile.isEmpty())
     {
-      //A Vic-20 cartridge. Add the flag indicating the cartridge type to the name
-      fileEnding = strippedGameFile.substring(strippedGameFile.indexOf("-"));
+      //Missing vsf files will be used
+      newGamefile = fileName + ".vsf.gz";
     }
-    String newGamefile = fileName + fileEnding;
+    else
+    {
+      //Ignore first "." when finding file ending
+      
+      String strippedGameFile = gamefile.substring(1);
+      String fileEnding = strippedGameFile.substring(strippedGameFile.indexOf("."));
+      if (!isC64 && fileEnding.contains(".crt"))
+      {
+        //A Vic-20 cartridge. Add the flag indicating the cartridge type to the name
+        fileEnding = strippedGameFile.substring(strippedGameFile.indexOf("-"));
+      }
+      newGamefile = fileName + fileEnding;
+    }
+
     addToDbRowList(title,
                    year,
                    author,
@@ -532,18 +546,22 @@ public class ImportManager
     Path targetScreen2Path = Paths.get("./screens/" + screen2Name);
 
     Path gamePath = srcGamesFolder.resolve(oldGameName);
-    if (gamebaseImport)
-    {
-      //When importing from gamebase use current folder
-      gamePath = new File(oldGameName).toPath();
-    }
-
+    
     Path targetGamePath = Paths.get("./games/" + gameName);
 
     try
     {
       logger.debug("RowData = {}", dbRowData);
-
+      
+      if (gamebaseImport)
+      {
+        if (!oldGameName.isEmpty())
+        {
+          //When importing from gamebase use current folder
+          gamePath = new File(oldGameName).toPath();
+        }
+      }
+      //Cover
       if (!oldCoverName.isEmpty())
       {
         infoBuilder.append("Copying cover from ");
@@ -570,32 +588,52 @@ public class ImportManager
           ExceptionHandler.handleException(e, "Could not store cover");
         }
       }
-      if (!oldScreen1Name.isEmpty())
+      //Screenshots
+      if (oldScreen1Name.isEmpty() && oldScreen2Name.isEmpty())
       {
-        infoBuilder.append("Copying screenshot from ");
-        infoBuilder.append(screens1Path.toString());
-        infoBuilder.append(" to ");
-        infoBuilder.append(targetScreen1Path.toString());
-        infoBuilder.append("\n");
-        Files.copy(screens1Path, targetScreen1Path, StandardCopyOption.REPLACE_EXISTING);
-        if (gamebaseImport)
+        //Copy empty screen files 
+        //Use missing cover since none available
+        try
         {
-          FileManager.scaleScreenshotImageAndSave(targetScreen1Path);
+          BufferedImage emptyScreenshot = advanced.contains("vic") ? FileManager.emptyVic20Screenshot : FileManager.emptyC64Screenshot;
+          ImageIO.write(emptyScreenshot, "png", targetScreen1Path.toFile());
+          ImageIO.write(emptyScreenshot, "png", targetScreen2Path.toFile());
+        }
+        catch (IOException e)
+        {
+          ExceptionHandler.handleException(e, "Could not store screenshot");
         }
       }
-      if (!oldScreen2Name.isEmpty())
-      {
-        infoBuilder.append("Copying screenshot from ");
-        infoBuilder.append(screens2Path.toString());
-        infoBuilder.append(" to ");
-        infoBuilder.append(targetScreen2Path.toString());
-        infoBuilder.append("\n");
-        Files.copy(screens2Path, targetScreen2Path, StandardCopyOption.REPLACE_EXISTING);
-        if (gamebaseImport)
+      else
+      {    
+        if (!oldScreen1Name.isEmpty())
         {
-          FileManager.scaleScreenshotImageAndSave(targetScreen2Path);
+          infoBuilder.append("Copying screenshot from ");
+          infoBuilder.append(screens1Path.toString());
+          infoBuilder.append(" to ");
+          infoBuilder.append(targetScreen1Path.toString());
+          infoBuilder.append("\n");
+          Files.copy(screens1Path, targetScreen1Path, StandardCopyOption.REPLACE_EXISTING);
+          if (gamebaseImport)
+          {
+            FileManager.scaleScreenshotImageAndSave(targetScreen1Path);
+          }
+        }
+        if (!oldScreen2Name.isEmpty())
+        {
+          infoBuilder.append("Copying screenshot from ");
+          infoBuilder.append(screens2Path.toString());
+          infoBuilder.append(" to ");
+          infoBuilder.append(targetScreen2Path.toString());
+          infoBuilder.append("\n");
+          Files.copy(screens2Path, targetScreen2Path, StandardCopyOption.REPLACE_EXISTING);
+          if (gamebaseImport)
+          {
+            FileManager.scaleScreenshotImageAndSave(targetScreen2Path);
+          }
         }
       }
+      //Game file
       if (!oldGameName.isEmpty())
       {
         infoBuilder.append("Copying game file from ");
@@ -605,8 +643,14 @@ public class ImportManager
         infoBuilder.append("\n");
         Files.copy(gamePath, targetGamePath, StandardCopyOption.REPLACE_EXISTING);
       }
+      else
+      {
+        //Use missing game file
+        InputStream missingFileStream = advanced.contains("vic") ? FileManager.getMissingVIC20GameFile() : FileManager.getMissingC64GameFile();
+        FileUtils.copyInputStreamToFile(missingFileStream, targetGamePath.toFile());
+      }
     }
-    catch (IOException e)
+    catch (Exception e)
     {
       infoBuilder.append("ERROR: Could not copy files for " + gameName + ", " + e.getMessage() + "\n");
       ExceptionHandler.handleException(e, "Could NOT copy files for: " + gameName);

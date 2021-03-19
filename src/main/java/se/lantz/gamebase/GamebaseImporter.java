@@ -47,6 +47,8 @@ public class GamebaseImporter
 
   private Options selectedOption = Options.FAVORITES;
   private String titleQueryString = "";
+  
+  private boolean includeEntriesWithMissingGameFile = false;
 
   public GamebaseImporter(ImportManager importManager)
   {
@@ -60,6 +62,7 @@ public class GamebaseImporter
     this.isC64 = options.isC64();
     this.selectedOption = options.getSelectedOption();
     this.titleQueryString = options.getTitleQueryString();
+    this.includeEntriesWithMissingGameFile = options.isIncludeMissingGameFileEntries();
     return readPathsIni();
   }
 
@@ -196,7 +199,7 @@ public class GamebaseImporter
 
           //GB64 includes game files for all games, no extras available. GbVic20 can have empty 
           //game files but available TAP or CART images
-          if (isC64 && gamefile.isEmpty())
+          if (isC64 && gamefile.isEmpty() && !includeEntriesWithMissingGameFile)
           {
             builder.append("Ignoring " + title + " (No game file available)\n");
             continue;
@@ -257,7 +260,7 @@ public class GamebaseImporter
               gamefile = gbExtrasPath.toString() + "\\" + tapFile;
             }
 
-            if (gamefile.isEmpty())
+            if (gamefile.isEmpty() && !includeEntriesWithMissingGameFile)
             {
               builder.append("Ignoring " + title + " (No game file available)\n");
               continue;
@@ -518,6 +521,10 @@ public class GamebaseImporter
 
   private String getFileToInclude(Path gbPath, String filenameInGb) throws IOException
   {
+    if (filenameInGb.isEmpty())
+    {
+      return "";
+    }
     File gameFile = gbPath.resolve(filenameInGb).toFile();
     File selectedFile = FileManager.createTempFileForScraper(new BufferedInputStream(new FileInputStream(gameFile)), gameFile.getName());
     Path compressedFilePath = selectedFile.toPath().getParent().resolve(selectedFile.getName() + ".gz");

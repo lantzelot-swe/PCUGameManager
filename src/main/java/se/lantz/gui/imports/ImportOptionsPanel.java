@@ -70,7 +70,7 @@ public class ImportOptionsPanel extends JPanel
     add(getSelectionPanel(), gbc_selectionPanel);
     
     GridBagConstraints gbc_matchLabel = new GridBagConstraints();
-    gbc_matchLabel.insets = new Insets(15, 10, 15, 10);
+    gbc_matchLabel.insets = new Insets(5, 10, 15, 10);
     gbc_matchLabel.anchor = GridBagConstraints.NORTH;
     gbc_matchLabel.weighty = 1.0;
     gbc_matchLabel.weightx = 1.0;

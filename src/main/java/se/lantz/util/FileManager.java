@@ -11,6 +11,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -48,6 +50,9 @@ public class FileManager
 {
   public static BufferedImage emptyC64Cover;
   public static BufferedImage emptyVic20Cover;
+  public static BufferedImage emptyC64Screenshot;
+  public static BufferedImage emptyVic20Screenshot;
+  
   private static final String GAMES = "./games/";
   private static final String SCREENS = "./screens/";
   private static final String COVERS = "./covers/";
@@ -68,6 +73,8 @@ public class FileManager
     {
       emptyC64Cover = ImageIO.read(FileManager.class.getResource("/se/lantz/CoverMissing-C64.png"));
       emptyVic20Cover = ImageIO.read(FileManager.class.getResource("/se/lantz/CoverMissing-VIC20.png"));
+      emptyC64Screenshot = ImageIO.read(FileManager.class.getResource("/se/lantz/MissingScreenshot-C64.png"));
+      emptyVic20Screenshot = ImageIO.read(FileManager.class.getResource("/se/lantz/MissingScreenshot-VIC20.png"));
     }
     catch (IOException e)
     {
@@ -81,7 +88,17 @@ public class FileManager
     this.systemModel = model.getSystemModel();
     this.model = model;
   }
-
+  
+  public static InputStream getMissingC64GameFile() throws URISyntaxException
+  {   
+    return FileManager.class.getResourceAsStream("/se/lantz/MissingGame-C64.vsf.gz");
+  }
+  
+  public static InputStream getMissingVIC20GameFile() throws URISyntaxException
+  {
+    return FileManager.class.getResourceAsStream("/se/lantz/MissingGame-Vic20.vsf.gz");  
+  }
+ 
   public void saveFiles()
   {
     //Check if title is different that in db, then rename existing files!
