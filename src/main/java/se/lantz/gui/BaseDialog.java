@@ -48,6 +48,7 @@ public class BaseDialog extends JDialog
     //Register esc as closing the window
     getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(escKeyStroke, "closeDialog");
     getRootPane().getActionMap().put("closeDialog", escAction);
+    getRootPane().setDefaultButton(getOkButton());
   }
 
   protected void addContent(JPanel panel)
