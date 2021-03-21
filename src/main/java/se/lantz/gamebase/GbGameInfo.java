@@ -16,6 +16,8 @@ public class GbGameInfo
   private String joy2config;
   private String advanced;
   private String description;
+  
+  private boolean vic20cart = false;
 
   public GbGameInfo(String title,
                     String year,
@@ -29,7 +31,8 @@ public class GbGameInfo
                     String joy1config,
                     String joy2config,
                     String advanced,
-                    String description)
+                    String description, 
+                    boolean vic20cart)
   {
     this.title = title;
     this.year = year;
@@ -44,6 +47,7 @@ public class GbGameInfo
     this.joy2config = joy2config;
     this.advanced = advanced;
     this.description = description;
+    this.vic20cart = vic20cart;
   }
 
   public String getTitle()
@@ -174,5 +178,15 @@ public class GbGameInfo
   public void setDescription(String description)
   {
     this.description = description;
+  }
+
+  public boolean isVic20Cart()
+  {
+    return vic20cart;
+  }
+  
+  public void setVic20Cart(boolean vic20Cart)
+  {
+    this.vic20cart = vic20Cart;
   }
 }

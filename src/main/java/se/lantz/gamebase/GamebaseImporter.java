@@ -39,7 +39,7 @@ public class GamebaseImporter
   private Path gbGamesPath;
   private Path gbScreensPath;
   private Path gbExtrasPath;
-  
+
   private boolean isC64 = true;
 
   private String joyBase = ":JU,JD,JL,JR,JF,JF,SP,EN,,F1,F3,F5,,,";
@@ -47,7 +47,7 @@ public class GamebaseImporter
 
   private Options selectedOption = Options.FAVORITES;
   private String titleQueryString = "";
-  
+
   private boolean includeEntriesWithMissingGameFile = false;
 
   public GamebaseImporter(ImportManager importManager)
@@ -85,13 +85,13 @@ public class GamebaseImporter
           games = true;
           pictures = false;
           extras = false;
-        }      
+        }
         else if (line.equals("[Pictures]"))
         {
           games = false;
           pictures = true;
           extras = false;
-        }       
+        }
         else if (line.equals("[Extras]"))
         {
           games = false;
@@ -117,9 +117,9 @@ public class GamebaseImporter
             else
             {
               //Do nothing
-            }          
+            }
           }
-        }       
+        }
       }
       return true;
     }
@@ -190,7 +190,9 @@ public class GamebaseImporter
           int palOrNtsc = result.getInt("V_PalNTSC");
           int trueDriveEmu = result.getInt("V_TrueDriveEmu");
           String gemus = result.getString("Gemus");
-          
+
+          boolean vic20Cart = false;
+
           //Year can start with 99 for unknown, use 9999 for unknown. Gamebase uses several different ones (e.g. 9994)
           if (year.startsWith("99"))
           {
@@ -250,6 +252,10 @@ public class GamebaseImporter
           if (!cartridgePath.isEmpty())
           {
             gamefile = gbExtrasPath.toString() + "\\" + cartridgePath;
+            if (!isC64)
+            {
+              vic20Cart = true;
+            }
           }
           //Check tap for VIC-20
           if (!isC64 && gamefile.isEmpty())
@@ -267,6 +273,12 @@ public class GamebaseImporter
             }
           }
 
+          //Extra check for cart or not for vic-20: if description contains "cart", treat it as a cart.
+          if (!isC64 && description.contains("cart"))
+          {
+            vic20Cart = true;
+          }
+
           GbGameInfo info = new GbGameInfo(title,
                                            year,
                                            publisher,
@@ -279,7 +291,8 @@ public class GamebaseImporter
                                            joy1config,
                                            joy2config,
                                            advanced,
-                                           description);
+                                           description,
+                                           vic20Cart);
 
           gbGameInfoList.add(info);
           gameCount++;
@@ -396,7 +409,7 @@ public class GamebaseImporter
     {
       try
       {
-        String gameFile = getFileToInclude(gbGamesPath, gbGameInfo.getGamefile());
+        String gameFile = getFileToInclude(gbGamesPath, gbGameInfo.getGamefile(), gbGameInfo.isVic20Cart());
         importManager.addFromGamebaseImporter(gbGameInfo.getTitle(),
                                               gbGameInfo.getYear(),
                                               gbGameInfo.getPublisher(),
@@ -519,17 +532,28 @@ public class GamebaseImporter
     return returnValue;
   }
 
-  private String getFileToInclude(Path gbPath, String filenameInGb) throws IOException
+  private String getFileToInclude(Path gbPath, String filenameInGb, boolean isVic20cart) throws IOException
   {
     if (filenameInGb.isEmpty())
     {
       return "";
     }
+
     File gameFile = gbPath.resolve(filenameInGb).toFile();
-    File selectedFile = FileManager.createTempFileForScraper(new BufferedInputStream(new FileInputStream(gameFile)), gameFile.getName());
-    Path compressedFilePath = selectedFile.toPath().getParent().resolve(selectedFile.getName() + ".gz");
-    FileManager.compressGzip(selectedFile.toPath(), compressedFilePath);
-    return compressedFilePath.toString();
+    if (isVic20cart)
+    {
+      return FileManager
+        .getTempFileForVic20Cart(new BufferedInputStream(new FileInputStream(gameFile)), gameFile.getName()).toPath()
+        .toString();
+    }
+    else
+    {
+      File selectedFile = FileManager.createTempFileForScraper(new BufferedInputStream(new FileInputStream(gameFile)),
+                                                               gameFile.getName());
+      Path compressedFilePath = selectedFile.toPath().getParent().resolve(selectedFile.getName() + ".gz");
+      FileManager.compressGzip(selectedFile.toPath(), compressedFilePath);
+      return compressedFilePath.toString();
+    }
   }
 
   public void clearAfterImport()

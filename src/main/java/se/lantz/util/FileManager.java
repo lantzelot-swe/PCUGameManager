@@ -52,7 +52,7 @@ public class FileManager
   public static BufferedImage emptyVic20Cover;
   public static BufferedImage emptyC64Screenshot;
   public static BufferedImage emptyVic20Screenshot;
-  
+
   private static final String GAMES = "./games/";
   private static final String SCREENS = "./screens/";
   private static final String COVERS = "./covers/";
@@ -88,17 +88,17 @@ public class FileManager
     this.systemModel = model.getSystemModel();
     this.model = model;
   }
-  
+
   public static InputStream getMissingC64GameFile() throws URISyntaxException
-  {   
+  {
     return FileManager.class.getResourceAsStream("/se/lantz/MissingGame-C64.vsf.gz");
   }
-  
+
   public static InputStream getMissingVIC20GameFile() throws URISyntaxException
   {
-    return FileManager.class.getResourceAsStream("/se/lantz/MissingGame-Vic20.vsf.gz");  
+    return FileManager.class.getResourceAsStream("/se/lantz/MissingGame-Vic20.vsf.gz");
   }
- 
+
   public void saveFiles()
   {
     //Check if title is different that in db, then rename existing files!
@@ -507,50 +507,29 @@ public class FileManager
       if (gamePath != null)
       {
         appendCorrectFlagForGameFile(gamePath.toString(), command);
-        //        if (gamePath.toString().contains("crt"))
-        //        {
-        //          command.append("-cartcrt \"" + gamePath.toString() + "\"");
-        //        }
-        //        else
-        //        {
-        //          command.append("-autostart \"" + gamePath.toString() + "\"");
-        //        }
       }
       else
       {
         appendCorrectFlagForGameFile(gameFile, command);
-        //        //For Vic-20 treat prg's as carts. TODO: many cart alternatives for Vic-20, see GEMUS for GB-VIC20.
-        //        if (!systemModel.isC64() && gameFile.contains("prg"))
-        //        {
-        //          command.append("-cartA \"" + gameFile + "\"");
-        //        }
-        //        else
-        //        {
-        //          if (gameFile.contains("crt"))
-        //          {
-        //            command.append("-cartcrt \"" + decompressIfNeeded(gameFile) + "\"");
-        //          }
-        //          else
-        //          {
-        //            command.append("-autostart \"" + gameFile + "\"");
-        //          }
-        //        }
       }
     }
 
     //Append truedrive
-    command.append(" -autostart-handle-tde ");
-    if (systemModel.isAccurateDisk())
+    if (systemModel.isC64())
     {
-      command.append("-truedrive ");
-    }
-    else
-    {
-      command.append("+truedrive ");
-    }
-    if (systemModel.isReadOnly())
-    {
-      command.append("-attach8ro ");
+      command.append(" -autostart-handle-tde ");
+      if (systemModel.isAccurateDisk())
+      {
+        command.append("-truedrive ");
+      }
+      else
+      {
+        command.append("+truedrive ");
+      }
+      if (systemModel.isReadOnly())
+      {
+        command.append("-attach8ro ");
+      }
     }
 
     //Append default joystick port
@@ -585,43 +564,7 @@ public class FileManager
 
   private void appendCorrectFlagForGameFile(String gameFile, StringBuilder command)
   {
-    Map<String, String> nameToFlagMap = new HashMap<>();
-    nameToFlagMap.put("a0", "-cartA ");
-    nameToFlagMap.put("a0", "-cartA ");
-    if (!systemModel.isC64())
-    {
-      //VIC-20
-      if (gameFile.contains("crt"))
-      {
-        //Get the file flag
-        String fileFlag = gameFile.substring(gameFile.lastIndexOf("-") + 1, gameFile.indexOf("crt.gz") - 1);
-        if (fileFlag.contains("a0"))
-        {
-          command.append("-cartA \"" + gameFile + "\"");
-        }
-        else if (fileFlag.contains("b0"))
-        {
-          command.append("-cartB \"" + gameFile + "\"");
-        }
-        else if (fileFlag.contains("20"))
-        {
-          command.append("-cart2 \"" + gameFile + "\"");
-        }
-        else if (fileFlag.contains("40"))
-        {
-          command.append("-cart4 \"" + gameFile + "\"");
-        }
-        else if (fileFlag.contains("60"))
-        {
-          command.append("-cart6 \"" + gameFile + "\"");
-        }
-      }
-      else
-      {
-          command.append("-autostart \"" + decompressIfNeeded(gameFile) + "\"");
-      }
-    }
-    else
+    if (systemModel.isC64())
     {
       //C64
       if (gameFile.contains("crt"))
@@ -631,6 +574,69 @@ public class FileManager
       else
       {
         command.append("-autostart \"" + gameFile + "\"");
+      }
+    }
+    else
+    {
+      //VIC-20
+      if (gameFile.endsWith(".zip"))
+      {
+        //Only carts ends with zip... try to decompress and add to command
+        List<String> crtFiles = unzipVic20cart(new File(gameFile));
+        for (String file : crtFiles)
+        {
+          String fileFlag = file.substring(file.lastIndexOf("-") + 1, file.lastIndexOf("-") + 3);
+          if (fileFlag.contains("a0"))
+          {
+            command.append("-cartA \"" + file + "\" ");
+          }
+          else if (fileFlag.contains("b0"))
+          {
+            command.append("-cartB \"" + file + "\" ");
+          }
+          else if (fileFlag.contains("20"))
+          {
+            command.append("-cart2 \"" + file + "\" ");
+          }
+          else if (fileFlag.contains("40"))
+          {
+            command.append("-cart4 \"" + file + "\" ");
+          }
+          else if (fileFlag.contains("60"))
+          {
+            command.append("-cart6 \"" + file + "\" ");
+          }
+        }
+      }
+      //This is obsolete, all carts are zip files now, kept for backwards compatibility
+      else if (gameFile.contains("crt"))
+      {
+        //Get the file flag
+        String fileFlag = gameFile.substring(gameFile.lastIndexOf("-") + 1, gameFile.indexOf("crt.gz") - 1);
+        if (fileFlag.contains("a0"))
+        {
+          command.append("-cartA \"" + gameFile + "\" ");
+        }
+        else if (fileFlag.contains("b0"))
+        {
+          command.append("-cartB \"" + gameFile + "\" ");
+        }
+        else if (fileFlag.contains("20"))
+        {
+          command.append("-cart2 \"" + gameFile + "\" ");
+        }
+        else if (fileFlag.contains("40"))
+        {
+          command.append("-cart4 \"" + gameFile + "\" ");
+        }
+        else if (fileFlag.contains("60"))
+        {
+          command.append("-cart6 \"" + gameFile + "\" ");
+        }
+      }
+      else
+      {
+        command.append("-autostart \"" + decompressIfNeeded(gameFile) + "\" ");
       }
     }
   }
@@ -1027,6 +1033,22 @@ public class FileManager
     return newImage;
   }
 
+  public static File getTempFileForVic20Cart(BufferedInputStream inputStream, String gameFilename) throws IOException
+  {
+    Files.createDirectories(TEMP_PATH);
+    File file = new File(TEMP_PATH + File.separator + gameFilename);
+    FileOutputStream fos = new FileOutputStream(file, false);
+    byte[] buffer = new byte[1024];
+    int len;
+    while ((len = inputStream.read(buffer)) != -1)
+    {
+      fos.write(buffer, 0, len);
+    }
+    inputStream.close();
+    fos.close();
+    return file;
+  }
+
   public static File createTempFileForScraper(BufferedInputStream inputStream, String gameFilename) throws IOException
   {
     Files.createDirectories(TEMP_PATH);
@@ -1041,6 +1063,48 @@ public class FileManager
     inputStream.close();
     fos.close();
     return unzipAndPickFirstEntry(file);
+  }
+
+  public static List<String> unzipVic20cart(File file)
+  {
+    List<String> unzippedFilesList = new ArrayList<>();
+
+    String zipFilePath = file.getAbsolutePath();
+    Path filePath = null;
+    FileInputStream fis;
+    //buffer for read and write data to file
+    byte[] buffer = new byte[1024];
+    try
+    {
+      fis = new FileInputStream(zipFilePath);
+      ZipArchiveInputStream zis = new ZipArchiveInputStream(fis);
+      ZipEntry ze = zis.getNextZipEntry();
+      while (ze != null)
+      {
+        String fileName = ze.getName();
+        File newFile = new File(TEMP_PATH + File.separator + fileName);
+        //create directories for sub directories in zip
+        new File(newFile.getParent()).mkdirs();
+        FileOutputStream fos = new FileOutputStream(newFile);
+        int len;
+        while ((len = zis.read(buffer)) > 0)
+        {
+          fos.write(buffer, 0, len);
+        }
+        fos.close();
+        filePath = newFile.toPath();
+        unzippedFilesList.add(filePath.toString());
+        ze = zis.getNextZipEntry();
+      }
+      //close this ZipEntry
+      zis.close();
+      fis.close();
+    }
+    catch (IOException e)
+    {
+      ExceptionHandler.logException(e, "Could not unzip file");
+    }
+    return unzippedFilesList;
   }
 
   public static File unzipAndPickFirstEntry(File file)
