@@ -99,7 +99,7 @@ public class FilterPanel extends JPanel
       GridBagConstraints gbc_orScrollPane = new GridBagConstraints();
       gbc_orScrollPane.weighty = 1.0;
       gbc_orScrollPane.weightx = 1.0;
-      gbc_orScrollPane.insets = new Insets(5, 5, 0, 5);
+      gbc_orScrollPane.insets = new Insets(0, 5, 0, 5);
       gbc_orScrollPane.fill = GridBagConstraints.BOTH;
       gbc_orScrollPane.gridx = 0;
       gbc_orScrollPane.gridy = 1;
@@ -118,13 +118,13 @@ public class FilterPanel extends JPanel
       GridBagConstraints gbc_orAddButton = new GridBagConstraints();
       gbc_orAddButton.anchor = GridBagConstraints.EAST;
       gbc_orAddButton.weightx = 1.0;
-      gbc_orAddButton.insets = new Insets(5, 5, 5, 5);
+      gbc_orAddButton.insets = new Insets(0, 5, 5, 5);
       gbc_orAddButton.gridx = 0;
       gbc_orAddButton.gridy = 0;
       orButtonPanel.add(getOrAddButton(), gbc_orAddButton);
       GridBagConstraints gbc_orRemoveButton = new GridBagConstraints();
       gbc_orRemoveButton.anchor = GridBagConstraints.EAST;
-      gbc_orRemoveButton.insets = new Insets(5, 0, 5, 5);
+      gbc_orRemoveButton.insets = new Insets(0, 0, 5, 5);
       gbc_orRemoveButton.gridx = 1;
       gbc_orRemoveButton.gridy = 0;
       orButtonPanel.add(getOrRemoveButton(), gbc_orRemoveButton);
@@ -418,7 +418,7 @@ public class FilterPanel extends JPanel
       gbc_andInfoLabel.gridy = 0;
       andTablePanel.add(getAndInfoLabel(), gbc_andInfoLabel);
       GridBagConstraints gbc_andScrollPane = new GridBagConstraints();
-      gbc_andScrollPane.insets = new Insets(5, 5, 0, 5);
+      gbc_andScrollPane.insets = new Insets(0, 5, 0, 5);
       gbc_andScrollPane.weighty = 1.0;
       gbc_andScrollPane.weightx = 1.0;
       gbc_andScrollPane.fill = GridBagConstraints.BOTH;
@@ -468,12 +468,12 @@ public class FilterPanel extends JPanel
       GridBagConstraints gbc_andAddButton = new GridBagConstraints();
       gbc_andAddButton.weightx = 1.0;
       gbc_andAddButton.anchor = GridBagConstraints.EAST;
-      gbc_andAddButton.insets = new Insets(5, 5, 5, 5);
+      gbc_andAddButton.insets = new Insets(0, 5, 5, 5);
       gbc_andAddButton.gridx = 0;
       gbc_andAddButton.gridy = 0;
       andButtonPanel.add(getAndAddButton(), gbc_andAddButton);
       GridBagConstraints gbc_andRemoveButton = new GridBagConstraints();
-      gbc_andRemoveButton.insets = new Insets(5, 0, 5, 5);
+      gbc_andRemoveButton.insets = new Insets(0, 0, 5, 5);
       gbc_andRemoveButton.anchor = GridBagConstraints.EAST;
       gbc_andRemoveButton.gridx = 1;
       gbc_andRemoveButton.gridy = 0;

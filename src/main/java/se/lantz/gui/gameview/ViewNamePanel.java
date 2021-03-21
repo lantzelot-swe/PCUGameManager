@@ -32,7 +32,7 @@ public class ViewNamePanel extends JPanel
     setLayout(gridBagLayout);
     GridBagConstraints gbc_nameLabel = new GridBagConstraints();
     gbc_nameLabel.anchor = GridBagConstraints.WEST;
-    gbc_nameLabel.insets = new Insets(10, 5, 5, 5);
+    gbc_nameLabel.insets = new Insets(10, 5, 0, 5);
     gbc_nameLabel.gridx = 0;
     gbc_nameLabel.gridy = 0;
     add(getNameLabel(), gbc_nameLabel);
@@ -48,7 +48,7 @@ public class ViewNamePanel extends JPanel
   }
   private JLabel getNameLabel() {
     if (nameLabel == null) {
-    	nameLabel = new JLabel("View name");
+    	nameLabel = new JLabel("Gamelist view name");
     }
     return nameLabel;
   }

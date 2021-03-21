@@ -120,16 +120,16 @@ public class ListPanel extends JPanel
           public void actionPerformed(ActionEvent arg0)
           {
             JPopupMenu menu = new JPopupMenu();
-            JMenuItem addItem = new JMenuItem("Add view...");
+            JMenuItem addItem = new JMenuItem("Add gamelist view...");
             addItem.addActionListener(e -> gameViewManager.openViewEditDialog(new GameView(0)));
             menu.add(addItem);
             if (((GameView) getListViewComboBox().getSelectedItem()).getGameViewId() > 0)
             {
-              JMenuItem editItem = new JMenuItem("Edit view...");
+              JMenuItem editItem = new JMenuItem("Edit gamelist view...");
               editItem.addActionListener(e -> gameViewManager
                 .openViewEditDialog((GameView) getListViewComboBox().getSelectedItem()));
               menu.add(editItem);
-              JMenuItem deleteItem = new JMenuItem("Delete view...");
+              JMenuItem deleteItem = new JMenuItem("Delete gamelist view...");
               deleteItem
                 .addActionListener(e -> gameViewManager.deleteView((GameView) getListViewComboBox().getSelectedItem()));
               menu.add(deleteItem);

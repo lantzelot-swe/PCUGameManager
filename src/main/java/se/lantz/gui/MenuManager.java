@@ -182,7 +182,7 @@ public class MenuManager
 
   JMenuItem getDeleteGamesForViewMenuItem()
   {
-    deleteGamesForViewItem = new JMenuItem("Delete all games in current view");
+    deleteGamesForViewItem = new JMenuItem("Delete all games in current gamelist view");
 
     deleteGamesForViewItem.addActionListener(e -> deleteAllGamesInView());
     return deleteGamesForViewItem;
@@ -231,7 +231,7 @@ public class MenuManager
 
   private JMenuItem getRefreshItem()
   {
-    refreshItem = new JMenuItem("Reload current game view");
+    refreshItem = new JMenuItem("Reload current gamelist view");
     KeyStroke keyStrokeToReloadGameView = KeyStroke.getKeyStroke(KeyEvent.VK_F5, 0);
     refreshItem.setAccelerator(keyStrokeToReloadGameView);
     refreshItem.setMnemonic('C');

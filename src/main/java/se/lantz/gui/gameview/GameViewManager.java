@@ -28,11 +28,11 @@ public class GameViewManager
     GameViewEditDialog dialog = new GameViewEditDialog(MainWindow.getInstance(), gameView);
     if (gameView.getGameViewId() == 0)
     {
-      dialog.setTitle("Add game view");
+      dialog.setTitle("Add gamelist view");
     }
     else
     {
-      dialog.setTitle("Edit game view");
+      dialog.setTitle("Edit gamelist view");
     }
     dialog.pack();
     dialog.setLocationRelativeTo(MainWindow.getInstance());
@@ -62,8 +62,8 @@ public class GameViewManager
   
   public void deleteView(GameView view)
   {
-    String message = "Do you want to delete the game view  \"" + view.getName() + "\"?";
-    int value = JOptionPane.showConfirmDialog(MainWindow.getInstance().getMainPanel(), message, "Delete game view", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+    String message = "Do you want to delete the gamelist view  \"" + view.getName() + "\"?";
+    int value = JOptionPane.showConfirmDialog(MainWindow.getInstance().getMainPanel(), message, "Delete gamelist view", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
     if (value == JOptionPane.YES_OPTION)
     {
       uiModel.deleteGameView(view);
