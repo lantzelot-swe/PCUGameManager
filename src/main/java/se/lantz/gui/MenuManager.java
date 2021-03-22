@@ -314,7 +314,7 @@ public class MenuManager
 
   private JMenuItem getDeleteAllGamesItem()
   {
-    deleteAllGamesItem = new JMenuItem("Delete all games");
+    deleteAllGamesItem = new JMenuItem("Delete all games in database");
     deleteAllGamesItem.addActionListener(e -> deleteAllGames());
     return deleteAllGamesItem;
   }

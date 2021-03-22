@@ -203,7 +203,7 @@ public class GameBaseOptionsPanel extends JPanel
     	systemPanel.add(getVic20RadioButton(), gbc_vic20RadioButton);
     	//Set initial selected system based on selected file in SelectDirPanel
     	File selectedDir = getSelectDirPanel().getTargetDirectory();
-    	if (selectedDir.toString().contains("Vic"))
+    	if (selectedDir.toString().contains("Vic20"))
     	{
     	  getVic20RadioButton().setSelected(true);
     	}
