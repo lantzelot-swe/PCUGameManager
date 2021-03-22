@@ -175,132 +175,9 @@ public class GamebaseImporter
       int gameCount = 0;
       while (result.next())
       {
-        String title = "";
-        try
+        if (createGbGameInfo(result, statement, builder))
         {
-          title = result.getString("Name");
-          String year = result.getString("Year");
-          int gameId = result.getInt("GA_Id");
-          String gamefile = result.getString("Filename");
-          String screen1 = result.getString("ScrnShotFileName");
-          String musician = result.getString("Musician");
-          String genre = result.getString("ParentGenre");
-          String publisher = result.getString("Publisher");
-          int control = result.getInt("Control");
-          int palOrNtsc = result.getInt("V_PalNTSC");
-          int trueDriveEmu = result.getInt("V_TrueDriveEmu");
-          String gemus = result.getString("Gemus");
-
-          boolean vic20Cart = false;
-
-          //Year can start with 99 for unknown, use 9999 for unknown. Gamebase uses several different ones (e.g. 9994)
-          if (year.startsWith("99"))
-          {
-            year = "9999";
-          }
-
-          //GB64 includes game files for all games, no extras available. GbVic20 can have empty 
-          //game files but available TAP or CART images
-          if (isC64 && gamefile.isEmpty() && !includeEntriesWithMissingGameFile)
-          {
-            builder.append("Ignoring " + title + " (No game file available)\n");
-            continue;
-          }
-
-          //Setup advanced string (system, sid, pal, truedrive etc)
-          String advanced = constructAdvancedString(palOrNtsc, trueDriveEmu, gemus);
-
-          //Description: add key-value pairs for Vic-20 since that holds important info about memory expansion
-          String description = "";
-          if (!isC64)
-          {
-            description = gemus;
-          }
-          //Control: 0=JoyPort2, 1=JoyPort1, 2=Keyboard, 3=PaddlePort2, 4=PaddlePort1, 5=Mouse, 6=LightPen, 7=KoalaPad, 8=LightGun
-          //Setup joystick port
-          String joy1config;
-          String joy2config;
-          if (control == 1)
-          {
-            //1 means joystick port 1 in the gb database
-            joy1config = "J:1*" + joyBase;
-            joy2config = "J:2" + joyBase;
-          }
-          else
-          {
-            //For anything else, use port 2.
-            joy1config = "J:1" + joyBase;
-            joy2config = "J:2*" + joyBase;
-          }
-
-          //Fix screenshots
-          String screen2 = "";
-          if (screen1 != null && !screen1.isEmpty())
-          {
-            screen1 = gbScreensPath.toString() + "\\" + screen1;
-            screen2 = getScreen2(screen1);
-          }
-
-          //Map genre properly towards existing ones for the carousel
-          genre = GamebaseScraper.mapGenre(genre);
-
-          //Get cover
-          String coverFile = getCoverPath(gameId, statement);
-
-          //Get cartridge if available, easyflash is preferred
-          String cartridgePath = getCartridgePath(gameId, statement);
-          if (!cartridgePath.isEmpty())
-          {
-            gamefile = gbExtrasPath.toString() + "\\" + cartridgePath;
-            if (!isC64)
-            {
-              vic20Cart = true;
-            }
-          }
-          //Check tap for VIC-20
-          if (!isC64 && gamefile.isEmpty())
-          {
-            String tapFile = getTapPath(gameId, statement);
-            if (!tapFile.isEmpty())
-            {
-              gamefile = gbExtrasPath.toString() + "\\" + tapFile;
-            }
-
-            if (gamefile.isEmpty() && !includeEntriesWithMissingGameFile)
-            {
-              builder.append("Ignoring " + title + " (No game file available)\n");
-              continue;
-            }
-          }
-
-          //Extra check for cart or not for vic-20: if description contains "cart", treat it as a cart.
-          if (!isC64 && description.contains("cart"))
-          {
-            vic20Cart = true;
-          }
-
-          GbGameInfo info = new GbGameInfo(title,
-                                           year,
-                                           publisher,
-                                           musician,
-                                           genre,
-                                           gamefile,
-                                           coverFile,
-                                           screen1,
-                                           screen2,
-                                           joy1config,
-                                           joy2config,
-                                           advanced,
-                                           description,
-                                           vic20Cart);
-
-          gbGameInfoList.add(info);
           gameCount++;
-        }
-        catch (Exception e)
-        {
-          builder.append("ERROR: Could not fetch all info for " + title + ":\n" + e.toString() + "\n");
-          ExceptionHandler.handleException(e, "Could not fetch all info for " + title);
         }
       }
       builder.append("Read " + gameCount + " games from the gamebase db.\n");
@@ -311,6 +188,146 @@ public class GamebaseImporter
       ExceptionHandler.handleException(ex, "Query failed");
     }
     return builder;
+  }
+  
+  private boolean createGbGameInfo(ResultSet result, Statement statement, StringBuilder builder)
+  {
+    String title = "";
+    try
+    {
+      title = result.getString("Name");
+      String year = result.getString("Year");
+      int gameId = result.getInt("GA_Id");
+      String gamefile = result.getString("Filename");
+      String screen1 = result.getString("ScrnShotFileName");
+      String musician = result.getString("Musician");
+      String genre = result.getString("ParentGenre");
+      String publisher = result.getString("Publisher");
+      int control = result.getInt("Control");
+      int palOrNtsc = result.getInt("V_PalNTSC");
+      int trueDriveEmu = result.getInt("V_TrueDriveEmu");
+      String gemus = result.getString("Gemus");
+
+      String vic20Description = "";
+      boolean vic20Cart = false;
+      
+      //Game file
+      if (isC64)
+      {
+        //GB64 includes game files for all games, no additional extras available.
+        if (gamefile.isEmpty() && !includeEntriesWithMissingGameFile)
+        {
+          builder.append("Ignoring " + title + " (No game file available)\n");
+          return false;
+        }
+        
+        //1: Cartridge preferred, easyflash is preferred
+        String cartridgePath = getCartridgePath(gameId, statement);
+        if (!cartridgePath.isEmpty())
+        {
+          gamefile = gbExtrasPath.toString() + "\\" + cartridgePath;
+        }        
+      }
+      else
+      {
+        //Description: add key-value pairs for Vic-20 since that holds important info about memory expansion
+        vic20Description = gemus;
+        //1: Cartridge preferred
+        String cartridgePath = getCartridgePath(gameId, statement);
+        if (!cartridgePath.isEmpty())
+        {
+          gamefile = gbExtrasPath.toString() + "\\" + cartridgePath;      
+          vic20Cart = true;
+        }      
+        if (!gamefile.isEmpty())
+        {
+          //2: GameFile
+          //Extra check for cart or not for vic-20: if description contains "cart", treat it as a cart.
+          if (vic20Description.contains("cart"))
+          {
+            vic20Cart = true;
+          }
+        }
+        else 
+        {
+          //3: Tap
+          String tapFile = getTapPath(gameId, statement);
+          if (!tapFile.isEmpty())
+          {
+            gamefile = gbExtrasPath.toString() + "\\" + tapFile;
+          }
+
+          if (gamefile.isEmpty() && !includeEntriesWithMissingGameFile)
+          {
+            builder.append("Ignoring " + title + " (No game file available)\n");
+            return false;
+          }
+        }
+      }
+      
+      //Year can start with 99 for unknown, use 9999 for unknown. Gamebase uses several different ones (e.g. 9994)
+      if (year.startsWith("99"))
+      {
+        year = "9999";
+      }
+      
+      //Setup advanced string (system, sid, pal, truedrive etc)
+      String advanced = constructAdvancedString(palOrNtsc, trueDriveEmu, gemus);
+
+      //Control: 0=JoyPort2, 1=JoyPort1, 2=Keyboard, 3=PaddlePort2, 4=PaddlePort1, 5=Mouse, 6=LightPen, 7=KoalaPad, 8=LightGun
+      //Setup joystick port
+      String joy1config;
+      String joy2config;
+      if (control == 1)
+      {
+        //1 means joystick port 1 in the gb database
+        joy1config = "J:1*" + joyBase;
+        joy2config = "J:2" + joyBase;
+      }
+      else
+      {
+        //For anything else, use port 2.
+        joy1config = "J:1" + joyBase;
+        joy2config = "J:2*" + joyBase;
+      }
+
+      //Fix screenshots
+      String screen2 = "";
+      if (screen1 != null && !screen1.isEmpty())
+      {
+        screen1 = gbScreensPath.toString() + "\\" + screen1;
+        screen2 = getScreen2(screen1);
+      }
+
+      //Map genre properly towards existing ones for the carousel
+      genre = GamebaseScraper.mapGenre(genre);
+
+      //Get cover
+      String coverFile = getCoverPath(gameId, statement);
+      
+      //Add to list to be processed in next import step.
+      gbGameInfoList.add(new GbGameInfo(title,
+                                        year,
+                                        publisher,
+                                        musician,
+                                        genre,
+                                        gamefile,
+                                        coverFile,
+                                        screen1,
+                                        screen2,
+                                        joy1config,
+                                        joy2config,
+                                        advanced,
+                                        vic20Description,
+                                        vic20Cart));
+      return true;
+    }
+    catch (Exception e)
+    {
+      builder.append("ERROR: Could not fetch all info for " + title + ":\n" + e.toString() + "\n");
+      ExceptionHandler.handleException(e, "Could not fetch all info for " + title);
+    }
+    return false;
   }
 
   private String getCoverPath(int gameId, Statement statement) throws SQLException

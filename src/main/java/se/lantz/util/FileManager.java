@@ -608,7 +608,7 @@ public class FileManager
           }
         }
       }
-      //This is obsolete, all carts are zip files now, kept for backwards compatibility
+      //This is obsolete, all vic-20 carts are zip files now to support multicarts, kept for backwards compatibility
       else if (gameFile.contains("crt"))
       {
         //Get the file flag
@@ -1033,6 +1033,13 @@ public class FileManager
     return newImage;
   }
 
+  /**
+   * Creates a temporary file from inputStream, just leaving the File as-is.
+   * @param inputStream The stream to read from
+   * @param gameFilename The name of the file
+   * @return The created temporary file
+   * @throws IOException if a File cannot be created.
+   */
   public static File getTempFileForVic20Cart(BufferedInputStream inputStream, String gameFilename) throws IOException
   {
     Files.createDirectories(TEMP_PATH);
@@ -1049,6 +1056,15 @@ public class FileManager
     return file;
   }
 
+  /**
+   * Creates a temporary file from inputStream, unzips the File and picks the first valid entry in the file.
+   * Since GB64 for example can contain multiple disk images The first one is picked (no support for disk swap in the carousel).
+   * For some file a .NFO file is the first entry, which will not work when passing it to the carousel.
+   * @param inputStream The stream to read from
+   * @param gameFilename The name of the file
+   * @return The first entry in the zip file (unzipped) to be included with the game during import.
+   * @throws IOException if a File cannot be created.
+   */
   public static File createTempFileForScraper(BufferedInputStream inputStream, String gameFilename) throws IOException
   {
     Files.createDirectories(TEMP_PATH);

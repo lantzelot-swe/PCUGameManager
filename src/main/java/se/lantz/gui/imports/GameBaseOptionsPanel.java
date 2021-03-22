@@ -15,6 +15,7 @@ import javax.swing.JRadioButton;
 import javax.swing.ButtonGroup;
 import javax.swing.JTextField;
 import java.awt.event.ActionListener;
+import java.io.File;
 import java.awt.event.ActionEvent;
 import javax.swing.JCheckBox;
 
@@ -200,6 +201,12 @@ public class GameBaseOptionsPanel extends JPanel
     	gbc_vic20RadioButton.gridx = 0;
     	gbc_vic20RadioButton.gridy = 1;
     	systemPanel.add(getVic20RadioButton(), gbc_vic20RadioButton);
+    	//Set initial selected system based on selected file in SelectDirPanel
+    	File selectedDir = getSelectDirPanel().getTargetDirectory();
+    	if (selectedDir.toString().contains("Vic"))
+    	{
+    	  getVic20RadioButton().setSelected(true);
+    	}
     }
     return systemPanel;
   }
