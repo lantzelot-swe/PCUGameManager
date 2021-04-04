@@ -41,13 +41,35 @@ public class GameListData implements Comparable
   
   public void toggleFavorite()
   {
-    this.favorite = favorite == 0 ? 1 : 0;
+    this.favorite = favorite == 1 ? 0 : 1;
+  }
+  
+  public void toggleFavorite2()
+  {
+    this.favorite = favorite == 2 ? 0 : 2;
+  }
+  
+  public void toggleFavorite3()
+  {
+    this.favorite = favorite == 3 ? 0 : 3;
+  }
+  public void toggleFavorite4()
+  {
+    this.favorite = favorite == 4 ? 0 : 4;
+  }
+  public void toggleFavorite5()
+  {
+    this.favorite = favorite == 5 ? 0 : 5;
   }
 
   public boolean isFavorite()
   {
-    //For now "1" means favorite and "0 means no favorite. Possible to add support for multiple favorite lists later on.
-    return favorite == 1;
+    return favorite > 0;
+  }
+  
+  public int getFavoriteNumber()
+  {
+    return favorite;
   }
 
   public void setFavorite(int favorite)

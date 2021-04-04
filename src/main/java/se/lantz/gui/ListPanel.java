@@ -23,6 +23,7 @@ import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
+import javax.swing.ToolTipManager;
 
 import se.lantz.gui.gameview.GameViewManager;
 import se.lantz.model.MainViewModel;
@@ -166,6 +167,7 @@ public class ListPanel extends JPanel
           }
         });
       listViewComboBox.setModel(uiModel.getGameViewModel());
+      listViewComboBox.setRenderer(new GameListDataRenderer());
     }
     return listViewComboBox;
   }
@@ -401,6 +403,8 @@ public class ListPanel extends JPanel
       });
       list.setModel(uiModel.getGameListModel());
       list.setCellRenderer(new GameListDataRenderer());
+      //Remove from tootlipManager to avoid throwing a nullpointer for CTRL+F1
+      ToolTipManager.sharedInstance().unregisterComponent(list);
     }
     return list;
   }
@@ -442,6 +446,56 @@ public class ListPanel extends JPanel
       for (GameListData  glData : list.getSelectedValuesList())
       {
         uiModel.toggleFavorite(glData);
+      }
+      mainPanel.repaintAfterModifications();
+    }
+  }
+  
+  public void toggleFavorite2()
+  {
+    if (!uiModel.isDataChanged())
+    {
+      for (GameListData  glData : list.getSelectedValuesList())
+      {
+        uiModel.toggleFavorite2(glData);
+      }
+      mainPanel.repaintAfterModifications();
+    }
+  }
+  
+  public void toggleFavorite3()
+  {
+    if (!uiModel.isDataChanged())
+    {
+      for (GameListData  glData : list.getSelectedValuesList())
+      {
+        uiModel.toggleFavorite3(glData);
+      }
+      mainPanel.repaintAfterModifications();
+    }
+  }
+  
+  
+  public void toggleFavorite4()
+  {
+    if (!uiModel.isDataChanged())
+    {
+      for (GameListData  glData : list.getSelectedValuesList())
+      {
+        uiModel.toggleFavorite4(glData);
+      }
+      mainPanel.repaintAfterModifications();
+    }
+  }
+  
+  
+  public void toggleFavorite5()
+  {
+    if (!uiModel.isDataChanged())
+    {
+      for (GameListData  glData : list.getSelectedValuesList())
+      {
+        uiModel.toggleFavorite5(glData);
       }
       mainPanel.repaintAfterModifications();
     }

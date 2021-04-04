@@ -10,6 +10,10 @@ public class GameView implements Comparable
 {
   public static final int ALL_GAMES_ID = -1;
   public static final int FAVORITES_ID = -2;
+  public static final int FAVORITES_2_ID = -3;
+  public static final int FAVORITES_3_ID = -4;
+  public static final int FAVORITES_4_ID = -5;
+  public static final int FAVORITES_5_ID = -6;
   private static final Logger logger = LoggerFactory.getLogger(GameView.class);
   private String name = "";
   private List<ViewFilter> viewFilters = new ArrayList<>();

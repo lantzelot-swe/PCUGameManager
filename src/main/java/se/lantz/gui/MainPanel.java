@@ -1,11 +1,17 @@
 package se.lantz.gui;
 
 import java.awt.BorderLayout;
+import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
 import java.util.List;
 
+import javax.swing.InputMap;
+import javax.swing.JComponent;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
+import javax.swing.KeyStroke;
+import javax.swing.ToolTipManager;
 
 import se.lantz.model.MainViewModel;
 import se.lantz.model.data.GameListData;
@@ -170,6 +176,26 @@ public class MainPanel extends JPanel
   public void toggleFavorite()
   {
     getListPanel().toggleFavorite();
+  }
+  
+  public void toggleFavorite2()
+  {
+    getListPanel().toggleFavorite2();
+  }
+  
+  public void toggleFavorite3()
+  {
+    getListPanel().toggleFavorite3();
+  }
+  
+  public void toggleFavorite4()
+  {
+    getListPanel().toggleFavorite4();
+  }
+  
+  public void toggleFavorite5()
+  {
+    getListPanel().toggleFavorite5();
   }
   
   public void runCurrentGame()

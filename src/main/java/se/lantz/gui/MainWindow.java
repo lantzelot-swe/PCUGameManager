@@ -7,10 +7,8 @@ import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
-import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 
-import se.lantz.gui.scraper.MobyGamesOptionsPanel;
 import se.lantz.model.MainViewModel;
 import se.lantz.util.FileManager;
 
@@ -25,12 +23,12 @@ public final class MainWindow extends JFrame
   private JMenuBar menuBar;
   private final MainViewModel uiModel;
   private final MenuManager menuManager;
-  
+
   private static MainWindow instance = null;
-  
+
   private Cursor waitCursor = new Cursor(Cursor.WAIT_CURSOR);
   private Cursor defaultCursor = new Cursor(Cursor.DEFAULT_CURSOR);
-  
+
   public static MainWindow getInstance()
   {
     if (instance == null)
@@ -39,11 +37,11 @@ public final class MainWindow extends JFrame
     }
     return instance;
   }
-  
-  public static boolean isInitialized() {
+
+  public static boolean isInitialized()
+  {
     return instance != null;
   }
-  
 
   private MainWindow()
   {
@@ -52,7 +50,7 @@ public final class MainWindow extends JFrame
     uiModel = new MainViewModel();
     menuManager = new MenuManager(uiModel, this);
     this.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
-    
+
     this.addWindowListener(new java.awt.event.WindowAdapter()
       {
         public void windowClosing(java.awt.event.WindowEvent e)
@@ -62,9 +60,8 @@ public final class MainWindow extends JFrame
       });
     getContentPane().add(getMainPanel(), BorderLayout.CENTER);
 
-    
     this.setJMenuBar(getMainMenuBar());
-    
+
     //Update title with version if available
     String versionValue = FileManager.getPcuVersionFromManifest();
     if (!versionValue.isEmpty())
@@ -72,7 +69,7 @@ public final class MainWindow extends JFrame
       setTitle("PCU Game Manager v." + versionValue);
     }
   }
-  
+
   public void initialize()
   {
     getMainPanel().initialize();
@@ -100,22 +97,22 @@ public final class MainWindow extends JFrame
     }
     return menuBar;
   }
-  
+
   public void reloadCurrentGameView()
   {
     getMainPanel().reloadCurrentGameView();
   }
-  
+
   public void repaintAfterModifications()
   {
     getMainPanel().repaintAfterModifications();
   }
-  
+
   public void selectViewAfterRestore()
   {
     getMainPanel().selectViewAfterRestore();
   }
-  
+
   public void setWaitCursor(boolean wait)
   {
     if (wait)

@@ -1005,9 +1005,9 @@ public class DbConnector
     }
   }
 
-  public void toggleFavorite(String gameId, int currentFavoriteValue)
+  public void toggleFavorite(String gameId, int currentFavoriteValue, int newFavorite)
   {
-    int newValue = currentFavoriteValue == 0 ? 1 : 0;
+    int newValue = currentFavoriteValue == newFavorite ? 0: newFavorite;
     String sql = "UPDATE gameinfo SET Favorite = " + newValue + " WHERE rowId = " + gameId + ";";
     try (Connection conn = this.connect(); PreparedStatement favoritestmt = conn.prepareStatement(sql))
     {
@@ -1020,9 +1020,9 @@ public class DbConnector
     }
   }
 
-  public void clearFavorites()
+  public void clearFavorites(int favoriteNumber)
   {
-    String sql = "UPDATE gameinfo SET Favorite = 0 where Favorite = 1;";
+    String sql = "UPDATE gameinfo SET Favorite = 0 where Favorite = " + favoriteNumber + ";";
     try (Connection conn = this.connect(); PreparedStatement favoritestmt = conn.prepareStatement(sql))
     {
       int value = favoritestmt.executeUpdate();

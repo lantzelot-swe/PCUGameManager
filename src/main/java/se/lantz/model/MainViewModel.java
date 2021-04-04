@@ -36,8 +36,16 @@ public class MainViewModel extends AbstractModel
   private GameView selectedGameView;
   private int allGamesCount = 0;
   private int favoritesCount = 0;
+  private int favorites2Count = 0;
+  private int favorites3Count = 0;
+  private int favorites4Count = 0;
+  private int favorites5Count = 0;
   private GameView allGameView;
   private GameView favoritesView;
+  private GameView favorites2View;
+  private GameView favorites3View;
+  private GameView favorites4View;
+  private GameView favorites5View;
 
   private InfoModel infoModel = new InfoModel();
   private JoystickModel joy1Model = new JoystickModel(true);
@@ -102,13 +110,33 @@ public class MainViewModel extends AbstractModel
     allGameView.setSqlQuery("");   
     selectedGameView = allGameView;
     
-    //Add favorites view
+    //Add favorites views
     favoritesView = new GameView(GameView.FAVORITES_ID);
-    favoritesView.setName("Favorites");
+    favoritesView.setName("Favorites 1");
     favoritesView.setSqlQuery(" WHERE Favorite = 1");
+    
+    favorites2View = new GameView(GameView.FAVORITES_2_ID);
+    favorites2View.setName("Favorites 2");
+    favorites2View.setSqlQuery(" WHERE Favorite = 2");
+    
+    favorites3View = new GameView(GameView.FAVORITES_3_ID);
+    favorites3View.setName("Favorites 3");
+    favorites3View.setSqlQuery(" WHERE Favorite = 3");
+    
+    favorites4View = new GameView(GameView.FAVORITES_4_ID);
+    favorites4View.setName("Favorites 4");
+    favorites4View.setSqlQuery(" WHERE Favorite = 4");
+    
+    favorites5View = new GameView(GameView.FAVORITES_5_ID);
+    favorites5View.setName("Favorites 5");
+    favorites5View.setSqlQuery(" WHERE Favorite = 5");
     
     gameViewModel.addElement(allGameView);
     gameViewModel.addElement(favoritesView);
+    gameViewModel.addElement(favorites2View);
+    gameViewModel.addElement(favorites3View);
+    gameViewModel.addElement(favorites4View);
+    gameViewModel.addElement(favorites5View);
 
     List<GameView> gameViewList = dbConnector.loadGameViews();
     Collections.sort(gameViewList);
@@ -259,14 +287,41 @@ public class MainViewModel extends AbstractModel
         this.allGamesCount = gamesList.size();
         //Update favorites count
         favoritesCount = 0;
+        favorites2Count = 0;
+        favorites3Count = 0;
+        favorites4Count = 0;
+        favorites5Count = 0;
         for (GameListData gameListData : gamesList)
         {
           if (gameListData.isFavorite())
           {
-            favoritesCount++;
+            switch (gameListData.getFavoriteNumber())
+            {
+            case 1:
+              favoritesCount++;
+              break;
+            case 2:
+              favorites2Count++;
+              break;
+            case 3:
+              favorites3Count++;
+              break;
+            case 4:
+              favorites4Count++;
+              break;
+            case 5:
+              favorites5Count++;
+              break;
+            default:
+              break;
+            }
           }
         }
         favoritesView.setGameCount(favoritesCount);
+        favorites2View.setGameCount(favorites2Count);
+        favorites3View.setGameCount(favorites3Count);
+        favorites4View.setGameCount(favorites4Count);
+        favorites5View.setGameCount(favorites5Count);
       }
       this.disableChangeNotification(false);
       logger.debug("...done.");
@@ -391,6 +446,26 @@ public class MainViewModel extends AbstractModel
           //Mark as favorites
           toggleFavorite(selectedData);
         }
+        else if (getSelectedGameView().getGameViewId() == GameView.FAVORITES_2_ID)
+        {
+          //Mark as favorites
+          toggleFavorite2(selectedData);
+        }
+        else if (getSelectedGameView().getGameViewId() == GameView.FAVORITES_3_ID)
+        {
+          //Mark as favorites
+          toggleFavorite3(selectedData);
+        }
+        else if (getSelectedGameView().getGameViewId() == GameView.FAVORITES_4_ID)
+        {
+          //Mark as favorites
+          toggleFavorite4(selectedData);
+        }
+        else if (getSelectedGameView().getGameViewId() == GameView.FAVORITES_5_ID)
+        {
+          //Mark as favorites
+          toggleFavorite5(selectedData);
+        }
       }
       else
       {
@@ -474,9 +549,9 @@ public class MainViewModel extends AbstractModel
     }
   }
   
-  public void clearFavorites()
+  public void clearFavorites(int number)
   {
-    dbConnector.clearFavorites();
+    dbConnector.clearFavorites(number);
     //Reload the current view
     reloadCurrentGameView();
   }
@@ -525,20 +600,126 @@ public class MainViewModel extends AbstractModel
       resetDataChanged();
     }
   }
+  
+  private void reduceFavoriteCount(int previousFavorite)
+  {
+    switch (previousFavorite)
+    {
+    case 1:
+      favoritesView.setGameCount(--favoritesCount);
+      break;
+    case 2:
+      favorites2View.setGameCount(--favorites2Count);
+      break;
+    case 3:
+      favorites3View.setGameCount(--favorites3Count);
+      break;
+    case 4:
+      favorites4View.setGameCount(--favorites4Count);
+      break;
+    case 5:
+      favorites5View.setGameCount(--favorites5Count);
+      break;
+    default:
+      break;
+    }
+  }
 
   public void toggleFavorite(GameListData data)
   {
     if (data != null && !data.getGameId().isEmpty())
     {
-      dbConnector.toggleFavorite(data.getGameId(), data.getFavorite());
+      int previousFavorite = data.getFavorite();
+      dbConnector.toggleFavorite(data.getGameId(), previousFavorite, 1);
       data.toggleFavorite();
       if (data.isFavorite())
       {
         favoritesView.setGameCount(++favoritesCount);
+        reduceFavoriteCount(previousFavorite);
       }
       else
       {
         favoritesView.setGameCount(--favoritesCount);
+      }
+      gameListModel.notifyChange();
+    }
+  }
+  
+  public void toggleFavorite2(GameListData data)
+  {
+    if (data != null && !data.getGameId().isEmpty())
+    {
+      int previousFavorite = data.getFavorite();
+      dbConnector.toggleFavorite(data.getGameId(), previousFavorite, 2);
+      data.toggleFavorite2();
+      if (data.isFavorite())
+      {
+        favorites2View.setGameCount(++favorites2Count);
+        reduceFavoriteCount(previousFavorite);
+      }
+      else
+      {
+        favorites2View.setGameCount(--favorites2Count);
+      }
+      gameListModel.notifyChange();
+    }
+  }
+  
+  public void toggleFavorite3(GameListData data)
+  {
+    if (data != null && !data.getGameId().isEmpty())
+    {
+      int previousFavorite = data.getFavorite();
+      dbConnector.toggleFavorite(data.getGameId(), previousFavorite, 3);
+      data.toggleFavorite3();
+      if (data.isFavorite())
+      {
+        favorites3View.setGameCount(++favorites3Count);
+        reduceFavoriteCount(previousFavorite);
+      }
+      else
+      {
+        favorites3View.setGameCount(--favorites3Count);
+      }
+      gameListModel.notifyChange();
+    }
+  }
+  
+  public void toggleFavorite4(GameListData data)
+  {
+    if (data != null && !data.getGameId().isEmpty())
+    {
+      int previousFavorite = data.getFavorite();
+      dbConnector.toggleFavorite(data.getGameId(), previousFavorite, 4);
+      data.toggleFavorite4();
+      if (data.isFavorite())
+      {
+        favorites4View.setGameCount(++favorites4Count);
+        reduceFavoriteCount(previousFavorite);
+      }
+      else
+      {
+        favorites4View.setGameCount(--favorites4Count);
+      }
+      gameListModel.notifyChange();
+    }
+  }
+  
+  public void toggleFavorite5(GameListData data)
+  {
+    if (data != null && !data.getGameId().isEmpty())
+    {
+      int previousFavorite = data.getFavorite();
+      dbConnector.toggleFavorite(data.getGameId(), previousFavorite, 5);
+      data.toggleFavorite5();
+      if (data.isFavorite())
+      {
+        favorites5View.setGameCount(++favorites5Count);
+        reduceFavoriteCount(previousFavorite);
+      }
+      else
+      {
+        favorites5View.setGameCount(--favorites5Count);
       }
       gameListModel.notifyChange();
     }
