@@ -386,7 +386,7 @@ public class DbConnector
 
   public StringBuilder importRowsInGameInfoTable(List<String> rowValues,
                                                  ImportManager.Options option,
-                                                 boolean addAsFavorite)
+                                                 int addAsFavorite)
   {
     StringBuilder returnBuilder = new StringBuilder();
     switch (option)
@@ -408,7 +408,7 @@ public class DbConnector
 
   private void overwriteExistingAndInsertMissingIntoGameInfoTable(List<String> rowValues,
                                                                   StringBuilder infoBuilder,
-                                                                  boolean addAsFavorite)
+                                                                  int addAsFavorite)
   {
     List<String> existingRowValues = new ArrayList<>();
     List<String> newRowValues = new ArrayList<>();
@@ -470,7 +470,7 @@ public class DbConnector
 
   private void skipExistingAndInsertMissingIntoGameInfoTable(List<String> rowValues,
                                                              StringBuilder infoBuilder,
-                                                             boolean addAsFavorite)
+                                                             int addAsFavorite)
   {
     List<String> newRowValues = new ArrayList<>();
     //Check which are already available and sort them out of rowValues
@@ -535,7 +535,7 @@ public class DbConnector
     rowValues.addAll(newRowValues);
   }
 
-  private void insertAllIntoGameInfoTable(List<String> rowValues, StringBuilder infoBuilder, boolean addAsFavorite)
+  private void insertAllIntoGameInfoTable(List<String> rowValues, StringBuilder infoBuilder, int addAsFavorite)
   {
     infoBuilder.append("Adding ");
     infoBuilder.append(rowValues.size());
@@ -564,9 +564,9 @@ public class DbConnector
       String strippedRowData = stripRowDataFromOldFileNames(rowData);
       String duplicateIndex = rowData.substring(rowData.lastIndexOf(",")+1);
       st.append(strippedRowData);
-      if (addAsFavorite)
+      if (addAsFavorite > 0)
       {
-        st.append(",1");
+        st.append("," + addAsFavorite);
       }
       else
       {
@@ -623,7 +623,7 @@ public class DbConnector
     return splittedRowData[21].split("\"")[0];
   }
 
-  private void updateAllInGameInfoTable(List<String> rowValues, boolean addAsFavorite)
+  private void updateAllInGameInfoTable(List<String> rowValues, int addAsFavorite)
   {
     for (String rowValue : rowValues)
     {
@@ -654,9 +654,9 @@ public class DbConnector
           }
         }
       }
-      if (addAsFavorite)
+      if (addAsFavorite > 0)
       {
-        sqlBuilder.append(",Favorite = 1");
+        sqlBuilder.append(",Favorite = " + addAsFavorite);
       }
       else
       {

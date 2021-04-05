@@ -20,6 +20,7 @@ public class JoystickModel extends AbstractModel
 
   private Map<String, String> keyCodeMap = new HashMap<>();
   private List<String> keyCodeList = new ArrayList<>();
+  private Object latestConfigString;
 
   public JoystickModel(boolean port1)
   {
@@ -141,6 +142,7 @@ public class JoystickModel extends AbstractModel
 
   public void setConfigStringFromDb(String configString)
   {
+    this.latestConfigString = configString;
     if (configString == null || configString.isEmpty())
     {
       configList = new ArrayList<>();
@@ -170,6 +172,10 @@ public class JoystickModel extends AbstractModel
 
   public void setConfigString(String configString)
   {
+    if (this.latestConfigString.equals(configString))
+    {
+      return;
+    }
     disableChangeNotification(true);
     String definitions = configString;
     // Set all other fields based on configString
@@ -209,7 +215,7 @@ public class JoystickModel extends AbstractModel
     setUnused2(newConfigList.get(12));
     setUnused3(newConfigList.get(13));
     setUnused4(newConfigList.get(14));
-
+    this.latestConfigString = configString;
     disableChangeNotification(false);
     notifyChange();
   }

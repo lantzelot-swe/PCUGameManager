@@ -55,7 +55,7 @@ public class ImportManager
 
   private MainViewModel uiModel;
   private Options selectedOption;
-  private boolean addAsFavorite = false;
+  private int addAsFavorite = -1;
 
   public ImportManager(MainViewModel uiModel)
   {
@@ -67,9 +67,9 @@ public class ImportManager
     this.selectedOption = option;
   }
 
-  public void setAddAsFavorite(boolean favorite)
+  public void setAddAsFavorite(int favoriteValue)
   {
-    this.addAsFavorite = favorite;
+    this.addAsFavorite = favoriteValue;
   }
 
   public void setSelectedFoldersForGamebase(Path gamesFolder, Path screensPath, Path coversPath)

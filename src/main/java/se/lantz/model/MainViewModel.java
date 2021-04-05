@@ -217,7 +217,7 @@ public class MainViewModel extends AbstractModel
     TextComponentSupport.clearUndoManagers();
   }
 
-  public StringBuilder importGameInfo(List<String> rowValues, ImportManager.Options option, boolean addAsFavorite)
+  public StringBuilder importGameInfo(List<String> rowValues, ImportManager.Options option, int addAsFavorite)
   {
     return dbConnector.importRowsInGameInfoTable(rowValues, option, addAsFavorite);
   }

@@ -51,6 +51,7 @@ public class SystemModel extends AbstractModel
   private boolean reu2Mb = false;
   private boolean reu16Mb = false;
   private int verticalShift = 0;
+  private String latestConfigString = "";
   
   public SystemModel()
   {
@@ -293,8 +294,14 @@ public class SystemModel extends AbstractModel
         throw new IllegalArgumentException("Does not recognize " + flag);
       }
     }
+    
     disableChangeNotification(false);
-    notifyChange();
+    //Call getConfigString to get everything in the right order
+    if (!this.latestConfigString.equals(getConfigString()))
+    {
+      notifyChange();
+    }
+    this.latestConfigString = getConfigString();
   }
 
   public boolean isC64()
