@@ -252,7 +252,7 @@ public class ImportOptionsPanel extends JPanel
       gbc_skipRadioButton.gridwidth = 2;
       gbc_skipRadioButton.anchor = GridBagConstraints.WEST;
       gbc_skipRadioButton.weightx = 1.0;
-      gbc_skipRadioButton.insets = new Insets(0, 5, 5, 0);
+      gbc_skipRadioButton.insets = new Insets(0, 5, 0, 0);
       gbc_skipRadioButton.gridx = 0;
       gbc_skipRadioButton.gridy = 0;
       selectionPanel.add(getSkipRadioButton(), gbc_skipRadioButton);
@@ -260,7 +260,7 @@ public class ImportOptionsPanel extends JPanel
       gbc_overwriteRadioButton.gridwidth = 2;
       gbc_overwriteRadioButton.anchor = GridBagConstraints.WEST;
       gbc_overwriteRadioButton.weightx = 1.0;
-      gbc_overwriteRadioButton.insets = new Insets(0, 5, 5, 0);
+      gbc_overwriteRadioButton.insets = new Insets(0, 5, 0, 0);
       gbc_overwriteRadioButton.gridx = 0;
       gbc_overwriteRadioButton.gridy = 1;
       selectionPanel.add(getOverwriteRadioButton(), gbc_overwriteRadioButton);
