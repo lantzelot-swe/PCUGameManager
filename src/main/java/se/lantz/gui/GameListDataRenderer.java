@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Font;
 
+import javax.swing.BorderFactory;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.JList;
 
@@ -15,17 +16,17 @@ public class GameListDataRenderer extends DefaultListCellRenderer
   private Color fav1Color = Color.BLACK;
   private Color fav1ColorSelected = Color.WHITE;
   //Orange
-  private Color fav2Color = new Color(255, 106, 0);
-  private Color fav2ColorSelected = new Color(255, 163, 132);
+  private Color fav2Color = new Color(0, 38, 255);
+  private Color fav2ColorSelected = new Color(186, 202, 255);
   //Blue
-  private Color fav3Color = new Color(0, 38, 255);
-  private Color fav3ColorSelected = new Color(186, 202, 255);
+  private Color fav3Color = new Color(255, 106, 0);
+  private Color fav3ColorSelected = new Color(255, 163, 132);
   //Red
-  private Color fav4Color = Color.RED;
-  private Color fav4ColorSelected = Color.PINK;
+  private Color fav4Color = Color.GREEN.darker();
+  private Color fav4ColorSelected = Color.GREEN;
   //Green
-  private Color fav5Color = Color.GREEN.darker();
-  private Color fav5ColorSelected = Color.GREEN;
+  private Color fav5Color = Color.RED;
+  private Color fav5ColorSelected = Color.PINK;
 
   private final Font bold;
   private final Font plain;
@@ -51,7 +52,7 @@ public class GameListDataRenderer extends DefaultListCellRenderer
     }
     else
     {
-      handleGameListView(value, isSelected);
+      handleGameListView(value, isSelected, index);
     }
     return listCellRendererComponent;
   }
@@ -90,13 +91,18 @@ public class GameListDataRenderer extends DefaultListCellRenderer
     }
   }
   
-  private void handleGameListView(Object value, boolean isSelected)
+  private void handleGameListView(Object value, boolean isSelected, int index)
   {
+    this.setBorder(null);
     GameView view = (GameView) value;
     if (view.getGameViewId() == GameView.FAVORITES_ID)
     {
       this.setFont(bold);
       this.setForeground(isSelected ? fav1ColorSelected : fav1Color);
+      if(index > -1)
+      {
+        this.setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, Color.LIGHT_GRAY));
+      }
     }
     else if (view.getGameViewId() == GameView.FAVORITES_2_ID)
     {
@@ -117,6 +123,10 @@ public class GameListDataRenderer extends DefaultListCellRenderer
     {
       this.setFont(bold);
       this.setForeground(isSelected ? fav5ColorSelected : fav5Color);
+      if(index > -1)
+      {
+        this.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Color.LIGHT_GRAY));
+      }     
     }
     else
     {

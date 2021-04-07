@@ -3,6 +3,7 @@ package se.lantz.gui;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -14,6 +15,7 @@ import java.util.List;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JMenuItem;
@@ -24,6 +26,9 @@ import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
 import javax.swing.ToolTipManager;
+import javax.swing.event.PopupMenuEvent;
+import javax.swing.event.PopupMenuListener;
+import javax.swing.plaf.basic.ComboPopup;
 
 import se.lantz.gui.gameview.GameViewManager;
 import se.lantz.model.MainViewModel;
@@ -168,6 +173,31 @@ public class ListPanel extends JPanel
         });
       listViewComboBox.setModel(uiModel.getGameViewModel());
       listViewComboBox.setRenderer(new GameListDataRenderer());
+      listViewComboBox.addPopupMenuListener(new PopupMenuListener()
+        {
+          @Override
+          public void popupMenuWillBecomeVisible(PopupMenuEvent e)
+          {
+            ComboPopup popup = (ComboPopup) listViewComboBox.getUI().getAccessibleChild(listViewComboBox, 0);
+            //Each row is 14 pixels
+            int height = listViewComboBox.getModel().getSize() * 14 + 6;
+            ((JComponent) popup)
+              .setPreferredSize(new Dimension(listViewComboBox.getSize().width, Math.min(height, 700)));
+            ((JComponent) popup).setLayout(new GridLayout(1, 1));
+          }
+
+          @Override
+          public void popupMenuWillBecomeInvisible(PopupMenuEvent e)
+          {
+            //Empty
+          }
+
+          @Override
+          public void popupMenuCanceled(PopupMenuEvent e)
+          {
+            //Empty
+          }
+        });
     }
     return listViewComboBox;
   }
@@ -176,10 +206,12 @@ public class ListPanel extends JPanel
   {
     return getList().getSelectedValuesList();
   }
+
   boolean isSingleGameSelected()
   {
     return getList().getSelectedIndices().length == 1;
   }
+
   int getSelectedIndexInList()
   {
     return getList().getSelectedIndex();
@@ -275,9 +307,9 @@ public class ListPanel extends JPanel
               super.removeSelectionInterval(start, end);
             }
           }
-          
+
           @Override
-          public void addSelectionInterval(int anchor, int lead) 
+          public void addSelectionInterval(int anchor, int lead)
           {
             if (!uiModel.isDataChanged())
             {
@@ -384,7 +416,8 @@ public class ListPanel extends JPanel
           @Override
           public void mouseClicked(MouseEvent e)
           {
-            if (SwingUtilities.isLeftMouseButton(e) && e.getClickCount() == 2 && list.getSelectionModel().getSelectedItemsCount() == 1)
+            if (SwingUtilities.isLeftMouseButton(e) && e.getClickCount() == 2 &&
+              list.getSelectionModel().getSelectedItemsCount() == 1)
             {
               //trigger run game...
               MainWindow.getInstance().getMainPanel().runCurrentGame();
@@ -443,57 +476,55 @@ public class ListPanel extends JPanel
   {
     if (!uiModel.isDataChanged())
     {
-      for (GameListData  glData : list.getSelectedValuesList())
+      for (GameListData glData : list.getSelectedValuesList())
       {
         uiModel.toggleFavorite(glData);
       }
       mainPanel.repaintAfterModifications();
     }
   }
-  
+
   public void toggleFavorite2()
   {
     if (!uiModel.isDataChanged())
     {
-      for (GameListData  glData : list.getSelectedValuesList())
+      for (GameListData glData : list.getSelectedValuesList())
       {
         uiModel.toggleFavorite2(glData);
       }
       mainPanel.repaintAfterModifications();
     }
   }
-  
+
   public void toggleFavorite3()
   {
     if (!uiModel.isDataChanged())
     {
-      for (GameListData  glData : list.getSelectedValuesList())
+      for (GameListData glData : list.getSelectedValuesList())
       {
         uiModel.toggleFavorite3(glData);
       }
       mainPanel.repaintAfterModifications();
     }
   }
-  
-  
+
   public void toggleFavorite4()
   {
     if (!uiModel.isDataChanged())
     {
-      for (GameListData  glData : list.getSelectedValuesList())
+      for (GameListData glData : list.getSelectedValuesList())
       {
         uiModel.toggleFavorite4(glData);
       }
       mainPanel.repaintAfterModifications();
     }
   }
-  
-  
+
   public void toggleFavorite5()
   {
     if (!uiModel.isDataChanged())
     {
-      for (GameListData  glData : list.getSelectedValuesList())
+      for (GameListData glData : list.getSelectedValuesList())
       {
         uiModel.toggleFavorite5(glData);
       }
