@@ -303,7 +303,9 @@ public class MenuManager
     KeyStroke keyStrokeToToggleFav = KeyStroke.getKeyStroke(KeyEvent.VK_F1, InputEvent.CTRL_DOWN_MASK);
     toggleFavorite1Item.setAccelerator(keyStrokeToToggleFav);
     toggleFavorite1Item.addActionListener(e -> {
+      mainWindow.setWaitCursor(true);
       mainWindow.getMainPanel().toggleFavorite();
+      mainWindow.setWaitCursor(false);
     });
     return toggleFavorite1Item;
   }
@@ -314,7 +316,9 @@ public class MenuManager
     KeyStroke keyStrokeToToggleFav = KeyStroke.getKeyStroke(KeyEvent.VK_F2, InputEvent.CTRL_DOWN_MASK);
     toggleFavorite2Item.setAccelerator(keyStrokeToToggleFav);
     toggleFavorite2Item.addActionListener(e -> {
+      mainWindow.setWaitCursor(true);
       mainWindow.getMainPanel().toggleFavorite2();
+      mainWindow.setWaitCursor(false);
     });
     return toggleFavorite2Item;
   }
@@ -325,7 +329,9 @@ public class MenuManager
     KeyStroke keyStrokeToToggleFav = KeyStroke.getKeyStroke(KeyEvent.VK_F3, InputEvent.CTRL_DOWN_MASK);
     toggleFavorite3Item.setAccelerator(keyStrokeToToggleFav);
     toggleFavorite3Item.addActionListener(e -> {
+      mainWindow.setWaitCursor(true);
       mainWindow.getMainPanel().toggleFavorite3();
+      mainWindow.setWaitCursor(false);
     });
     return toggleFavorite3Item;
   }
@@ -336,7 +342,9 @@ public class MenuManager
     KeyStroke keyStrokeToToggleFav = KeyStroke.getKeyStroke(KeyEvent.VK_F4, InputEvent.CTRL_DOWN_MASK);
     toggleFavorite4Item.setAccelerator(keyStrokeToToggleFav);
     toggleFavorite4Item.addActionListener(e -> {
+      mainWindow.setWaitCursor(true);
       mainWindow.getMainPanel().toggleFavorite4();
+      mainWindow.setWaitCursor(false);
     });
     return toggleFavorite4Item;
   }
@@ -347,7 +355,9 @@ public class MenuManager
     KeyStroke keyStrokeToToggleFav = KeyStroke.getKeyStroke(KeyEvent.VK_F5, InputEvent.CTRL_DOWN_MASK);
     toggleFavorite5Item.setAccelerator(keyStrokeToToggleFav);
     toggleFavorite5Item.addActionListener(e -> {
+      mainWindow.setWaitCursor(true);
       mainWindow.getMainPanel().toggleFavorite5();
+      mainWindow.setWaitCursor(false);
     });
     return toggleFavorite5Item;
   }
