@@ -11,7 +11,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
@@ -20,9 +19,7 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -39,6 +36,9 @@ import javax.imageio.ImageIO;
 import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.github.junrar.Archive;
+import com.github.junrar.rarfile.FileHeader;
 
 import se.lantz.db.DbConnector;
 import se.lantz.model.InfoModel;
@@ -1035,6 +1035,7 @@ public class FileManager
 
   /**
    * Creates a temporary file from inputStream, just leaving the File as-is.
+   * 
    * @param inputStream The stream to read from
    * @param gameFilename The name of the file
    * @return The created temporary file
@@ -1057,9 +1058,10 @@ public class FileManager
   }
 
   /**
-   * Creates a temporary file from inputStream, unzips the File and picks the first valid entry in the file.
-   * Since GB64 for example can contain multiple disk images The first one is picked (no support for disk swap in the carousel).
+   * Creates a temporary file from inputStream, unzips the File and picks the first valid entry in the file. Since GB64
+   * for example can contain multiple disk images The first one is picked (no support for disk swap in the carousel).
    * For some file a .NFO file is the first entry, which will not work when passing it to the carousel.
+   * 
    * @param inputStream The stream to read from
    * @param gameFilename The name of the file
    * @return The first entry in the zip file (unzipped) to be included with the game during import.
@@ -1068,7 +1070,7 @@ public class FileManager
   public static File createTempFileForScraper(BufferedInputStream inputStream, String gameFilename) throws IOException
   {
     Files.createDirectories(TEMP_PATH);
-    File file = new File(TEMP_PATH + File.separator + gameFilename + ".zip");
+    File file = new File(TEMP_PATH + File.separator + gameFilename);
     FileOutputStream fos = new FileOutputStream(file, false);
     byte[] buffer = new byte[1024];
     int len;
@@ -1078,6 +1080,10 @@ public class FileManager
     }
     inputStream.close();
     fos.close();
+    if (gameFilename.toLowerCase().endsWith(".rar"))
+    {
+      return unrarAndPickFirstEntry(file);
+    }
     return unzipAndPickFirstEntry(file);
   }
 
@@ -1159,6 +1165,30 @@ public class FileManager
       ExceptionHandler.logException(e, "Could not unzip file");
     }
     //Return original file if no zip entry found, it's not zipped
+    return filePath != null ? filePath.toFile() : file;
+  }
+
+  public static File unrarAndPickFirstEntry(File file)
+  {
+    Path filePath = null;
+    try (Archive archive = new Archive(file))
+    {
+      archive.getMainHeader().print();
+      FileHeader fh = archive.nextFileHeader();
+      if (fh != null)
+      {
+        File fileEntry = new File(TEMP_PATH + File.separator + fh.getFileNameString().trim());
+        FileOutputStream os = new FileOutputStream(fileEntry);
+        archive.extractFile(fh, os);
+        os.close();
+        fh = archive.nextFileHeader();
+        filePath = fileEntry.toPath();
+      }
+    }
+    catch (Exception e)
+    {
+      ExceptionHandler.logException(e, "Could not unrar file");
+    }
     return filePath != null ? filePath.toFile() : file;
   }
 

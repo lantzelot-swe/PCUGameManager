@@ -567,9 +567,18 @@ public class GamebaseImporter
     {
       File selectedFile = FileManager.createTempFileForScraper(new BufferedInputStream(new FileInputStream(gameFile)),
                                                                gameFile.getName());
-      Path compressedFilePath = selectedFile.toPath().getParent().resolve(selectedFile.getName() + ".gz");
-      FileManager.compressGzip(selectedFile.toPath(), compressedFilePath);
-      return compressedFilePath.toString();
+      //Do not compress prg files: Vice doesn't seem to unzip them properly
+      String lowercaseName =  selectedFile.getName().toLowerCase();
+      if (lowercaseName.endsWith(".gz") || lowercaseName.endsWith(".prg") || lowercaseName.endsWith(".p00") )
+      {
+        return selectedFile.toPath().toString();
+      }
+      else
+      {
+        Path compressedFilePath = selectedFile.toPath().getParent().resolve(selectedFile.getName() + ".gz");
+        FileManager.compressGzip(selectedFile.toPath(), compressedFilePath);
+        return compressedFilePath.toString();
+      }
     }
   }
 

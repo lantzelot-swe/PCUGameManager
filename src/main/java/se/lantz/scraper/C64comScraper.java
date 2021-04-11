@@ -240,7 +240,7 @@ public class C64comScraper implements Scraper
           .execute();
         
         //create a temp file and fetch the content
-        scrapedFile = FileManager.createTempFileForScraper(response.bodyStream(), "ScrapedFile");
+        scrapedFile = FileManager.createTempFileForScraper(response.bodyStream(), "ScrapedFile.zip");
         logger.debug("File to include as game: {}", scrapedFile != null ? scrapedFile.getAbsolutePath() : null);
       }
       catch (Exception e)
