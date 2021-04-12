@@ -140,6 +140,11 @@ public class ExceptionHandler extends JDialog
     super.setVisible(visible);
   }
   
+  public static void logMessage(final String message)
+  {
+    logger.error(message);
+  }
+  
   public static void logException(final Throwable ex, final String message)
   {
     logger.error(message, ex);

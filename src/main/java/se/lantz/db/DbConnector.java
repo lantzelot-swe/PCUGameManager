@@ -478,7 +478,7 @@ public class DbConnector
     {
       String[] splittedRowValue = rowValue.split(COMMA);   
       String title = splittedRowValue[0];
-      if (addedRowsList.contains(rowValue.substring(0, rowValue.indexOf(","))))
+      if (addedRowsList.contains(rowValue.substring(0, rowValue.indexOf(",")).toLowerCase()))
       {
         //Add game, another one has been added with the same title, no one was available in the db at that point.
         infoBuilder.append("Not available, adding to db\n");
@@ -596,7 +596,7 @@ public class DbConnector
       int value = pstmt.executeUpdate();
       logger.debug("Executed successfully, value = {}", value);
       //Add game title to keep track of added games
-      rowValues.stream().forEach(row -> addedRowsList.add(row.substring(0, row.indexOf(','))));
+      rowValues.stream().forEach(row -> addedRowsList.add(row.substring(0, row.indexOf(',')).toLowerCase()));
     }
     catch (SQLException e)
     {

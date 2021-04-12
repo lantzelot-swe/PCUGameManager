@@ -359,7 +359,7 @@ public class ImportManager
     String newCoverfile = fileName + "-cover.png";
     String newScreen1file = fileName + "-00.png";
     String newScreen2file = fileName + "-01.png";
-    
+
     String newGamefile = "";
     if (gamefile.isEmpty())
     {
@@ -369,7 +369,7 @@ public class ImportManager
     else
     {
       //Ignore first "." when finding file ending
-      
+
       String strippedGameFile = gamefile.substring(1);
       String fileEnding = strippedGameFile.substring(strippedGameFile.indexOf("."));
       if (!isC64 && fileEnding.contains(".crt"))
@@ -546,13 +546,13 @@ public class ImportManager
     Path targetScreen2Path = Paths.get("./screens/" + screen2Name);
 
     Path gamePath = srcGamesFolder.resolve(oldGameName);
-    
+
     Path targetGamePath = Paths.get("./games/" + gameName);
 
     try
     {
       logger.debug("RowData = {}", dbRowData);
-      
+
       if (gamebaseImport)
       {
         if (!oldGameName.isEmpty())
@@ -569,43 +569,33 @@ public class ImportManager
         infoBuilder.append(" to ");
         infoBuilder.append(targetCoverPath.toString());
         infoBuilder.append("\n");
-        Files.copy(coverPath, targetCoverPath, StandardCopyOption.REPLACE_EXISTING);
-        if (gamebaseImport)
+        try
         {
-          FileManager.scaleCoverImageAndSave(targetCoverPath);
+          Files.copy(coverPath, targetCoverPath, StandardCopyOption.REPLACE_EXISTING);
+          if (gamebaseImport)
+          {
+            FileManager.scaleCoverImageAndSave(targetCoverPath);
+          }
+        }
+        catch (Exception e)
+        {
+          infoBuilder.append("ERROR: Could not copy cover file for " + gameName + ", " + e.getMessage() + "\n");
+          ExceptionHandler.logException(e, "Could not copy cover for " + gameName);
+          useMissingCover(advanced, targetCoverPath);
         }
       }
       else
       {
-        //Use missing cover since none available
-        try
-        {
-          BufferedImage emptyCover = advanced.contains("vic") ? FileManager.emptyVic20Cover : FileManager.emptyC64Cover;
-          ImageIO.write(emptyCover, "png", targetCoverPath.toFile());
-        }
-        catch (IOException e)
-        {
-          ExceptionHandler.handleException(e, "Could not store cover");
-        }
+        useMissingCover(advanced, targetCoverPath);
       }
       //Screenshots
       if (oldScreen1Name.isEmpty() && oldScreen2Name.isEmpty())
       {
-        //Copy empty screen files 
-        //Use missing cover since none available
-        try
-        {
-          BufferedImage emptyScreenshot = advanced.contains("vic") ? FileManager.emptyVic20Screenshot : FileManager.emptyC64Screenshot;
-          ImageIO.write(emptyScreenshot, "png", targetScreen1Path.toFile());
-          ImageIO.write(emptyScreenshot, "png", targetScreen2Path.toFile());
-        }
-        catch (IOException e)
-        {
-          ExceptionHandler.handleException(e, "Could not store screenshot");
-        }
+        useMissingScreenshot(advanced, targetScreen1Path);
+        useMissingScreenshot(advanced, targetScreen2Path);
       }
       else
-      {    
+      {
         if (!oldScreen1Name.isEmpty())
         {
           infoBuilder.append("Copying screenshot from ");
@@ -613,10 +603,19 @@ public class ImportManager
           infoBuilder.append(" to ");
           infoBuilder.append(targetScreen1Path.toString());
           infoBuilder.append("\n");
-          Files.copy(screens1Path, targetScreen1Path, StandardCopyOption.REPLACE_EXISTING);
-          if (gamebaseImport)
+          try
           {
-            FileManager.scaleScreenshotImageAndSave(targetScreen1Path);
+            Files.copy(screens1Path, targetScreen1Path, StandardCopyOption.REPLACE_EXISTING);
+            if (gamebaseImport)
+            {
+              FileManager.scaleScreenshotImageAndSave(targetScreen1Path);
+            }
+          }
+          catch (Exception e)
+          {
+            infoBuilder.append("ERROR: Could not copy screenshot file for " + gameName + ", " + e.getMessage() + "\n");
+            ExceptionHandler.logException(e, "Could not copy screenshot for " + gameName);
+            useMissingScreenshot(advanced, targetScreen1Path);
           }
         }
         if (!oldScreen2Name.isEmpty())
@@ -626,10 +625,19 @@ public class ImportManager
           infoBuilder.append(" to ");
           infoBuilder.append(targetScreen2Path.toString());
           infoBuilder.append("\n");
-          Files.copy(screens2Path, targetScreen2Path, StandardCopyOption.REPLACE_EXISTING);
-          if (gamebaseImport)
+          try
           {
-            FileManager.scaleScreenshotImageAndSave(targetScreen2Path);
+            Files.copy(screens2Path, targetScreen2Path, StandardCopyOption.REPLACE_EXISTING);
+            if (gamebaseImport)
+            {
+              FileManager.scaleScreenshotImageAndSave(targetScreen2Path);
+            }
+          }
+          catch (Exception e)
+          {
+            infoBuilder.append("ERROR: Could not copy screenshot file for " + gameName + ", " + e.getMessage() + "\n");
+            ExceptionHandler.logException(e, "Could not copy screenshot for " + gameName);
+            useMissingScreenshot(advanced, targetScreen2Path);
           }
         }
       }
@@ -641,19 +649,68 @@ public class ImportManager
         infoBuilder.append(" to ");
         infoBuilder.append(targetGamePath.toString());
         infoBuilder.append("\n");
-        Files.copy(gamePath, targetGamePath, StandardCopyOption.REPLACE_EXISTING);
+        try
+        {
+          Files.copy(gamePath, targetGamePath, StandardCopyOption.REPLACE_EXISTING);
+        }
+        catch (Exception e)
+        {
+          infoBuilder.append("ERROR: Could not copy game file for " + gameName + ", " + e.getMessage() + "\n");
+          ExceptionHandler.logException(e, "Could not copy game file for " + gameName);
+          useMissingGameFile(advanced, targetGamePath);
+        }
       }
       else
       {
-        //Use missing game file
-        InputStream missingFileStream = advanced.contains("vic") ? FileManager.getMissingVIC20GameFile() : FileManager.getMissingC64GameFile();
-        FileUtils.copyInputStreamToFile(missingFileStream, targetGamePath.toFile());
+        useMissingGameFile(advanced, targetGamePath);
       }
     }
     catch (Exception e)
     {
       infoBuilder.append("ERROR: Could not copy files for " + gameName + ", " + e.getMessage() + "\n");
       ExceptionHandler.handleException(e, "Could NOT copy files for: " + gameName);
+    }
+  }
+
+  private void useMissingCover(String advanced, Path targetCoverPath)
+  {
+    try
+    {
+      BufferedImage emptyCover = advanced.contains("vic") ? FileManager.emptyVic20Cover : FileManager.emptyC64Cover;
+      ImageIO.write(emptyCover, "png", targetCoverPath.toFile());
+    }
+    catch (IOException e)
+    {
+      ExceptionHandler.handleException(e, "Could not store cover");
+    }
+  }
+
+  private void useMissingScreenshot(String advanced, Path targetScreenPath)
+  {
+    //Copy empty screen file
+    try
+    {
+      BufferedImage emptyScreenshot =
+        advanced.contains("vic") ? FileManager.emptyVic20Screenshot : FileManager.emptyC64Screenshot;
+      ImageIO.write(emptyScreenshot, "png", targetScreenPath.toFile());
+    }
+    catch (IOException e)
+    {
+      ExceptionHandler.handleException(e, "Could not store screenshot");
+    }
+  }
+
+  private void useMissingGameFile(String advanced, Path targetGamePath)
+  {
+    try
+    {
+      InputStream missingFileStream =
+        advanced.contains("vic") ? FileManager.getMissingVIC20GameFile() : FileManager.getMissingC64GameFile();
+      FileUtils.copyInputStreamToFile(missingFileStream, targetGamePath.toFile());
+    }
+    catch (Exception e)
+    {
+      ExceptionHandler.handleException(e, "Could not store game file");
     }
   }
 

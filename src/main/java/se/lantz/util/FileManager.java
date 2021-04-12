@@ -1162,7 +1162,7 @@ public class FileManager
     }
     catch (IOException e)
     {
-      ExceptionHandler.logException(e, "Could not unzip file");
+      ExceptionHandler.logMessage("Could not unzip file, using original file");
     }
     //Return original file if no zip entry found, it's not zipped
     return filePath != null ? filePath.toFile() : file;
@@ -1187,7 +1187,7 @@ public class FileManager
     }
     catch (Exception e)
     {
-      ExceptionHandler.logException(e, "Could not unrar file");
+      ExceptionHandler.logMessage("Could not unrar file, using original file");
     }
     return filePath != null ? filePath.toFile() : file;
   }
