@@ -20,7 +20,6 @@ public class DeleteProgressDialog extends JDialog
   public DeleteProgressDialog(Frame frame)
   {
     super(frame, "Deleting", true);
-    setAlwaysOnTop(true);
     setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
     setResizable(false);
     GridBagLayout gridBagLayout = new GridBagLayout();

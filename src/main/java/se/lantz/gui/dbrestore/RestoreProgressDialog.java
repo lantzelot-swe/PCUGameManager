@@ -15,7 +15,6 @@ public class RestoreProgressDialog extends JDialog
     super(frame,"Restore backup", true);
     this.add(getExportProgressPanel());
     setSize(900, 600);
-    setAlwaysOnTop(true);
     setLocationRelativeTo(frame);
   }
 

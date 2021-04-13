@@ -19,7 +19,6 @@ public class TranslationProgressDialog extends JDialog
   public TranslationProgressDialog(Frame frame)
   {
     super(frame, "Translating", true);
-    setAlwaysOnTop(true);
     setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
     setResizable(false);
     GridBagLayout gridBagLayout = new GridBagLayout();

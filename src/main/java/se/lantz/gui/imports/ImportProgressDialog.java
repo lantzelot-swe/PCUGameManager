@@ -18,7 +18,6 @@ public class ImportProgressDialog extends JDialog
     super(frame,"Import games", true);
     this.add(getImportProgressPanel());
     setSize(900, 600);
-    setAlwaysOnTop(true);
     setLocationRelativeTo(frame);
     setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
   }

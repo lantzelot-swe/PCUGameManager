@@ -20,7 +20,6 @@ public class ScraperProgressDialog extends JDialog
   public ScraperProgressDialog(Frame frame)
   {
     super(frame,"Scraping", true);
-    setAlwaysOnTop(true);
     setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
     setResizable(false);
     GridBagLayout gridBagLayout = new GridBagLayout();

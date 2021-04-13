@@ -15,7 +15,6 @@ public class BackupProgressDialog extends JDialog
     super(frame,"Backup database", true);
     this.add(getExportProgressPanel());
     setSize(900, 600);
-    setAlwaysOnTop(true);
     setLocationRelativeTo(frame);
   }
 

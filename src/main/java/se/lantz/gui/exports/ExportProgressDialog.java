@@ -16,7 +16,6 @@ public class ExportProgressDialog extends JDialog
     super(frame,"Export games", true);
     this.add(getExportProgressPanel());
     setSize(900, 600);
-    setAlwaysOnTop(true);
     setLocationRelativeTo(frame);
     setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
   }
