@@ -142,7 +142,7 @@ public class ExceptionHandler extends JDialog
   
   public static void logMessage(final String message)
   {
-    logger.error(message);
+    logger.debug(message);
   }
   
   public static void logException(final Throwable ex, final String message)
