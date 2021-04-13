@@ -34,6 +34,7 @@ import java.util.zip.ZipEntry;
 import javax.imageio.ImageIO;
 
 import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream;
+import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -1131,6 +1132,8 @@ public class FileManager
 
   public static File unzipAndPickFirstEntry(File file)
   {
+    String unzippedBasePath = TEMP_PATH + File.separator + FilenameUtils.removeExtension(file.getName()) + File.separator;
+    
     String zipFilePath = file.getAbsolutePath();
     Path filePath = null;
     FileInputStream fis;
@@ -1144,9 +1147,9 @@ public class FileManager
       if (ze != null)
       {
         String fileName = ze.getName();
-        File newFile = new File(TEMP_PATH + File.separator + fileName);
+        File newFile = new File(unzippedBasePath + fileName);
         //create directories for sub directories in zip
-        new File(newFile.getParent()).mkdirs();
+        new File(newFile.getParentFile().getParent()).mkdirs();
         FileOutputStream fos = new FileOutputStream(newFile);
         int len;
         while ((len = zis.read(buffer)) > 0)
@@ -1170,6 +1173,7 @@ public class FileManager
 
   public static File unrarAndPickFirstEntry(File file)
   {
+    String unzippedBasePath = TEMP_PATH + File.separator + FilenameUtils.removeExtension(file.getName()) + File.separator;
     Path filePath = null;
     try (Archive archive = new Archive(file))
     {
@@ -1177,7 +1181,11 @@ public class FileManager
       FileHeader fh = archive.nextFileHeader();
       if (fh != null)
       {
-        File fileEntry = new File(TEMP_PATH + File.separator + fh.getFileNameString().trim());
+        File fileEntry = new File(unzippedBasePath + fh.getFileNameString().trim());
+        //create directories for sub directories in rar
+        new File(fileEntry.getParentFile().getParent()).mkdirs();
+        
+        
         FileOutputStream os = new FileOutputStream(fileEntry);
         archive.extractFile(fh, os);
         os.close();

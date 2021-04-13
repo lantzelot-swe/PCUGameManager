@@ -42,6 +42,7 @@ public class GamebaseImporter
 
   private String joyBase = ":JU,JD,JL,JR,JF,JF,SP,EN,,F1,F3,F5,,,";
   private List<GbGameInfo> gbGameInfoList = new ArrayList<>();
+  private int importIndexForTempFiles = 0;
 
   private Options selectedOption = Options.FAVORITES;
   private String titleQueryString = "";
@@ -555,16 +556,18 @@ public class GamebaseImporter
     }
 
     File gameFile = gbPath.resolve(filenameInGb).toFile();
+    //Increase index to be sure file names are unique in the temp folder
+    importIndexForTempFiles++;
     if (isVic20cart)
     {
       return FileManager
-        .getTempFileForVic20Cart(new BufferedInputStream(new FileInputStream(gameFile)), gameFile.getName()).toPath()
+        .getTempFileForVic20Cart(new BufferedInputStream(new FileInputStream(gameFile)), importIndexForTempFiles + "_" + gameFile.getName()).toPath()
         .toString();
     }
     else
     {
       File selectedFile = FileManager.createTempFileForScraper(new BufferedInputStream(new FileInputStream(gameFile)),
-                                                               gameFile.getName());
+                                                               importIndexForTempFiles + "_" + gameFile.getName());
       //Do not compress prg files: Vice doesn't seem to unzip them properly
       String lowercaseName =  selectedFile.getName().toLowerCase();
       if (lowercaseName.endsWith(".gz") || lowercaseName.endsWith(".prg") || lowercaseName.endsWith(".p00") )
@@ -584,5 +587,6 @@ public class GamebaseImporter
   {
     gbGameInfoList.clear();
     FileManager.deleteTempFolder();
+    importIndexForTempFiles = 0;
   }
 }
