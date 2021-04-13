@@ -527,7 +527,7 @@ public class MainViewModel extends AbstractModel
     for (int i = 0; i < getGameListModel().getSize(); i++)
     {
       GameListData currentData = getGameListModel().getElementAt(i);   
-      if (!currentData.getTitle().contains("THEC64"))
+      if (!currentData.getTitle().contains("THEC64") || currentData.getTitle().contains("VIC20"))
       {
         GameDetails details = dbConnector.getGameDetails(currentData.getGameId());
         FileManager.deleteFilesForGame(details);

@@ -1149,7 +1149,7 @@ public class FileManager
         String fileName = ze.getName();
         File newFile = new File(unzippedBasePath + fileName);
         //create directories for sub directories in zip
-        new File(newFile.getParentFile().getParent()).mkdirs();
+        new File(newFile.getParent()).mkdirs();
         FileOutputStream fos = new FileOutputStream(newFile);
         int len;
         while ((len = zis.read(buffer)) > 0)
@@ -1183,8 +1183,7 @@ public class FileManager
       {
         File fileEntry = new File(unzippedBasePath + fh.getFileNameString().trim());
         //create directories for sub directories in rar
-        new File(fileEntry.getParentFile().getParent()).mkdirs();
-        
+        new File(fileEntry.getParent()).mkdirs();
         
         FileOutputStream os = new FileOutputStream(fileEntry);
         archive.extractFile(fh, os);

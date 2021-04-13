@@ -513,8 +513,9 @@ public class MenuManager
       CarouselImportWorker worker = new CarouselImportWorker(importManager, dialog);
       worker.execute();
       dialog.setVisible(true);
-      //Refresh current game view after import
-      uiModel.reloadCurrentGameView();
+      //Refresh game views after import
+      uiModel.reloadGameViews();
+      MainWindow.getInstance().selectViewAfterRestore();
       MainWindow.getInstance().repaintAfterModifications();
     }
   }
@@ -536,8 +537,9 @@ public class MenuManager
         GamebaseImportWorker worker = new GamebaseImportWorker(gamebaseImporter, importManager, dialog);
         worker.execute();
         dialog.setVisible(true);
-        //Refresh current game view after import
-        uiModel.reloadCurrentGameView();
+        //Refresh game views after import
+        uiModel.reloadGameViews();
+        MainWindow.getInstance().selectViewAfterRestore();
         MainWindow.getInstance().repaintAfterModifications();
       }
       else
