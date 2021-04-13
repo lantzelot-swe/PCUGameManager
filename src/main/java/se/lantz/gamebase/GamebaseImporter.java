@@ -16,8 +16,6 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.google.common.collect.Lists;
-
 import se.lantz.manager.ImportManager;
 import se.lantz.scraper.GamebaseScraper;
 import se.lantz.util.ExceptionHandler;
@@ -416,7 +414,7 @@ public class GamebaseImporter
 
   public List<List<GbGameInfo>> getGbGameInfoChunks()
   {
-    return Lists.partition(gbGameInfoList, CHUNK_SIZE);
+    return importManager.getReadChunks(gbGameInfoList, CHUNK_SIZE);
   }
 
   public StringBuilder checkGameFileForGbGames(List<GbGameInfo> gbGameList)

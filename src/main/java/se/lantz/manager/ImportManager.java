@@ -24,8 +24,6 @@ import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.collect.Lists;
-
 import se.lantz.model.MainViewModel;
 import se.lantz.util.ExceptionHandler;
 import se.lantz.util.FileManager;
@@ -500,7 +498,24 @@ public class ImportManager
 
   public List<List<String>> getDbRowReadChunks()
   {
-    return Lists.partition(dbRowDataList, DB_ROW_CHUNK_SIZE);
+    return getReadChunks(dbRowDataList, DB_ROW_CHUNK_SIZE);
+  }
+  
+  /**
+   * Divides list into chunks with chunkSize size.
+   * @param <T> The type of objects in the list
+   * @param list The list to divide
+   * @param chunkSize The size of each chunk
+   * @return A list of chunks.
+   */
+  public <T> List<List<T>> getReadChunks(List<T> list, int chunkSize)
+  {
+    final int listSize = list.size();
+    List<List<T>> lists = new ArrayList<>();
+    for (int i = 0; i < listSize; i += chunkSize) {
+          lists.add(new ArrayList<T>(list.subList(i, Math.min(listSize, i + chunkSize))));
+    }
+    return lists;
   }
 
   public StringBuilder copyFiles(boolean gamebaseImport, List<String> rowList)
