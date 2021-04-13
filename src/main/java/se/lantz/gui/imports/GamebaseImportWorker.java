@@ -47,7 +47,7 @@ public class GamebaseImportWorker extends AbstractImportWorker
     
     List<List<String>> dbRowReadChunks = importManager.getDbRowReadChunks();
     progressValueString = "Importing to db and copying files...";
-    progressMaximum = dbRowReadChunks.size() + 1;
+    progressMaximum = dbRowReadChunks.size();
     progressValue = 0;
     publish("Importing to db, copying covers, screens and game files...");
     int chunkCount = 0;

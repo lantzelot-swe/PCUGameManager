@@ -29,7 +29,7 @@ public class CarouselImportWorker extends AbstractImportWorker
     publish("Importing to db...");
     List<List<String>> dbRowReadChunks = importManager.getDbRowReadChunks();
     progressValueString = "Importing to db, copying covers, screens and game files...";
-    progressMaximum = dbRowReadChunks.size() + 1;
+    progressMaximum = dbRowReadChunks.size();
     progressValue = 0;
     int chunkCount = 0;
     for (List<String> rowList : importManager.getDbRowReadChunks())

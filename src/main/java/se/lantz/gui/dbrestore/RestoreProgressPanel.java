@@ -98,7 +98,7 @@ public class RestoreProgressPanel extends JPanel
     int count = text.length() - text.replace("ERROR:", "").length();
     if (count > 0)
     {
-      getTextArea().append("\nRestore ended with " + count/6 + " errors. See log file for details.");
+      getTextArea().append("\nRestore ended with " + count/6 + " errors. See pcusb.log for details.");
     }
     else
     {

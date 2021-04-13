@@ -117,7 +117,7 @@ public class ImportProgressPanel extends JPanel
     }
     if (count > 0)
     {
-      getTextArea().append("\nImport ended with " + count/6 + " errors. See log file for details.");
+      getTextArea().append("\nImport ended with " + count/6 + " errors. See pcusb.log for details.");
     }
     else
     {

@@ -478,14 +478,6 @@ public class DbConnector
     {
       String[] splittedRowValue = rowValue.split(COMMA);   
       String title = splittedRowValue[0];
-      if (addedRowsList.contains(rowValue.substring(0, rowValue.indexOf(",")).toLowerCase()))
-      {
-        //Add game, another one has been added with the same title, no one was available in the db at that point.
-        infoBuilder.append("Not available, adding to db\n");
-        logger.debug("Game: {} is not available, adding to db", title);
-        newRowValues.add(rowValue);
-        continue;
-      }
       StringBuilder sqlBuilder = new StringBuilder();
       sqlBuilder.append("SELECT COUNT(*) FROM gameinfo WHERE title = ");
       sqlBuilder.append(title);
@@ -496,6 +488,15 @@ public class DbConnector
       infoBuilder.append(": ");
       logger.debug("Checking game: {}", sql);
 
+      if (addedRowsList.contains(rowValue.substring(0, rowValue.indexOf(",")).toLowerCase()))
+      {
+        //Add game, another one has been added with the same title, no one was available in the db at that point.
+        infoBuilder.append("Not available, adding to db\n");
+        logger.debug("Game: {} is not available, adding to db", title);
+        newRowValues.add(rowValue);
+        continue;
+      }
+      //Check db
       try (Connection conn = this.connect(); PreparedStatement pstmt = conn.prepareStatement(sql))
       {
         ResultSet rs = pstmt.executeQuery();
