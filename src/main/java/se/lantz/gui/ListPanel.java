@@ -320,7 +320,6 @@ public class ListPanel extends JPanel
           @Override
           public void setSelectionInterval(int anchor, int lead)
           {
-            System.out.println("anchor=" + anchor + ", lead=" + lead);
             if (!uiModel.isDataChanged())
             {
               super.setSelectionInterval(anchor, lead);

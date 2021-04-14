@@ -1132,7 +1132,10 @@ public class FileManager
 
   public static File unzipAndPickFirstEntry(File file)
   {
-    String unzippedBasePath = TEMP_PATH + File.separator + FilenameUtils.removeExtension(file.getName()) + File.separator;
+    String dirName = file.getName();
+    dirName = dirName.replaceAll("\\.", "");
+    
+    String unzippedBasePath = TEMP_PATH + File.separator + dirName + File.separator;
     
     String zipFilePath = file.getAbsolutePath();
     Path filePath = null;
@@ -1147,7 +1150,12 @@ public class FileManager
       if (ze != null)
       {
         String fileName = ze.getName();
-        File newFile = new File(unzippedBasePath + fileName);
+        String extension = FilenameUtils.getExtension(fileName);
+        fileName = FilenameUtils.removeExtension(fileName);
+        //remove all "." in name ...
+        fileName = fileName.replaceAll("\\.", "");
+
+        File newFile = new File(unzippedBasePath + fileName + "." + extension);
         //create directories for sub directories in zip
         new File(newFile.getParent()).mkdirs();
         FileOutputStream fos = new FileOutputStream(newFile);
@@ -1173,7 +1181,9 @@ public class FileManager
 
   public static File unrarAndPickFirstEntry(File file)
   {
-    String unzippedBasePath = TEMP_PATH + File.separator + FilenameUtils.removeExtension(file.getName()) + File.separator;
+    String dirName = file.getName();
+    dirName = dirName.replaceAll("\\.", "");
+    String unzippedBasePath = TEMP_PATH + File.separator + dirName + File.separator;
     Path filePath = null;
     try (Archive archive = new Archive(file))
     {
@@ -1181,7 +1191,13 @@ public class FileManager
       FileHeader fh = archive.nextFileHeader();
       if (fh != null)
       {
-        File fileEntry = new File(unzippedBasePath + fh.getFileNameString().trim());
+        String fileName = fh.getFileNameString().trim();
+        String extension = FilenameUtils.getExtension(fileName);
+        fileName = FilenameUtils.removeExtension(fileName);
+        //remove all "." in name ...
+        fileName = fileName.replaceAll("\\.", "");
+
+        File fileEntry = new File(unzippedBasePath + fileName + "." + extension);
         //create directories for sub directories in rar
         new File(fileEntry.getParent()).mkdirs();
         
