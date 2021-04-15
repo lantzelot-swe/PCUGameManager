@@ -339,7 +339,7 @@ public class FileManager
     }
     // Do the conversion
     List<Character> forbiddenCharsList =
-      " ,:'’-.!+*<>()/[]?".chars().mapToObj(item -> (char) item).collect(Collectors.toList());
+      " ,:'’-.!+*<>()/[]?|".chars().mapToObj(item -> (char) item).collect(Collectors.toList());
 
     List<Character> newName =
       title.chars().mapToObj(item -> (char) item).filter(character -> !forbiddenCharsList.contains(character))
@@ -948,7 +948,7 @@ public class FileManager
     });
   }
 
-  public static void scaleCoverImageAndSave(Path coverImagePath)
+  public static void scaleCoverImageAndSave(Path coverImagePath, String gameName)
   {
     try
     {
@@ -963,11 +963,20 @@ public class FileManager
     }
     catch (IOException e)
     {
-      ExceptionHandler.handleException(e, "Could not scale and cover");
+      ExceptionHandler.logException(e, "Could not scale and store cover for " + gameName + ", using missing cover instead");
+      //Use missing file
+      try
+      {
+        ImageIO.write(emptyC64Cover, "png", coverImagePath.toFile());
+      }
+      catch (IOException e1)
+      {
+        ExceptionHandler.logException(e1, "Could not store empty cover for " + gameName);
+      }
     }
   }
 
-  public static void scaleScreenshotImageAndSave(Path screenshotImagePath)
+  public static void scaleScreenshotImageAndSave(Path screenshotImagePath, String gameName)
   {
     try
     {
@@ -976,7 +985,16 @@ public class FileManager
     }
     catch (IOException e)
     {
-      ExceptionHandler.handleException(e, "Could not scale and store screenshot");
+      ExceptionHandler.logException(e, "Could not scale and store screenshot for " + gameName + ", using empty screenshot instead");
+      //Use missing file
+      try
+      {
+        ImageIO.write(emptyC64Screenshot, "png", screenshotImagePath.toFile());
+      }
+      catch (IOException e1)
+      {
+        ExceptionHandler.logException(e1, "Could not store empty screenshot for " + gameName);
+      }
     }
   }
 

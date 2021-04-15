@@ -551,23 +551,23 @@ public class ImportManager
 
     String advanced = splittedForPaths[16];
 
-    Path coverPath = srcCoversFolder.resolve(oldCoverName);
-    Path targetCoverPath = Paths.get("./covers/" + coverName);
-
-    Path screens1Path = srcScreensFolder.resolve(oldScreen1Name);
-    Path targetScreen1Path = Paths.get("./screens/" + screen1Name);
-
-    Path screens2Path = srcScreensFolder.resolve(oldScreen2Name);
-    Path targetScreen2Path = Paths.get("./screens/" + screen2Name);
-
-    Path gamePath = srcGamesFolder.resolve(oldGameName);
-
-    Path targetGamePath = Paths.get("./games/" + gameName);
-
     try
-    {
+    {  
       logger.debug("RowData = {}", dbRowData);
 
+      Path coverPath = srcCoversFolder.resolve(oldCoverName);
+      Path targetCoverPath = Paths.get("./covers/" + coverName);
+
+      Path screens1Path = srcScreensFolder.resolve(oldScreen1Name);
+      Path targetScreen1Path = Paths.get("./screens/" + screen1Name);
+
+      Path screens2Path = srcScreensFolder.resolve(oldScreen2Name);
+      Path targetScreen2Path = Paths.get("./screens/" + screen2Name);
+
+      Path gamePath = srcGamesFolder.resolve(oldGameName);
+
+      Path targetGamePath = Paths.get("./games/" + gameName);
+      
       if (gamebaseImport)
       {
         if (!oldGameName.isEmpty())
@@ -589,7 +589,7 @@ public class ImportManager
           Files.copy(coverPath, targetCoverPath, StandardCopyOption.REPLACE_EXISTING);
           if (gamebaseImport)
           {
-            FileManager.scaleCoverImageAndSave(targetCoverPath);
+            FileManager.scaleCoverImageAndSave(targetCoverPath, gameName);
           }
         }
         catch (Exception e)
@@ -623,7 +623,7 @@ public class ImportManager
             Files.copy(screens1Path, targetScreen1Path, StandardCopyOption.REPLACE_EXISTING);
             if (gamebaseImport)
             {
-              FileManager.scaleScreenshotImageAndSave(targetScreen1Path);
+              FileManager.scaleScreenshotImageAndSave(targetScreen1Path, gameName);
             }
           }
           catch (Exception e)
@@ -645,7 +645,7 @@ public class ImportManager
             Files.copy(screens2Path, targetScreen2Path, StandardCopyOption.REPLACE_EXISTING);
             if (gamebaseImport)
             {
-              FileManager.scaleScreenshotImageAndSave(targetScreen2Path);
+              FileManager.scaleScreenshotImageAndSave(targetScreen2Path, gameName);
             }
           }
           catch (Exception e)
