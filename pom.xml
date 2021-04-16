@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>se.lantz</groupId>
 	<artifactId>PCUGameManager</artifactId>
-	<version>1.7.2</version>
+	<version>1.7.3</version>
 	<name>PCUGameManager</name>
 	<dependencies>
 		<dependency>
