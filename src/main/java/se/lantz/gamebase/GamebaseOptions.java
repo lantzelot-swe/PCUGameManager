@@ -8,6 +8,7 @@ public class GamebaseOptions
   private boolean c64 = true;
   private String titleQueryString = "";
   private boolean includeMissingGameFileEntries = false;
+  private String viewTag = "";
 
   private GamebaseImporter.Options selectedOption = GamebaseImporter.Options.FAVORITES;
 
@@ -66,4 +67,13 @@ public class GamebaseOptions
     this.includeMissingGameFileEntries = includeMissingGameFileEntries;
   }
 
+  public String getViewTag()
+  {
+    return viewTag;
+  }
+
+  public void setViewTag(String viewTag)
+  {
+    this.viewTag = viewTag;
+  }
 }

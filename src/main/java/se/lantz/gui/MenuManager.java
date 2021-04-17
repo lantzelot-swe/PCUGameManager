@@ -509,6 +509,7 @@ public class MenuManager
       importManager.setSelectedFolderForCarousel(optionsDialog.getImportDirectory());
       importManager.setSelectedOption(optionsDialog.getSelectedOption());
       importManager.setAddAsFavorite(optionsDialog.getMarkAsFavorite());
+      importManager.setViewTag(optionsDialog.getViewTag());
       ImportProgressDialog dialog = new ImportProgressDialog(this.mainWindow);
       CarouselImportWorker worker = new CarouselImportWorker(importManager, dialog);
       worker.execute();
@@ -533,6 +534,7 @@ public class MenuManager
         //Set options for how to handle games during import
         importManager.setSelectedOption(optionsDialog.getSelectedOption());
         importManager.setAddAsFavorite(optionsDialog.getMarkAsFavorite());
+        importManager.setViewTag(optionsDialog.getViewTag());
         ImportProgressDialog dialog = new ImportProgressDialog(this.mainWindow);
         GamebaseImportWorker worker = new GamebaseImportWorker(gamebaseImporter, importManager, dialog);
         worker.execute();

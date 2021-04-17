@@ -3,25 +3,23 @@ package se.lantz.gui.imports;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.nio.file.Path;
-
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JRadioButton;
-
-import se.lantz.manager.ImportManager;
-import se.lantz.model.data.GameView;
 
 import javax.swing.ButtonGroup;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JRadioButton;
+import javax.swing.JTextField;
 
 import se.lantz.gamebase.GamebaseOptions;
 import se.lantz.gui.SelectDirPanel;
 import se.lantz.gui.SelectDirPanel.Mode;
-import javax.swing.JComboBox;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
+import se.lantz.manager.ImportManager;
 
 public class ImportOptionsPanel extends JPanel
 {
@@ -38,6 +36,8 @@ public class ImportOptionsPanel extends JPanel
   private JPanel selectionPanel;
   private boolean isCarouselImport;
   private JComboBox<String> favoriteComboBox;
+  private JCheckBox viewTagCheckBox;
+  private JTextField viewTagTextField;
 
   public ImportOptionsPanel()
   {
@@ -267,14 +267,14 @@ public class ImportOptionsPanel extends JPanel
       GridBagConstraints gbc_addRadioButton = new GridBagConstraints();
       gbc_addRadioButton.gridwidth = 2;
       gbc_addRadioButton.anchor = GridBagConstraints.WEST;
-      gbc_addRadioButton.insets = new Insets(0, 5, 5, 0);
+      gbc_addRadioButton.insets = new Insets(0, 5, 10, 0);
       gbc_addRadioButton.gridx = 0;
       gbc_addRadioButton.gridy = 2;
       selectionPanel.add(getAddRadioButton(), gbc_addRadioButton);
       GridBagConstraints gbc_favoriteCheckBox = new GridBagConstraints();
       gbc_favoriteCheckBox.weighty = 1.0;
       gbc_favoriteCheckBox.anchor = GridBagConstraints.NORTHWEST;
-      gbc_favoriteCheckBox.insets = new Insets(5, 5, 5, 0);
+      gbc_favoriteCheckBox.insets = new Insets(5, 5, 5, 5);
       gbc_favoriteCheckBox.gridx = 0;
       gbc_favoriteCheckBox.gridy = 3;
       selectionPanel.add(getFavoriteCheckBox(), gbc_favoriteCheckBox);
@@ -283,6 +283,17 @@ public class ImportOptionsPanel extends JPanel
       gbc_favoriteComboBox.gridx = 1;
       gbc_favoriteComboBox.gridy = 3;
       selectionPanel.add(getFavoriteComboBox(), gbc_favoriteComboBox);
+      GridBagConstraints gbc_viewTagCheckBox = new GridBagConstraints();
+      gbc_viewTagCheckBox.anchor = GridBagConstraints.NORTHWEST;
+      gbc_viewTagCheckBox.insets = new Insets(5, 5, 5, 5);
+      gbc_viewTagCheckBox.gridx = 0;
+      gbc_viewTagCheckBox.gridy = 4;
+      selectionPanel.add(getViewTagCheckBox(), gbc_viewTagCheckBox);
+      GridBagConstraints gbc_viewTagTextField = new GridBagConstraints();
+      gbc_viewTagTextField.fill = GridBagConstraints.HORIZONTAL;
+      gbc_viewTagTextField.gridx = 1;
+      gbc_viewTagTextField.gridy = 4;
+      selectionPanel.add(getViewTagTextField(), gbc_viewTagTextField);
     }
     return selectionPanel;
   }
@@ -307,5 +318,36 @@ public class ImportOptionsPanel extends JPanel
       favoriteComboBox.setEnabled(false);
     }
     return favoriteComboBox;
+  }
+
+  private JCheckBox getViewTagCheckBox()
+  {
+    if (viewTagCheckBox == null)
+    {
+      viewTagCheckBox = new JCheckBox("Add view tag to games");
+      viewTagCheckBox.addActionListener(new ActionListener()
+        {
+          public void actionPerformed(ActionEvent e)
+          {
+            getViewTagTextField().setEnabled(viewTagCheckBox.isSelected());
+          }
+        });
+    }
+    return viewTagCheckBox;
+  }
+
+  private JTextField getViewTagTextField()
+  {
+    if (viewTagTextField == null)
+    {
+      viewTagTextField = new JTextField();
+      viewTagTextField.setColumns(10);
+    }
+    return viewTagTextField;
+  }
+
+  public String getViewTag()
+  {
+    return viewTagCheckBox.isSelected() ? viewTagTextField.getText() : "";
   }
 }

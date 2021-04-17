@@ -54,6 +54,7 @@ public class ImportManager
   private MainViewModel uiModel;
   private Options selectedOption;
   private int addAsFavorite = -1;
+  private String viewTag;
 
   public ImportManager(MainViewModel uiModel)
   {
@@ -68,6 +69,11 @@ public class ImportManager
   public void setAddAsFavorite(int favoriteValue)
   {
     this.addAsFavorite = favoriteValue;
+  }
+  
+  public void setViewTag(String viewTag)
+  {
+    this.viewTag = viewTag;
   }
 
   public void setSelectedFoldersForGamebase(Path gamesFolder, Path screensPath, Path coversPath)
@@ -146,7 +152,7 @@ public class ImportManager
 
   public StringBuilder insertRowsIntoDb(List<String> rowList)
   {
-    return uiModel.importGameInfo(rowList, selectedOption, addAsFavorite);
+    return uiModel.importGameInfo(rowList, selectedOption, addAsFavorite, viewTag);
   }
 
   private void extractInfoIntoRowString(List<String> fileLines, StringBuilder infoBuilder)

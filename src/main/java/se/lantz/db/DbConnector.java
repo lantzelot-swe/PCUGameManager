@@ -386,19 +386,20 @@ public class DbConnector
 
   public StringBuilder importRowsInGameInfoTable(List<String> rowValues,
                                                  ImportManager.Options option,
-                                                 int addAsFavorite)
+                                                 int addAsFavorite,
+                                                 String viewTag)
   {
     StringBuilder returnBuilder = new StringBuilder();
     switch (option)
     {
     case SKIP:
-      skipExistingAndInsertMissingIntoGameInfoTable(rowValues, returnBuilder, addAsFavorite);
+      skipExistingAndInsertMissingIntoGameInfoTable(rowValues, returnBuilder, addAsFavorite, viewTag);
       break;
     case OVERWRITE:
-      overwriteExistingAndInsertMissingIntoGameInfoTable(rowValues, returnBuilder, addAsFavorite);
+      overwriteExistingAndInsertMissingIntoGameInfoTable(rowValues, returnBuilder, addAsFavorite, viewTag);
       break;
     case ADD:
-      insertAllIntoGameInfoTable(rowValues, returnBuilder, addAsFavorite);
+      insertAllIntoGameInfoTable(rowValues, returnBuilder, addAsFavorite, viewTag);
       break;
     default:
       break;
@@ -408,7 +409,8 @@ public class DbConnector
 
   private void overwriteExistingAndInsertMissingIntoGameInfoTable(List<String> rowValues,
                                                                   StringBuilder infoBuilder,
-                                                                  int addAsFavorite)
+                                                                  int addAsFavorite,
+                                                                  String viewTag)
   {
     List<String> existingRowValues = new ArrayList<>();
     List<String> newRowValues = new ArrayList<>();
@@ -455,12 +457,12 @@ public class DbConnector
       infoBuilder.append("Replacing ");
       infoBuilder.append(existingRowValues.size());
       infoBuilder.append(" games in the db\n");
-      updateAllInGameInfoTable(existingRowValues, addAsFavorite);
+      updateAllInGameInfoTable(existingRowValues, addAsFavorite, viewTag);
     }
 
     if (newRowValues.size() > 0)
     {
-      insertAllIntoGameInfoTable(newRowValues, infoBuilder, addAsFavorite);
+      insertAllIntoGameInfoTable(newRowValues, infoBuilder, addAsFavorite, viewTag);
     }
     else
     {
@@ -470,7 +472,8 @@ public class DbConnector
 
   private void skipExistingAndInsertMissingIntoGameInfoTable(List<String> rowValues,
                                                              StringBuilder infoBuilder,
-                                                             int addAsFavorite)
+                                                             int addAsFavorite,
+                                                             String viewTag)
   {
     List<String> newRowValues = new ArrayList<>();
     //Check which are already available and sort them out of rowValues
@@ -525,7 +528,7 @@ public class DbConnector
     infoBuilder.append(" games.\n");
     if (newRowValues.size() > 0)
     {
-      insertAllIntoGameInfoTable(newRowValues, infoBuilder, addAsFavorite);
+      insertAllIntoGameInfoTable(newRowValues, infoBuilder, addAsFavorite, viewTag);
     }
     else
     {
@@ -536,7 +539,7 @@ public class DbConnector
     rowValues.addAll(newRowValues);
   }
 
-  private void insertAllIntoGameInfoTable(List<String> rowValues, StringBuilder infoBuilder, int addAsFavorite)
+  private void insertAllIntoGameInfoTable(List<String> rowValues, StringBuilder infoBuilder, int addAsFavorite, String viewTag)
   {
     infoBuilder.append("Adding ");
     infoBuilder.append(rowValues.size());
@@ -577,12 +580,17 @@ public class DbConnector
       
       if (oldGameName.isEmpty())
       {
-        st.append("\"missing\",");
+        st.append("\"missing");
+        if (!viewTag.isEmpty())
+        {
+          st.append(", " + viewTag);
+        }
+        st.append("\",");
       }
       else
       {
-        //Append empty string for viewtag
-        st.append("\"\",");
+        //Append viewtag
+        st.append("\"" + viewTag + "\",");
       }
       st.append(duplicateIndex);
       st.append("),(");
@@ -624,7 +632,7 @@ public class DbConnector
     return splittedRowData[21].split("\"")[0];
   }
 
-  private void updateAllInGameInfoTable(List<String> rowValues, int addAsFavorite)
+  private void updateAllInGameInfoTable(List<String> rowValues, int addAsFavorite, String viewTag)
   {
     for (String rowValue : rowValues)
     {
@@ -662,6 +670,10 @@ public class DbConnector
       else
       {
         sqlBuilder.append(",Favorite = 0");
+      }
+      if (!viewTag.isEmpty())
+      {
+        sqlBuilder.append(",Viewtag = \"" + viewTag + "\"");
       }
       
       sqlBuilder.append(" WHERE title = ");
