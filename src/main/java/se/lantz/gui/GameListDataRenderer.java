@@ -85,10 +85,6 @@ public class GameListDataRenderer extends DefaultListCellRenderer
         break;
       }
     }
-    else
-    {
-      this.setFont(plain);
-    }
   }
   
   private void handleGameListView(Object value, boolean isSelected, int index)
@@ -127,11 +123,6 @@ public class GameListDataRenderer extends DefaultListCellRenderer
       {
         this.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Color.LIGHT_GRAY));
       }     
-    }
-    else
-    {
-      this.setFont(plain);
-      this.setForeground(isSelected ? fav1ColorSelected : fav1Color);
     }
   }
 }
