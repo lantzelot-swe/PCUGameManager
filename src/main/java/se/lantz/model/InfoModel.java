@@ -2,13 +2,9 @@ package se.lantz.model;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Objects;
 
-import javax.imageio.ImageIO;
-
-import se.lantz.util.ExceptionHandler;
 import se.lantz.util.FileManager;
 
 public class InfoModel extends AbstractModel
@@ -41,9 +37,9 @@ public class InfoModel extends AbstractModel
   private String oldCoverFile = "";
   private String oldScreens1File = "";
   private String oldScreens2File = "";
-  
+
   private int duplicateIndex = 0;
-  
+
   private String viewTag = "";
 
   public String getTitle()
@@ -176,12 +172,12 @@ public class InfoModel extends AbstractModel
       notifyChange();
     }
   }
-  
+
   public int getDuplicateIndex()
   {
     return duplicateIndex;
   }
-  
+
   public void setDuplicateIndex(int index)
   {
     this.duplicateIndex = index;
@@ -350,14 +346,16 @@ public class InfoModel extends AbstractModel
     //Set games name, always add ".gz"??
     String fileName = FileManager.generateFileNameFromTitle(this.title, getDuplicateIndex());
     String fileEnding = file.getName().substring(file.getName().indexOf("."));
-    if (fileEnding.endsWith(".gz") || fileEnding.endsWith(".GZ"))
-    {
-      setGamesFile(fileName + fileEnding);
-    }
-    else
+
+    if (FileManager.shouldCompressFile(file.getName()))
     {
       setGamesFile(fileName + fileEnding + ".gz");
     }
+    else
+    {
+      setGamesFile(fileName + fileEnding);
+    }
+
     if (!Objects.equals(old, gamesPath))
     {
       notifyChange();

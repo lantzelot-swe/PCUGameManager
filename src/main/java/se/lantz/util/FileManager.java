@@ -194,14 +194,14 @@ public class FileManager
 
       try
       {
-        if (source.toString().endsWith(".gz"))
+        if (shouldCompressFile(source.toString()))
         {
-          //Just copy
-          Files.copy(source, target, StandardCopyOption.REPLACE_EXISTING);
+          compressGzip(source, target);
         }
         else
         {
-          compressGzip(source, target);
+          //Just copy
+          Files.copy(source, target, StandardCopyOption.REPLACE_EXISTING);
         }
       }
       catch (IOException e)
@@ -209,6 +209,13 @@ public class FileManager
         ExceptionHandler.handleException(e, "Could not copy game file from " + source.toString());
       }
     }
+  }
+
+  public static boolean shouldCompressFile(String filePath)
+  {
+    String lowerCasePath = filePath.toLowerCase();
+    return !(lowerCasePath.endsWith(".gz") || lowerCasePath.endsWith(".d81") || lowerCasePath.endsWith(".prg") ||
+      lowerCasePath.endsWith(".p00"));
   }
 
   public static void compressGzip(Path source, Path target) throws IOException
@@ -568,7 +575,7 @@ public class FileManager
     if (systemModel.isC64())
     {
       //C64
-      if (gameFile.contains("crt"))
+      if (gameFile.toLowerCase().contains("crt"))
       {
         command.append("-cartcrt \"" + decompressIfNeeded(gameFile) + "\"");
       }
@@ -645,7 +652,8 @@ public class FileManager
   private String decompressIfNeeded(String path)
   {
     String returnPath = path;
-    if (path.contains("crt.gz") || path.contains("CRT.gz") || path.contains("prg.gz"))
+    String lowerCasePath = path.toLowerCase();
+    if (lowerCasePath.contains("crt.gz") || lowerCasePath.contains("prg.gz"))
     {
       Path targetFile = Paths.get("./temp/" + path.substring(path.lastIndexOf("/") + 1, path.lastIndexOf(".")));
       try
@@ -963,7 +971,8 @@ public class FileManager
     }
     catch (IOException e)
     {
-      ExceptionHandler.logException(e, "Could not scale and store cover for " + gameName + ", using missing cover instead");
+      ExceptionHandler
+        .logException(e, "Could not scale and store cover for " + gameName + ", using missing cover instead");
       //Use missing file
       try
       {
@@ -985,7 +994,8 @@ public class FileManager
     }
     catch (IOException e)
     {
-      ExceptionHandler.logException(e, "Could not scale and store screenshot for " + gameName + ", using empty screenshot instead");
+      ExceptionHandler
+        .logException(e, "Could not scale and store screenshot for " + gameName + ", using empty screenshot instead");
       //Use missing file
       try
       {
@@ -1152,9 +1162,9 @@ public class FileManager
   {
     String dirName = file.getName();
     dirName = dirName.replaceAll("\\.", "");
-    
+
     String unzippedBasePath = TEMP_PATH + File.separator + dirName + File.separator;
-    
+
     String zipFilePath = file.getAbsolutePath();
     Path filePath = null;
     FileInputStream fis;
@@ -1218,7 +1228,7 @@ public class FileManager
         File fileEntry = new File(unzippedBasePath + fileName + "." + extension);
         //create directories for sub directories in rar
         new File(fileEntry.getParent()).mkdirs();
-        
+
         FileOutputStream os = new FileOutputStream(fileEntry);
         archive.extractFile(fh, os);
         os.close();

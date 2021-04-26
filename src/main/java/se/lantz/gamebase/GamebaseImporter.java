@@ -188,7 +188,7 @@ public class GamebaseImporter
     }
     return builder;
   }
-  
+
   private boolean createGbGameInfo(ResultSet result, Statement statement, StringBuilder builder)
   {
     String title = "";
@@ -209,7 +209,7 @@ public class GamebaseImporter
 
       String vic20Description = "";
       boolean vic20Cart = false;
-      
+
       //Game file
       if (isC64)
       {
@@ -219,13 +219,13 @@ public class GamebaseImporter
           builder.append("Ignoring " + title + " (No game file available)\n");
           return false;
         }
-        
+
         //1: Cartridge preferred, easyflash is preferred
         String cartridgePath = getCartridgePath(gameId, statement);
         if (!cartridgePath.isEmpty())
         {
           gamefile = gbExtrasPath.toString() + "\\" + cartridgePath;
-        }        
+        }
       }
       else
       {
@@ -235,9 +235,9 @@ public class GamebaseImporter
         String cartridgePath = getCartridgePath(gameId, statement);
         if (!cartridgePath.isEmpty())
         {
-          gamefile = gbExtrasPath.toString() + "\\" + cartridgePath;      
+          gamefile = gbExtrasPath.toString() + "\\" + cartridgePath;
           vic20Cart = true;
-        }      
+        }
         if (!gamefile.isEmpty())
         {
           //2: GameFile
@@ -247,7 +247,7 @@ public class GamebaseImporter
             vic20Cart = true;
           }
         }
-        else 
+        else
         {
           //3: Tap
           String tapFile = getTapPath(gameId, statement);
@@ -263,13 +263,13 @@ public class GamebaseImporter
           }
         }
       }
-      
+
       //Year can start with 99 for unknown, use 9999 for unknown. Gamebase uses several different ones (e.g. 9994)
       if (year.startsWith("99"))
       {
         year = "9999";
       }
-      
+
       //Setup advanced string (system, sid, pal, truedrive etc)
       String advanced = constructAdvancedString(palOrNtsc, trueDriveEmu, gemus);
 
@@ -303,7 +303,7 @@ public class GamebaseImporter
 
       //Get cover
       String coverFile = getCoverPath(gameId, statement);
-      
+
       //Add to list to be processed in next import step.
       gbGameInfoList.add(new GbGameInfo(title,
                                         year,
@@ -560,25 +560,24 @@ public class GamebaseImporter
     importIndexForTempFiles++;
     if (isVic20cart)
     {
-      return FileManager
-        .getTempFileForVic20Cart(new BufferedInputStream(new FileInputStream(gameFile)), importIndexForTempFiles + "_" + gameFile.getName()).toPath()
-        .toString();
+      return FileManager.getTempFileForVic20Cart(new BufferedInputStream(new FileInputStream(gameFile)),
+                                                 importIndexForTempFiles + "_" + gameFile.getName())
+        .toPath().toString();
     }
     else
     {
       File selectedFile = FileManager.createTempFileForScraper(new BufferedInputStream(new FileInputStream(gameFile)),
                                                                importIndexForTempFiles + "_" + gameFile.getName());
-      //Do not compress prg files: Vice doesn't seem to unzip them properly
-      String lowercaseName =  selectedFile.getName().toLowerCase();
-      if (lowercaseName.endsWith(".gz") || lowercaseName.endsWith(".prg") || lowercaseName.endsWith(".p00") )
-      {
-        return selectedFile.toPath().toString();
-      }
-      else
+      //Do not compress some files: Vice doesn't seem to unzip them properly
+      if (FileManager.shouldCompressFile(selectedFile.getName()))
       {
         Path compressedFilePath = selectedFile.toPath().getParent().resolve(selectedFile.getName() + ".gz");
         FileManager.compressGzip(selectedFile.toPath(), compressedFilePath);
         return compressedFilePath.toString();
+      }
+      else
+      {
+        return selectedFile.toPath().toString();
       }
     }
   }
