@@ -18,6 +18,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Properties;
@@ -68,6 +69,10 @@ public class FileManager
   private InfoModel infoModel;
   private SystemModel systemModel;
   private static ExecutorService executor = Executors.newSingleThreadExecutor();
+
+  private static List<String> validFileEndingList =
+    Arrays.asList("d64", "t64", "prg", "p00", "d81", "d71", "x64", "g64", "tap", "crt", "vsf");
+
   static
   {
     try
@@ -1111,9 +1116,9 @@ public class FileManager
     fos.close();
     if (gameFilename.toLowerCase().endsWith(".rar"))
     {
-      return unrarAndPickFirstEntry(file);
+      return unrarAndPickFirstValidEntry(file);
     }
-    return unzipAndPickFirstEntry(file);
+    return unzipAndPickFirstValidEntry(file);
   }
 
   public static List<String> unzipVic20cart(File file)
@@ -1158,7 +1163,7 @@ public class FileManager
     return unzippedFilesList;
   }
 
-  public static File unzipAndPickFirstEntry(File file)
+  public static File unzipAndPickFirstValidEntry(File file)
   {
     String dirName = file.getName();
     dirName = dirName.replaceAll("\\.", "");
@@ -1207,7 +1212,7 @@ public class FileManager
     return filePath != null ? filePath.toFile() : file;
   }
 
-  public static File unrarAndPickFirstEntry(File file)
+  public static File unrarAndPickFirstValidEntry(File file)
   {
     String dirName = file.getName();
     dirName = dirName.replaceAll("\\.", "");
@@ -1216,7 +1221,7 @@ public class FileManager
     try (Archive archive = new Archive(file))
     {
       archive.getMainHeader().print();
-      FileHeader fh = archive.nextFileHeader();
+      FileHeader fh = getFirstMatchingRarEntry(archive);
       if (fh != null)
       {
         String fileName = fh.getFileNameString().trim();
@@ -1243,14 +1248,29 @@ public class FileManager
     return filePath != null ? filePath.toFile() : file;
   }
 
+  private static FileHeader getFirstMatchingRarEntry(Archive archive)
+  {
+    FileHeader fh = archive.nextFileHeader();
+    if (fh != null && !isValidFileEnding(fh.getFileNameString().trim().toLowerCase()))
+    {
+      fh = getFirstMatchingRarEntry(archive);
+    }
+    return fh;
+  }
+
   private static ZipEntry getFirstMatchingZipEntry(ZipArchiveInputStream zis) throws IOException
   {
     ZipEntry ze = zis.getNextZipEntry();
-    if (ze != null && ze.getName().endsWith(".NFO"))
+    if (ze != null && !isValidFileEnding(ze.getName().trim().toLowerCase()))
     {
-      ze = zis.getNextZipEntry();
+      ze = getFirstMatchingZipEntry(zis);
     }
     return ze;
+  }
+
+  private static boolean isValidFileEnding(String fileName)
+  {
+    return validFileEndingList.stream().anyMatch(ending -> fileName.endsWith(ending));
   }
 
   public static List<String> convertAllScreenshotsTo32Bit() throws IOException
