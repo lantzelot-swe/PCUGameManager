@@ -530,7 +530,67 @@ public class ListPanel extends JPanel
       mainPanel.repaintAfterModifications();
     }
   }
-
+  
+  public void toggleFavorite6()
+  {
+    if (!uiModel.isDataChanged())
+    {
+      for (GameListData glData : list.getSelectedValuesList())
+      {
+        uiModel.toggleFavorite6(glData);
+      }
+      mainPanel.repaintAfterModifications();
+    }
+  }
+  
+  public void toggleFavorite7()
+  {
+    if (!uiModel.isDataChanged())
+    {
+      for (GameListData glData : list.getSelectedValuesList())
+      {
+        uiModel.toggleFavorite7(glData);
+      }
+      mainPanel.repaintAfterModifications();
+    }
+  }
+  
+  public void toggleFavorite8()
+  {
+    if (!uiModel.isDataChanged())
+    {
+      for (GameListData glData : list.getSelectedValuesList())
+      {
+        uiModel.toggleFavorite8(glData);
+      }
+      mainPanel.repaintAfterModifications();
+    }
+  }
+  
+  public void toggleFavorite9()
+  {
+    if (!uiModel.isDataChanged())
+    {
+      for (GameListData glData : list.getSelectedValuesList())
+      {
+        uiModel.toggleFavorite9(glData);
+      }
+      mainPanel.repaintAfterModifications();
+    }
+  }
+  
+  public void toggleFavorite10()
+  {
+    if (!uiModel.isDataChanged())
+    {
+      for (GameListData glData : list.getSelectedValuesList())
+      {
+        uiModel.toggleFavorite10(glData);
+      }
+      mainPanel.repaintAfterModifications();
+    }
+  }
+  
   public void reloadCurrentGameView()
   {
     GameListData selectedData = getList().getSelectedValue();

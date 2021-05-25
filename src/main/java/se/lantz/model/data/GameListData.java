@@ -39,29 +39,11 @@ public class GameListData implements Comparable
     return favorite;
   }
   
-  public void toggleFavorite()
+  public void toggleFavorite(int number)
   {
-    this.favorite = favorite == 1 ? 0 : 1;
+    this.favorite = favorite == number ? 0 : number;
   }
   
-  public void toggleFavorite2()
-  {
-    this.favorite = favorite == 2 ? 0 : 2;
-  }
-  
-  public void toggleFavorite3()
-  {
-    this.favorite = favorite == 3 ? 0 : 3;
-  }
-  public void toggleFavorite4()
-  {
-    this.favorite = favorite == 4 ? 0 : 4;
-  }
-  public void toggleFavorite5()
-  {
-    this.favorite = favorite == 5 ? 0 : 5;
-  }
-
   public boolean isFavorite()
   {
     return favorite > 0;

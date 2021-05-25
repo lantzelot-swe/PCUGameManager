@@ -64,11 +64,21 @@ public class MenuManager
   private JMenuItem toggleFavorite3Item;
   private JMenuItem toggleFavorite4Item;
   private JMenuItem toggleFavorite5Item;
+  private JMenuItem toggleFavorite6Item;
+  private JMenuItem toggleFavorite7Item;
+  private JMenuItem toggleFavorite8Item;
+  private JMenuItem toggleFavorite9Item;
+  private JMenuItem toggleFavorite10Item;
   private JMenuItem clearFavorites1Item;
   private JMenuItem clearFavorites2Item;
   private JMenuItem clearFavorites3Item;
   private JMenuItem clearFavorites4Item;
   private JMenuItem clearFavorites5Item;
+  private JMenuItem clearFavorites6Item;
+  private JMenuItem clearFavorites7Item;
+  private JMenuItem clearFavorites8Item;
+  private JMenuItem clearFavorites9Item;
+  private JMenuItem clearFavorites10Item;
 
   private JMenuItem backupDbItem;
   private JMenuItem restoreDbItem;
@@ -133,12 +143,22 @@ public class MenuManager
     editMenu.add(getToggleFavorite3Item());
     editMenu.add(getToggleFavorite4Item());
     editMenu.add(getToggleFavorite5Item());
+    editMenu.add(getToggleFavorite6Item());
+    editMenu.add(getToggleFavorite7Item());
+    editMenu.add(getToggleFavorite8Item());
+    editMenu.add(getToggleFavorite9Item());
+    editMenu.add(getToggleFavorite10Item());
     editMenu.addSeparator();
     editMenu.add(getClearFavorites1Item());
     editMenu.add(getClearFavorites2Item());
     editMenu.add(getClearFavorites3Item());
     editMenu.add(getClearFavorites4Item());
     editMenu.add(getClearFavorites5Item());
+    editMenu.add(getClearFavorites6Item());
+    editMenu.add(getClearFavorites7Item());
+    editMenu.add(getClearFavorites8Item());
+    editMenu.add(getClearFavorites9Item());
+    editMenu.add(getClearFavorites10Item());
     toolsMenu = new JMenu("Tools");
     toolsMenu.setMnemonic('T');
     toolsMenu.add(getBackupDbItem());
@@ -160,10 +180,10 @@ public class MenuManager
     uiModel.addSaveChangeListener(e -> {
       boolean okToEnable = !uiModel.isDataChanged();
       addGameItem.setEnabled(okToEnable);
-      importCarouselItem.setEnabled(okToEnable);
-      importGamebaseItem.setEnabled(okToEnable);
+      importMenu.setEnabled(okToEnable);
       exportItem.setEnabled(okToEnable);
-      toggleFavorite1Item.setEnabled(okToEnable);
+      toolsMenu.setEnabled(okToEnable);
+      editMenu.setEnabled(okToEnable);
       runGameItem.setEnabled(!uiModel.getInfoModel().getGamesFile().isEmpty());
       refreshItem.setEnabled(okToEnable);
     });
@@ -362,6 +382,71 @@ public class MenuManager
     return toggleFavorite5Item;
   }
 
+  private JMenuItem getToggleFavorite6Item()
+  {
+    toggleFavorite6Item = new JMenuItem("Add/remove from favorites 6");
+    KeyStroke keyStrokeToToggleFav = KeyStroke.getKeyStroke(KeyEvent.VK_F6, InputEvent.CTRL_DOWN_MASK);
+    toggleFavorite6Item.setAccelerator(keyStrokeToToggleFav);
+    toggleFavorite6Item.addActionListener(e -> {
+      mainWindow.setWaitCursor(true);
+      mainWindow.getMainPanel().toggleFavorite6();
+      mainWindow.setWaitCursor(false);
+    });
+    return toggleFavorite6Item;
+  }
+
+  private JMenuItem getToggleFavorite7Item()
+  {
+    toggleFavorite7Item = new JMenuItem("Add/remove from favorites 7");
+    KeyStroke keyStrokeToToggleFav = KeyStroke.getKeyStroke(KeyEvent.VK_F7, InputEvent.CTRL_DOWN_MASK);
+    toggleFavorite7Item.setAccelerator(keyStrokeToToggleFav);
+    toggleFavorite7Item.addActionListener(e -> {
+      mainWindow.setWaitCursor(true);
+      mainWindow.getMainPanel().toggleFavorite7();
+      mainWindow.setWaitCursor(false);
+    });
+    return toggleFavorite7Item;
+  }
+
+  private JMenuItem getToggleFavorite8Item()
+  {
+    toggleFavorite8Item = new JMenuItem("Add/remove from favorites 8");
+    KeyStroke keyStrokeToToggleFav = KeyStroke.getKeyStroke(KeyEvent.VK_F8, InputEvent.CTRL_DOWN_MASK);
+    toggleFavorite8Item.setAccelerator(keyStrokeToToggleFav);
+    toggleFavorite8Item.addActionListener(e -> {
+      mainWindow.setWaitCursor(true);
+      mainWindow.getMainPanel().toggleFavorite8();
+      mainWindow.setWaitCursor(false);
+    });
+    return toggleFavorite8Item;
+  }
+
+  private JMenuItem getToggleFavorite9Item()
+  {
+    toggleFavorite9Item = new JMenuItem("Add/remove from favorites 9");
+    KeyStroke keyStrokeToToggleFav = KeyStroke.getKeyStroke(KeyEvent.VK_F9, InputEvent.CTRL_DOWN_MASK);
+    toggleFavorite9Item.setAccelerator(keyStrokeToToggleFav);
+    toggleFavorite9Item.addActionListener(e -> {
+      mainWindow.setWaitCursor(true);
+      mainWindow.getMainPanel().toggleFavorite9();
+      mainWindow.setWaitCursor(false);
+    });
+    return toggleFavorite9Item;
+  }
+
+  private JMenuItem getToggleFavorite10Item()
+  {
+    toggleFavorite10Item = new JMenuItem("Add/remove from favorites 10");
+    KeyStroke keyStrokeToToggleFav = KeyStroke.getKeyStroke(KeyEvent.VK_F10, InputEvent.CTRL_DOWN_MASK);
+    toggleFavorite10Item.setAccelerator(keyStrokeToToggleFav);
+    toggleFavorite10Item.addActionListener(e -> {
+      mainWindow.setWaitCursor(true);
+      mainWindow.getMainPanel().toggleFavorite10();
+      mainWindow.setWaitCursor(false);
+    });
+    return toggleFavorite10Item;
+  }
+
   private JMenuItem getClearFavorites1Item()
   {
     clearFavorites1Item = new JMenuItem("Clear favorites 1");
@@ -369,7 +454,7 @@ public class MenuManager
       KeyStroke.getKeyStroke(KeyEvent.VK_F1, InputEvent.CTRL_DOWN_MASK + InputEvent.SHIFT_DOWN_MASK);
     clearFavorites1Item.setAccelerator(keyStrokeToClearFav);
     clearFavorites1Item.addActionListener(e -> {
-      clearFavorites();
+      clearFavorites(1);
     });
     return clearFavorites1Item;
   }
@@ -381,7 +466,7 @@ public class MenuManager
       KeyStroke.getKeyStroke(KeyEvent.VK_F2, InputEvent.CTRL_DOWN_MASK + InputEvent.SHIFT_DOWN_MASK);
     clearFavorites2Item.setAccelerator(keyStrokeToClearFav);
     clearFavorites2Item.addActionListener(e -> {
-      clearFavorites2();
+      clearFavorites(2);
     });
     return clearFavorites2Item;
   }
@@ -393,7 +478,7 @@ public class MenuManager
       KeyStroke.getKeyStroke(KeyEvent.VK_F3, InputEvent.CTRL_DOWN_MASK + InputEvent.SHIFT_DOWN_MASK);
     clearFavorites3Item.setAccelerator(keyStrokeToClearFav);
     clearFavorites3Item.addActionListener(e -> {
-      clearFavorites3();
+      clearFavorites(3);
     });
     return clearFavorites3Item;
   }
@@ -405,7 +490,7 @@ public class MenuManager
       KeyStroke.getKeyStroke(KeyEvent.VK_F4, InputEvent.CTRL_DOWN_MASK + InputEvent.SHIFT_DOWN_MASK);
     clearFavorites4Item.setAccelerator(keyStrokeToClearFav);
     clearFavorites4Item.addActionListener(e -> {
-      clearFavorites4();
+      clearFavorites(4);
     });
     return clearFavorites4Item;
   }
@@ -417,9 +502,69 @@ public class MenuManager
       KeyStroke.getKeyStroke(KeyEvent.VK_F5, InputEvent.CTRL_DOWN_MASK + InputEvent.SHIFT_DOWN_MASK);
     clearFavorites5Item.setAccelerator(keyStrokeToClearFav);
     clearFavorites5Item.addActionListener(e -> {
-      clearFavorites5();
+      clearFavorites(5);
     });
     return clearFavorites5Item;
+  }
+
+  private JMenuItem getClearFavorites6Item()
+  {
+    clearFavorites6Item = new JMenuItem("Clear favorites 6");
+    KeyStroke keyStrokeToClearFav =
+      KeyStroke.getKeyStroke(KeyEvent.VK_F6, InputEvent.CTRL_DOWN_MASK + InputEvent.SHIFT_DOWN_MASK);
+    clearFavorites6Item.setAccelerator(keyStrokeToClearFav);
+    clearFavorites6Item.addActionListener(e -> {
+      clearFavorites(6);
+    });
+    return clearFavorites6Item;
+  }
+
+  private JMenuItem getClearFavorites7Item()
+  {
+    clearFavorites7Item = new JMenuItem("Clear favorites 7");
+    KeyStroke keyStrokeToClearFav =
+      KeyStroke.getKeyStroke(KeyEvent.VK_F7, InputEvent.CTRL_DOWN_MASK + InputEvent.SHIFT_DOWN_MASK);
+    clearFavorites7Item.setAccelerator(keyStrokeToClearFav);
+    clearFavorites7Item.addActionListener(e -> {
+      clearFavorites(7);
+    });
+    return clearFavorites7Item;
+  }
+
+  private JMenuItem getClearFavorites8Item()
+  {
+    clearFavorites8Item = new JMenuItem("Clear favorites 8");
+    KeyStroke keyStrokeToClearFav =
+      KeyStroke.getKeyStroke(KeyEvent.VK_F8, InputEvent.CTRL_DOWN_MASK + InputEvent.SHIFT_DOWN_MASK);
+    clearFavorites8Item.setAccelerator(keyStrokeToClearFav);
+    clearFavorites8Item.addActionListener(e -> {
+      clearFavorites(8);
+    });
+    return clearFavorites8Item;
+  }
+
+  private JMenuItem getClearFavorites9Item()
+  {
+    clearFavorites9Item = new JMenuItem("Clear favorites 9");
+    KeyStroke keyStrokeToClearFav =
+      KeyStroke.getKeyStroke(KeyEvent.VK_F9, InputEvent.CTRL_DOWN_MASK + InputEvent.SHIFT_DOWN_MASK);
+    clearFavorites9Item.setAccelerator(keyStrokeToClearFav);
+    clearFavorites9Item.addActionListener(e -> {
+      clearFavorites(9);
+    });
+    return clearFavorites9Item;
+  }
+
+  private JMenuItem getClearFavorites10Item()
+  {
+    clearFavorites10Item = new JMenuItem("Clear favorites 10");
+    KeyStroke keyStrokeToClearFav =
+      KeyStroke.getKeyStroke(KeyEvent.VK_F10, InputEvent.CTRL_DOWN_MASK + InputEvent.SHIFT_DOWN_MASK);
+    clearFavorites10Item.setAccelerator(keyStrokeToClearFav);
+    clearFavorites10Item.addActionListener(e -> {
+      clearFavorites(10);
+    });
+    return clearFavorites10Item;
   }
 
   private JMenuItem getBackupDbItem()
@@ -670,58 +815,17 @@ public class MenuManager
     }
   }
 
-  private void clearFavorites()
+  private void clearFavorites(int number)
   {
-    String message = "Are you sure you want to clear all games marked as favorites 1?";
-    int option = JOptionPane.showConfirmDialog(MainWindow.getInstance()
-      .getMainPanel(), message, "Clear all favorites 1", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+    String message = "Are you sure you want to clear all games marked as favorites " + number + "?";
+    int option = JOptionPane.showConfirmDialog(MainWindow.getInstance().getMainPanel(),
+                                               message,
+                                               "Clear all favorites " + number,
+                                               JOptionPane.YES_NO_OPTION,
+                                               JOptionPane.QUESTION_MESSAGE);
     if (option == JOptionPane.YES_OPTION)
     {
-      uiModel.clearFavorites(1);
-    }
-  }
-
-  private void clearFavorites2()
-  {
-    String message = "Are you sure you want to clear all games marked as favorites 2?";
-    int option = JOptionPane.showConfirmDialog(MainWindow.getInstance()
-      .getMainPanel(), message, "Clear all favorites 2", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
-    if (option == JOptionPane.YES_OPTION)
-    {
-      uiModel.clearFavorites(2);
-    }
-  }
-
-  private void clearFavorites3()
-  {
-    String message = "Are you sure you want to clear all games marked as favorites 3?";
-    int option = JOptionPane.showConfirmDialog(MainWindow.getInstance()
-      .getMainPanel(), message, "Clear all favorites 3", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
-    if (option == JOptionPane.YES_OPTION)
-    {
-      uiModel.clearFavorites(3);
-    }
-  }
-
-  private void clearFavorites4()
-  {
-    String message = "Are you sure you want to clear all games marked as favorites 4?";
-    int option = JOptionPane.showConfirmDialog(MainWindow.getInstance()
-      .getMainPanel(), message, "Clear all favorites 4", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
-    if (option == JOptionPane.YES_OPTION)
-    {
-      uiModel.clearFavorites(4);
-    }
-  }
-
-  private void clearFavorites5()
-  {
-    String message = "Are you sure you want to clear all games marked as favorites 5?";
-    int option = JOptionPane.showConfirmDialog(MainWindow.getInstance()
-      .getMainPanel(), message, "Clear all favorites 5", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
-    if (option == JOptionPane.YES_OPTION)
-    {
-      uiModel.clearFavorites(5);
+      uiModel.clearFavorites(number);
     }
   }
 

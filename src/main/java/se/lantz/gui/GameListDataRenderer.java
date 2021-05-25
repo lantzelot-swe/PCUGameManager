@@ -29,11 +29,11 @@ public class GameListDataRenderer extends DefaultListCellRenderer
   private Color fav5ColorSelected = Color.PINK;
 
   private final Font bold;
-  private final Font plain;
+  private final Font boldItalic;
 
   public GameListDataRenderer()
   {
-    this.plain = getFont().deriveFont(Font.PLAIN);
+    this.boldItalic = getFont().deriveFont(Font.BOLD + Font.ITALIC);
     this.bold = getFont().deriveFont(Font.BOLD);
   }
 
@@ -81,6 +81,26 @@ public class GameListDataRenderer extends DefaultListCellRenderer
       case 5:
         this.setForeground(isSelected ? fav5ColorSelected : fav5Color);
         break;
+      case 6:
+        this.setForeground(isSelected ? fav1ColorSelected : fav1Color);
+        this.setFont(boldItalic);
+        break;
+      case 7:
+        this.setForeground(isSelected ? fav2ColorSelected : fav2Color);
+        this.setFont(boldItalic);
+        break;
+      case 8:
+        this.setForeground(isSelected ? fav3ColorSelected : fav3Color);
+        this.setFont(boldItalic);
+        break;
+      case 9:
+        this.setForeground(isSelected ? fav4ColorSelected : fav4Color);
+        this.setFont(boldItalic);
+        break;
+      case 10:
+        this.setForeground(isSelected ? fav5ColorSelected : fav5Color);
+        this.setFont(boldItalic);
+        break;
       default:
         break;
       }
@@ -118,6 +138,31 @@ public class GameListDataRenderer extends DefaultListCellRenderer
     else if (view.getGameViewId() == GameView.FAVORITES_5_ID)
     {
       this.setFont(bold);
+      this.setForeground(isSelected ? fav5ColorSelected : fav5Color);
+    }
+    else if (view.getGameViewId() == GameView.FAVORITES_6_ID)
+    {
+      this.setFont(boldItalic);
+      this.setForeground(isSelected ? fav1ColorSelected : fav1Color);
+    }
+    else if (view.getGameViewId() == GameView.FAVORITES_7_ID)
+    {
+      this.setFont(boldItalic);
+      this.setForeground(isSelected ? fav2ColorSelected : fav2Color);
+    }
+    else if (view.getGameViewId() == GameView.FAVORITES_8_ID)
+    {
+      this.setFont(boldItalic);
+      this.setForeground(isSelected ? fav3ColorSelected : fav3Color);
+    }
+    else if (view.getGameViewId() == GameView.FAVORITES_9_ID)
+    {
+      this.setFont(boldItalic);
+      this.setForeground(isSelected ? fav4ColorSelected : fav4Color);
+    }
+    else if (view.getGameViewId() == GameView.FAVORITES_10_ID)
+    {
+      this.setFont(boldItalic);
       this.setForeground(isSelected ? fav5ColorSelected : fav5Color);
       if(index > -1)
       {

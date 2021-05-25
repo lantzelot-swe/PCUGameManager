@@ -198,6 +198,31 @@ public class MainPanel extends JPanel
     getListPanel().toggleFavorite5();
   }
   
+  public void toggleFavorite6()
+  {
+    getListPanel().toggleFavorite6();
+  }
+  
+  public void toggleFavorite7()
+  {
+    getListPanel().toggleFavorite7();
+  }
+  
+  public void toggleFavorite8()
+  {
+    getListPanel().toggleFavorite8();
+  }
+  
+  public void toggleFavorite9()
+  {
+    getListPanel().toggleFavorite9();
+  }
+  
+  public void toggleFavorite10()
+  {
+    getListPanel().toggleFavorite10();
+  }
+  
   public void runCurrentGame()
   {
     if (getListPanel().isSingleGameSelected() && getListPanel().getSelectedIndexInList() > -1)

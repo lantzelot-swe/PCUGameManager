@@ -1,6 +1,5 @@
 package se.lantz.model;
 
-import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
@@ -19,7 +18,6 @@ import se.lantz.manager.ImportManager;
 import se.lantz.model.data.GameDetails;
 import se.lantz.model.data.GameListData;
 import se.lantz.model.data.GameView;
-import se.lantz.model.data.ScraperFields;
 import se.lantz.scraper.MobyGamesScraper;
 import se.lantz.scraper.Scraper;
 import se.lantz.util.FileManager;
@@ -35,17 +33,27 @@ public class MainViewModel extends AbstractModel
 
   private GameView selectedGameView;
   private int allGamesCount = 0;
-  private int favoritesCount = 0;
+  private int favorites1Count = 0;
   private int favorites2Count = 0;
   private int favorites3Count = 0;
   private int favorites4Count = 0;
   private int favorites5Count = 0;
+  private int favorites6Count = 0;
+  private int favorites7Count = 0;
+  private int favorites8Count = 0;
+  private int favorites9Count = 0;
+  private int favorites10Count = 0;
   private GameView allGameView;
-  private GameView favoritesView;
+  private GameView favorites1View;
   private GameView favorites2View;
   private GameView favorites3View;
   private GameView favorites4View;
   private GameView favorites5View;
+  private GameView favorites6View;
+  private GameView favorites7View;
+  private GameView favorites8View;
+  private GameView favorites9View;
+  private GameView favorites10View;
 
   private InfoModel infoModel = new InfoModel();
   private JoystickModel joy1Model = new JoystickModel(true);
@@ -77,7 +85,7 @@ public class MainViewModel extends AbstractModel
 
     resetDataChangedAfterInit();
   }
-  
+
   public DbConnector getDbConnector()
   {
     return this.dbConnector;
@@ -105,38 +113,63 @@ public class MainViewModel extends AbstractModel
   {
     //Setup game views
     allGameView = new GameView(GameView.ALL_GAMES_ID);
-    
+
     allGameView.setName("All Games");
-    allGameView.setSqlQuery("");   
+    allGameView.setSqlQuery("");
     selectedGameView = allGameView;
-    
+
     //Add favorites views
-    favoritesView = new GameView(GameView.FAVORITES_ID);
-    favoritesView.setName("Favorites 1");
-    favoritesView.setSqlQuery(" WHERE Favorite = 1");
-    
+    favorites1View = new GameView(GameView.FAVORITES_ID);
+    favorites1View.setName("Favorites 1");
+    favorites1View.setSqlQuery(" WHERE Favorite = 1");
+
     favorites2View = new GameView(GameView.FAVORITES_2_ID);
     favorites2View.setName("Favorites 2");
     favorites2View.setSqlQuery(" WHERE Favorite = 2");
-    
+
     favorites3View = new GameView(GameView.FAVORITES_3_ID);
     favorites3View.setName("Favorites 3");
     favorites3View.setSqlQuery(" WHERE Favorite = 3");
-    
+
     favorites4View = new GameView(GameView.FAVORITES_4_ID);
     favorites4View.setName("Favorites 4");
     favorites4View.setSqlQuery(" WHERE Favorite = 4");
-    
+
     favorites5View = new GameView(GameView.FAVORITES_5_ID);
     favorites5View.setName("Favorites 5");
     favorites5View.setSqlQuery(" WHERE Favorite = 5");
-    
+
+    favorites6View = new GameView(GameView.FAVORITES_6_ID);
+    favorites6View.setName("Favorites 6");
+    favorites6View.setSqlQuery(" WHERE Favorite = 6");
+
+    favorites7View = new GameView(GameView.FAVORITES_7_ID);
+    favorites7View.setName("Favorites 7");
+    favorites7View.setSqlQuery(" WHERE Favorite = 7");
+
+    favorites8View = new GameView(GameView.FAVORITES_8_ID);
+    favorites8View.setName("Favorites 8");
+    favorites8View.setSqlQuery(" WHERE Favorite = 8");
+
+    favorites9View = new GameView(GameView.FAVORITES_9_ID);
+    favorites9View.setName("Favorites 9");
+    favorites9View.setSqlQuery(" WHERE Favorite = 9");
+
+    favorites10View = new GameView(GameView.FAVORITES_10_ID);
+    favorites10View.setName("Favorites 10");
+    favorites10View.setSqlQuery(" WHERE Favorite = 10");
+
     gameViewModel.addElement(allGameView);
-    gameViewModel.addElement(favoritesView);
+    gameViewModel.addElement(favorites1View);
     gameViewModel.addElement(favorites2View);
     gameViewModel.addElement(favorites3View);
     gameViewModel.addElement(favorites4View);
     gameViewModel.addElement(favorites5View);
+    gameViewModel.addElement(favorites6View);
+    gameViewModel.addElement(favorites7View);
+    gameViewModel.addElement(favorites8View);
+    gameViewModel.addElement(favorites9View);
+    gameViewModel.addElement(favorites10View);
 
     List<GameView> gameViewList = dbConnector.loadGameViews();
     Collections.sort(gameViewList);
@@ -217,11 +250,14 @@ public class MainViewModel extends AbstractModel
     TextComponentSupport.clearUndoManagers();
   }
 
-  public StringBuilder importGameInfo(List<String> rowValues, ImportManager.Options option, int addAsFavorite, String viewTag)
+  public StringBuilder importGameInfo(List<String> rowValues,
+                                      ImportManager.Options option,
+                                      int addAsFavorite,
+                                      String viewTag)
   {
     return dbConnector.importRowsInGameInfoTable(rowValues, option, addAsFavorite, viewTag);
   }
-  
+
   public void cleanupAfterImport()
   {
     dbConnector.cleanupAfterImport();
@@ -286,11 +322,16 @@ public class MainViewModel extends AbstractModel
       {
         this.allGamesCount = gamesList.size();
         //Update favorites count
-        favoritesCount = 0;
+        favorites1Count = 0;
         favorites2Count = 0;
         favorites3Count = 0;
         favorites4Count = 0;
         favorites5Count = 0;
+        favorites6Count = 0;
+        favorites7Count = 0;
+        favorites8Count = 0;
+        favorites9Count = 0;
+        favorites10Count = 0;
         for (GameListData gameListData : gamesList)
         {
           if (gameListData.isFavorite())
@@ -298,7 +339,7 @@ public class MainViewModel extends AbstractModel
             switch (gameListData.getFavoriteNumber())
             {
             case 1:
-              favoritesCount++;
+              favorites1Count++;
               break;
             case 2:
               favorites2Count++;
@@ -312,16 +353,36 @@ public class MainViewModel extends AbstractModel
             case 5:
               favorites5Count++;
               break;
+            case 6:
+              favorites6Count++;
+              break;
+            case 7:
+              favorites7Count++;
+              break;
+            case 8:
+              favorites8Count++;
+              break;
+            case 9:
+              favorites9Count++;
+              break;
+            case 10:
+              favorites10Count++;
+              break;
             default:
               break;
             }
           }
         }
-        favoritesView.setGameCount(favoritesCount);
+        favorites1View.setGameCount(favorites1Count);
         favorites2View.setGameCount(favorites2Count);
         favorites3View.setGameCount(favorites3Count);
         favorites4View.setGameCount(favorites4Count);
         favorites5View.setGameCount(favorites5Count);
+        favorites6View.setGameCount(favorites6Count);
+        favorites7View.setGameCount(favorites7Count);
+        favorites8View.setGameCount(favorites8Count);
+        favorites9View.setGameCount(favorites9Count);
+        favorites10View.setGameCount(favorites10Count);
       }
       this.disableChangeNotification(false);
       logger.debug("...done.");
@@ -399,7 +460,7 @@ public class MainViewModel extends AbstractModel
         //Update duplicate index 
         infoModel.setDuplicateIndex(dbConnector.getGameDuplicateIndexToUse(infoModel.getTitle()));
       }
-      
+
       if (!validateRequiredFields().isEmpty())
       {
         //Validate that all required fields are set here!!
@@ -409,7 +470,7 @@ public class MainViewModel extends AbstractModel
 
       //Update with empty cover and/or screen before saving
       infoModel.updateCoverAndScreensIfEmpty(getSystemModel().isC64());
-      
+
       //Update all file names to match title
       infoModel.updateFileNames();
       //Create game details
@@ -443,28 +504,43 @@ public class MainViewModel extends AbstractModel
         selectedData.setGameId(currentGameId);
         if (getSelectedGameView().getGameViewId() == GameView.FAVORITES_ID)
         {
-          //Mark as favorites
           toggleFavorite(selectedData);
         }
         else if (getSelectedGameView().getGameViewId() == GameView.FAVORITES_2_ID)
         {
-          //Mark as favorites
           toggleFavorite2(selectedData);
         }
         else if (getSelectedGameView().getGameViewId() == GameView.FAVORITES_3_ID)
         {
-          //Mark as favorites
           toggleFavorite3(selectedData);
         }
         else if (getSelectedGameView().getGameViewId() == GameView.FAVORITES_4_ID)
         {
-          //Mark as favorites
           toggleFavorite4(selectedData);
         }
         else if (getSelectedGameView().getGameViewId() == GameView.FAVORITES_5_ID)
         {
-          //Mark as favorites
           toggleFavorite5(selectedData);
+        }
+        else if (getSelectedGameView().getGameViewId() == GameView.FAVORITES_6_ID)
+        {
+          toggleFavorite6(selectedData);
+        }
+        else if (getSelectedGameView().getGameViewId() == GameView.FAVORITES_7_ID)
+        {
+          toggleFavorite7(selectedData);
+        }
+        else if (getSelectedGameView().getGameViewId() == GameView.FAVORITES_8_ID)
+        {
+          toggleFavorite8(selectedData);
+        }
+        else if (getSelectedGameView().getGameViewId() == GameView.FAVORITES_9_ID)
+        {
+          toggleFavorite9(selectedData);
+        }
+        else if (getSelectedGameView().getGameViewId() == GameView.FAVORITES_10_ID)
+        {
+          toggleFavorite10(selectedData);
         }
       }
       else
@@ -520,13 +596,13 @@ public class MainViewModel extends AbstractModel
     //Reload the current view
     reloadCurrentGameView();
   }
-  
+
   public void deleteAllGamesInCurrentView()
   {
     //First delete all covers, screens and games 
     for (int i = 0; i < getGameListModel().getSize(); i++)
     {
-      GameListData currentData = getGameListModel().getElementAt(i);   
+      GameListData currentData = getGameListModel().getElementAt(i);
       if (!currentData.getTitle().contains("THEC64") || currentData.getTitle().contains("VIC20"))
       {
         GameDetails details = dbConnector.getGameDetails(currentData.getGameId());
@@ -548,7 +624,7 @@ public class MainViewModel extends AbstractModel
       reloadGameViews();
     }
   }
-  
+
   public void clearFavorites(int number)
   {
     dbConnector.clearFavorites(number);
@@ -600,13 +676,13 @@ public class MainViewModel extends AbstractModel
       resetDataChanged();
     }
   }
-  
+
   private void reduceFavoriteCount(int previousFavorite)
   {
     switch (previousFavorite)
     {
     case 1:
-      favoritesView.setGameCount(--favoritesCount);
+      favorites1View.setGameCount(--favorites1Count);
       break;
     case 2:
       favorites2View.setGameCount(--favorites2Count);
@@ -620,6 +696,21 @@ public class MainViewModel extends AbstractModel
     case 5:
       favorites5View.setGameCount(--favorites5Count);
       break;
+    case 6:
+      favorites6View.setGameCount(--favorites6Count);
+      break;
+    case 7:
+      favorites7View.setGameCount(--favorites7Count);
+      break;
+    case 8:
+      favorites8View.setGameCount(--favorites8Count);
+      break;
+    case 9:
+      favorites9View.setGameCount(--favorites9Count);
+      break;
+    case 10:
+      favorites10View.setGameCount(--favorites10Count);
+      break;
     default:
       break;
     }
@@ -627,11 +718,61 @@ public class MainViewModel extends AbstractModel
 
   public void toggleFavorite(GameListData data)
   {
+    favorites1Count = toggleFavorite(data, 1, favorites1Count, favorites1View);
+  }
+
+  public void toggleFavorite2(GameListData data)
+  {
+    favorites2Count = toggleFavorite(data, 2, favorites2Count, favorites2View);
+  }
+
+  public void toggleFavorite3(GameListData data)
+  {
+    favorites3Count = toggleFavorite(data, 3, favorites3Count, favorites3View);
+  }
+
+  public void toggleFavorite4(GameListData data)
+  {
+    favorites4Count = toggleFavorite(data, 4, favorites4Count, favorites4View);
+  }
+
+  public void toggleFavorite5(GameListData data)
+  {
+    favorites5Count = toggleFavorite(data, 5, favorites5Count, favorites5View);
+  }
+
+  public void toggleFavorite6(GameListData data)
+  {
+    favorites6Count = toggleFavorite(data, 6, favorites6Count, favorites6View);
+  }
+
+  public void toggleFavorite7(GameListData data)
+  {
+    favorites7Count = toggleFavorite(data, 7, favorites7Count, favorites7View);
+  }
+
+  public void toggleFavorite8(GameListData data)
+  {
+    favorites8Count = toggleFavorite(data, 8, favorites8Count, favorites8View);
+  }
+
+  public void toggleFavorite9(GameListData data)
+  {
+    favorites9Count = toggleFavorite(data, 9, favorites9Count, favorites9View);
+  }
+
+  public void toggleFavorite10(GameListData data)
+  {
+    favorites10Count = toggleFavorite(data, 10, favorites10Count, favorites10View);
+  }
+
+  private int toggleFavorite(GameListData data, int favoritesNumber, int favoritesCount, GameView favoritesView)
+  {
     if (data != null && !data.getGameId().isEmpty())
     {
       int previousFavorite = data.getFavorite();
-      dbConnector.toggleFavorite(data.getGameId(), previousFavorite, 1);
-      data.toggleFavorite();
+      dbConnector.toggleFavorite(data.getGameId(), previousFavorite, favoritesNumber);
+      data.toggleFavorite(favoritesNumber);
       if (data.isFavorite())
       {
         favoritesView.setGameCount(++favoritesCount);
@@ -643,93 +784,14 @@ public class MainViewModel extends AbstractModel
       }
       gameListModel.notifyChange();
     }
-  }
-  
-  public void toggleFavorite2(GameListData data)
-  {
-    if (data != null && !data.getGameId().isEmpty())
-    {
-      int previousFavorite = data.getFavorite();
-      dbConnector.toggleFavorite(data.getGameId(), previousFavorite, 2);
-      data.toggleFavorite2();
-      if (data.isFavorite())
-      {
-        favorites2View.setGameCount(++favorites2Count);
-        reduceFavoriteCount(previousFavorite);
-      }
-      else
-      {
-        favorites2View.setGameCount(--favorites2Count);
-      }
-      gameListModel.notifyChange();
-    }
-  }
-  
-  public void toggleFavorite3(GameListData data)
-  {
-    if (data != null && !data.getGameId().isEmpty())
-    {
-      int previousFavorite = data.getFavorite();
-      dbConnector.toggleFavorite(data.getGameId(), previousFavorite, 3);
-      data.toggleFavorite3();
-      if (data.isFavorite())
-      {
-        favorites3View.setGameCount(++favorites3Count);
-        reduceFavoriteCount(previousFavorite);
-      }
-      else
-      {
-        favorites3View.setGameCount(--favorites3Count);
-      }
-      gameListModel.notifyChange();
-    }
-  }
-  
-  public void toggleFavorite4(GameListData data)
-  {
-    if (data != null && !data.getGameId().isEmpty())
-    {
-      int previousFavorite = data.getFavorite();
-      dbConnector.toggleFavorite(data.getGameId(), previousFavorite, 4);
-      data.toggleFavorite4();
-      if (data.isFavorite())
-      {
-        favorites4View.setGameCount(++favorites4Count);
-        reduceFavoriteCount(previousFavorite);
-      }
-      else
-      {
-        favorites4View.setGameCount(--favorites4Count);
-      }
-      gameListModel.notifyChange();
-    }
-  }
-  
-  public void toggleFavorite5(GameListData data)
-  {
-    if (data != null && !data.getGameId().isEmpty())
-    {
-      int previousFavorite = data.getFavorite();
-      dbConnector.toggleFavorite(data.getGameId(), previousFavorite, 5);
-      data.toggleFavorite5();
-      if (data.isFavorite())
-      {
-        favorites5View.setGameCount(++favorites5Count);
-        reduceFavoriteCount(previousFavorite);
-      }
-      else
-      {
-        favorites5View.setGameCount(--favorites5Count);
-      }
-      gameListModel.notifyChange();
-    }
+    return favoritesCount;
   }
 
   public void runGameInVice()
   {
     fileManager.runVice(true);
   }
-  
+
   public void runVice()
   {
     fileManager.runVice(false);

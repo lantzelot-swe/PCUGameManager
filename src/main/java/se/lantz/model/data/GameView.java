@@ -14,6 +14,11 @@ public class GameView implements Comparable
   public static final int FAVORITES_3_ID = -4;
   public static final int FAVORITES_4_ID = -5;
   public static final int FAVORITES_5_ID = -6;
+  public static final int FAVORITES_6_ID = -7;
+  public static final int FAVORITES_7_ID = -8;
+  public static final int FAVORITES_8_ID = -9;
+  public static final int FAVORITES_9_ID = -10;
+  public static final int FAVORITES_10_ID = -11;
   private static final Logger logger = LoggerFactory.getLogger(GameView.class);
   private String name = "";
   private List<ViewFilter> viewFilters = new ArrayList<>();
