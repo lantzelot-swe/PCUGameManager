@@ -105,11 +105,11 @@ public class ExportManager
     gameDetailsList = uiModel.readGameDetailsForExport(infoBuilder, gamesList);
   }
 
-  public void createGameInfoFiles(StringBuilder infoBuilder)
+  public void createGameInfoFiles(StringBuilder infoBuilder, boolean fileLoader)
   {
     for (GameDetails gameDetails : gameDetailsList)
     {
-      uiModel.exportGameInfoFile(gameDetails, targetDir, infoBuilder);
+      uiModel.exportGameInfoFile(gameDetails, targetDir, infoBuilder, fileLoader);
     }
   }
 
@@ -118,39 +118,33 @@ public class ExportManager
     return deleteBeforeExport;
   }
 
- 
-
   public void copyFiles(StringBuilder infoBuilder)
   {
-    
-      try
-      {
-        Path targetCoverPath = targetDir.toPath().resolve("covers");
-        Files.createDirectories(targetCoverPath);
-        Path targetScreenPath = targetDir.toPath().resolve("screens");
-        Files.createDirectories(targetScreenPath);
-        Path targetGamePath = targetDir.toPath().resolve("games");
-        Files.createDirectories(targetGamePath);
-      }
-      catch (IOException e)
-      {
-        infoBuilder
-          .append("ERROR: Could not create directories for covers, screens and games, " + e.getMessage() + "\n");
-        ExceptionHandler.handleException(e, " Could not create directories for covers, screens and games");
-        return;
-      }
-    
-
+    try
+    {
+      Path targetCoverPath = targetDir.toPath().resolve("covers");
+      Files.createDirectories(targetCoverPath);
+      Path targetScreenPath = targetDir.toPath().resolve("screens");
+      Files.createDirectories(targetScreenPath);
+      Path targetGamePath = targetDir.toPath().resolve("games");
+      Files.createDirectories(targetGamePath);
+    }
+    catch (IOException e)
+    {
+      infoBuilder.append("ERROR: Could not create directories for covers, screens and games, " + e.getMessage() + "\n");
+      ExceptionHandler.handleException(e, " Could not create directories for covers, screens and games");
+      return;
+    }
     for (GameDetails gameDetails : gameDetailsList)
     {
       Path coverPath = Paths.get("./covers/" + gameDetails.getCover());
       Path targetCoverPath = targetDir.toPath().resolve("covers/" + gameDetails.getCover());
-      
+
       Path screens1Path = Paths.get("./screens/" + gameDetails.getScreen1());
       Path targetScreen1Path = targetDir.toPath().resolve("screens/" + gameDetails.getScreen1());
       Path screens2Path = Paths.get("./screens/" + gameDetails.getScreen2());
       Path targetScreen2Path = targetDir.toPath().resolve("screens/" + gameDetails.getScreen2());
-      
+
       Path gamePath = Paths.get("./games/" + gameDetails.getGame());
       Path targetGamePath = targetDir.toPath().resolve("games/" + gameDetails.getGame());
 
@@ -177,6 +171,45 @@ public class ExportManager
           infoBuilder.append("\n");
           Files.copy(screens2Path, targetScreen2Path, StandardCopyOption.REPLACE_EXISTING);
         }
+        if (!gameDetails.getGame().isEmpty())
+        {
+          infoBuilder.append("Copying game file from ");
+          infoBuilder.append(gamePath.toString());
+          infoBuilder.append("\n");
+          Files.copy(gamePath, targetGamePath, StandardCopyOption.REPLACE_EXISTING);
+        }
+      }
+      catch (IOException e)
+      {
+        infoBuilder.append("ERROR: Could not copy files for " + gameDetails.getTitle() + ", " + e.getMessage() + "\n");
+        ExceptionHandler.handleException(e, "Could NOT copy files for: " + gameDetails.getTitle());
+      }
+    }
+  }
+  
+  public void copyGamesForFileLoader(StringBuilder infoBuilder)
+  {
+    try
+    {
+      Path targetGamePath = targetDir.toPath();
+      Files.createDirectories(targetGamePath);
+    }
+    catch (IOException e)
+    {
+      infoBuilder.append("ERROR: Could not create directory for games, " + e.getMessage() + "\n");
+      ExceptionHandler.handleException(e, " Could not create directory for games");
+      return;
+    }
+    for (GameDetails gameDetails : gameDetailsList)
+    {
+      Path gamePath = Paths.get("./games/" + gameDetails.getGame());
+      
+      //TODO: Unzip if needed, rename vsf files to prg according to Spannernick
+      
+      Path targetGamePath = targetDir.toPath().resolve(gameDetails.getGame());
+
+      try
+      {
         if (!gameDetails.getGame().isEmpty())
         {
           infoBuilder.append("Copying game file from ");

@@ -7,13 +7,13 @@ import javax.swing.SwingWorker;
 import se.lantz.manager.ExportManager;
 import se.lantz.util.ExceptionHandler;
 
-public class ExportWorker extends SwingWorker<Void, String>
+public class ExportFileLoaderWorker extends SwingWorker<Void, String>
 {
 
   private ExportManager exportManager;
   private ExportProgressDialog dialog;
 
-  public ExportWorker(ExportManager importManager, ExportProgressDialog dialog)
+  public ExportFileLoaderWorker(ExportManager importManager, ExportProgressDialog dialog)
   {
     this.exportManager = importManager;
     this.dialog = dialog;
@@ -30,13 +30,13 @@ public class ExportWorker extends SwingWorker<Void, String>
     StringBuilder infoBuilder = new StringBuilder();
     exportManager.readFromDb(infoBuilder);
     publish(infoBuilder.toString());
-    publish("Creating game info files...");
+    publish("Creating cjm files...");
     infoBuilder = new StringBuilder();
-    exportManager.createGameInfoFiles(infoBuilder, false);
+    exportManager.createGameInfoFiles(infoBuilder, true);
     publish(infoBuilder.toString());
-    publish("Copy screenshots, covers and game files...");
+    publish("Copy game files...");
     infoBuilder = new StringBuilder();
-    exportManager.copyFiles(infoBuilder);
+    exportManager.copyGamesForFileLoader(infoBuilder);
     publish(infoBuilder.toString());
     exportManager.clearAfterImport();
     publish("Done!");

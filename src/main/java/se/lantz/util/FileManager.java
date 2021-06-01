@@ -366,16 +366,45 @@ public class FileManager
     logger.debug("Game title: \"{}\" ---- New fileName: \"{}\"", title, newNameString);
     return newNameString;
   }
+  
+  public static String generateFileNameFromTitleForFileLoader(String title, int duplicateIndex)
+  {
+    List<Character> forbiddenCharsList =
+      ":,'’!+*<>()/[]?|".chars().mapToObj(item -> (char) item).collect(Collectors.toList());
 
-  public void exportGameInfoFile(GameDetails gameDetails, File targetDir, StringBuilder infoBuilder)
+    List<Character> newName =
+      title.chars().mapToObj(item -> (char) item).filter(character -> !forbiddenCharsList.contains(character))
+        .collect(Collectors.toList());
+    String newNameString = newName.stream().map(String::valueOf).collect(Collectors.joining());
+    if (duplicateIndex > 0)
+    {
+      //Just add the duplicate index if there are several games with the same name
+      newNameString = newNameString + "0" + duplicateIndex;
+    }
+
+    logger.debug("Game title: \"{}\" ---- New fileName: \"{}\"", title, newNameString);
+    return newNameString;
+  }
+
+  public void exportGameInfoFile(GameDetails gameDetails, File targetDir, StringBuilder infoBuilder, boolean fileLoader)
   {
     try
     {
-      String filename = generateFileNameFromTitle(gameDetails.getTitle(), gameDetails.getDuplicateIndex());
-      infoBuilder.append("Creating game info file for " + gameDetails.getTitle() + "\n");
-      //Add -ms to comply with the maxi game tool.
-      filename = filename + "-ms.tsg";
-      writeGameInfoFile(filename, targetDir, gameDetails);
+      String filename = "";
+        
+      if (fileLoader)
+      {
+        infoBuilder.append("Creating cjm file for " + gameDetails.getTitle() + "\n");
+        filename = generateFileNameFromTitleForFileLoader(gameDetails.getTitle(), gameDetails.getDuplicateIndex()) + ".cjm";
+      }
+      else
+      {
+        infoBuilder.append("Creating game info file for " + gameDetails.getTitle() + "\n");
+        //Add -ms to comply with the maxi game tool.
+        filename = generateFileNameFromTitle(gameDetails.getTitle(), gameDetails.getDuplicateIndex()) + "-ms.tsg";
+      }
+      
+      writeGameInfoFile(filename, targetDir, gameDetails, fileLoader);
     }
     catch (Exception e)
     {
@@ -385,47 +414,49 @@ public class FileManager
     }
   }
 
-  public void writeGameInfoFile(String fileName, File targetDir, GameDetails gameDetails) throws IOException
+  public void writeGameInfoFile(String fileName, File targetDir, GameDetails gameDetails, boolean fileLoader) throws IOException
   {
     Path outDirPath = targetDir.toPath();
     Path filePath = outDirPath.resolve(fileName);
     filePath.toFile().createNewFile();
     FileWriter fw = new FileWriter(filePath.toFile());
-
-    fw.write("T:" + gameDetails.getTitle() + "\n");
+  
+    if (!fileLoader)
+    {
+      fw.write("T:" + gameDetails.getTitle() + "\n");
+      String description = replaceMinus(gameDetails.getDescription());
+      fw.write("D:en:" + description + "\n");
+      fw.write("D:de:" +
+        (gameDetails.getDescriptionDe().isEmpty() ? description : replaceMinus(gameDetails.getDescriptionDe())) + "\n");
+      fw.write("D:fr:" +
+        (gameDetails.getDescriptionFr().isEmpty() ? description : replaceMinus(gameDetails.getDescriptionFr())) + "\n");
+      fw.write("D:es:" +
+        (gameDetails.getDescriptionEs().isEmpty() ? description : replaceMinus(gameDetails.getDescriptionEs())) + "\n");
+      fw.write("D:it:" +
+        (gameDetails.getDescriptionIt().isEmpty() ? description : replaceMinus(gameDetails.getDescriptionIt())) + "\n");
+      if (!gameDetails.getAuthor().isEmpty())
+      {
+        fw.write("A:" + gameDetails.getAuthor() + "\n");
+      }
+      if (!gameDetails.getComposer().isEmpty())
+      {
+        fw.write("M:" + gameDetails.getComposer() + "\n");
+      }
+      fw.write("E:" + gameDetails.getGenre() + "\n");
+      fw.write("Y:" + gameDetails.getYear() + "\n");
+  
+      fw.write("F:" + "games/" + gameDetails.getGame() + "\n");
+      fw.write("C:" + "covers/" + gameDetails.getCover() + "\n");
+      if (!gameDetails.getScreen1().isEmpty())
+      {
+        fw.write("G:" + "screens/" + gameDetails.getScreen1() + "\n");
+      }
+      if (!gameDetails.getScreen2().isEmpty())
+      {
+        fw.write("G:" + "screens/" + gameDetails.getScreen2() + "\n");
+      }
+    }
     fw.write("X:" + gameDetails.getSystem() + "\n");
-    String description = replaceMinus(gameDetails.getDescription());
-    fw.write("D:en:" + description + "\n");
-    fw.write("D:de:" +
-      (gameDetails.getDescriptionDe().isEmpty() ? description : replaceMinus(gameDetails.getDescriptionDe())) + "\n");
-    fw.write("D:fr:" +
-      (gameDetails.getDescriptionFr().isEmpty() ? description : replaceMinus(gameDetails.getDescriptionFr())) + "\n");
-    fw.write("D:es:" +
-      (gameDetails.getDescriptionEs().isEmpty() ? description : replaceMinus(gameDetails.getDescriptionEs())) + "\n");
-    fw.write("D:it:" +
-      (gameDetails.getDescriptionIt().isEmpty() ? description : replaceMinus(gameDetails.getDescriptionIt())) + "\n");
-    if (!gameDetails.getAuthor().isEmpty())
-    {
-      fw.write("A:" + gameDetails.getAuthor() + "\n");
-    }
-    if (!gameDetails.getComposer().isEmpty())
-    {
-      fw.write("M:" + gameDetails.getComposer() + "\n");
-    }
-    fw.write("E:" + gameDetails.getGenre() + "\n");
-    fw.write("Y:" + gameDetails.getYear() + "\n");
-
-    fw.write("F:" + "games/" + gameDetails.getGame() + "\n");
-    fw.write("C:" + "covers/" + gameDetails.getCover() + "\n");
-    if (!gameDetails.getScreen1().isEmpty())
-    {
-      fw.write("G:" + "screens/" + gameDetails.getScreen1() + "\n");
-    }
-    if (!gameDetails.getScreen2().isEmpty())
-    {
-      fw.write("G:" + "screens/" + gameDetails.getScreen2() + "\n");
-    }
-
     if (!gameDetails.getJoy1().isEmpty())
     {
       fw.write(gameDetails.getJoy1() + "\n");

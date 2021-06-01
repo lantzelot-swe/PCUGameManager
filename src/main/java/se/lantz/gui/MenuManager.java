@@ -24,6 +24,7 @@ import se.lantz.gui.dbbackup.BackupWorker;
 import se.lantz.gui.dbrestore.RestoreDbDialog;
 import se.lantz.gui.dbrestore.RestoreProgressDialog;
 import se.lantz.gui.dbrestore.RestoreWorker;
+import se.lantz.gui.exports.ExportFileLoaderWorker;
 import se.lantz.gui.exports.ExportGamesDialog;
 import se.lantz.gui.exports.ExportProgressDialog;
 import se.lantz.gui.exports.ExportWorker;
@@ -46,6 +47,7 @@ public class MenuManager
 {
   private JMenu fileMenu;
   private JMenu importMenu;
+  private JMenu exportMenu;
   private JMenu editMenu;
   private JMenu toolsMenu;
   private JMenu helpMenu;
@@ -57,6 +59,7 @@ public class MenuManager
   private JMenuItem importCarouselItem;
   private JMenuItem importGamebaseItem;
   private JMenuItem exportItem;
+  private JMenuItem exportFLItem;
   private JMenuItem refreshItem;
 
   private JMenuItem toggleFavorite1Item;
@@ -131,7 +134,11 @@ public class MenuManager
     fileMenu.add(importMenu);
     importMenu.add(getImportCarouselItem());
     importMenu.add(getImportGamebaseItem());
-    fileMenu.add(getExportItem());
+    exportMenu = new JMenu("Export");
+    exportMenu.setMnemonic('X');
+    exportMenu.add(getExportItem());
+    exportMenu.add(getExportFileLoaderItem());
+    fileMenu.add(exportMenu);
     fileMenu.addSeparator();
     fileMenu.add(getRefreshItem());
     fileMenu.addSeparator();
@@ -262,12 +269,22 @@ public class MenuManager
 
   private JMenuItem getExportItem()
   {
-    exportItem = new JMenuItem("Export games...");
+    exportItem = new JMenuItem("Export to Carousel...");
     KeyStroke keyStrokeToExportGames = KeyStroke.getKeyStroke(KeyEvent.VK_E, InputEvent.CTRL_DOWN_MASK);
     exportItem.setAccelerator(keyStrokeToExportGames);
     exportItem.setMnemonic('E');
     exportItem.addActionListener(e -> exportGames());
     return exportItem;
+  }
+  
+  private JMenuItem getExportFileLoaderItem()
+  {
+    exportFLItem = new JMenuItem("Export to File Loader...");
+    KeyStroke keyStrokeToExportGames = KeyStroke.getKeyStroke(KeyEvent.VK_L, InputEvent.CTRL_DOWN_MASK);
+    exportFLItem.setAccelerator(keyStrokeToExportGames);
+    exportFLItem.setMnemonic('L');
+    exportFLItem.addActionListener(e -> exportGamesToFileLoader());
+    return exportFLItem;
   }
 
   private JMenuItem getRefreshItem()
@@ -715,6 +732,28 @@ public class MenuManager
                                          exportSelectionDialog.addGamesSubDirectory());
         ExportProgressDialog dialog = new ExportProgressDialog(this.mainWindow);
         ExportWorker worker = new ExportWorker(exportManager, dialog);
+        worker.execute();
+        dialog.setVisible(true);
+      }
+    }
+  }
+  
+  private void exportGamesToFileLoader()
+  {
+    final ExportGamesDialog exportSelectionDialog = new ExportGamesDialog(MainWindow.getInstance());
+    exportSelectionDialog.pack();
+    exportSelectionDialog.setLocationRelativeTo(this.mainWindow);
+    if (exportSelectionDialog.showDialog())
+    {
+      List<GameListData> gamesList = exportSelectionDialog.getSelectedGames();
+      if (!gamesList.isEmpty())
+      {
+        exportManager.setGamesToExport(gamesList);
+        exportManager.setTargetDirectory(exportSelectionDialog.getTargetDirectory(),
+                                         exportSelectionDialog.deleteBeforeExport(),
+                                         exportSelectionDialog.addGamesSubDirectory());
+        ExportProgressDialog dialog = new ExportProgressDialog(this.mainWindow);
+        ExportFileLoaderWorker worker = new ExportFileLoaderWorker(exportManager, dialog);
         worker.execute();
         dialog.setVisible(true);
       }
