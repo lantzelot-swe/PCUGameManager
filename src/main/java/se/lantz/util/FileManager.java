@@ -239,7 +239,7 @@ public class FileManager
     }
   }
 
-  public void decompressGzip(Path source, Path target) throws IOException
+  public static void decompressGzip(Path source, Path target) throws IOException
   {
     try (GZIPInputStream gis = new GZIPInputStream(new FileInputStream(source.toFile()));
       FileOutputStream fos = new FileOutputStream(target.toFile()))
@@ -379,7 +379,7 @@ public class FileManager
     if (duplicateIndex > 0)
     {
       //Just add the duplicate index if there are several games with the same name
-      newNameString = newNameString + "0" + duplicateIndex;
+      newNameString = newNameString + "_" + duplicateIndex;
     }
 
     logger.debug("Game title: \"{}\" ---- New fileName: \"{}\"", title, newNameString);
@@ -1278,7 +1278,7 @@ public class FileManager
     }
     return filePath != null ? filePath.toFile() : file;
   }
-
+  
   private static FileHeader getFirstMatchingRarEntry(Archive archive)
   {
     FileHeader fh = archive.nextFileHeader();

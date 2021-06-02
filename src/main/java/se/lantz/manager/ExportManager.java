@@ -9,6 +9,7 @@ import java.nio.file.StandardCopyOption;
 import java.util.Comparator;
 import java.util.List;
 
+import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -202,20 +203,42 @@ public class ExportManager
     }
     for (GameDetails gameDetails : gameDetailsList)
     {
-      Path gamePath = Paths.get("./games/" + gameDetails.getGame());
+      String gameName = gameDetails.getGame();
       
-      //TODO: Unzip if needed, rename vsf files to prg according to Spannernick
+      Path gamePath = Paths.get("./games/" + gameName);
+      String extension = FilenameUtils.getExtension(gameName);
+      boolean zipped = false;
+      if (extension.equalsIgnoreCase("gz"))
+      {
+        gameName = FilenameUtils.removeExtension(gameName);
+        //Get next extension
+        extension = FilenameUtils.getExtension(gameName);
+        if (extension.equalsIgnoreCase("vsf"))
+        {
+          //Rename to prg so that it works in the file loader
+          extension = "prg";
+        }
+        zipped = true;
+      }
+      Path targetGamePath = targetDir.toPath().resolve(FileManager.generateFileNameFromTitleForFileLoader(gameDetails.getTitle(), gameDetails.getDuplicateIndex()) + "." + extension);
       
-      Path targetGamePath = targetDir.toPath().resolve(gameDetails.getGame());
-
       try
       {
         if (!gameDetails.getGame().isEmpty())
         {
           infoBuilder.append("Copying game file from ");
           infoBuilder.append(gamePath.toString());
+          infoBuilder.append(" to ");
+          infoBuilder.append(targetGamePath);
           infoBuilder.append("\n");
-          Files.copy(gamePath, targetGamePath, StandardCopyOption.REPLACE_EXISTING);
+          if (zipped)
+          {
+            FileManager.decompressGzip(gamePath, targetGamePath);
+          }
+          else
+          {
+            Files.copy(gamePath, targetGamePath, StandardCopyOption.REPLACE_EXISTING);
+          }
         }
       }
       catch (IOException e)
