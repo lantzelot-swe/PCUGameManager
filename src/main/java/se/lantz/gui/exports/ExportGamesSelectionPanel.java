@@ -57,6 +57,7 @@ public class ExportGamesSelectionPanel extends JPanel
   private JCheckBox deleteCheckBox;
   private JButton exportButton;
   private JCheckBox gamesFolderCheckBox;
+  private ExportGameViewsSelectionPanel exportGameViewsSelectionPanel;
 
   public ExportGamesSelectionPanel(JButton exportButton)
   {
@@ -103,13 +104,22 @@ public class ExportGamesSelectionPanel extends JPanel
     gbc_warningLabel.gridy = 2;
     add(getWarningLabel(), gbc_warningLabel);
     GridBagConstraints gbc_formatPanel = new GridBagConstraints();
+    gbc_formatPanel.insets = new Insets(0, 0, 5, 0);
     gbc_formatPanel.anchor = GridBagConstraints.NORTH;
     gbc_formatPanel.gridwidth = 3;
-    gbc_formatPanel.insets = new Insets(0, 0, 0, 5);
     gbc_formatPanel.fill = GridBagConstraints.BOTH;
     gbc_formatPanel.gridx = 0;
     gbc_formatPanel.gridy = 3;
     add(getFormatPanel(), gbc_formatPanel);
+    GridBagConstraints gbc_exportGameViewsSelectionPanel = new GridBagConstraints();
+    gbc_exportGameViewsSelectionPanel.weighty = 1.0;
+    gbc_exportGameViewsSelectionPanel.fill = GridBagConstraints.BOTH;
+    gbc_exportGameViewsSelectionPanel.gridwidth = 3;
+    gbc_exportGameViewsSelectionPanel.weightx = 1.0;
+    gbc_exportGameViewsSelectionPanel.insets = new Insets(0, 0, 0, 5);
+    gbc_exportGameViewsSelectionPanel.gridx = 0;
+    gbc_exportGameViewsSelectionPanel.gridy = 4;
+    add(getExportGameViewsSelectionPanel(), gbc_exportGameViewsSelectionPanel);
     uiModel.initialize();
   }
 
@@ -231,7 +241,7 @@ public class ExportGamesSelectionPanel extends JPanel
       GridBagConstraints gbc_selectedScrollPane = new GridBagConstraints();
       gbc_selectedScrollPane.weightx = 1.0;
       gbc_selectedScrollPane.weighty = 1.0;
-      gbc_selectedScrollPane.insets = new Insets(5, 10, 5, 10);
+      gbc_selectedScrollPane.insets = new Insets(0, 10, 5, 10);
       gbc_selectedScrollPane.fill = GridBagConstraints.BOTH;
       gbc_selectedScrollPane.gridx = 0;
       gbc_selectedScrollPane.gridy = 0;
@@ -481,5 +491,11 @@ public class ExportGamesSelectionPanel extends JPanel
   boolean addGamesSubDirectory()
   {
     return getGamesFolderCheckBox().isSelected();
+  }
+  private ExportGameViewsSelectionPanel getExportGameViewsSelectionPanel() {
+    if (exportGameViewsSelectionPanel == null) {
+    	exportGameViewsSelectionPanel = new ExportGameViewsSelectionPanel();
+    }
+    return exportGameViewsSelectionPanel;
   }
 }
