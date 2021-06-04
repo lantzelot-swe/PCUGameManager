@@ -73,18 +73,19 @@ public class ExportMainPanel extends JPanel
       GridBagConstraints gbc_infoLabel = new GridBagConstraints();
       gbc_infoLabel.weightx = 1.0;
       gbc_infoLabel.fill = GridBagConstraints.HORIZONTAL;
-      gbc_infoLabel.insets = new Insets(10, 5, 0, 5);
+      gbc_infoLabel.insets = new Insets(10, 10, 0, 10);
       gbc_infoLabel.gridx = 0;
       gbc_infoLabel.gridy = 0;
       optionPanel.add(getInfoLabel(), gbc_infoLabel);
       GridBagConstraints gbc_viewRadioButton = new GridBagConstraints();
       gbc_viewRadioButton.weightx = 1.0;
-      gbc_viewRadioButton.insets = new Insets(10, 0, 0, 0);
+      gbc_viewRadioButton.insets = new Insets(10, 5, 0, 0);
       gbc_viewRadioButton.anchor = GridBagConstraints.WEST;
       gbc_viewRadioButton.gridx = 0;
       gbc_viewRadioButton.gridy = 1;
       optionPanel.add(getViewRadioButton(), gbc_viewRadioButton);
       GridBagConstraints gbc_gamesRadioButton = new GridBagConstraints();
+      gbc_gamesRadioButton.insets = new Insets(0, 5, 0, 0);
       gbc_gamesRadioButton.weightx = 1.0;
       gbc_gamesRadioButton.anchor = GridBagConstraints.WEST;
       gbc_gamesRadioButton.gridx = 0;
@@ -101,14 +102,14 @@ public class ExportMainPanel extends JPanel
       StringBuilder infoBuilder = new StringBuilder();
       if (this.carouselMode)
       {
-        infoBuilder.append("<html>When exporting to Carousel a TSG file is generated and the game files are copied into the selected folder below.<br>");
+        infoBuilder.append("<html>When exporting to Carousel a TSG file is generated and the game files are copied into the selected target folder.<br>");
         infoBuilder.append("Copy the folder into Project Carousel USB on a USB stick.</html>");
       }
       else
       {
-        infoBuilder.append("<html>When exporting to File loader a CJM file is generated and the game file is copied into the selected folder below.<br>");
+        infoBuilder.append("<html>When exporting to File loader a CJM file is generated and the game file is copied into the target folder. ");
         infoBuilder.append("The files are named after the game title.<br>");
-        infoBuilder.append("Copy the folder into a USB stick and load the games using the File loader.</html>");
+        infoBuilder.append("Copy the folder to a USB stick and load the games using the File loader.</html>");
       }
       infoLabel =
         new JLabel(infoBuilder.toString());
@@ -120,13 +121,12 @@ public class ExportMainPanel extends JPanel
   {
     if (viewRadioButton == null)
     {
-      viewRadioButton = new JRadioButton("Export gamelist views");
+      viewRadioButton = new JRadioButton("Export gamelist views. A subfolder is created in the target folder for each list.");
       viewRadioButton.addActionListener(new ActionListener()
         {
           public void actionPerformed(ActionEvent e)
           {
             showGameViewSelectionPanel();
-            getOutputDirPanel().showGamesSubdirCheckbox(false);
           }
         });
       buttonGroup.add(viewRadioButton);
@@ -139,13 +139,12 @@ public class ExportMainPanel extends JPanel
   {
     if (gamesRadioButton == null)
     {
-      gamesRadioButton = new JRadioButton("Export individual games");
+      gamesRadioButton = new JRadioButton("Export individual games to the target folder");
       gamesRadioButton.addActionListener(new ActionListener()
         {
           public void actionPerformed(ActionEvent e)
           {
             showGameSelectionPanel();
-            getOutputDirPanel().showGamesSubdirCheckbox(true);
           }
         });
       buttonGroup.add(gamesRadioButton);
@@ -160,7 +159,7 @@ public class ExportMainPanel extends JPanel
       cardPanel = new JPanel();
       cardPanel.setLayout(cardLayout);
       cardPanel.add(getGameViewsSelectionPanel(), "views");
-      cardPanel.add(getExportGamesSelectionPanel(), "games");
+      cardPanel.add(getGamesSelectionPanel(), "games");
     }
     return cardPanel;
   }
@@ -168,11 +167,14 @@ public class ExportMainPanel extends JPanel
   private void showGameViewSelectionPanel()
   {
     cardLayout.show(getCardPanel(), "views");
+    getGameViewsSelectionPanel().setExportButtonEnablement();
+    
   }
 
   private void showGameSelectionPanel()
   {
     cardLayout.show(getCardPanel(), "games");
+    getGamesSelectionPanel().setExportButtonEnablement();
   }
 
   private ExportGameViewsSelectionPanel getGameViewsSelectionPanel()
@@ -188,8 +190,7 @@ public class ExportMainPanel extends JPanel
   {
     if (outputDirPanel == null)
     {
-      outputDirPanel = new OutputDirPanel();
-      outputDirPanel.showGamesSubdirCheckbox(false);
+      outputDirPanel = new OutputDirPanel(carouselMode);
     }
     return outputDirPanel;
   }
@@ -204,22 +205,22 @@ public class ExportMainPanel extends JPanel
     return getOutputDirPanel().getDeleteCheckBox().isSelected();
   }
 
-  boolean addGamesSubDirectory()
-  {
-    return getOutputDirPanel().getGamesFolderCheckBox().isSelected();
-  }
-
   List<GameListData> getSelectedGames()
   {
-    return getExportGamesSelectionPanel().getSelectedGames();
+    return getGamesSelectionPanel().getSelectedGames();
   }
 
   List<GameView> getSelectedGameViews()
   {
     return getGameViewsSelectionPanel().getSelectedViews();
   }
+  
+  boolean isExportGameViews()
+  {
+    return getViewRadioButton().isSelected();
+  }
 
-  private ExportGamesSelectionPanel getExportGamesSelectionPanel()
+  private ExportGamesSelectionPanel getGamesSelectionPanel()
   {
     if (exportGamesSelectionPanel == null)
     {

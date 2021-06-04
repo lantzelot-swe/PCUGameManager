@@ -279,7 +279,7 @@ public class MenuManager
   
   private JMenuItem getExportFileLoaderItem()
   {
-    exportFLItem = new JMenuItem("Export to File Loader...");
+    exportFLItem = new JMenuItem("Export to File loader...");
     KeyStroke keyStrokeToExportGames = KeyStroke.getKeyStroke(KeyEvent.VK_L, InputEvent.CTRL_DOWN_MASK);
     exportFLItem.setAccelerator(keyStrokeToExportGames);
     exportFLItem.setMnemonic('L');
@@ -723,17 +723,33 @@ public class MenuManager
     exportSelectionDialog.setLocationRelativeTo(this.mainWindow);
     if (exportSelectionDialog.showDialog())
     {
-      List<GameListData> gamesList = exportSelectionDialog.getSelectedGames();
-      if (!gamesList.isEmpty())
+      if (exportSelectionDialog.isExportGameViews())
       {
-        exportManager.setGamesToExport(gamesList);
-        exportManager.setTargetDirectory(exportSelectionDialog.getTargetDirectory(),
-                                         exportSelectionDialog.deleteBeforeExport(),
-                                         exportSelectionDialog.addGamesSubDirectory());
-        ExportProgressDialog dialog = new ExportProgressDialog(this.mainWindow);
-        ExportWorker worker = new ExportWorker(exportManager, dialog);
-        worker.execute();
-        dialog.setVisible(true);
+        List<GameView> viewList = exportSelectionDialog.getSelectedGameViews();
+        if (!viewList.isEmpty())
+        {
+          exportManager.setGameViewsToExport(viewList);
+          exportManager.setTargetDirectory(exportSelectionDialog.getTargetDirectory(),
+                                           exportSelectionDialog.deleteBeforeExport());
+          ExportProgressDialog dialog = new ExportProgressDialog(this.mainWindow);
+          ExportWorker worker = new ExportWorker(exportManager, dialog);
+          worker.execute();
+          dialog.setVisible(true);
+        }
+      }
+      else
+      {
+        List<GameListData> gamesList = exportSelectionDialog.getSelectedGames();
+        if (!gamesList.isEmpty())
+        {
+          exportManager.setGamesToExport(gamesList);
+          exportManager.setTargetDirectory(exportSelectionDialog.getTargetDirectory(),
+                                           exportSelectionDialog.deleteBeforeExport());
+          ExportProgressDialog dialog = new ExportProgressDialog(this.mainWindow);
+          ExportWorker worker = new ExportWorker(exportManager, dialog);
+          worker.execute();
+          dialog.setVisible(true);
+        }
       }
     }
   }
@@ -745,17 +761,33 @@ public class MenuManager
     exportSelectionDialog.setLocationRelativeTo(this.mainWindow);
     if (exportSelectionDialog.showDialog())
     {
-      List<GameListData> gamesList = exportSelectionDialog.getSelectedGames();
-      if (!gamesList.isEmpty())
+      if (exportSelectionDialog.isExportGameViews())
       {
-        exportManager.setGamesToExport(gamesList);
-        exportManager.setTargetDirectory(exportSelectionDialog.getTargetDirectory(),
-                                         exportSelectionDialog.deleteBeforeExport(),
-                                         exportSelectionDialog.addGamesSubDirectory());
-        ExportProgressDialog dialog = new ExportProgressDialog(this.mainWindow);
-        ExportFileLoaderWorker worker = new ExportFileLoaderWorker(exportManager, dialog);
-        worker.execute();
-        dialog.setVisible(true);
+        List<GameView> viewList = exportSelectionDialog.getSelectedGameViews();
+        if (!viewList.isEmpty())
+        {
+          exportManager.setGameViewsToExport(viewList);
+          exportManager.setTargetDirectory(exportSelectionDialog.getTargetDirectory(),
+                                           exportSelectionDialog.deleteBeforeExport());
+          ExportProgressDialog dialog = new ExportProgressDialog(this.mainWindow);
+          ExportFileLoaderWorker worker = new ExportFileLoaderWorker(exportManager, dialog);
+          worker.execute();
+          dialog.setVisible(true);
+        }
+      }
+      else
+      {
+        List<GameListData> gamesList = exportSelectionDialog.getSelectedGames();
+        if (!gamesList.isEmpty())
+        {
+          exportManager.setGamesToExport(gamesList);
+          exportManager.setTargetDirectory(exportSelectionDialog.getTargetDirectory(),
+                                           exportSelectionDialog.deleteBeforeExport());
+          ExportProgressDialog dialog = new ExportProgressDialog(this.mainWindow);
+          ExportFileLoaderWorker worker = new ExportFileLoaderWorker(exportManager, dialog);
+          worker.execute();
+          dialog.setVisible(true);
+        }
       }
     }
   }

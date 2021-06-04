@@ -28,13 +28,14 @@ public class SelectDirPanel extends JPanel
 {
   public enum Mode
   {
-    CAROUSEL_IMPORT, GB_IMPORT, EXPORT
+    CAROUSEL_IMPORT, GB_IMPORT, CAROUSEL_EXPORT, FILELOADER_EXPORT
   }
 
   private static final Logger logger = LoggerFactory.getLogger(SelectDirPanel.class);
   private static final String IMPORT_DIR_PROPERTY = "importDir";
   private static final String GB_IMPORT_DIR_PROPERTY = "gbImportDir";
-  private static final String EXPORT_DIR_PROPERTY = "exportDir";
+  private static final String CAROUSEL_EXPORT_DIR_PROPERTY = "exportDir";
+  private static final String FILELOADER_EXPORT_DIR_PROPERTY = "flexportDir";
   private JTextField dirTextField;
   private JButton selectDirButton;
 
@@ -81,8 +82,15 @@ public class SelectDirPanel extends JPanel
         configuredDir = new File(".").getAbsolutePath();
       }
       break;
-    case EXPORT:
-      configuredDir = FileManager.getConfiguredProperties().getProperty(EXPORT_DIR_PROPERTY);
+    case CAROUSEL_EXPORT:
+      configuredDir = FileManager.getConfiguredProperties().getProperty(CAROUSEL_EXPORT_DIR_PROPERTY);
+      if (configuredDir == null)
+      {
+        configuredDir = new File("export").getAbsolutePath();
+      }
+      break;
+    case FILELOADER_EXPORT:
+      configuredDir = FileManager.getConfiguredProperties().getProperty(FILELOADER_EXPORT_DIR_PROPERTY);
       if (configuredDir == null)
       {
         configuredDir = new File("export").getAbsolutePath();
@@ -124,8 +132,11 @@ public class SelectDirPanel extends JPanel
             case GB_IMPORT:
               selectGbImportFile();
               break;
-            case EXPORT:
-              selectExportDirectory();
+            case CAROUSEL_EXPORT:
+              selectExportDirectory(true);
+              break;
+            case FILELOADER_EXPORT:
+              selectExportDirectory(false);
               break;
             default:
               break;
@@ -193,7 +204,7 @@ public class SelectDirPanel extends JPanel
     }
   }
 
-  private void selectExportDirectory()
+  private void selectExportDirectory(boolean carousel)
   {
     final JFileChooser fileChooser = new JFileChooser();
     fileChooser.setDialogTitle("Select a directory to export to");
@@ -204,10 +215,12 @@ public class SelectDirPanel extends JPanel
     {
       targetDirectory = fileChooser.getSelectedFile();
       configuredDir = targetDirectory.toPath().toString();
-      FileManager.getConfiguredProperties().put(EXPORT_DIR_PROPERTY, configuredDir);
+      FileManager.getConfiguredProperties().put(carousel ? CAROUSEL_EXPORT_DIR_PROPERTY : FILELOADER_EXPORT_DIR_PROPERTY, configuredDir);
       getDirTextField().setText(configuredDir);
     }
   }
+  
+  
 
   public File getTargetDirectory()
   {

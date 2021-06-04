@@ -7,6 +7,7 @@ import java.util.List;
 
 import se.lantz.gui.BaseDialog;
 import se.lantz.model.data.GameListData;
+import se.lantz.model.data.GameView;
 
 public class ExportGamesDialog extends BaseDialog
 {
@@ -21,6 +22,7 @@ public class ExportGamesDialog extends BaseDialog
     addContent(getExportGamesPanel());
     getOkButton().setText("Export");
     this.setPreferredSize(new Dimension(800, 700));
+    this.setMinimumSize(new Dimension(800, 700));
   }
 
   private ExportMainPanel getExportGamesPanel()
@@ -31,10 +33,20 @@ public class ExportGamesDialog extends BaseDialog
     }
     return panel;
   }
+  
+  public boolean isExportGameViews()
+  {
+    return getExportGamesPanel().isExportGameViews();
+  }
 
   public List<GameListData> getSelectedGames()
   {
     return getExportGamesPanel().getSelectedGames();
+  }
+  
+  public List<GameView> getSelectedGameViews()
+  {
+    return getExportGamesPanel().getSelectedGameViews();
   }
 
   public File getTargetDirectory()
@@ -45,10 +57,5 @@ public class ExportGamesDialog extends BaseDialog
   public boolean deleteBeforeExport()
   {
     return getExportGamesPanel().deleteBeforeExport();
-  }
-
-  public boolean addGamesSubDirectory()
-  {
-    return getExportGamesPanel().addGamesSubDirectory();
   }
 }

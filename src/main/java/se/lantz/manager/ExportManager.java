@@ -6,8 +6,11 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
@@ -16,17 +19,22 @@ import org.slf4j.LoggerFactory;
 import se.lantz.model.MainViewModel;
 import se.lantz.model.data.GameDetails;
 import se.lantz.model.data.GameListData;
+import se.lantz.model.data.GameView;
 import se.lantz.util.ExceptionHandler;
 import se.lantz.util.FileManager;
 
 public class ExportManager
 {
   private static final Logger logger = LoggerFactory.getLogger(ExportManager.class);
-  private List<GameListData> gamesList;
-  private List<GameDetails> gameDetailsList;
+  private List<GameListData> gamesList = new ArrayList<>();
+  private List<GameDetails> gameDetailsList = new ArrayList<>();
+  private List<GameView> gameViewList = new ArrayList<>();
+  private Map<GameView, List<GameDetails>> gameDetailsForViewsMap = new HashMap<>();
   private File targetDir;
   private MainViewModel uiModel;
   private boolean deleteBeforeExport = false;
+
+  private boolean gameViewMode = true;
 
   public ExportManager(MainViewModel uiModel)
   {
@@ -36,58 +44,35 @@ public class ExportManager
   public void setGamesToExport(List<GameListData> gamesList)
   {
     this.gamesList = gamesList;
+    gameViewMode = false;
   }
 
-  public void setTargetDirectory(File targetDir, boolean delete, boolean gamesDir)
+  public void setGameViewsToExport(List<GameView> gameViewList)
+  {
+    this.gameViewList = gameViewList;
+    gameViewMode = true;
+  }
+
+  public void setTargetDirectory(File targetDir, boolean delete)
   {
     this.deleteBeforeExport = delete;
     Path targetDirPath = targetDir.toPath();
 
     if (delete)
     {
+      //Delete target folder first
       try
       {
         if (Files.exists(targetDirPath))
         {
-          if (Files.exists(targetDirPath.resolve("games").resolve("games")))
-          {
-            //Delete entire games folder
-            Files.walk(targetDirPath.resolve("games")).sorted(Comparator.reverseOrder()).map(Path::toFile)
-              .forEach(File::delete);
-          }
-          else
-          {
-            //Delete covers, screens, and games folders and all tsg files
-            if (Files.exists(targetDirPath.resolve("covers")))
-            {
-              Files.walk(targetDirPath.resolve("covers")).sorted(Comparator.reverseOrder()).map(Path::toFile)
-                .forEach(File::delete);
-            }
-            if (Files.exists(targetDirPath.resolve("screens")))
-            {
-              Files.walk(targetDirPath.resolve("screens")).sorted(Comparator.reverseOrder()).map(Path::toFile)
-                .forEach(File::delete);
-            }
-            if (Files.exists(targetDirPath.resolve("games")))
-            {
-              Files.walk(targetDirPath.resolve("games")).sorted(Comparator.reverseOrder()).map(Path::toFile)
-                .forEach(File::delete);
-            }
-
-            Files.walk(targetDirPath, 1).filter(p -> p.toString().endsWith(".tsg")).map(Path::toFile)
-              .forEach(File::delete);
-          }
+          //Delete entire folder
+          Files.walk(targetDirPath).sorted(Comparator.reverseOrder()).map(Path::toFile).forEach(File::delete);
         }
       }
       catch (IOException e)
       {
-        ExceptionHandler.handleException(e, "Could not delete games folder");
+        ExceptionHandler.handleException(e, "Could not delete target folder");
       }
-    }
-
-    if (gamesDir)
-    {
-      targetDirPath = targetDirPath.resolve("games");
     }
 
     this.targetDir = targetDirPath.toFile();
@@ -103,14 +88,46 @@ public class ExportManager
 
   public void readFromDb(StringBuilder infoBuilder)
   {
-    gameDetailsList = uiModel.readGameDetailsForExport(infoBuilder, gamesList);
+    if (gameViewMode)
+    {
+      for (GameView gameView : gameViewList)
+      {
+        gameDetailsForViewsMap.put(gameView, uiModel.readGameDetailsForGameView(infoBuilder, gameView));
+      }
+    }
+    else
+    {
+      gameDetailsList = uiModel.readGameDetailsForExport(infoBuilder, gamesList);
+    }
   }
 
   public void createGameInfoFiles(StringBuilder infoBuilder, boolean fileLoader)
   {
-    for (GameDetails gameDetails : gameDetailsList)
+    if (gameViewMode)
     {
-      uiModel.exportGameInfoFile(gameDetails, targetDir, infoBuilder, fileLoader);
+      for (GameView gameView : gameViewList)
+      {
+        Path targetPath = targetDir.toPath().resolve(gameView.getName());
+        try
+        {
+          Files.createDirectories(targetPath);
+        }
+        catch (IOException e)
+        {
+          ExceptionHandler.handleException(e, "Could not create " + targetPath);
+        }
+        for (GameDetails gameDetails : gameDetailsForViewsMap.get(gameView))
+        {
+          uiModel.exportGameInfoFile(gameDetails, targetPath.toFile(), infoBuilder, fileLoader);
+        }
+      }
+    }
+    else
+    {
+      for (GameDetails gameDetails : gameDetailsList)
+      {
+        uiModel.exportGameInfoFile(gameDetails, targetDir, infoBuilder, fileLoader);
+      }
     }
   }
 
@@ -121,13 +138,29 @@ public class ExportManager
 
   public void copyFiles(StringBuilder infoBuilder)
   {
+    if (gameViewMode)
+    {
+      for (GameView gameView : gameViewList)
+      {
+        Path targetPath = targetDir.toPath().resolve(gameView.getName());
+        copyFiles(infoBuilder, targetPath, gameDetailsForViewsMap.get(gameView));
+      }
+    }
+    else
+    {
+      copyFiles(infoBuilder, targetDir.toPath(), gameDetailsList);
+    }
+  }
+
+  private void copyFiles(StringBuilder infoBuilder, Path targetPath, List<GameDetails> gameDetailsList)
+  {
     try
     {
-      Path targetCoverPath = targetDir.toPath().resolve("covers");
+      Path targetCoverPath = targetPath.resolve("covers");
       Files.createDirectories(targetCoverPath);
-      Path targetScreenPath = targetDir.toPath().resolve("screens");
+      Path targetScreenPath = targetPath.resolve("screens");
       Files.createDirectories(targetScreenPath);
-      Path targetGamePath = targetDir.toPath().resolve("games");
+      Path targetGamePath = targetPath.resolve("games");
       Files.createDirectories(targetGamePath);
     }
     catch (IOException e)
@@ -139,15 +172,15 @@ public class ExportManager
     for (GameDetails gameDetails : gameDetailsList)
     {
       Path coverPath = Paths.get("./covers/" + gameDetails.getCover());
-      Path targetCoverPath = targetDir.toPath().resolve("covers/" + gameDetails.getCover());
+      Path targetCoverPath = targetPath.resolve("covers/" + gameDetails.getCover());
 
       Path screens1Path = Paths.get("./screens/" + gameDetails.getScreen1());
-      Path targetScreen1Path = targetDir.toPath().resolve("screens/" + gameDetails.getScreen1());
+      Path targetScreen1Path = targetPath.resolve("screens/" + gameDetails.getScreen1());
       Path screens2Path = Paths.get("./screens/" + gameDetails.getScreen2());
-      Path targetScreen2Path = targetDir.toPath().resolve("screens/" + gameDetails.getScreen2());
+      Path targetScreen2Path = targetPath.resolve("screens/" + gameDetails.getScreen2());
 
       Path gamePath = Paths.get("./games/" + gameDetails.getGame());
-      Path targetGamePath = targetDir.toPath().resolve("games/" + gameDetails.getGame());
+      Path targetGamePath = targetPath.resolve("games/" + gameDetails.getGame());
 
       try
       {
@@ -187,12 +220,29 @@ public class ExportManager
       }
     }
   }
-  
+
   public void copyGamesForFileLoader(StringBuilder infoBuilder)
+  {
+    if (gameViewMode)
+    {
+      for (GameView gameView : gameViewList)
+      {
+        Path targetPath = targetDir.toPath().resolve(gameView.getName());
+        copyGamesForFileLoader(infoBuilder, targetPath, gameDetailsForViewsMap.get(gameView));
+      }
+    }
+    else
+    {
+      copyGamesForFileLoader(infoBuilder, targetDir.toPath(), gameDetailsList);
+    }
+
+  }
+
+  private void copyGamesForFileLoader(StringBuilder infoBuilder, Path targetPath, List<GameDetails> gameDetailsList)
   {
     try
     {
-      Path targetGamePath = targetDir.toPath();
+      Path targetGamePath = targetPath;
       Files.createDirectories(targetGamePath);
     }
     catch (IOException e)
@@ -204,7 +254,7 @@ public class ExportManager
     for (GameDetails gameDetails : gameDetailsList)
     {
       String gameName = gameDetails.getGame();
-      
+
       Path gamePath = Paths.get("./games/" + gameName);
       String extension = FilenameUtils.getExtension(gameName);
       boolean zipped = false;
@@ -220,8 +270,11 @@ public class ExportManager
         }
         zipped = true;
       }
-      Path targetGamePath = targetDir.toPath().resolve(FileManager.generateFileNameFromTitleForFileLoader(gameDetails.getTitle(), gameDetails.getDuplicateIndex()) + "." + extension);
-      
+      Path targetGamePath = targetPath
+        .resolve(FileManager.generateFileNameFromTitleForFileLoader(gameDetails.getTitle(),
+                                                                    gameDetails.getDuplicateIndex()) +
+          "." + extension);
+
       try
       {
         if (!gameDetails.getGame().isEmpty())
@@ -253,6 +306,7 @@ public class ExportManager
   {
     gamesList.clear();
     gameDetailsList.clear();
+    gameDetailsForViewsMap.clear();
     targetDir = null;
     deleteBeforeExport = false;
   }

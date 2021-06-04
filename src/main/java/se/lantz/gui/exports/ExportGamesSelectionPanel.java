@@ -204,8 +204,13 @@ public class ExportGamesSelectionPanel extends JPanel
   {
     sortSelectedList();
     getWarningLabel().setVisible(selectedListModel.getSize() > MAX_GAMES);
-    exportButton.setEnabled(selectedListModel.getSize() > 0);
+    setExportButtonEnablement();
     getCountLabel().setText(Integer.toString(selectedListModel.getSize()));
+  }
+
+  public void setExportButtonEnablement()
+  {
+    exportButton.setEnabled(selectedListModel.getSize() > 0);
   }
 
   private JPanel getSelectedListPanel()

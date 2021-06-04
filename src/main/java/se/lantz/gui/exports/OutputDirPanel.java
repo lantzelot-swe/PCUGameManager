@@ -17,9 +17,10 @@ public class OutputDirPanel extends JPanel
   private JLabel outputDirLabel;
   private SelectDirPanel selectDirPanel;
   private JCheckBox deleteCheckBox;
-  private JCheckBox gamesFolderCheckBox;
+  private boolean carouselMode;
   
-  public OutputDirPanel() {
+  public OutputDirPanel(boolean carouselMode) {
+    this.carouselMode = carouselMode;
     GridBagLayout gbl_outputDirPanel = new GridBagLayout();
     gbl_outputDirPanel.columnWidths = new int[] { 0, 0 };
     gbl_outputDirPanel.rowHeights = new int[] { 0, 0, 0, 0, 0 };
@@ -33,17 +34,11 @@ public class OutputDirPanel extends JPanel
     gbc_outputDirLabel.gridy = 0;
     add(getOutputDirLabel(), gbc_outputDirLabel);
     GridBagConstraints gbc_selectDirPanel = new GridBagConstraints();
-    gbc_selectDirPanel.insets = new Insets(0, 5, 5, 0);
+    gbc_selectDirPanel.insets = new Insets(0, 5, 5, 5);
     gbc_selectDirPanel.fill = GridBagConstraints.BOTH;
     gbc_selectDirPanel.gridx = 0;
     gbc_selectDirPanel.gridy = 1;
     add(getSelectDirPanel(), gbc_selectDirPanel);
-    GridBagConstraints gbc_gamesFolderCheckBox = new GridBagConstraints();
-    gbc_gamesFolderCheckBox.anchor = GridBagConstraints.WEST;
-    gbc_gamesFolderCheckBox.insets = new Insets(0, 10, 0, 0);
-    gbc_gamesFolderCheckBox.gridx = 0;
-    gbc_gamesFolderCheckBox.gridy = 3;
-    add(getGamesFolderCheckBox(), gbc_gamesFolderCheckBox);
     GridBagConstraints gbc_deleteCheckBox = new GridBagConstraints();
     gbc_deleteCheckBox.insets = new Insets(0, 10, 0, 0);
     gbc_deleteCheckBox.anchor = GridBagConstraints.WEST;
@@ -56,7 +51,7 @@ public class OutputDirPanel extends JPanel
   {
     if (outputDirLabel == null)
     {
-      outputDirLabel = new JLabel("Select directory to export to:");
+      outputDirLabel = new JLabel("Select target folder to export to:");
     }
     return outputDirLabel;
   }
@@ -65,7 +60,7 @@ public class OutputDirPanel extends JPanel
   {
     if (selectDirPanel == null)
     {
-      selectDirPanel = new SelectDirPanel(Mode.EXPORT);
+      selectDirPanel = new SelectDirPanel(carouselMode ? Mode.CAROUSEL_EXPORT: Mode.FILELOADER_EXPORT);
     }
     return selectDirPanel;
   }
@@ -74,7 +69,7 @@ public class OutputDirPanel extends JPanel
   {
     if (deleteCheckBox == null)
     {
-      deleteCheckBox = new JCheckBox("Delete existing games in the selected directory before exporting");
+      deleteCheckBox = new JCheckBox("Delete existing games in the target folder before exporting");
       deleteCheckBox.setSelected(true);
     }
     return deleteCheckBox;
@@ -89,24 +84,4 @@ public class OutputDirPanel extends JPanel
   {
     return getDeleteCheckBox().isSelected();
   }
-  
-  JCheckBox getGamesFolderCheckBox()
-  {
-    if (gamesFolderCheckBox == null)
-    {
-      gamesFolderCheckBox = new JCheckBox("Export to a \"games\" subdirectory");
-    }
-    return gamesFolderCheckBox;
-  }
-
-  boolean addGamesSubDirectory()
-  {
-    return getGamesFolderCheckBox().isSelected();
-  }
-  
-  void showGamesSubdirCheckbox(boolean show)
-  {
-    getGamesFolderCheckBox().setVisible(show); 
-  }
-
 }

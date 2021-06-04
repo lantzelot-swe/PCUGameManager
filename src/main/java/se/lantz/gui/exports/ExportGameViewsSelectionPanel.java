@@ -267,6 +267,11 @@ public class ExportGameViewsSelectionPanel extends JPanel
   private void updateAfterEditingSelectedList()
   {
     getCountLabel().setText(Integer.toString(selectedListModel.getSize()));
+    setExportButtonEnablement();
+  }
+  
+  public void setExportButtonEnablement()
+  {
     exportButton.setEnabled(selectedListModel.getSize() > 0);
   }
 

@@ -273,6 +273,12 @@ public class MainViewModel extends AbstractModel
     }
     return returnList;
   }
+  
+  public List<GameDetails> readGameDetailsForGameView(StringBuilder infoBuilder, GameView gameView)
+  {
+    List<GameListData> gamesList = dbConnector.fetchGamesByView(gameView);
+    return readGameDetailsForExport(infoBuilder, gamesList);
+  }
 
   public void exportGameInfoFile(GameDetails gameDetails, File targetDir, StringBuilder infoBuilder, boolean fileLoader)
   {
