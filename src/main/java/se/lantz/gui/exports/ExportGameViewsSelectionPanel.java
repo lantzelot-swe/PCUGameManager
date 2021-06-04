@@ -1,33 +1,28 @@
 package se.lantz.gui.exports;
 
-import java.awt.LayoutManager;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.util.Collections;
-import java.util.List;
-
-import javax.swing.JPanel;
-import java.awt.GridBagLayout;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.beans.Beans;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.DefaultListModel;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JLabel;
 import javax.swing.JList;
+import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
-import se.lantz.model.GameListModel;
 import se.lantz.model.MainViewModel;
-import se.lantz.model.data.GameListData;
 import se.lantz.model.data.GameView;
-import se.lantz.util.GameListDataComparator;
-
-import javax.swing.JLabel;
 
 public class ExportGameViewsSelectionPanel extends JPanel
 {
@@ -43,15 +38,22 @@ public class ExportGameViewsSelectionPanel extends JPanel
   private final MainViewModel uiModel;
   DefaultListModel<GameView> selectedListModel = new DefaultListModel<>();
   private JLabel countLabel;
-  
-  public ExportGameViewsSelectionPanel() {
+  private JButton exportButton;
+  private JLabel infoLabel;
+
+  public ExportGameViewsSelectionPanel(JButton exportButton)
+  {
+    this.exportButton = exportButton;
     uiModel = new MainViewModel();
-    uiModel.initialize();
+    if (!Beans.isDesignTime())
+    {
+      uiModel.initialize();
+    }
     GridBagLayout gridBagLayout = new GridBagLayout();
-    gridBagLayout.columnWidths = new int[]{0, 0, 0, 0};
-    gridBagLayout.rowHeights = new int[]{0, 0, 0};
-    gridBagLayout.columnWeights = new double[]{0.0, 0.0, 0.0, Double.MIN_VALUE};
-    gridBagLayout.rowWeights = new double[]{0.0, 0.0, Double.MIN_VALUE};
+    gridBagLayout.columnWidths = new int[] { 0, 0, 0, 0 };
+    gridBagLayout.rowHeights = new int[] { 0, 0, 0 };
+    gridBagLayout.columnWeights = new double[] { 0.0, 0.0, 0.0, Double.MIN_VALUE };
+    gridBagLayout.rowWeights = new double[] { 0.0, 0.0, Double.MIN_VALUE };
     setLayout(gridBagLayout);
     GridBagConstraints gbc_listPanel = new GridBagConstraints();
     gbc_listPanel.weightx = 1.0;
@@ -59,13 +61,13 @@ public class ExportGameViewsSelectionPanel extends JPanel
     gbc_listPanel.weighty = 1.0;
     gbc_listPanel.insets = new Insets(0, 0, 5, 5);
     gbc_listPanel.gridx = 0;
-    gbc_listPanel.gridy = 0;
+    gbc_listPanel.gridy = 1;
     add(getListPanel(), gbc_listPanel);
     GridBagConstraints gbc_ButtonPanel = new GridBagConstraints();
     gbc_ButtonPanel.weighty = 1.0;
     gbc_ButtonPanel.insets = new Insets(0, 0, 5, 5);
     gbc_ButtonPanel.gridx = 1;
-    gbc_ButtonPanel.gridy = 0;
+    gbc_ButtonPanel.gridy = 1;
     add(getButtonPanel(), gbc_ButtonPanel);
     GridBagConstraints gbc_selectedListPanel = new GridBagConstraints();
     gbc_selectedListPanel.fill = GridBagConstraints.BOTH;
@@ -73,33 +75,47 @@ public class ExportGameViewsSelectionPanel extends JPanel
     gbc_selectedListPanel.weighty = 1.0;
     gbc_selectedListPanel.insets = new Insets(0, 0, 5, 0);
     gbc_selectedListPanel.gridx = 2;
-    gbc_selectedListPanel.gridy = 0;
+    gbc_selectedListPanel.gridy = 1;
     add(getSelectedListPanel(), gbc_selectedListPanel);
+    GridBagConstraints gbc_infoLabel = new GridBagConstraints();
+    gbc_infoLabel.anchor = GridBagConstraints.WEST;
+    gbc_infoLabel.gridwidth = 3;
+    gbc_infoLabel.insets = new Insets(10, 10, 5, 10);
+    gbc_infoLabel.gridx = 0;
+    gbc_infoLabel.gridy = 0;
+    add(getInfoLabel(), gbc_infoLabel);
   }
 
-  private JPanel getListPanel() {
-    if (listPanel == null) {
-    	listPanel = new JPanel();
-    	GridBagLayout gbl_listPanel = new GridBagLayout();
-    	gbl_listPanel.columnWidths = new int[]{0, 0};
-    	gbl_listPanel.rowHeights = new int[]{0, 0};
-    	gbl_listPanel.columnWeights = new double[]{0.0, Double.MIN_VALUE};
-    	gbl_listPanel.rowWeights = new double[]{0.0, Double.MIN_VALUE};
-    	listPanel.setLayout(gbl_listPanel);
-    	GridBagConstraints gbc_gameViewScrollPane = new GridBagConstraints();
-    	gbc_gameViewScrollPane.weighty = 1.0;
-    	gbc_gameViewScrollPane.weightx = 1.0;
-    	gbc_gameViewScrollPane.fill = GridBagConstraints.BOTH;
-    	gbc_gameViewScrollPane.gridx = 0;
-    	gbc_gameViewScrollPane.gridy = 0;
-    	listPanel.add(getGameViewScrollPane(), gbc_gameViewScrollPane);
+  private JPanel getListPanel()
+  {
+    if (listPanel == null)
+    {
+      listPanel = new JPanel();
+      GridBagLayout gbl_listPanel = new GridBagLayout();
+      gbl_listPanel.columnWidths = new int[] { 0, 0 };
+      gbl_listPanel.rowHeights = new int[] { 0, 0 };
+      gbl_listPanel.columnWeights = new double[] { 0.0, Double.MIN_VALUE };
+      gbl_listPanel.rowWeights = new double[] { 0.0, Double.MIN_VALUE };
+      listPanel.setLayout(gbl_listPanel);
+      GridBagConstraints gbc_gameViewScrollPane = new GridBagConstraints();
+      gbc_gameViewScrollPane.insets = new Insets(0, 10, 20, 10);
+      gbc_gameViewScrollPane.weighty = 1.0;
+      gbc_gameViewScrollPane.weightx = 1.0;
+      gbc_gameViewScrollPane.fill = GridBagConstraints.BOTH;
+      gbc_gameViewScrollPane.gridx = 0;
+      gbc_gameViewScrollPane.gridy = 0;
+      listPanel.add(getGameViewScrollPane(), gbc_gameViewScrollPane);
+      listPanel.setPreferredSize(new Dimension(325, 400));
     }
     return listPanel;
   }
-  private JPanel getButtonPanel() {
-    if (buttonPanel == null) {
-    	buttonPanel = new JPanel();
-    	GridBagLayout gbl_buttonPanel = new GridBagLayout();
+
+  private JPanel getButtonPanel()
+  {
+    if (buttonPanel == null)
+    {
+      buttonPanel = new JPanel();
+      GridBagLayout gbl_buttonPanel = new GridBagLayout();
       buttonPanel.setLayout(gbl_buttonPanel);
       GridBagConstraints gbc_addButton = new GridBagConstraints();
       gbc_addButton.anchor = GridBagConstraints.NORTHWEST;
@@ -115,7 +131,7 @@ public class ExportGameViewsSelectionPanel extends JPanel
     }
     return buttonPanel;
   }
-  
+
   private JButton getAddButton()
   {
     if (addButton == null)
@@ -142,7 +158,7 @@ public class ExportGameViewsSelectionPanel extends JPanel
     }
     return addButton;
   }
-  
+
   private JButton getRemoveButton()
   {
     if (removeButton == null)
@@ -166,20 +182,23 @@ public class ExportGameViewsSelectionPanel extends JPanel
     }
     return removeButton;
   }
-  private JPanel getSelectedListPanel() {
-    if (selectedListPanel == null) {
-    	selectedListPanel = new JPanel();
-    	GridBagLayout gbl_selectedListPanel = new GridBagLayout();
-    	selectedListPanel.setLayout(gbl_selectedListPanel);
-    	GridBagConstraints gbc_selectedScrollPane = new GridBagConstraints();
+
+  private JPanel getSelectedListPanel()
+  {
+    if (selectedListPanel == null)
+    {
+      selectedListPanel = new JPanel();
+      GridBagLayout gbl_selectedListPanel = new GridBagLayout();
+      selectedListPanel.setLayout(gbl_selectedListPanel);
+      GridBagConstraints gbc_selectedScrollPane = new GridBagConstraints();
       gbc_selectedScrollPane.weightx = 1.0;
       gbc_selectedScrollPane.weighty = 1.0;
       gbc_selectedScrollPane.insets = new Insets(0, 10, 5, 10);
       gbc_selectedScrollPane.fill = GridBagConstraints.BOTH;
       gbc_selectedScrollPane.gridx = 0;
       gbc_selectedScrollPane.gridy = 0;
-    	selectedListPanel.add(getScrollPane(), gbc_selectedScrollPane);
-    	GridBagConstraints gbc_countLabel = new GridBagConstraints();
+      selectedListPanel.add(getScrollPane(), gbc_selectedScrollPane);
+      GridBagConstraints gbc_countLabel = new GridBagConstraints();
       gbc_countLabel.insets = new Insets(0, 0, 0, 10);
       gbc_countLabel.anchor = GridBagConstraints.EAST;
       gbc_countLabel.gridx = 0;
@@ -189,61 +208,90 @@ public class ExportGameViewsSelectionPanel extends JPanel
     }
     return selectedListPanel;
   }
-  private JList<GameView> getGameViewList() {
-    if (gameViewList == null) {
-    	gameViewList = new JList<GameView>();
-    	gameViewList.addListSelectionListener(new ListSelectionListener()
-      {
-        public void valueChanged(ListSelectionEvent e)
+
+  private JList<GameView> getGameViewList()
+  {
+    if (gameViewList == null)
+    {
+      gameViewList = new JList<GameView>();
+      gameViewList.addListSelectionListener(new ListSelectionListener()
         {
-          getAddButton().setEnabled(!gameViewList.getSelectionModel().isSelectionEmpty());
-        }
-      });
-    	gameViewList.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
-    	gameViewList.setModel(uiModel.getGameViewModel());
+          public void valueChanged(ListSelectionEvent e)
+          {
+            getAddButton().setEnabled(!gameViewList.getSelectionModel().isSelectionEmpty());
+          }
+        });
+      gameViewList.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+      gameViewList.setModel(uiModel.getGameViewModel());
     }
     return gameViewList;
   }
-  private JScrollPane getGameViewScrollPane() {
-    if (gameViewScrollPane == null) {
-    	gameViewScrollPane = new JScrollPane();
-    	gameViewScrollPane.setViewportView(getGameViewList());
+
+  private JScrollPane getGameViewScrollPane()
+  {
+    if (gameViewScrollPane == null)
+    {
+      gameViewScrollPane = new JScrollPane();
+      gameViewScrollPane.setViewportView(getGameViewList());
     }
     return gameViewScrollPane;
   }
-  private JList<GameView> getSelectedList() {
-    if (selectedList == null) {
-    	selectedList = new JList<GameView>();
-    	selectedList.setModel(selectedListModel);
-    	selectedList.addListSelectionListener(new ListSelectionListener()
-      {
-        public void valueChanged(ListSelectionEvent e)
+
+  private JList<GameView> getSelectedList()
+  {
+    if (selectedList == null)
+    {
+      selectedList = new JList<GameView>();
+      selectedList.setModel(selectedListModel);
+      selectedList.addListSelectionListener(new ListSelectionListener()
         {
-          getRemoveButton().setEnabled(!selectedList.getSelectionModel().isSelectionEmpty());
-        }
-      });
+          public void valueChanged(ListSelectionEvent e)
+          {
+            getRemoveButton().setEnabled(!selectedList.getSelectionModel().isSelectionEmpty());
+          }
+        });
     }
     return selectedList;
   }
-  private JScrollPane getScrollPane() {
-    if (scrollPane == null) {
-    	scrollPane = new JScrollPane();
-    	scrollPane.setViewportView(getSelectedList());
+
+  private JScrollPane getScrollPane()
+  {
+    if (scrollPane == null)
+    {
+      scrollPane = new JScrollPane();
+      scrollPane.setViewportView(getSelectedList());
     }
     return scrollPane;
   }
-  
+
   private void updateAfterEditingSelectedList()
   {
-//    sortSelectedList();
-//    getWarningLabel().setVisible(selectedListModel.getSize() > MAX_GAMES);
-//    exportButton.setEnabled(selectedListModel.getSize() > 0);
     getCountLabel().setText(Integer.toString(selectedListModel.getSize()));
+    exportButton.setEnabled(selectedListModel.getSize() > 0);
   }
-  private JLabel getCountLabel() {
-    if (countLabel == null) {
-    	countLabel = new JLabel("0");
+
+  private JLabel getCountLabel()
+  {
+    if (countLabel == null)
+    {
+      countLabel = new JLabel("0");
     }
     return countLabel;
+  }
+  
+  List<GameView> getSelectedViews()
+  {
+    List<GameView> returnList = new ArrayList<>();
+    for (int i = 0; i < selectedListModel.getSize(); i++)
+    {
+      returnList.add(selectedListModel.getElementAt(i));
+    }
+    return returnList;
+  }
+  private JLabel getInfoLabel() {
+    if (infoLabel == null) {
+    	infoLabel = new JLabel("Select gamelist views to export:");
+    }
+    return infoLabel;
   }
 }

@@ -718,7 +718,7 @@ public class MenuManager
 
   private void exportGames()
   {
-    final ExportGamesDialog exportSelectionDialog = new ExportGamesDialog(MainWindow.getInstance());
+    final ExportGamesDialog exportSelectionDialog = new ExportGamesDialog(MainWindow.getInstance(), true);
     exportSelectionDialog.pack();
     exportSelectionDialog.setLocationRelativeTo(this.mainWindow);
     if (exportSelectionDialog.showDialog())
@@ -740,7 +740,7 @@ public class MenuManager
   
   private void exportGamesToFileLoader()
   {
-    final ExportGamesDialog exportSelectionDialog = new ExportGamesDialog(MainWindow.getInstance());
+    final ExportGamesDialog exportSelectionDialog = new ExportGamesDialog(MainWindow.getInstance(), false);
     exportSelectionDialog.pack();
     exportSelectionDialog.setLocationRelativeTo(this.mainWindow);
     if (exportSelectionDialog.showDialog())

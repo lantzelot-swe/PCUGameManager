@@ -6,14 +6,13 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.File;
+import java.beans.Beans;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JList;
@@ -24,8 +23,6 @@ import javax.swing.UIManager;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
-import se.lantz.gui.SelectDirPanel;
-import se.lantz.gui.SelectDirPanel.Mode;
 import se.lantz.model.GameListModel;
 import se.lantz.model.MainViewModel;
 import se.lantz.model.data.GameListData;
@@ -50,13 +47,7 @@ public class ExportGamesSelectionPanel extends JPanel
   private JLabel InfoLabel;
   private JLabel warningLabel;
   private JLabel countLabel;
-  private JPanel formatPanel;
-  private JPanel outputDirPanel;
-  private JLabel outputDirLabel;
-  private SelectDirPanel selectDirPanel;
-  private JCheckBox deleteCheckBox;
   private JButton exportButton;
-  private JCheckBox gamesFolderCheckBox;
   private ExportGameViewsSelectionPanel exportGameViewsSelectionPanel;
 
   public ExportGamesSelectionPanel(JButton exportButton)
@@ -103,24 +94,10 @@ public class ExportGamesSelectionPanel extends JPanel
     gbc_warningLabel.gridx = 0;
     gbc_warningLabel.gridy = 2;
     add(getWarningLabel(), gbc_warningLabel);
-    GridBagConstraints gbc_formatPanel = new GridBagConstraints();
-    gbc_formatPanel.insets = new Insets(0, 0, 5, 0);
-    gbc_formatPanel.anchor = GridBagConstraints.NORTH;
-    gbc_formatPanel.gridwidth = 3;
-    gbc_formatPanel.fill = GridBagConstraints.BOTH;
-    gbc_formatPanel.gridx = 0;
-    gbc_formatPanel.gridy = 3;
-    add(getFormatPanel(), gbc_formatPanel);
-    GridBagConstraints gbc_exportGameViewsSelectionPanel = new GridBagConstraints();
-    gbc_exportGameViewsSelectionPanel.weighty = 1.0;
-    gbc_exportGameViewsSelectionPanel.fill = GridBagConstraints.BOTH;
-    gbc_exportGameViewsSelectionPanel.gridwidth = 3;
-    gbc_exportGameViewsSelectionPanel.weightx = 1.0;
-    gbc_exportGameViewsSelectionPanel.insets = new Insets(0, 0, 0, 5);
-    gbc_exportGameViewsSelectionPanel.gridx = 0;
-    gbc_exportGameViewsSelectionPanel.gridy = 4;
-    add(getExportGameViewsSelectionPanel(), gbc_exportGameViewsSelectionPanel);
-    uiModel.initialize();
+    if (!Beans.isDesignTime())
+    {
+      uiModel.initialize();
+    }
   }
 
   private JPanel getListPanel()
@@ -381,121 +358,5 @@ public class ExportGamesSelectionPanel extends JPanel
       countLabel = new JLabel("0");
     }
     return countLabel;
-  }
-
-  private JPanel getFormatPanel()
-  {
-    if (formatPanel == null)
-    {
-      formatPanel = new JPanel();
-      GridBagLayout gbl_formatPanel = new GridBagLayout();
-      gbl_formatPanel.rowWeights = new double[] { 0.0, 0.0, 0.0, 1.0 };
-      gbl_formatPanel.columnWeights = new double[] { 1.0 };
-      formatPanel.setLayout(gbl_formatPanel);
-      GridBagConstraints gbc_outputDirPanel = new GridBagConstraints();
-      gbc_outputDirPanel.insets = new Insets(10, 0, 0, 0);
-      gbc_outputDirPanel.fill = GridBagConstraints.BOTH;
-      gbc_outputDirPanel.gridx = 0;
-      gbc_outputDirPanel.gridy = 3;
-      formatPanel.add(getOutputDirPanel(), gbc_outputDirPanel);
-    }
-    return formatPanel;
-  }
-
-  private JPanel getOutputDirPanel()
-  {
-    if (outputDirPanel == null)
-    {
-      outputDirPanel = new JPanel();
-      GridBagLayout gbl_outputDirPanel = new GridBagLayout();
-      gbl_outputDirPanel.columnWidths = new int[] { 0, 0 };
-      gbl_outputDirPanel.rowHeights = new int[] { 0, 0, 0, 0, 0 };
-      gbl_outputDirPanel.columnWeights = new double[] { 1.0, Double.MIN_VALUE };
-      gbl_outputDirPanel.rowWeights = new double[] { 0.0, 1.0, 0.0, 0.0, Double.MIN_VALUE };
-      outputDirPanel.setLayout(gbl_outputDirPanel);
-      GridBagConstraints gbc_outputDirLabel = new GridBagConstraints();
-      gbc_outputDirLabel.anchor = GridBagConstraints.WEST;
-      gbc_outputDirLabel.insets = new Insets(0, 10, 0, 0);
-      gbc_outputDirLabel.gridx = 0;
-      gbc_outputDirLabel.gridy = 0;
-      outputDirPanel.add(getOutputDirLabel(), gbc_outputDirLabel);
-      GridBagConstraints gbc_selectDirPanel = new GridBagConstraints();
-      gbc_selectDirPanel.insets = new Insets(0, 5, 5, 0);
-      gbc_selectDirPanel.fill = GridBagConstraints.BOTH;
-      gbc_selectDirPanel.gridx = 0;
-      gbc_selectDirPanel.gridy = 1;
-      outputDirPanel.add(getSelectDirPanel(), gbc_selectDirPanel);
-      GridBagConstraints gbc_gamesFolderCheckBox = new GridBagConstraints();
-      gbc_gamesFolderCheckBox.anchor = GridBagConstraints.WEST;
-      gbc_gamesFolderCheckBox.insets = new Insets(0, 10, 0, 0);
-      gbc_gamesFolderCheckBox.gridx = 0;
-      gbc_gamesFolderCheckBox.gridy = 3;
-      outputDirPanel.add(getGamesFolderCheckBox(), gbc_gamesFolderCheckBox);
-      GridBagConstraints gbc_deleteCheckBox = new GridBagConstraints();
-      gbc_deleteCheckBox.insets = new Insets(0, 10, 0, 0);
-      gbc_deleteCheckBox.anchor = GridBagConstraints.WEST;
-      gbc_deleteCheckBox.gridx = 0;
-      gbc_deleteCheckBox.gridy = 2;
-      outputDirPanel.add(getDeleteCheckBox(), gbc_deleteCheckBox);
-    }
-    return outputDirPanel;
-  }
-
-  private JLabel getOutputDirLabel()
-  {
-    if (outputDirLabel == null)
-    {
-      outputDirLabel = new JLabel("Select directory to export to:");
-    }
-    return outputDirLabel;
-  }
-
-  private SelectDirPanel getSelectDirPanel()
-  {
-    if (selectDirPanel == null)
-    {
-      selectDirPanel = new SelectDirPanel(Mode.EXPORT);
-    }
-    return selectDirPanel;
-  }
-
-  private JCheckBox getDeleteCheckBox()
-  {
-    if (deleteCheckBox == null)
-    {
-      deleteCheckBox = new JCheckBox("Delete existing games in the selected directory before exporting");
-      deleteCheckBox.setSelected(true);
-    }
-    return deleteCheckBox;
-  }
-
-  File getTargetDirectory()
-  {
-    return getSelectDirPanel().getTargetDirectory();
-  }
-
-  boolean deleteBeforeExport()
-  {
-    return getDeleteCheckBox().isSelected();
-  }
-
-  private JCheckBox getGamesFolderCheckBox()
-  {
-    if (gamesFolderCheckBox == null)
-    {
-      gamesFolderCheckBox = new JCheckBox("Export to a \"games\" subdirectory");
-    }
-    return gamesFolderCheckBox;
-  }
-
-  boolean addGamesSubDirectory()
-  {
-    return getGamesFolderCheckBox().isSelected();
-  }
-  private ExportGameViewsSelectionPanel getExportGameViewsSelectionPanel() {
-    if (exportGameViewsSelectionPanel == null) {
-    	exportGameViewsSelectionPanel = new ExportGameViewsSelectionPanel();
-    }
-    return exportGameViewsSelectionPanel;
   }
 }
