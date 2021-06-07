@@ -164,6 +164,21 @@ public class ImportOptionsPanel extends JPanel
       case "Favorite 5":
         returnValue = 5;
         break;
+      case "Favorite 6":
+        returnValue = 6;
+        break;
+      case "Favorite 7":
+        returnValue = 7;
+        break;
+      case "Favorite 8":
+        returnValue = 8;
+        break;
+      case "Favorite 9":
+        returnValue = 9;
+        break;
+      case "Favorite 10":
+        returnValue = 10;
+        break;
       default:
         break;
       }
@@ -314,6 +329,11 @@ public class ImportOptionsPanel extends JPanel
       favoriteComboModel.addElement("Favorite 3");
       favoriteComboModel.addElement("Favorite 4");
       favoriteComboModel.addElement("Favorite 5");
+      favoriteComboModel.addElement("Favorite 6");
+      favoriteComboModel.addElement("Favorite 7");
+      favoriteComboModel.addElement("Favorite 8");
+      favoriteComboModel.addElement("Favorite 9");
+      favoriteComboModel.addElement("Favorite 10");
       favoriteComboBox.setModel(favoriteComboModel);
       favoriteComboBox.setEnabled(false);
     }
