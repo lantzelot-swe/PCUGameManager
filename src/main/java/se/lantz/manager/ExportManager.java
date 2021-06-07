@@ -108,6 +108,10 @@ public class ExportManager
       for (GameView gameView : gameViewList)
       {
         Path targetPath = targetDir.toPath().resolve(gameView.getName());
+        if (!fileLoader)
+        {
+          targetPath = targetDir.toPath().resolve(gameView.getName().replace(" ", "_"));
+        }
         try
         {
           Files.createDirectories(targetPath);
@@ -136,23 +140,23 @@ public class ExportManager
     return deleteBeforeExport;
   }
 
-  public void copyFiles(StringBuilder infoBuilder)
+  public void copyFilesForCarousel(StringBuilder infoBuilder)
   {
     if (gameViewMode)
     {
       for (GameView gameView : gameViewList)
       {
-        Path targetPath = targetDir.toPath().resolve(gameView.getName());
-        copyFiles(infoBuilder, targetPath, gameDetailsForViewsMap.get(gameView));
+        Path targetPath = targetDir.toPath().resolve(gameView.getName().replace(" ", "_"));
+        copyFilesForCarousel(infoBuilder, targetPath, gameDetailsForViewsMap.get(gameView));
       }
     }
     else
     {
-      copyFiles(infoBuilder, targetDir.toPath(), gameDetailsList);
+      copyFilesForCarousel(infoBuilder, targetDir.toPath(), gameDetailsList);
     }
   }
 
-  private void copyFiles(StringBuilder infoBuilder, Path targetPath, List<GameDetails> gameDetailsList)
+  private void copyFilesForCarousel(StringBuilder infoBuilder, Path targetPath, List<GameDetails> gameDetailsList)
   {
     try
     {

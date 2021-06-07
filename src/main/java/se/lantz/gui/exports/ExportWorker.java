@@ -36,7 +36,7 @@ public class ExportWorker extends SwingWorker<Void, String>
     publish(infoBuilder.toString());
     publish("Copy screenshots, covers and game files...");
     infoBuilder = new StringBuilder();
-    exportManager.copyFiles(infoBuilder);
+    exportManager.copyFilesForCarousel(infoBuilder);
     publish(infoBuilder.toString());
     exportManager.clearAfterImport();
     publish("Done!");

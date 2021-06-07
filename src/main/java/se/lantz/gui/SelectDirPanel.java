@@ -1,8 +1,10 @@
 package se.lantz.gui;
 
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.HeadlessException;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -12,10 +14,12 @@ import java.nio.file.LinkOption;
 import java.nio.file.Path;
 
 import javax.swing.JButton;
+import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
@@ -174,7 +178,7 @@ public class SelectDirPanel extends JPanel
       }
     }
   }
-  
+
   private void selectGbImportFile()
   {
     final JFileChooser fileChooser = new JFileChooser();
@@ -206,7 +210,16 @@ public class SelectDirPanel extends JPanel
 
   private void selectExportDirectory(boolean carousel)
   {
-    final JFileChooser fileChooser = new JFileChooser();
+    final JFileChooser fileChooser = new JFileChooser()
+      {
+        @Override
+        protected JDialog createDialog(Component parent) throws HeadlessException
+        {
+          //Set parent to the export dialog
+          JDialog dlg = super.createDialog(SwingUtilities.getAncestorOfClass(JDialog.class, SelectDirPanel.this));
+          return dlg;
+        }
+      };
     fileChooser.setDialogTitle("Select a directory to export to");
     fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
     fileChooser.setCurrentDirectory(new File(configuredDir));
@@ -214,19 +227,33 @@ public class SelectDirPanel extends JPanel
     if (value == JFileChooser.APPROVE_OPTION)
     {
       targetDirectory = fileChooser.getSelectedFile();
+      if (carousel && targetDirectory.getName().contains(" "))
+      {
+        String message = String
+          .format("<html>The carousel does not support folders that contains a space in the name.<br>Are you sure you want to export to the \"%s\" directory?</html>",
+                  targetDirectory.getName());
+        int choice = JOptionPane.showConfirmDialog(SwingUtilities.getAncestorOfClass(JDialog.class, this),
+                                                   message,
+                                                   "Folder name",
+                                                   JOptionPane.YES_NO_OPTION,
+                                                   JOptionPane.WARNING_MESSAGE);
+        if (choice == JOptionPane.NO_OPTION)
+        {
+          selectExportDirectory(carousel);
+        }
+      }
       configuredDir = targetDirectory.toPath().toString();
-      FileManager.getConfiguredProperties().put(carousel ? CAROUSEL_EXPORT_DIR_PROPERTY : FILELOADER_EXPORT_DIR_PROPERTY, configuredDir);
+      FileManager.getConfiguredProperties()
+        .put(carousel ? CAROUSEL_EXPORT_DIR_PROPERTY : FILELOADER_EXPORT_DIR_PROPERTY, configuredDir);
       getDirTextField().setText(configuredDir);
     }
   }
-  
-  
 
   public File getTargetDirectory()
   {
     return targetDirectory;
   }
-  
+
   private boolean checkSelectedGbDirectory(Path gbFile)
   {
     Path iniPath = gbFile.getParent().resolve("Paths.ini");
