@@ -8,6 +8,7 @@ import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -270,6 +271,12 @@ public class GamebaseScraper implements Scraper
       logger.warn("Could not scrape all six screenshots");
     }
     return screensList;
+  }
+  
+  @Override
+  public List<BufferedImage> scrapeCovers()
+  {
+    return new ArrayList<>();
   }
 
   private void scrapeGame(Document doc)

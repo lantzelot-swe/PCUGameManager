@@ -10,6 +10,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
@@ -29,6 +31,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import se.lantz.gui.ScrollablePanel.ScrollableSizeHint;
+import se.lantz.gui.scraper.CoverSelectionDialog;
 import se.lantz.gui.scraper.ScraperDialog;
 import se.lantz.gui.scraper.ScraperProgressDialog;
 import se.lantz.gui.scraper.ScraperWorker;
@@ -315,6 +318,34 @@ public class GameDetailsBackgroundPanel extends JPanel
       dialog.setVisible(true);
 
       MainWindow.getInstance().setWaitCursor(false);
+      if (scraperFields.isCover())
+      {
+        List<BufferedImage> covers = scraperManager.getCovers();
+        if (covers.size() > 1)
+        {
+          //Show dialog for selecting cover image
+          CoverSelectionDialog coverDialog = new CoverSelectionDialog(MainWindow.getInstance(), covers);
+          coverDialog.pack();
+          coverDialog.setLocationRelativeTo(MainWindow.getInstance());
+          if (coverDialog.showDialog())
+          {
+            covers = Arrays.asList(coverDialog.getSelectedCover());
+          }
+          else
+          {
+            covers = new ArrayList<>();
+          }
+        }
+        //Update with cover
+        if (covers.size() == 1)
+        {
+          scraperManager.updateModelWithCoverImage(covers.get(0));
+        }
+        else
+        {
+          //Do nothing
+        }
+      }
       if (scraperFields.isScreenshots())
       {
         List<BufferedImage> screenshots = scraperManager.getScreenshots();
@@ -331,7 +362,7 @@ public class GameDetailsBackgroundPanel extends JPanel
           }
           else
           {
-            return;
+            screenshots = new ArrayList<>();
           }
         }
         //Update with screenshots

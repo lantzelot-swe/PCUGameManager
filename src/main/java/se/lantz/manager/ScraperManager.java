@@ -26,6 +26,7 @@ public class ScraperManager
   Scraper usedScraper = mobyScraper;
 
   List<BufferedImage> screenshotsList = new ArrayList<>();
+  List<BufferedImage> coversList = new ArrayList<>();
   private InfoModel infoModel;
   private SystemModel systemModel;
   private ScraperFields fields;
@@ -74,6 +75,16 @@ public class ScraperManager
   {
     return screenshotsList;
   }
+  
+  public void scrapeCovers()
+  {
+    coversList = usedScraper.scrapeCovers();
+  }
+
+  public List<BufferedImage> getCovers()
+  {
+    return coversList;
+  }
 
   public void updateModelWithGamesInfo()
   {
@@ -111,11 +122,7 @@ public class ScraperManager
     {
       infoModel.setComposer(usedScraper.getComposer());
     }
-    if (fields.isCover())
-    {
-      infoModel.setCoverImage(usedScraper.getCover());
-    }
-    
+
     if (fields.isGame())
     {
       File scrapedFile = usedScraper.getGameFile();
@@ -139,5 +146,10 @@ public class ScraperManager
   {
     infoModel.setScreen1Image(screen1);
     infoModel.setScreen2Image(screen2);
+  }
+  
+  public void updateModelWithCoverImage(BufferedImage cover)
+  {
+    infoModel.setCoverImage(cover);
   }
 }

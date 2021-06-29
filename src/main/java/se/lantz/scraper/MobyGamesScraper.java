@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import javax.imageio.ImageIO;
 
@@ -25,6 +26,7 @@ import org.slf4j.LoggerFactory;
 
 import se.lantz.model.data.ScraperFields;
 import se.lantz.util.ExceptionHandler;
+import se.lantz.util.FileManager;
 
 public class MobyGamesScraper implements Scraper
 {
@@ -36,8 +38,8 @@ public class MobyGamesScraper implements Scraper
   private String authorCssQuery = "#coreGameRelease > div:contains(Published)";
   private String yearCssQuery = "#coreGameRelease > div:contains(Released)";
   private String genreCssQuery = "#coreGameGenre > div > div:contains(Genre)";
-  private String coverCssQuery = "#coreGameCover > a > img";
   private String screensCssQuery = ".thumbnail-image-wrapper > a";
+  private String coversCssQuery = ".thumbnail-image-wrapper > a";
 
   Map<String, String> genreMap = new HashMap<>();
   private String scrapedTitle = "";
@@ -131,11 +133,6 @@ public class MobyGamesScraper implements Scraper
       {
         scrapedComposer = scrapeComposer(doc);
       }
-      if (fields.isCover())
-      {
-        scrapedCover = scrapeCover(doc);
-      }
-
     }
     catch (IOException e)
     {
@@ -272,48 +269,11 @@ public class MobyGamesScraper implements Scraper
     return value;
   }
 
-  public BufferedImage scrapeCover(Document doc)
-  {
-    //Fetch the right element
-    Elements coverElements = doc.select(coverCssQuery);
-    if (coverElements.first() != null)
-    {
-      Element coverElement = coverElements.first();
-      String bigCoverUrl = coverElement.parent().attr("href");
-      return scrapeBigCover(bigCoverUrl);
-    }
-    return null;
-  }
-
-  private BufferedImage scrapeBigCover(String url)
-  {
-    String cssQuery = "#main > div > div:eq(1) > center > img"; //*[@id="main"]/div/div[2]/center/img
-    Document doc;
-    try
-    {
-      Connection.Response result = Jsoup.connect(url).method(Connection.Method.GET).execute();
-      doc = result.parse();
-      //Fetch the right element
-      Elements coverElements = doc.select(cssQuery);
-      if (coverElements.first() != null)
-      {
-        Element coverElement = coverElements.first();
-        String absoluteUrl = coverElement.absUrl("src");
-
-        URL imageUrl = new URL(absoluteUrl);
-        return ImageIO.read(imageUrl);
-      }
-    }
-    catch (IOException e)
-    {
-      ExceptionHandler.handleException(e, "Could not scrape cover");
-    }
-    return null;
-  }
-
   @Override
   public List<BufferedImage> scrapeScreenshots()
   {
+    String cssQueryForBigScreenshot = "#main > div > div:eq(1) > div > div > img"; //*[@id="main"]/div/div[2]/div/div/img
+
     List<BufferedImage> returnList = new ArrayList<>();
     Document doc;
     try
@@ -330,7 +290,7 @@ public class MobyGamesScraper implements Scraper
       {
         String bigScreenUrl = coverElements.get(i).attr("href");
         logger.debug("Screen URL = " + bigScreenUrl);
-        returnList.add(scrapeBigScreenshot(bigScreenUrl));
+        returnList.add(scrapeBigImage(bigScreenUrl, cssQueryForBigScreenshot));
       }
     }
     catch (IOException e)
@@ -340,9 +300,43 @@ public class MobyGamesScraper implements Scraper
     return returnList;
   }
 
-  private BufferedImage scrapeBigScreenshot(String url)
+  @Override
+  public List<BufferedImage> scrapeCovers()
   {
-    String cssQuery = "#main > div > div:eq(1) > div > div > img"; //*[@id="main"]/div/div[2]/div/div/img
+    String cssQueryForBigCover = "#main > div > div:eq(1) > center > img"; //*[@id="main"]/div/div[2]/center/img
+    List<BufferedImage> returnList = new ArrayList<>();
+    Document doc;
+    try
+    {
+      Connection.Response result =
+        Jsoup.connect(mobyGamesGameUrl + "/cover-art").method(Connection.Method.GET).execute();
+      doc = result.parse();
+      //Fetch the right element
+      Elements coverElements = doc.select(coversCssQuery);
+
+      logger.debug("Number of cover art found: {}", coverElements.size());
+
+      List<Element> filteredElements = coverElements.stream()
+        .filter(element -> element.attr("title").contains("Front Cover")).collect(Collectors.toList());
+
+      //Scrape max 6 covers
+      for (int i = 0; i < Math.min(6, filteredElements.size()); i++)
+      {
+        String bigScreenUrl = filteredElements.get(i).attr("href");
+        logger.debug("Screen URL = " + bigScreenUrl);
+        BufferedImage scrapedImage = FileManager.getScaledCoverImage(scrapeBigImage(bigScreenUrl, cssQueryForBigCover));
+        returnList.add(scrapedImage);
+      }
+    }
+    catch (IOException e)
+    {
+      ExceptionHandler.handleException(e, "Could not scrape cover");
+    }
+    return returnList;
+  }
+
+  private BufferedImage scrapeBigImage(String url, String cssQuery)
+  {
     Document doc;
     try
     {

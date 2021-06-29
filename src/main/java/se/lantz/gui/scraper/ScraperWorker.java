@@ -1,5 +1,6 @@
 package se.lantz.gui.scraper;
 
+import java.util.Arrays;
 import java.util.List;
 
 import javax.swing.SwingWorker;
@@ -27,8 +28,15 @@ public class ScraperWorker extends SwingWorker<Void, String>
   {
     scraperManager.scrapeGameInformation(fields);
     publish("");
+    if (fields.isCover())
+    {
+      publish("Fetching Covers...");
+      scraperManager.scrapeCovers();
+    }
+    
     if (fields.isScreenshots())
     {
+      publish("Fetching Screenshots...");
       scraperManager.scrapeScreenshots();
     }
     return null;
@@ -37,8 +45,15 @@ public class ScraperWorker extends SwingWorker<Void, String>
   @Override
   protected void process(List<String> chunks)
   {
-    scraperManager.updateModelWithGamesInfo();  
-    dialog.updateProgress();
+    if (chunks.get(0).isEmpty())
+    {
+      scraperManager.updateModelWithGamesInfo();
+    }
+    for (String chunk : chunks)
+    {
+      dialog.updateProgress(chunk);
+    }
+    
   }
 
   @Override

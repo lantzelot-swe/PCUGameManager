@@ -42,9 +42,9 @@ public class ScraperProgressDialog extends JDialog
     getContentPane().add(getTextLabel(), gbc_textLabel);
   }
 
-  public void updateProgress()
+  public void updateProgress(String message)
   {
-    getTextLabel().setText("Fetching Screenshots...");
+    getTextLabel().setText(message);
     this.repaint();
   }
   

@@ -132,15 +132,18 @@ public class FileManager
     {
       try
       {
-        Image coverToSave = cover.getScaledInstance(122, 175, Image.SCALE_SMOOTH);
-        BufferedImage copyOfImage =
-          new BufferedImage(coverToSave.getWidth(null), coverToSave.getHeight(null), BufferedImage.TYPE_INT_ARGB);
-        Graphics g = copyOfImage.createGraphics();
-        g.drawImage(coverToSave, 0, 0, null);
-        g.dispose();
-
+        BufferedImage imageToSave = cover;
+        if (cover.getWidth() != 122 || cover.getHeight() != 175)
+        {
+          Image scaledCoverImage = cover.getScaledInstance(122, 175, Image.SCALE_SMOOTH);
+          imageToSave =
+            new BufferedImage(scaledCoverImage.getWidth(null), scaledCoverImage.getHeight(null), BufferedImage.TYPE_INT_ARGB);
+          Graphics g = imageToSave.createGraphics();
+          g.drawImage(scaledCoverImage, 0, 0, null);
+          g.dispose();         
+        }
         File outputfile = new File(COVERS + coverFileName);
-        ImageIO.write(copyOfImage, "png", outputfile);
+        ImageIO.write(imageToSave, "png", outputfile);
       }
       catch (IOException e)
       {
@@ -351,7 +354,7 @@ public class FileManager
     }
     // Do the conversion
     List<Character> forbiddenCharsList =
-      " ,:'’-.!+*<>()/[]?|".chars().mapToObj(item -> (char) item).collect(Collectors.toList());
+      " ,:'ï¿½-.!+*<>()/[]?|".chars().mapToObj(item -> (char) item).collect(Collectors.toList());
 
     List<Character> newName =
       title.chars().mapToObj(item -> (char) item).filter(character -> !forbiddenCharsList.contains(character))
@@ -366,15 +369,14 @@ public class FileManager
     logger.debug("Game title: \"{}\" ---- New fileName: \"{}\"", title, newNameString);
     return newNameString;
   }
-  
+
   public static String generateFileNameFromTitleForFileLoader(String title, int duplicateIndex)
   {
     List<Character> forbiddenCharsList =
-      ":,'’!+*<>()/[]?|".chars().mapToObj(item -> (char) item).collect(Collectors.toList());
+      ":,'ï¿½!+*<>()/[]?|".chars().mapToObj(item -> (char) item).collect(Collectors.toList());
 
-    List<Character> newName =
-      title.chars().mapToObj(item -> (char) item).filter(character -> !forbiddenCharsList.contains(character))
-        .collect(Collectors.toList());
+    List<Character> newName = title.chars().mapToObj(item -> (char) item)
+      .filter(character -> !forbiddenCharsList.contains(character)).collect(Collectors.toList());
     String newNameString = newName.stream().map(String::valueOf).collect(Collectors.joining());
     if (duplicateIndex > 0)
     {
@@ -391,11 +393,12 @@ public class FileManager
     try
     {
       String filename = "";
-        
+
       if (fileLoader)
       {
         infoBuilder.append("Creating cjm file for " + gameDetails.getTitle() + "\n");
-        filename = generateFileNameFromTitleForFileLoader(gameDetails.getTitle(), gameDetails.getDuplicateIndex()) + ".cjm";
+        filename =
+          generateFileNameFromTitleForFileLoader(gameDetails.getTitle(), gameDetails.getDuplicateIndex()) + ".cjm";
       }
       else
       {
@@ -403,7 +406,7 @@ public class FileManager
         //Add -ms to comply with the maxi game tool.
         filename = generateFileNameFromTitle(gameDetails.getTitle(), gameDetails.getDuplicateIndex()) + "-ms.tsg";
       }
-      
+
       writeGameInfoFile(filename, targetDir, gameDetails, fileLoader);
     }
     catch (Exception e)
@@ -414,13 +417,14 @@ public class FileManager
     }
   }
 
-  public void writeGameInfoFile(String fileName, File targetDir, GameDetails gameDetails, boolean fileLoader) throws IOException
+  public void writeGameInfoFile(String fileName, File targetDir, GameDetails gameDetails, boolean fileLoader)
+    throws IOException
   {
     Path outDirPath = targetDir.toPath();
     Path filePath = outDirPath.resolve(fileName);
     filePath.toFile().createNewFile();
     FileWriter fw = new FileWriter(filePath.toFile());
-  
+
     if (!fileLoader)
     {
       fw.write("T:" + gameDetails.getTitle() + "\n");
@@ -444,7 +448,7 @@ public class FileManager
       }
       fw.write("E:" + gameDetails.getGenre() + "\n");
       fw.write("Y:" + gameDetails.getYear() + "\n");
-  
+
       fw.write("F:" + "games/" + gameDetails.getGame() + "\n");
       fw.write("C:" + "covers/" + gameDetails.getCover() + "\n");
       if (!gameDetails.getScreen1().isEmpty())
@@ -996,14 +1000,8 @@ public class FileManager
   {
     try
     {
-      BufferedImage coverImage = ImageIO.read(coverImagePath.toFile());
-      Image newCover = coverImage.getScaledInstance(122, 175, Image.SCALE_SMOOTH);
-      BufferedImage copyOfImage =
-        new BufferedImage(newCover.getWidth(null), newCover.getHeight(null), BufferedImage.TYPE_INT_ARGB);
-      Graphics g = copyOfImage.createGraphics();
-      g.drawImage(newCover, 0, 0, null);
-      g.dispose();
-      ImageIO.write(copyOfImage, "png", coverImagePath.toFile());
+      BufferedImage coverImage = getScaledCoverImage(ImageIO.read(coverImagePath.toFile()));
+      ImageIO.write(coverImage, "png", coverImagePath.toFile());
     }
     catch (IOException e)
     {
@@ -1019,6 +1017,17 @@ public class FileManager
         ExceptionHandler.logException(e1, "Could not store empty cover for " + gameName);
       }
     }
+  }
+
+  public static BufferedImage getScaledCoverImage(BufferedImage originalCoverImage)
+  {
+    Image newCover = originalCoverImage.getScaledInstance(122, 175, Image.SCALE_SMOOTH);
+    BufferedImage copyOfImage =
+      new BufferedImage(newCover.getWidth(null), newCover.getHeight(null), BufferedImage.TYPE_INT_ARGB);
+    Graphics g = copyOfImage.createGraphics();
+    g.drawImage(newCover, 0, 0, null);
+    g.dispose();
+    return copyOfImage;
   }
 
   public static void scaleScreenshotImageAndSave(Path screenshotImagePath, String gameName)
@@ -1278,7 +1287,7 @@ public class FileManager
     }
     return filePath != null ? filePath.toFile() : file;
   }
-  
+
   private static FileHeader getFirstMatchingRarEntry(Archive archive)
   {
     FileHeader fh = archive.nextFileHeader();

@@ -30,6 +30,8 @@ public interface Scraper
   BufferedImage getCover();
 
   List<BufferedImage> scrapeScreenshots();
+  
+  List<BufferedImage> scrapeCovers();
 
   boolean isC64();
   
