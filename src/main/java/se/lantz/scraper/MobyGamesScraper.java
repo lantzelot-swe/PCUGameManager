@@ -188,19 +188,44 @@ public class MobyGamesScraper implements Scraper
     Elements descriptionDiv = doc.select(descriptionCssQuery);
     if (descriptionDiv.first() != null)
     {
-      //Get all text elements
-      List<TextNode> textNodes = descriptionDiv.first().textNodes();
+      List<Node> childNodes = descriptionDiv.first().childNodes();
       StringBuilder builder = new StringBuilder();
-      for (TextNode textNode : textNodes)
+      for (Node node : childNodes)
       {
-        if (textNode.text().length() > 1)
+        if (node instanceof TextNode)
         {
-          builder.append(textNode.text());
+          if (((TextNode) node).text().length() > 1)
+          {
+            builder.append(((TextNode) node).text());
+          }
+        }
+        else if (node instanceof Element)
+        {
+          Element nodeElement = (Element) node;
+          if (nodeElement.className().equalsIgnoreCase("sideBarLinks"))
+          {
+            //Description section ends
+            break;
+          }
+          builder.append(getTextFromElement(nodeElement));
         }
       }
       return builder.toString();
     }
     return "";
+  }
+
+  private String getTextFromElement(Element e)
+  {
+    String text = "";
+    if (e.hasAttr("href") || e.tagName().equals("i"))
+    {
+      if (!e.childNodes().isEmpty() && (e.childNode(0) instanceof TextNode))
+      {
+        text = ((TextNode) e.childNode(0)).text();
+      }
+    }
+    return text;
   }
 
   public String scrapeGenre(Document doc)
