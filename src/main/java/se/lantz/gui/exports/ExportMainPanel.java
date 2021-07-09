@@ -127,6 +127,7 @@ public class ExportMainPanel extends JPanel
           public void actionPerformed(ActionEvent e)
           {
             showGameViewSelectionPanel();
+            getOutputDirPanel().updateDeleteCheckBoxText(true);
           }
         });
       buttonGroup.add(viewRadioButton);
@@ -145,6 +146,7 @@ public class ExportMainPanel extends JPanel
           public void actionPerformed(ActionEvent e)
           {
             showGameSelectionPanel();
+            getOutputDirPanel().updateDeleteCheckBoxText(false);
           }
         });
       buttonGroup.add(gamesRadioButton);

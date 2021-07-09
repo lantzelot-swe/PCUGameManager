@@ -55,23 +55,46 @@ public class ExportManager
 
   public void setTargetDirectory(File targetDir, boolean delete)
   {
+    
     this.deleteBeforeExport = delete;
     Path targetDirPath = targetDir.toPath();
-
     if (delete)
     {
-      //Delete target folder first
-      try
+      if (gameViewMode)
       {
-        if (Files.exists(targetDirPath))
+        //Delete only subfolders
+        try
         {
-          //Delete entire folder
-          Files.walk(targetDirPath).sorted(Comparator.reverseOrder()).map(Path::toFile).forEach(File::delete);
+          if (Files.exists(targetDirPath))
+          {         
+            File[] directories = targetDir.listFiles(File::isDirectory);
+            for (File dir : directories)
+            {
+              //Delete entire folder
+              Files.walk(dir.toPath()).sorted(Comparator.reverseOrder()).map(Path::toFile).forEach(File::delete);
+            }
+          }
+        }
+        catch (IOException e)
+        {
+          ExceptionHandler.handleException(e, "Could not delete target folder");
         }
       }
-      catch (IOException e)
+      else
       {
-        ExceptionHandler.handleException(e, "Could not delete target folder");
+        //Delete entire target folder
+        try
+        {
+          if (Files.exists(targetDirPath))
+          {
+            //Delete entire folder
+            Files.walk(targetDirPath).sorted(Comparator.reverseOrder()).map(Path::toFile).forEach(File::delete);
+          }
+        }
+        catch (IOException e)
+        {
+          ExceptionHandler.handleException(e, "Could not delete target folder");
+        }
       }
     }
 

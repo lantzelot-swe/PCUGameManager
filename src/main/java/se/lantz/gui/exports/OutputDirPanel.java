@@ -69,10 +69,16 @@ public class OutputDirPanel extends JPanel
   {
     if (deleteCheckBox == null)
     {
-      deleteCheckBox = new JCheckBox("Delete existing games in the target folder before exporting");
+      deleteCheckBox = new JCheckBox();
       deleteCheckBox.setSelected(true);
+      updateDeleteCheckBoxText(true);
     }
     return deleteCheckBox;
+  }
+  
+  void updateDeleteCheckBoxText(boolean isListView)
+  {
+    getDeleteCheckBox().setText(isListView ? "Delete all subfolders in the target folder before exporting (other files are kept)" : "Delete all files and subfolders in the target folder before exporting");
   }
 
   File getTargetDirectory()
