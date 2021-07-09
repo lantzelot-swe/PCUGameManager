@@ -30,7 +30,7 @@ public class ScreenshotsSelectionDialog extends BaseDialog
   {
     if (mbyGamesPanel == null)
     {
-      mbyGamesPanel = new ScreenshotsSelectionPanel(screenshotInfoList);
+      mbyGamesPanel = new ScreenshotsSelectionPanel(screenshotInfoList, this.getOkButton());
     }
     return mbyGamesPanel;
   }

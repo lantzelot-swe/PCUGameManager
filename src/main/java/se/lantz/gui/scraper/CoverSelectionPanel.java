@@ -10,6 +10,7 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
@@ -39,7 +40,7 @@ public class CoverSelectionPanel extends JPanel
     gbc_infoLabel.gridy = 0;
     add(getInfoLabel(), gbc_infoLabel);
     GridBagConstraints gbc_scrollPane = new GridBagConstraints();
-    gbc_scrollPane.insets = new Insets(0, 5, 5, 5);
+    gbc_scrollPane.insets = new Insets(5, 10, 10, 10);
     gbc_scrollPane.weighty = 1.0;
     gbc_scrollPane.weightx = 1.0;
     gbc_scrollPane.fill = GridBagConstraints.BOTH;
@@ -99,6 +100,7 @@ public class CoverSelectionPanel extends JPanel
       scrollPane.setViewportView(getCoverPanel());
       scrollPane.setPreferredSize(new Dimension(Math.min(1400, getCoverPanel().getPreferredSize().width + 2),
                                   Math.min(800, getCoverPanel().getPreferredSize().height + 2)));
+      scrollPane.setBorder(BorderFactory.createEmptyBorder());
     }
     return scrollPane;
   }

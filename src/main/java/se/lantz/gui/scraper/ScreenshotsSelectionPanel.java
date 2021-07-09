@@ -9,12 +9,17 @@ import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
+import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
+import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.Scrollable;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 public class ScreenshotsSelectionPanel extends JPanel
 {
@@ -23,10 +28,12 @@ public class ScreenshotsSelectionPanel extends JPanel
   private JLabel infoLabel;
   private ScreensPanel screenPanel;
   private JScrollPane scrollPane;
+  private JButton okDialogButton;
 
-  public ScreenshotsSelectionPanel(List<BufferedImage> screenshots)
+  public ScreenshotsSelectionPanel(List<BufferedImage> screenshots, JButton okDialogButton)
   {
     this.screenshots = screenshots;
+    this.okDialogButton = okDialogButton;
     GridBagLayout gridBagLayout = new GridBagLayout();
     setLayout(gridBagLayout);
     GridBagConstraints gbc_infoLabel = new GridBagConstraints();
@@ -37,7 +44,7 @@ public class ScreenshotsSelectionPanel extends JPanel
     gbc_infoLabel.gridy = 0;
     add(getInfoLabel(), gbc_infoLabel);
     GridBagConstraints gbc_scrollPane = new GridBagConstraints();
-    gbc_scrollPane.insets = new Insets(0, 5, 5, 5);
+    gbc_scrollPane.insets = new Insets(0, 10, 10, 10);
     gbc_scrollPane.weighty = 1.0;
     gbc_scrollPane.weightx = 1.0;
     gbc_scrollPane.fill = GridBagConstraints.BOTH;
@@ -67,9 +74,25 @@ public class ScreenshotsSelectionPanel extends JPanel
         checkBox.getCheckBox().setText("Screenshot " + (i + 1));
         screenshotCheckBoxList.add(checkBox);
         screenPanel.add(checkBox);
+        
+        ChangeListener listener = new ChangeListener()
+        {
+          public void stateChanged(ChangeEvent e)
+          {
+            checkSelectedScreenshots();
+          }
+        };
+        
+        checkBox.getCheckBox().addChangeListener(listener);
       }
     }
     return screenPanel;
+  }
+  
+  private void checkSelectedScreenshots()
+  {
+    List<ScreenshotCheckBoxPanel> selectedScreensList = screenshotCheckBoxList.stream().filter(panel -> panel.getCheckBox().isSelected()).collect(Collectors.toList());   
+    okDialogButton.setEnabled(selectedScreensList.size() <= 2);
   }
 
   public List<BufferedImage> getSelectedScreenshots()
@@ -93,6 +116,7 @@ public class ScreenshotsSelectionPanel extends JPanel
       scrollPane.setViewportView(getScreenPanel());
       scrollPane.setPreferredSize(new Dimension(Math.min(1400, getScreenPanel().getPreferredSize().width + 2),
                                   Math.min(800, getScreenPanel().getPreferredSize().height + 2)));
+      scrollPane.setBorder(BorderFactory.createEmptyBorder());
     }
     return scrollPane;
   }
