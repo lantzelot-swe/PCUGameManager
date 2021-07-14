@@ -118,6 +118,12 @@ public class GameView implements Comparable
         builder.append(viewFilter.getFilterData());
         builder.append("%'");
         break;
+        
+      case ViewFilter.NOT_CONTAINS_TEXT:
+        builder.append(" NOT LIKE '%");
+        builder.append(viewFilter.getFilterData());
+        builder.append("%'");
+        break;
 
       case ViewFilter.EQUALS_TEXT:
         builder.append(" LIKE '");

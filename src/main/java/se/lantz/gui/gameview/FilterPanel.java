@@ -220,6 +220,7 @@ public class FilterPanel extends JPanel
     getOperatorTableComboBox().addItem(ViewFilter.BEGINS_WITH_TEXT);
     getOperatorTableComboBox().addItem(ViewFilter.ENDS_WITH_TEXT);
     getOperatorTableComboBox().addItem(ViewFilter.CONTAINS_TEXT);
+    getOperatorTableComboBox().addItem(ViewFilter.NOT_CONTAINS_TEXT);
     getOperatorTableComboBox().addItem(ViewFilter.EQUALS_TEXT);
     getOperatorTableComboBox().addItem(ViewFilter.EMPTY);
     getOperatorTableComboBox().addItem(ViewFilter.NOT_EMPTY);

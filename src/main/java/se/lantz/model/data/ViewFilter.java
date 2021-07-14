@@ -5,6 +5,7 @@ public class ViewFilter
   public static final String BEGINS_WITH_TEXT = "Begins with text";
   public static final String ENDS_WITH_TEXT = "Ends with text";
   public static final String CONTAINS_TEXT = "Contains text";
+  public static final String NOT_CONTAINS_TEXT = "Does not contain text";
   public static final String EQUALS_TEXT = "Equals text";
   public static final String NOT_EMPTY = "Is not empty";
   public static final String EMPTY = "Is empty";
