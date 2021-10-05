@@ -9,6 +9,7 @@ public class GamebaseOptions
   private String titleQueryString = "";
   private boolean includeMissingGameFileEntries = false;
   private String viewTag = "";
+  private GenreInfo genre;
 
   private GamebaseImporter.Options selectedOption = GamebaseImporter.Options.FAVORITES;
 
@@ -75,5 +76,15 @@ public class GamebaseOptions
   public void setViewTag(String viewTag)
   {
     this.viewTag = viewTag;
+  }
+
+  public GenreInfo getGenre()
+  {
+    return genre;
+  }
+
+  public void setGenre(GenreInfo genre)
+  {
+    this.genre = genre;
   }
 }

@@ -688,7 +688,7 @@ public class MenuManager
     ImportOptionsDialog optionsDialog = new ImportOptionsDialog(this.mainWindow, false);
     optionsDialog.pack();
     optionsDialog.setLocationRelativeTo(this.mainWindow);
-    if (optionsDialog.showDialog())
+    if (optionsDialog.showDialog(gamebaseImporter))
     {
       //Set selected option in gamebaseImporter from the dialog.
       if (gamebaseImporter.setImportOptions(optionsDialog.getSelectedGbOptions()))

@@ -220,7 +220,7 @@ public class ImportOptionsPanel extends JPanel
     return selectDirPanel;
   }
 
-  private GameBaseOptionsPanel getGbOptionsPanel()
+  protected GameBaseOptionsPanel getGbOptionsPanel()
   {
     if (gbOptionsPanel == null)
     {
@@ -362,6 +362,7 @@ public class ImportOptionsPanel extends JPanel
     {
       viewTagTextField = new JTextField();
       viewTagTextField.setColumns(10);
+      viewTagTextField.setEnabled(false);
     }
     return viewTagTextField;
   }

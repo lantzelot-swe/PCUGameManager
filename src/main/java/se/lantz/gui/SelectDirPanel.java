@@ -47,6 +47,7 @@ public class SelectDirPanel extends JPanel
   private Mode mode = Mode.CAROUSEL_IMPORT;
 
   private String configuredDir = "";
+  private ActionListener gbDbFileSelectedlistener;
 
   public SelectDirPanel(Mode mode)
   {
@@ -196,6 +197,7 @@ public class SelectDirPanel extends JPanel
         configuredDir = targetDirectory.toPath().toString();
         FileManager.getConfiguredProperties().put(GB_IMPORT_DIR_PROPERTY, configuredDir);
         getDirTextField().setText(configuredDir);
+        gbDbFileSelectedlistener.actionPerformed(new ActionEvent(this,0,""));
       }
       else
       {
@@ -306,5 +308,11 @@ public class SelectDirPanel extends JPanel
         return false;
       }
     }
+  }
+  
+  public void registerGBFileSelectedActionListener(ActionListener listener)
+  {
+    this.gbDbFileSelectedlistener = listener;
+    
   }
 }

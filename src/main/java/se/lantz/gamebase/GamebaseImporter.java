@@ -14,7 +14,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import se.lantz.manager.ImportManager;
 import se.lantz.scraper.GamebaseScraper;
@@ -27,7 +29,7 @@ public class GamebaseImporter
 
   public enum Options
   {
-    ALL, FAVORITES, QUERY;
+    ALL, FAVORITES, QUERY, GENRE;
   }
 
   private final ImportManager importManager;
@@ -48,11 +50,21 @@ public class GamebaseImporter
   private String titleQueryString = "";
 
   private boolean includeEntriesWithMissingGameFile = false;
+  private GenreInfo selectedGenre;
 
   public GamebaseImporter(ImportManager importManager)
   {
     this.importManager = importManager;
     importManager = null;
+    //Ucanaccess does not work properly in standalone installation if this is not added
+    try
+    {
+      Class.forName("net.ucanaccess.jdbc.UcanaccessDriver");
+    }
+    catch (ClassNotFoundException e1)
+    {
+      ExceptionHandler.handleException(e1, "");
+    }
   }
 
   public boolean setImportOptions(GamebaseOptions options)
@@ -61,6 +73,7 @@ public class GamebaseImporter
     this.isC64 = options.isC64();
     this.selectedOption = options.getSelectedOption();
     this.titleQueryString = options.getTitleQueryString();
+    this.selectedGenre = options.getGenre();
     this.includeEntriesWithMissingGameFile = options.isIncludeMissingGameFileEntries();
     return readPathsIni();
   }
@@ -138,16 +151,6 @@ public class GamebaseImporter
 
     String databaseURL = "jdbc:ucanaccess://" + gbDatabasePath.toString();
 
-    //Ucanaccess does not work properly in standalone installation if this is not added
-    try
-    {
-      Class.forName("net.ucanaccess.jdbc.UcanaccessDriver");
-    }
-    catch (ClassNotFoundException e1)
-    {
-      ExceptionHandler.handleException(e1, "");
-    }
-
     try (Connection connection = DriverManager.getConnection(databaseURL))
     {
       Statement statement = connection.createStatement();
@@ -164,6 +167,9 @@ public class GamebaseImporter
         break;
       case QUERY:
         condition = "WHERE (((Games.Name) LIKE '" + titleQueryString + "'));";
+        break;
+      case GENRE:
+        condition = "WHERE (Genres.PG_Id = " + selectedGenre.getPgId() + " AND Genres.GE_Id = " +  selectedGenre.getGeId() + ");";
         break;
       default:
         break;
@@ -587,5 +593,76 @@ public class GamebaseImporter
     gbGameInfoList.clear();
     FileManager.deleteTempFolder();
     importIndexForTempFiles = 0;
+  }
+
+  public List<GenreInfo> getAvailableGenres(Path gbDbPath) throws SQLException
+  {
+    List<GenreInfo> genreList = new ArrayList<>();
+    String databaseURL = "jdbc:ucanaccess://" + gbDbPath.toString();
+    try (Connection connection = DriverManager.getConnection(databaseURL))
+    {
+      Statement statement = connection.createStatement();
+      String sql = "SELECT PGenres.PG_Id, PGenres.ParentGenre FROM PGenres\r\n";
+      ResultSet result = statement.executeQuery(sql);
+      Map<Integer, String> pGenresMap = new HashMap<>();
+      while (result.next())
+      {
+        pGenresMap.put(result.getInt("PG_Id"), result.getString("ParentGenre"));
+      }
+
+      String subGenreSql = "SELECT Genres.GE_Id, Genres.PG_Id, Genres.Genre FROM Genres\r\n";
+      result = statement.executeQuery(subGenreSql);
+      Map<Integer, List<SubGenre>> subGenresMap = new HashMap<>();
+      while (result.next())
+      {
+        int pgId = result.getInt("PG_Id");
+        List<SubGenre> subgenres = subGenresMap.getOrDefault(pgId, new ArrayList<>());
+        subgenres.add(new SubGenre(result.getInt("GE_Id"), result.getString("Genre")));
+        subGenresMap.put(pgId, subgenres);
+      }
+
+      //Create list
+      for (Integer pgId : pGenresMap.keySet())
+      {
+        String genreString = pGenresMap.get(pgId);
+        for (SubGenre subGenre : subGenresMap.get(pgId))
+        {
+          genreList.add(new GenreInfo(genreString + " - " + subGenre.getName(), pgId, subGenre.getGeId()));
+        }
+      }
+    }
+    return genreList;
+  }
+
+  private class SubGenre
+  {
+    private int geId;
+    private String name;
+
+    public SubGenre(int geId, String name)
+    {
+      this.geId = geId;
+      this.name = name;
+    }
+
+    public int getGeId()
+    {
+      return geId;
+    }
+
+    public void setGeId(int geId)
+    {
+      this.geId = geId;
+    }
+
+    public String getName()
+    {
+      return name;
+    }
+
+    public void setName(String name)
+    {
+      this.name = name;
+    }
   }
 }
