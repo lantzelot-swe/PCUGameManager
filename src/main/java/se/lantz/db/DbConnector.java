@@ -121,7 +121,7 @@ public class DbConnector
       ExceptionHandler.handleException(e, "Could not cretate db tables");
     }
   }
-  
+
   public void validateMissingColumnsAfterRestore()
   {
     addLanguageAndDuplicateColumnsIfMissing();
@@ -140,7 +140,8 @@ public class DbConnector
     try (Connection conn = this.connect(); PreparedStatement stmnt = conn.prepareStatement(tableInfoSql);
       ResultSet rs = stmnt.executeQuery(); Statement addDestmnt = conn.createStatement();
       Statement addFrstmnt = conn.createStatement(); Statement addEsstmnt = conn.createStatement();
-      Statement addItstmnt = conn.createStatement(); Statement addDuplicatestmnt = conn.createStatement(); Statement addViewtagstmnt = conn.createStatement())
+      Statement addItstmnt = conn.createStatement(); Statement addDuplicatestmnt = conn.createStatement();
+      Statement addViewtagstmnt = conn.createStatement())
     {
       boolean columnsAvailable = false;
       boolean duplicateAvailable = false;
@@ -479,7 +480,7 @@ public class DbConnector
     //Check which are already available and sort them out of rowValues
     for (String rowValue : rowValues)
     {
-      String[] splittedRowValue = rowValue.split(COMMA);   
+      String[] splittedRowValue = rowValue.split(COMMA);
       String title = splittedRowValue[0];
       StringBuilder sqlBuilder = new StringBuilder();
       sqlBuilder.append("SELECT COUNT(*) FROM gameinfo WHERE title = ");
@@ -539,7 +540,10 @@ public class DbConnector
     rowValues.addAll(newRowValues);
   }
 
-  private void insertAllIntoGameInfoTable(List<String> rowValues, StringBuilder infoBuilder, int addAsFavorite, String viewTag)
+  private void insertAllIntoGameInfoTable(List<String> rowValues,
+                                          StringBuilder infoBuilder,
+                                          int addAsFavorite,
+                                          String viewTag)
   {
     infoBuilder.append("Adding ");
     infoBuilder.append(rowValues.size());
@@ -549,7 +553,7 @@ public class DbConnector
     {
       return;
     }
-    
+
     StringBuilder st = new StringBuilder();
     st.append("INSERT INTO gameinfo (");
     for (String column : columnList)
@@ -566,7 +570,7 @@ public class DbConnector
       String oldGameName = getOldGameName(rowData);
       //Strip  rowData from new filenames
       String strippedRowData = stripRowDataFromOldFileNames(rowData);
-      String duplicateIndex = rowData.substring(rowData.lastIndexOf(",")+1);
+      String duplicateIndex = rowData.substring(rowData.lastIndexOf(",") + 1);
       st.append(strippedRowData);
       if (addAsFavorite > 0)
       {
@@ -577,7 +581,7 @@ public class DbConnector
         st.append(",0");
       }
       st.append(",");
-      
+
       if (oldGameName.isEmpty())
       {
         st.append("\"missing");
@@ -625,7 +629,7 @@ public class DbConnector
     }
     return String.join("\",\"", strippedDataList) + "\"";
   }
-  
+
   private String getOldGameName(String rowData)
   {
     String[] splittedRowData = rowData.split(COMMA);
@@ -675,7 +679,7 @@ public class DbConnector
       {
         sqlBuilder.append(",Viewtag = \"" + viewTag + "\"");
       }
-      
+
       sqlBuilder.append(" WHERE title = ");
       sqlBuilder.append(title);
       sqlBuilder.append("\" AND Duplicate = ");
@@ -1020,7 +1024,7 @@ public class DbConnector
 
   public void toggleFavorite(String gameId, int currentFavoriteValue, int newFavorite)
   {
-    int newValue = currentFavoriteValue == newFavorite ? 0: newFavorite;
+    int newValue = currentFavoriteValue == newFavorite ? 0 : newFavorite;
     String sql = "UPDATE gameinfo SET Favorite = " + newValue + " WHERE rowId = " + gameId + ";";
     try (Connection conn = this.connect(); PreparedStatement favoritestmt = conn.prepareStatement(sql))
     {
@@ -1046,10 +1050,59 @@ public class DbConnector
       ExceptionHandler.handleException(e, "Could not clear favorite values in db.");
     }
   }
-  
+
   public void cleanupAfterImport()
   {
     addedRowsList.clear();
     duplicateMap.clear();
+  }
+
+  public List<String> fixDescriptions()
+  {
+    List<String> fixedGames = new ArrayList<>();
+    String sql =
+      "SELECT title FROM gameinfo where description LIKE '%\n%' OR description_de LIKE '%\n%' OR description_es LIKE '%\n%' OR description_fr LIKE '%\n%' OR description_it LIKE '%\n%'";
+    logger.debug("Generated SELECT String:\n{}", sql);
+
+    String replaceDescSql =
+      "UPDATE gameinfo SET " + DbConstants.DESC + " = REPLACE(" + DbConstants.DESC + ", '\n', ' ');";
+    String replaceDescDESql =
+      "UPDATE gameinfo SET " + DbConstants.DESC_DE + " = REPLACE(" + DbConstants.DESC_DE + ", '\n', ' ');";
+    String replaceDescESSql =
+      "UPDATE gameinfo SET " + DbConstants.DESC_ES + " = REPLACE(" + DbConstants.DESC_ES + ", '\n', ' ');";
+    String replaceDescFRSql =
+      "UPDATE gameinfo SET " + DbConstants.DESC_FR + " = REPLACE(" + DbConstants.DESC_FR + ", '\n', ' ');";
+    String replaceDescITSql =
+      "UPDATE gameinfo SET " + DbConstants.DESC_IT + " = REPLACE(" + DbConstants.DESC_IT + ", '\n', ' ');";
+
+    try (Connection conn = this.connect(); PreparedStatement pstmt = conn.prepareStatement(sql);
+      PreparedStatement replaceDescPstmt = conn.prepareStatement(replaceDescSql);
+      PreparedStatement replaceDescDEPstmt = conn.prepareStatement(replaceDescDESql);
+      PreparedStatement replaceDescESPstmt = conn.prepareStatement(replaceDescESSql);
+      PreparedStatement replaceDescFRPstmt = conn.prepareStatement(replaceDescFRSql);
+      PreparedStatement replaceDescITPstmt = conn.prepareStatement(replaceDescITSql);)
+    {
+      ResultSet rs = pstmt.executeQuery();
+      while (rs.next())
+      {
+        String title = rs.getString("Title");
+        fixedGames.add(title);
+      }
+      int value = replaceDescPstmt.executeUpdate();
+      logger.debug("Fix description Executed successfully, value = {}", value);
+      value = replaceDescDEPstmt.executeUpdate();
+      logger.debug("Fix description_de Executed successfully, value = {}", value);
+      value = replaceDescESPstmt.executeUpdate();
+      logger.debug("Fix description_es Executed successfully, value = {}", value);
+      value = replaceDescFRPstmt.executeUpdate();
+      logger.debug("Fix description_fr Executed successfully, value = {}", value);
+      value = replaceDescITPstmt.executeUpdate();
+      logger.debug("Fix description_it Executed successfully, value = {}", value);
+    }
+    catch (SQLException e)
+    {
+      ExceptionHandler.handleException(e, "Could not fix descriptions in db.");
+    }
+    return fixedGames;
   }
 }

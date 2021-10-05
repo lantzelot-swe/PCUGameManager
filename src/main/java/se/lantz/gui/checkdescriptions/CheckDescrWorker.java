@@ -1,31 +1,34 @@
-package se.lantz.gui.convertscreens;
+package se.lantz.gui.checkdescriptions;
 
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 import javax.swing.SwingWorker;
 
+import se.lantz.db.DbConnector;
 import se.lantz.util.FileManager;
 
-public class ConvertWorker extends SwingWorker<Integer, String>
+public class CheckDescrWorker extends SwingWorker<Integer, String>
 {
-  private ConvertProgressDialog dialog;
+  private CheckDescrProgressDialog dialog;
+  private DbConnector dbConnector;
 
-  public ConvertWorker(ConvertProgressDialog dialog)
+  public CheckDescrWorker(CheckDescrProgressDialog dialog, DbConnector dbConnector)
   {
     this.dialog = dialog;
+    this.dbConnector = dbConnector;
   }
 
   @Override
   protected Integer doInBackground() throws Exception
   {
-    publish("Reading screenshots...");
-    List<String> convertionList = FileManager.convertAllScreenshotsTo32Bit();
-    for (String screenshot : convertionList)
+    publish("Reading descriptions...");
+    List<String> fixedEntriesList = dbConnector.fixDescriptions();
+    for (String game : fixedEntriesList)
     {
-      publish(screenshot);
+      publish("Fixed " + game);
     }
-    return convertionList.size();
+    return fixedEntriesList.size();
   }
 
   @Override

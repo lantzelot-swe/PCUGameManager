@@ -17,6 +17,8 @@ import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
 
 import se.lantz.gamebase.GamebaseImporter;
+import se.lantz.gui.checkdescriptions.CheckDescrProgressDialog;
+import se.lantz.gui.checkdescriptions.CheckDescrWorker;
 import se.lantz.gui.convertscreens.ConvertProgressDialog;
 import se.lantz.gui.convertscreens.ConvertWorker;
 import se.lantz.gui.dbbackup.BackupProgressDialog;
@@ -89,6 +91,7 @@ public class MenuManager
   private JMenuItem deleteGamesForViewItem;
 
   private JMenuItem convertScreensItem;
+  private JMenuItem checkDescrItem;
 
   private JMenuItem helpItem;
   private JMenuItem aboutItem;
@@ -175,6 +178,7 @@ public class MenuManager
     toolsMenu.add(getDeleteGamesForViewMenuItem());
     toolsMenu.addSeparator();
     toolsMenu.add(getConvertScreensItem());
+    toolsMenu.add(getCheckDescriptionsItem());
     helpMenu = new JMenu("Help");
     helpMenu.setMnemonic('H');
     helpMenu.add(getHelpItem());
@@ -276,7 +280,7 @@ public class MenuManager
     exportItem.addActionListener(e -> exportGames());
     return exportItem;
   }
-  
+
   private JMenuItem getExportFileLoaderItem()
   {
     exportFLItem = new JMenuItem("Export to File loader...");
@@ -616,6 +620,14 @@ public class MenuManager
     return convertScreensItem;
   }
 
+  private JMenuItem getCheckDescriptionsItem()
+  {
+    checkDescrItem = new JMenuItem("Check descriptions...");
+    checkDescrItem.setMnemonic('e');
+    checkDescrItem.addActionListener(e -> fixInvalidCharsInDescriptions());
+    return checkDescrItem;
+  }
+
   private JMenuItem getHelpItem()
   {
     helpItem = new JMenuItem("Help");
@@ -753,7 +765,7 @@ public class MenuManager
       }
     }
   }
-  
+
   private void exportGamesToFileLoader()
   {
     final ExportGamesDialog exportSelectionDialog = new ExportGamesDialog(MainWindow.getInstance(), false);
@@ -881,6 +893,22 @@ public class MenuManager
     {
       ConvertProgressDialog dialog = new ConvertProgressDialog(this.mainWindow);
       ConvertWorker worker = new ConvertWorker(dialog);
+      worker.execute();
+      dialog.setVisible(true);
+    }
+  }
+
+  private void fixInvalidCharsInDescriptions()
+  {
+    String message =
+      "Do you want to check all description texts in the database and remove all carrage return (CR) characters?\nEarlier versions of the game manager allowed for CR characters, the Carousel " +
+        "does not handle that properly.\nCR characters will be replaced by a space character.";
+    int option = JOptionPane.showConfirmDialog(MainWindow.getInstance()
+      .getMainPanel(), message, "Check description texts", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+    if (option == JOptionPane.YES_OPTION)
+    {
+      CheckDescrProgressDialog dialog = new CheckDescrProgressDialog(this.mainWindow);
+      CheckDescrWorker worker = new CheckDescrWorker(dialog, this.uiModel.getDbConnector());
       worker.execute();
       dialog.setVisible(true);
     }
