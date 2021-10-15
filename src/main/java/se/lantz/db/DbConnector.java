@@ -582,7 +582,7 @@ public class DbConnector
       }
       st.append(",");
 
-      if (oldGameName.isEmpty())
+      if (oldGameName.isEmpty() && !getSystemInfo(rowData).contains("basic"))
       {
         st.append("\"missing");
         if (!viewTag.isEmpty())
@@ -634,6 +634,12 @@ public class DbConnector
   {
     String[] splittedRowData = rowData.split(COMMA);
     return splittedRowData[21].split("\"")[0];
+  }
+  
+  private String getSystemInfo(String rowData)
+  {
+    String[] splittedRowData = rowData.split(COMMA);
+    return splittedRowData[16].split("\"")[0];
   }
 
   private void updateAllInGameInfoTable(List<String> rowValues, int addAsFavorite, String viewTag)

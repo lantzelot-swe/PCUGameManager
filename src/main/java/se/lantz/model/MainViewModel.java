@@ -273,7 +273,7 @@ public class MainViewModel extends AbstractModel
     }
     return returnList;
   }
-  
+
   public List<GameDetails> readGameDetailsForGameView(StringBuilder infoBuilder, GameView gameView)
   {
     List<GameListData> gamesList = dbConnector.fetchGamesByView(gameView);
@@ -654,7 +654,7 @@ public class MainViewModel extends AbstractModel
     {
       missingFields.add("At least one screenshot");
     }
-    if (infoModel.getGamesFile().isEmpty())
+    if (infoModel.getGamesFile().isEmpty() && !systemModel.isBasic())
     {
       missingFields.add("Game file");
     }

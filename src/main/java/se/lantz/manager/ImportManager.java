@@ -307,9 +307,11 @@ public class ImportManager
       coverfile = fileName + "-cover.png";
       screen1file = fileName + "-00.png";
       screen2file = fileName + "-01.png";
-      String fileEnding = oldGameFile.substring(oldGameFile.indexOf("."));
-      gamefile = fileName + fileEnding;
-
+      if (!oldGameFile.isEmpty())
+      {
+        String fileEnding = oldGameFile.substring(oldGameFile.indexOf("."));
+        gamefile = fileName + fileEnding;
+      }
       // Construct a data row
       addToDbRowList(title,
                      year,
@@ -681,7 +683,7 @@ public class ImportManager
           useMissingGameFile(advanced, targetGamePath);
         }
       }
-      else
+      else if (!advanced.contains("basic"))
       {
         useMissingGameFile(advanced, targetGamePath);
       }
