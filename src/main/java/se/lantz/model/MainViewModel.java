@@ -486,7 +486,8 @@ public class MainViewModel extends AbstractModel
       updatedGame.setAuthor(infoModel.getAuthor().replace("\"", "\"\""));
       updatedGame.setYear(infoModel.getYear());
       updatedGame.setComposer(infoModel.getComposer().replace("\"", "\"\""));
-      updatedGame.setGenre(infoModel.getGenre());
+      //If no genre selected use "adventure".
+      updatedGame.setGenre(infoModel.getGenre().isEmpty() ? "adventure" : infoModel.getGenre());
       updatedGame.setDescription(infoModel.getDescription().replace("\"", "\"\""));
       updatedGame.setDescriptionDe(infoModel.getDescriptionDe().replace("\"", "\"\""));
       updatedGame.setDescriptionFr(infoModel.getDescriptionFr().replace("\"", "\"\""));
