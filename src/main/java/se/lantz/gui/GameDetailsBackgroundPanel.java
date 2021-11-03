@@ -23,6 +23,7 @@ import javax.swing.JComponent;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JTabbedPane;
 import javax.swing.KeyStroke;
 import javax.swing.Timer;
 import javax.swing.border.TitledBorder;
@@ -52,8 +53,10 @@ public class GameDetailsBackgroundPanel extends JPanel
   private final MainViewModel model;
   private ScrollablePanel settingsPanel;
   private InfoBackgroundPanel infoPanel;
+  private JTabbedPane systemSavesTabbedPane;
   private CombinedJoystickPanel joystickPanel;
   private SystemPanel systemPanel;
+  private SavesBackgroundPanel savesBackgroundPanel;
   private JPanel buttonPanel;
   private JButton saveButton;
   private ScraperDialog scraperDialog = null;
@@ -163,7 +166,7 @@ public class GameDetailsBackgroundPanel extends JPanel
       gbc_systemPanel.insets = new Insets(0, 0, 0, 5);
       gbc_systemPanel.gridx = 1;
       gbc_systemPanel.gridy = 0;
-      settingsPanel.add(getSystemPanel(), gbc_systemPanel);
+      settingsPanel.add(getSystemSavesTabbedPane(), gbc_systemPanel);
       GridBagConstraints gbc_joystickPanel = new GridBagConstraints();
       gbc_joystickPanel.insets = new Insets(0, 5, 0, 0);
       gbc_joystickPanel.weighty = 1.0;
@@ -174,6 +177,17 @@ public class GameDetailsBackgroundPanel extends JPanel
       settingsPanel.add(getCombinedJoystickPanel(), gbc_joystickPanel);
     }
     return settingsPanel;
+  }
+  
+  private JTabbedPane getSystemSavesTabbedPane()
+  {
+    if (systemSavesTabbedPane == null)
+    {
+      systemSavesTabbedPane = new JTabbedPane();
+      systemSavesTabbedPane.addTab("System Settings", getSystemPanel());
+      systemSavesTabbedPane.addTab("Saved states", getSavesBackgroundPanel());
+    }
+    return systemSavesTabbedPane;
   }
 
   protected InfoBackgroundPanel getInfoBackgroundPanel()
@@ -200,9 +214,19 @@ public class GameDetailsBackgroundPanel extends JPanel
     {
       systemPanel = new SystemPanel(model.getSystemModel());
       systemPanel
-        .setBorder(new TitledBorder(null, "System Settings", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+        .setBorder(new TitledBorder(null, "", TitledBorder.LEADING, TitledBorder.TOP, null, null));
     }
     return systemPanel;
+  }
+  
+  private SavesBackgroundPanel getSavesBackgroundPanel()
+  {
+    if (savesBackgroundPanel == null)
+    {
+      savesBackgroundPanel = new SavesBackgroundPanel(model);
+      
+    }
+    return savesBackgroundPanel;
   }
 
   private JPanel getButtonPanel()

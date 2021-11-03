@@ -3,6 +3,7 @@ package se.lantz.gui;
 import java.awt.Desktop;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
+import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -11,10 +12,12 @@ import java.util.List;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
+import javax.swing.JFileChooser;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 import se.lantz.gamebase.GamebaseImporter;
 import se.lantz.gui.checkdescriptions.CheckDescrProgressDialog;
@@ -92,6 +95,7 @@ public class MenuManager
 
   private JMenuItem convertScreensItem;
   private JMenuItem checkDescrItem;
+  private JMenuItem gzipVsfFileItem;
 
   private JMenuItem helpItem;
   private JMenuItem aboutItem;
@@ -179,6 +183,7 @@ public class MenuManager
     toolsMenu.addSeparator();
     toolsMenu.add(getConvertScreensItem());
     toolsMenu.add(getCheckDescriptionsItem());
+    toolsMenu.add(getGzipVsfFileItem());
     helpMenu = new JMenu("Help");
     helpMenu.setMnemonic('H');
     helpMenu.add(getHelpItem());
@@ -627,6 +632,14 @@ public class MenuManager
     checkDescrItem.addActionListener(e -> fixInvalidCharsInDescriptions());
     return checkDescrItem;
   }
+  
+  private JMenuItem getGzipVsfFileItem()
+  {
+    gzipVsfFileItem = new JMenuItem("Gzip .VSF file...");
+    gzipVsfFileItem.setMnemonic('e');
+    gzipVsfFileItem.addActionListener(e -> gZipVsfFile());
+    return gzipVsfFileItem;
+  }
 
   private JMenuItem getHelpItem()
   {
@@ -911,6 +924,42 @@ public class MenuManager
       CheckDescrWorker worker = new CheckDescrWorker(dialog, this.uiModel.getDbConnector());
       worker.execute();
       dialog.setVisible(true);
+    }
+  }
+  
+  private void gZipVsfFile()
+  {
+    //TODO: Create a default png screenshot to use, and a default .mta file with some time (1 minute?) Look at an existing
+    //in the HEX editor at "hexed.it", the first 3 bytes, "24-bit heltal" to the left, specifies the time. 
+    
+    //import save states: select the ".THEC64SAVE" dir on a stick and read all matching folders (named after the executable file in the game manager).
+    //add to a new directory perhaps? With subfolders named after the game executable? 
+    
+    //Export save states: export existing ones to a  ".THEC64SAVE" folder you choose.
+    
+    //Add 4 save slots somewhere in the UI. Allow for selecting a screenshot, a vsf file and specify a "playtime" value that can be used to generate the mta file.
+    
+    final JFileChooser fileChooser = new JFileChooser();
+    fileChooser.setDialogTitle("Select a valid vsf file");
+    fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+    fileChooser.setCurrentDirectory(new File("."));
+
+    FileNameExtensionFilter vicefilter =
+      new FileNameExtensionFilter("Vice snapshot", "vsf");
+    fileChooser.addChoosableFileFilter(vicefilter);
+    fileChooser.setFileFilter(vicefilter);
+    int value = fileChooser.showOpenDialog(MainWindow.getInstance());
+    if (value == JFileChooser.APPROVE_OPTION)
+    {
+      File selectedFile = fileChooser.getSelectedFile();
+      try
+      {
+        FileManager.compressGzip(selectedFile.toPath(), selectedFile.toPath().getParent().resolve("1.vsz"));
+      }
+      catch (IOException e)
+      {
+        ExceptionHandler.handleException(e, "");
+      }
     }
   }
 
