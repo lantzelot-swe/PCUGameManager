@@ -25,6 +25,7 @@ import javax.swing.JFileChooser;
 import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JSeparator;
 import javax.swing.JTextField;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.text.MaskFormatter;
@@ -42,19 +43,21 @@ public class SaveStatePanel extends JPanel
 {
   private static final Logger logger = LoggerFactory.getLogger(SaveStatePanel.class);
   private JLabel screenshotLabel;
-  private JTextField gameTextField;
+  private JTextField snapshotTextField;
   private MainViewModel model;
   private SavedStatesModel stateModel;
-  private JButton gameButton;
+  private JButton snapshotButton;
   private BufferedImage currentScreen1Image = null;
   private String currentScreenFile = "";
   private ImageIcon missingSceenshotIcon = null;
   private JLabel timeLabel;
-  private JLabel lblNewLabel;
+  private JLabel snapshotLabel;
   private JFormattedTextField timeField;
   private JButton runButton;
   private boolean gamesFileUpdated = false;
   private SAVESTATE saveState;
+  private JSeparator separator;
+  private JButton screenshotButton;
 
   public SaveStatePanel(MainViewModel model, SAVESTATE saveState)
   {
@@ -64,15 +67,14 @@ public class SaveStatePanel extends JPanel
     {
       this.stateModel = model.getSavedStatesModel();
     }
-    
 
     GridBagLayout gridBagLayout = new GridBagLayout();
     setLayout(gridBagLayout);
     GridBagConstraints gbc_screenshotLabel = new GridBagConstraints();
     gbc_screenshotLabel.weighty = 1.0;
-    gbc_screenshotLabel.gridheight = 4;
+    gbc_screenshotLabel.gridheight = 3;
     gbc_screenshotLabel.anchor = GridBagConstraints.NORTHWEST;
-    gbc_screenshotLabel.insets = new Insets(5, 5, 0, 5);
+    gbc_screenshotLabel.insets = new Insets(1, 1, 0, 1);
     gbc_screenshotLabel.gridx = 0;
     gbc_screenshotLabel.gridy = 0;
     add(getScreenshotLabel(), gbc_screenshotLabel);
@@ -80,45 +82,59 @@ public class SaveStatePanel extends JPanel
     gbc_timeTextField.fill = GridBagConstraints.HORIZONTAL;
     gbc_timeTextField.anchor = GridBagConstraints.NORTHWEST;
     gbc_timeTextField.weighty = 1.0;
-    gbc_timeTextField.insets = new Insets(0, 5, 0, 5);
-    gbc_timeTextField.gridx = 1;
-    gbc_timeTextField.gridy = 3;
+    gbc_timeTextField.insets = new Insets(0, 5, 5, 5);
+    gbc_timeTextField.gridx = 3;
+    gbc_timeTextField.gridy = 1;
     add(getTimeField(), gbc_timeTextField);
-    GridBagConstraints gbc_gameTextField = new GridBagConstraints();
-    gbc_gameTextField.gridwidth = 2;
-    gbc_gameTextField.weightx = 1.0;
-    gbc_gameTextField.anchor = GridBagConstraints.NORTHWEST;
-    gbc_gameTextField.insets = new Insets(0, 5, 5, 5);
-    gbc_gameTextField.fill = GridBagConstraints.HORIZONTAL;
-    gbc_gameTextField.gridx = 1;
-    gbc_gameTextField.gridy = 1;
-    add(getGameTextField(), gbc_gameTextField);
-    GridBagConstraints gbc_gameButton = new GridBagConstraints();
-    gbc_gameButton.insets = new Insets(0, 0, 5, 5);
-    gbc_gameButton.anchor = GridBagConstraints.NORTHWEST;
-    gbc_gameButton.gridx = 3;
-    gbc_gameButton.gridy = 1;
-    add(getGameButton(), gbc_gameButton);
+    GridBagConstraints gbc_snapshotTextField = new GridBagConstraints();
+    gbc_snapshotTextField.weightx = 1.0;
+    gbc_snapshotTextField.anchor = GridBagConstraints.NORTHWEST;
+    gbc_snapshotTextField.insets = new Insets(0, 0, 5, 5);
+    gbc_snapshotTextField.fill = GridBagConstraints.HORIZONTAL;
+    gbc_snapshotTextField.gridx = 1;
+    gbc_snapshotTextField.gridy = 1;
+    add(getSnapshotTextField(), gbc_snapshotTextField);
+    GridBagConstraints gbc_snapshotButton = new GridBagConstraints();
+    gbc_snapshotButton.insets = new Insets(-1, 0, 5, 5);
+    gbc_snapshotButton.anchor = GridBagConstraints.NORTHWEST;
+    gbc_snapshotButton.gridx = 2;
+    gbc_snapshotButton.gridy = 1;
+    add(getGameButton(), gbc_snapshotButton);
     GridBagConstraints gbc_timeLabel = new GridBagConstraints();
     gbc_timeLabel.anchor = GridBagConstraints.NORTHWEST;
-    gbc_timeLabel.insets = new Insets(0, 5, 0, 5);
-    gbc_timeLabel.gridx = 1;
-    gbc_timeLabel.gridy = 2;
+    gbc_timeLabel.insets = new Insets(5, 5, 0, 0);
+    gbc_timeLabel.gridx = 3;
+    gbc_timeLabel.gridy = 0;
     add(getTimeLabel(), gbc_timeLabel);
-    GridBagConstraints gbc_lblNewLabel = new GridBagConstraints();
-    gbc_lblNewLabel.insets = new Insets(5, 5, 0, 5);
-    gbc_lblNewLabel.anchor = GridBagConstraints.NORTHWEST;
-    gbc_lblNewLabel.gridx = 1;
-    gbc_lblNewLabel.gridy = 0;
-    add(getLblNewLabel(), gbc_lblNewLabel);
+    GridBagConstraints gbc_snapshotLabel = new GridBagConstraints();
+    gbc_snapshotLabel.insets = new Insets(5, 0, 0, 5);
+    gbc_snapshotLabel.anchor = GridBagConstraints.NORTHWEST;
+    gbc_snapshotLabel.gridx = 1;
+    gbc_snapshotLabel.gridy = 0;
+    add(getSnapshotLabel(), gbc_snapshotLabel);
+    GridBagConstraints gbc_screenshotButton = new GridBagConstraints();
+    gbc_screenshotButton.anchor = GridBagConstraints.SOUTHWEST;
+    gbc_screenshotButton.insets = new Insets(0, 0, 0, 5);
+    gbc_screenshotButton.gridx = 1;
+    gbc_screenshotButton.gridy = 2;
+    add(getScreenshotButton(), gbc_screenshotButton);
     GridBagConstraints gbc_runButton = new GridBagConstraints();
-    gbc_runButton.weighty = 1.0;
     gbc_runButton.insets = new Insets(0, 0, 0, 5);
-    gbc_runButton.anchor = GridBagConstraints.NORTHEAST;
-    gbc_runButton.gridwidth = 2;
-    gbc_runButton.gridx = 2;
-    gbc_runButton.gridy = 3;
+    gbc_runButton.weighty = 1.0;
+    gbc_runButton.anchor = GridBagConstraints.SOUTHEAST;
+    gbc_runButton.gridx = 3;
+    gbc_runButton.gridy = 2;
     add(getRunButton(), gbc_runButton);
+    if (saveState != SAVESTATE.Save3)
+    {
+      GridBagConstraints gbc_separator = new GridBagConstraints();
+      gbc_separator.fill = GridBagConstraints.HORIZONTAL;
+      gbc_separator.insets = new Insets(5, 20, 0, 20);
+      gbc_separator.gridwidth = 4;
+      gbc_separator.gridx = 0;
+      gbc_separator.gridy = 3;
+      add(getSeparator(), gbc_separator);
+    }
 
     if (!Beans.isDesignTime())
     {
@@ -163,12 +179,12 @@ public class SaveStatePanel extends JPanel
 
     }
     // Read from model   
-    getGameTextField().setText(getGameFileName());
+    getSnapshotTextField().setText(getSnapshotFileName());
 
     reloadScreen();
   }
 
-  private String getGameFileName()
+  private String getSnapshotFileName()
   {
     String returnValue = "";
     switch (saveState)
@@ -214,7 +230,7 @@ public class SaveStatePanel extends JPanel
       break;
     default:
       break;
-    
+
     }
     if (screen1Image != null)
     {
@@ -244,7 +260,7 @@ public class SaveStatePanel extends JPanel
         break;
       default:
         break;
-      
+
       }
       if (modelScreenFile.isEmpty())
       {
@@ -272,7 +288,7 @@ public class SaveStatePanel extends JPanel
       try
       {
         image = ImageIO.read(imagefile);
-        Image newImage = image.getScaledInstance(160, 100, Image.SCALE_SMOOTH);
+        Image newImage = image.getScaledInstance(130, 82, Image.SCALE_SMOOTH);
         screenLabel.setIcon(new ImageIcon(newImage));
       }
       catch (IOException e)
@@ -296,7 +312,7 @@ public class SaveStatePanel extends JPanel
       try
       {
         image = ImageIO.read(FileManager.class.getResource("/se/lantz/MissingScreenshot-C64.png"));
-        Image newImage = image.getScaledInstance(160, 100, Image.SCALE_SMOOTH);
+        Image newImage = image.getScaledInstance(130, 82, Image.SCALE_SMOOTH);
         missingSceenshotIcon = new ImageIcon(newImage);
       }
       catch (IOException e)
@@ -313,18 +329,46 @@ public class SaveStatePanel extends JPanel
     if (screenshotLabel == null)
     {
       screenshotLabel = new JLabel("");
+      new FileDrop(screenshotLabel, new FileDrop.Listener()
+      {
+        public void filesDropped(java.io.File[] files)
+        {
+          //TODO
+//          if (files.length > 0)
+//          {
+//            gamesFileUpdated = true;
+//            switch (saveState)
+//            {
+//            case Save0:
+//              stateModel.setState1Path(files[0].toPath());
+//              break;
+//            case Save1:
+//              stateModel.setState2Path(files[0].toPath());
+//              break;
+//            case Save2:
+//              stateModel.setState3Path(files[0].toPath());
+//              break;
+//            case Save3:
+//              stateModel.setState4Path(files[0].toPath());
+//              break;
+//            default:
+//              break;
+//            }
+//          }
+        }
+      });
     }
     return screenshotLabel;
   }
 
-  private JTextField getGameTextField()
+  private JTextField getSnapshotTextField()
   {
-    if (gameTextField == null)
+    if (snapshotTextField == null)
     {
-      gameTextField = new JTextField();
-      gameTextField.setEditable(false);
-      gameTextField.setPreferredSize(new Dimension(50, 20));
-      new FileDrop(gameTextField, new FileDrop.Listener()
+      snapshotTextField = new JTextField();
+      snapshotTextField.setEditable(false);
+      snapshotTextField.setPreferredSize(new Dimension(50, 20));
+      new FileDrop(snapshotTextField, new FileDrop.Listener()
         {
           public void filesDropped(java.io.File[] files)
           {
@@ -346,34 +390,34 @@ public class SaveStatePanel extends JPanel
                 stateModel.setState4Path(files[0].toPath());
                 break;
               default:
-                break; 
-              }          
+                break;
+              }
             }
           }
         });
 
     }
-    return gameTextField;
+    return snapshotTextField;
   }
 
   private JButton getGameButton()
   {
-    if (gameButton == null)
+    if (snapshotButton == null)
     {
-      gameButton = new JButton("...");
-      gameButton.addActionListener(new ActionListener()
+      snapshotButton = new JButton("...");
+      snapshotButton.addActionListener(new ActionListener()
         {
           public void actionPerformed(ActionEvent e)
           {
-            selectGameFile();
+            selectSnapshotFile();
           }
         });
-      gameButton.setMargin(new Insets(1, 3, 1, 3));
+      snapshotButton.setMargin(new Insets(1, 3, 1, 3));
     }
-    return gameButton;
+    return snapshotButton;
   }
 
-  private void selectGameFile()
+  private void selectSnapshotFile()
   {
     final JFileChooser fileChooser = new JFileChooser();
     fileChooser.setDialogTitle("Select a valid game file for " + model.getInfoModel().getTitle());
@@ -409,7 +453,7 @@ public class SaveStatePanel extends JPanel
         stateModel.setState4Path(selectedFile.toPath());
         break;
       default:
-        break;     
+        break;
       }
     }
   }
@@ -423,13 +467,13 @@ public class SaveStatePanel extends JPanel
     return timeLabel;
   }
 
-  private JLabel getLblNewLabel()
+  private JLabel getSnapshotLabel()
   {
-    if (lblNewLabel == null)
+    if (snapshotLabel == null)
     {
-      lblNewLabel = new JLabel("Vice snapshot");
+      snapshotLabel = new JLabel("Vice snapshot");
     }
-    return lblNewLabel;
+    return snapshotLabel;
   }
 
   private JFormattedTextField getTimeField()
@@ -490,8 +534,8 @@ public class SaveStatePanel extends JPanel
               stateModel.setState4time(timeField.getValue().toString());
               break;
             default:
-              break;            
-            }           
+              break;
+            }
           }
         });
       timeField.setPreferredSize(new Dimension(55, 20));
@@ -513,5 +557,31 @@ public class SaveStatePanel extends JPanel
         });
     }
     return runButton;
+  }
+
+  private JSeparator getSeparator()
+  {
+    if (separator == null)
+    {
+      separator = new JSeparator();
+    }
+    return separator;
+  }
+
+  private JButton getScreenshotButton()
+  {
+    if (screenshotButton == null)
+    {
+      screenshotButton = new JButton("...");
+      screenshotButton.addActionListener(new ActionListener()
+        {
+          public void actionPerformed(ActionEvent e)
+          {
+            //TODO
+          }
+        });
+      screenshotButton.setMargin(new Insets(1, 3, 1, 3));
+    }
+    return screenshotButton;
   }
 }

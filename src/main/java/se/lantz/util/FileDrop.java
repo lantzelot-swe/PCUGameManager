@@ -8,6 +8,9 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.io.Reader;
 
+import javax.swing.JComponent;
+import javax.swing.border.EmptyBorder;
+
 import se.lantz.util.FileDrop.TransferableObject;
 
 /**
@@ -221,7 +224,12 @@ public class FileDrop
                   final boolean recursive,
                   final Listener listener)
   {
-
+    
+    if (c instanceof javax.swing.JLabel)
+    {
+      ((JComponent)c).setBorder(new EmptyBorder(2, 2, 2, 2));
+    }
+    
     if (supportsDnD())
     {   // Make a drop listener
       dropListener = new java.awt.dnd.DropTargetListener()
