@@ -183,6 +183,8 @@ public class SaveStatePanel extends JPanel
     getSnapshotTextField().setText(getSnapshotFileName());
     getTimeField().setText(getPlayTime());
     reloadScreen();
+    getRunButton().setEnabled(!getSnapshotTextField().getText().isEmpty());
+    getTimeField().setEnabled(!getSnapshotTextField().getText().isEmpty());
   }
   
   
