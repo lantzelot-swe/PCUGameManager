@@ -7,14 +7,14 @@ import se.lantz.model.SavedStatesModel.SAVESTATE;
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
 
-public class SavesBackgroundPanel extends JPanel
+public class SaveStateBackgroundPanel extends JPanel
 {
   private SaveStatePanel saveStatePanel1;
   private MainViewModel model;
   private SaveStatePanel saveStatePanel2;
   private SaveStatePanel saveStatePanel3;
   private SaveStatePanel saveStatePanel4;
-  public SavesBackgroundPanel(MainViewModel model) {
+  public SaveStateBackgroundPanel(MainViewModel model) {
     this.model = model;
     GridBagLayout gridBagLayout = new GridBagLayout();
     setLayout(gridBagLayout);

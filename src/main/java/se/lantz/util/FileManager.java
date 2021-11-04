@@ -526,6 +526,7 @@ public class FileManager
           gamePathString = SavedStatesManager.SAVES + infoModel.getGamesFile() + "/" + savedStatesModel.getState1File();
         }
       }
+      break;
     case Save1:
       //Use path if available, otherwise the available game in /games.
       vsfPath = savedStatesModel.getState2Path();

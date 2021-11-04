@@ -33,6 +33,7 @@ import javax.swing.text.MaskFormatter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import se.lantz.model.InfoModel;
 import se.lantz.model.MainViewModel;
 import se.lantz.model.SavedStatesModel;
 import se.lantz.model.SavedStatesModel.SAVESTATE;
@@ -48,7 +49,7 @@ public class SaveStatePanel extends JPanel
   private SavedStatesModel stateModel;
   private JButton snapshotButton;
   private BufferedImage currentScreen1Image = null;
-  private String currentScreenFile = "";
+  private String currentGameFile = "";
   private ImageIcon missingSceenshotIcon = null;
   private JLabel timeLabel;
   private JLabel snapshotLabel;
@@ -180,8 +181,32 @@ public class SaveStatePanel extends JPanel
     }
     // Read from model   
     getSnapshotTextField().setText(getSnapshotFileName());
-
+    getTimeField().setText(getPlayTime());
     reloadScreen();
+  }
+  
+  
+  private String getPlayTime()
+  {
+    String returnValue = "";
+    switch (saveState)
+    {
+    case Save0:
+      returnValue = stateModel.getState1time();
+      break;
+    case Save1:
+      returnValue = stateModel.getState2time();
+      break;
+    case Save2:
+      returnValue = stateModel.getState3time();
+      break;
+    case Save3:
+      returnValue = stateModel.getState4time();
+      break;
+    default:
+      break;
+    }
+    return returnValue;
   }
 
   private String getSnapshotFileName()
@@ -264,14 +289,14 @@ public class SaveStatePanel extends JPanel
       }
       if (modelScreenFile.isEmpty())
       {
-        currentScreenFile = "";
         getScreenshotLabel().setIcon(getMissingScreenshotImageIcon());
       }
-      else if (!modelScreenFile.equals(currentScreenFile))
+      else if (!model.getInfoModel().getGamesFile().equals(currentGameFile))
       {
         currentScreen1Image = loadScreen(modelScreenFile, getScreenshotLabel());
-        currentScreenFile = modelScreenFile;
       }
+      //Keep track of which game is selected
+      currentGameFile = model.getInfoModel().getGamesFile();
     }
   }
 
@@ -311,7 +336,7 @@ public class SaveStatePanel extends JPanel
       BufferedImage image = null;
       try
       {
-        image = ImageIO.read(FileManager.class.getResource("/se/lantz/MissingScreenshot-C64.png"));
+        image = ImageIO.read(FileManager.class.getResource("/se/lantz/EmptySaveSlot.png"));
         Image newImage = image.getScaledInstance(130, 82, Image.SCALE_SMOOTH);
         missingSceenshotIcon = new ImageIcon(newImage);
       }

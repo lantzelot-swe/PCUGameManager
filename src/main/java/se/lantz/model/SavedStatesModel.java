@@ -313,6 +313,10 @@ public class SavedStatesModel extends AbstractModel
     state2time = "00:00:00";
     state3time = "00:00:00";
     state4time = "00:00:00";
+    state1File = "";
+    state2File = "";
+    state3File = "";
+    state4File = "";
   }
   
   public void notifyChange()

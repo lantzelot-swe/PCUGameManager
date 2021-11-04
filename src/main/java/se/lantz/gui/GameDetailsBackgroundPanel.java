@@ -56,7 +56,7 @@ public class GameDetailsBackgroundPanel extends JPanel
   private JTabbedPane systemSavesTabbedPane;
   private CombinedJoystickPanel joystickPanel;
   private SystemPanel systemPanel;
-  private SavesBackgroundPanel savesBackgroundPanel;
+  private SaveStateBackgroundPanel savesBackgroundPanel;
   private JPanel buttonPanel;
   private JButton saveButton;
   private ScraperDialog scraperDialog = null;
@@ -219,11 +219,11 @@ public class GameDetailsBackgroundPanel extends JPanel
     return systemPanel;
   }
   
-  private SavesBackgroundPanel getSavesBackgroundPanel()
+  private SaveStateBackgroundPanel getSavesBackgroundPanel()
   {
     if (savesBackgroundPanel == null)
     {
-      savesBackgroundPanel = new SavesBackgroundPanel(model);
+      savesBackgroundPanel = new SaveStateBackgroundPanel(model);
       
     }
     return savesBackgroundPanel;

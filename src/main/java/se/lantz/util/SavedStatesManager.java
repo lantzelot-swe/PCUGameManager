@@ -1,8 +1,13 @@
 package se.lantz.util;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.TimeZone;
 
 import se.lantz.model.MainViewModel;
 import se.lantz.model.SavedStatesModel;
@@ -28,7 +33,7 @@ public class SavedStatesManager
 
   private SavedStatesModel savedStatesModel;
   private MainViewModel model;
-  
+
   public SavedStatesManager(MainViewModel model)
   {
     this.model = model;
@@ -40,7 +45,6 @@ public class SavedStatesManager
     //TODO Save saved states here if any changed
 
   }
-  
 
   public void readSavedStates()
   {
@@ -61,7 +65,7 @@ public class SavedStatesManager
           //Update model
           savedStatesModel.setState1File(saveFolder.resolve(VSZ0).toFile().getName());
           savedStatesModel.setState1PngFile(saveFolder.resolve(PNG0).toFile().getName());
-          //TODO: read time from mta first 3 bytes
+          savedStatesModel.setState1time(readPlayTime(mta0Path));
         }
         Path mta1Path = saveFolder.resolve(MTA1);
         if (Files.exists(mta1Path))
@@ -69,7 +73,7 @@ public class SavedStatesManager
           //Update model
           savedStatesModel.setState2File(saveFolder.resolve(VSZ1).toFile().getName());
           savedStatesModel.setState2PngFile(saveFolder.resolve(PNG1).toFile().getName());
-          //TODO: read time from mta first 3 bytes
+          savedStatesModel.setState2time(readPlayTime(mta1Path));
         }
         Path mta2Path = saveFolder.resolve(MTA2);
         if (Files.exists(mta2Path))
@@ -77,7 +81,7 @@ public class SavedStatesManager
           //Update model
           savedStatesModel.setState3File(saveFolder.resolve(VSZ2).toFile().getName());
           savedStatesModel.setState3PngFile(saveFolder.resolve(PNG2).toFile().getName());
-          //TODO: read time from mta first 3 bytes
+          savedStatesModel.setState3time(readPlayTime(mta2Path));
         }
         Path mta3Path = saveFolder.resolve(MTA3);
         if (Files.exists(mta3Path))
@@ -85,10 +89,41 @@ public class SavedStatesManager
           //Update model
           savedStatesModel.setState4File(saveFolder.resolve(VSZ3).toFile().getName());
           savedStatesModel.setState4PngFile(saveFolder.resolve(PNG3).toFile().getName());
-          //TODO: read time from mta first 3 bytes
+          savedStatesModel.setState4time(readPlayTime(mta3Path));
         }
       }
     }
+  }
+
+  private String readPlayTime(Path mtaFilePath)
+  {
+    String returnValue = "";
+    try
+    {
+      byte[] fileContent = Files.readAllBytes(mtaFilePath);
+
+      //First 4 bytes represents play time
+      byte[] timeArray = new byte[] { fileContent[0], fileContent[1], fileContent[2], fileContent[3] };
+      //The value seems to be in milliseconds
+      int milliSeconds = ByteBuffer.wrap(timeArray).order(java.nio.ByteOrder.LITTLE_ENDIAN).getInt();
+      System.out.println("24 bit value Little endian x= " + milliSeconds);
+      returnValue = convertSecondToHHMMString(milliSeconds);// LocalTime.MIN.plusSeconds(seconds).toString(); 
+      System.out.println("Converted string = " + returnValue);
+    }
+    catch (IOException e)
+    {
+      ExceptionHandler.handleException(e, "Could not read play time from " + mtaFilePath);
+    }
+    return returnValue;
+  }
+
+  private String convertSecondToHHMMString(int secondtTime)
+  {
+    TimeZone tz = TimeZone.getTimeZone("UTC");
+    SimpleDateFormat df = new SimpleDateFormat("HH:mm:ss");
+    df.setTimeZone(tz);
+    String time = df.format(new Date(secondtTime));
+    return time;
   }
 
 }
