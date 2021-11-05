@@ -3,7 +3,9 @@ package se.lantz.util;
 import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.nio.file.Files;
+import java.nio.file.OpenOption;
 import java.nio.file.Path;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -42,8 +44,38 @@ public class SavedStatesManager
 
   public void saveSavedStates()
   {
-    //TODO Save saved states here if any changed
-
+    //TODO How to handle when the title (and game name) is changed? 
+    
+    String fileName = model.getInfoModel().getGamesFile();
+    Path saveFolder = new File(SAVES + fileName).toPath();
+    if (Files.exists(saveFolder))
+    {
+      //Check which ones are available
+      Path mta0Path = saveFolder.resolve(MTA0);
+      if (Files.exists(mta0Path))
+      {
+        storePlayTime(mta0Path, savedStatesModel.getState1time());
+        //TODO: screen and vsz
+      }
+      Path mta1Path = saveFolder.resolve(MTA1);
+      if (Files.exists(mta1Path))
+      {
+        storePlayTime(mta1Path, savedStatesModel.getState2time());
+        //TODO: screen and vsz
+      }
+      Path mta2Path = saveFolder.resolve(MTA2);
+      if (Files.exists(mta2Path))
+      {
+        storePlayTime(mta2Path, savedStatesModel.getState3time());
+        //TODO: screen and vsz
+      }
+      Path mta3Path = saveFolder.resolve(MTA3);
+      if (Files.exists(mta3Path))
+      {
+        storePlayTime(mta3Path, savedStatesModel.getState4time());
+        //TODO: screen and vsz
+      }
+    }
   }
 
   public void readSavedStates()
@@ -116,7 +148,32 @@ public class SavedStatesManager
     }
     return returnValue;
   }
-
+  
+  private void storePlayTime(Path mtaFilePath, String playTime)
+  {
+    try
+    {
+      String[] timeparts = playTime.split(":");
+      int millis = (Integer.parseInt(timeparts[0])*3600 + Integer.parseInt(timeparts[1])*60 +  Integer.parseInt(timeparts[2]))*1000;
+      byte[] fileContent = Files.readAllBytes(mtaFilePath);
+      //Replace the first 4 bytes with the correct values
+      ByteBuffer b = ByteBuffer.allocate(4);
+      b.order(ByteOrder.LITTLE_ENDIAN);
+      b.putInt(millis);
+      byte[] result = b.array();
+      fileContent[0] = result[0];
+      fileContent[1] = result[1];
+      fileContent[2] = result[2];
+      fileContent[3] = result[3];
+      
+      Files.write(mtaFilePath, fileContent);
+    }
+    catch (IOException e)
+    {
+      ExceptionHandler.handleException(e, "Could not write play time to " + mtaFilePath);
+    }
+  }
+  
   private String convertSecondToHHMMString(int secondtTime)
   {
     TimeZone tz = TimeZone.getTimeZone("UTC");
