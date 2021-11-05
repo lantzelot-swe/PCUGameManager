@@ -1,15 +1,19 @@
 package se.lantz.util;
 
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.file.Files;
-import java.nio.file.OpenOption;
 import java.nio.file.Path;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.TimeZone;
+
+import javax.imageio.ImageIO;
+
+import org.apache.commons.io.FileUtils;
 
 import se.lantz.model.MainViewModel;
 import se.lantz.model.SavedStatesModel;
@@ -28,10 +32,10 @@ public class SavedStatesManager
   private static final String PNG2 = "2.png";
   private static final String PNG3 = "3.png";
 
-  private static final String VSZ0 = "0.vsz";
-  private static final String VSZ1 = "1.vsz";
-  private static final String VSZ2 = "2.vsz";
-  private static final String VSZ3 = "3.vsz";
+  public static final String VSZ0 = "0.vsz";
+  public static final String VSZ1 = "1.vsz";
+  public static final String VSZ2 = "2.vsz";
+  public static final String VSZ3 = "3.vsz";
 
   private SavedStatesModel savedStatesModel;
   private MainViewModel model;
@@ -52,28 +56,40 @@ public class SavedStatesManager
     {
       //Check which ones are available
       Path mta0Path = saveFolder.resolve(MTA0);
-      if (Files.exists(mta0Path))
+      Path vsz0Path = saveFolder.resolve(VSZ0);
+      Path png0Path = saveFolder.resolve(PNG0);
+      if (Files.exists(mta0Path) || savedStatesModel.getState1Path() != null)
       {
-        storePlayTime(mta0Path, savedStatesModel.getState1time());
-        //TODO: screen and vsz
+        storePlayTime(mta0Path, savedStatesModel.getState1time());       
+        copyVsfFile(vsz0Path, savedStatesModel.getState1Path());
+        copyPngFile(png0Path, savedStatesModel.getState1PngImage());
       }
       Path mta1Path = saveFolder.resolve(MTA1);
-      if (Files.exists(mta1Path))
+      Path vsz1Path = saveFolder.resolve(VSZ1);
+      Path png1Path = saveFolder.resolve(PNG1);
+      if (Files.exists(mta1Path) || savedStatesModel.getState2Path() != null)
       {
         storePlayTime(mta1Path, savedStatesModel.getState2time());
-        //TODO: screen and vsz
+        copyVsfFile(vsz1Path, savedStatesModel.getState2Path());
+        copyPngFile(png1Path, savedStatesModel.getState2PngImage());
       }
       Path mta2Path = saveFolder.resolve(MTA2);
-      if (Files.exists(mta2Path))
+      Path vsz2Path = saveFolder.resolve(VSZ2);
+      Path png2Path = saveFolder.resolve(PNG2);
+      if (Files.exists(mta2Path) || savedStatesModel.getState3Path() != null)
       {
         storePlayTime(mta2Path, savedStatesModel.getState3time());
-        //TODO: screen and vsz
+        copyVsfFile(vsz2Path, savedStatesModel.getState3Path());
+        copyPngFile(png2Path, savedStatesModel.getState3PngImage());
       }
       Path mta3Path = saveFolder.resolve(MTA3);
-      if (Files.exists(mta3Path))
+      Path vsz3Path = saveFolder.resolve(VSZ3);
+      Path png3Path = saveFolder.resolve(PNG3);
+      if (Files.exists(mta3Path) || savedStatesModel.getState4Path() != null)
       {
         storePlayTime(mta3Path, savedStatesModel.getState4time());
-        //TODO: screen and vsz
+        copyVsfFile(vsz3Path, savedStatesModel.getState4Path());
+        copyPngFile(png3Path, savedStatesModel.getState4PngImage());
       }
     }
   }
@@ -153,6 +169,11 @@ public class SavedStatesManager
   {
     try
     {
+      if (!mtaFilePath.toFile().exists())
+      {
+        FileUtils.copyInputStreamToFile(getClass().getResourceAsStream("/se/lantz/template.mta"), mtaFilePath.toFile());
+      }
+      
       String[] timeparts = playTime.split(":");
       int millis = (Integer.parseInt(timeparts[0])*3600 + Integer.parseInt(timeparts[1])*60 +  Integer.parseInt(timeparts[2]))*1000;
       byte[] fileContent = Files.readAllBytes(mtaFilePath);
@@ -181,6 +202,36 @@ public class SavedStatesManager
     df.setTimeZone(tz);
     String time = df.format(new Date(secondtTime));
     return time;
+  }
+  
+  private void copyVsfFile(Path target, Path source)
+  {
+    if (source != null)
+    {
+      try
+      {
+        FileManager.compressGzip(source, target);
+      }
+      catch (IOException e)
+      {
+        ExceptionHandler.handleException(e, "Could not compress vsf file");
+      }
+    }
+  }
+  
+  private void copyPngFile(Path target, BufferedImage image)
+  {
+    if (image != null)
+    {
+      try
+      {
+        ImageIO.write(image, "png", target.toFile());
+      }
+      catch (IOException e1)
+      {
+        ExceptionHandler.logException(e1, "Could not store screenshot");
+      }
+    }
   }
 
 }

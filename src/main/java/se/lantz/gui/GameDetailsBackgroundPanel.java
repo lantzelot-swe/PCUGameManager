@@ -168,7 +168,7 @@ public class GameDetailsBackgroundPanel extends JPanel
       gbc_systemPanel.gridy = 0;
       settingsPanel.add(getSystemSavesTabbedPane(), gbc_systemPanel);
       GridBagConstraints gbc_joystickPanel = new GridBagConstraints();
-      gbc_joystickPanel.insets = new Insets(0, 5, 0, 0);
+      gbc_joystickPanel.insets = new Insets(0, 0, 0, 0);
       gbc_joystickPanel.weighty = 1.0;
       gbc_joystickPanel.anchor = GridBagConstraints.NORTH;
       gbc_joystickPanel.fill = GridBagConstraints.BOTH;
@@ -224,7 +224,8 @@ public class GameDetailsBackgroundPanel extends JPanel
     if (savesBackgroundPanel == null)
     {
       savesBackgroundPanel = new SaveStateBackgroundPanel(model);
-      
+      savesBackgroundPanel
+      .setBorder(new TitledBorder(null, "", TitledBorder.LEADING, TitledBorder.TOP, null, null));
     }
     return savesBackgroundPanel;
   }
@@ -293,6 +294,8 @@ public class GameDetailsBackgroundPanel extends JPanel
         {
           public void actionPerformed(ActionEvent e)
           {
+            //Make sure any edits to time for saved states are commited.
+            savesBackgroundPanel.commitEdits();
             if (model.saveData())
             {
               getInfoBackgroundPanel().getScreensPanel().resetWhenSaved();

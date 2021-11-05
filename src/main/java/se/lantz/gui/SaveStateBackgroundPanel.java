@@ -72,4 +72,12 @@ public class SaveStateBackgroundPanel extends JPanel
     }
     return saveStatePanel4;
   }
+  
+  void commitEdits()
+  {
+    getSaveStatePanel1().commitEdits();
+    getSaveStatePanel2().commitEdits();
+    getSaveStatePanel3().commitEdits();
+    getSaveStatePanel4().commitEdits();
+  }
 }

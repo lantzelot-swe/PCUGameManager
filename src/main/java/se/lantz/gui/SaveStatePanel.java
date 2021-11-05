@@ -33,22 +33,24 @@ import javax.swing.text.MaskFormatter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import se.lantz.model.InfoModel;
 import se.lantz.model.MainViewModel;
 import se.lantz.model.SavedStatesModel;
 import se.lantz.model.SavedStatesModel.SAVESTATE;
+import se.lantz.util.ExceptionHandler;
 import se.lantz.util.FileDrop;
 import se.lantz.util.FileManager;
+import se.lantz.util.SavedStatesManager;
 
 public class SaveStatePanel extends JPanel
 {
+  private static final String SNAPSHOT_DIR_PROPERTY = "snapshotDir";
   private static final Logger logger = LoggerFactory.getLogger(SaveStatePanel.class);
   private JLabel screenshotLabel;
   private JTextField snapshotTextField;
   private MainViewModel model;
   private SavedStatesModel stateModel;
   private JButton snapshotButton;
-  private BufferedImage currentScreen1Image = null;
+  private BufferedImage currentScreenImage = null;
   private String currentGameFile = "";
   private ImageIcon missingSceenshotIcon = null;
   private JLabel timeLabel;
@@ -59,6 +61,9 @@ public class SaveStatePanel extends JPanel
   private SAVESTATE saveState;
   private JSeparator separator;
   private JButton screenshotButton;
+
+  private FileNameExtensionFilter imagefilter =
+    new FileNameExtensionFilter("png, gif, jpeg, bmp", "png", "gif", "jpg", "jpeg", "bmp");
 
   public SaveStatePanel(MainViewModel model, SAVESTATE saveState)
   {
@@ -108,12 +113,14 @@ public class SaveStatePanel extends JPanel
     gbc_timeLabel.gridy = 0;
     add(getTimeLabel(), gbc_timeLabel);
     GridBagConstraints gbc_snapshotLabel = new GridBagConstraints();
+    gbc_snapshotLabel.weightx = 1.0;
     gbc_snapshotLabel.insets = new Insets(5, 0, 0, 5);
     gbc_snapshotLabel.anchor = GridBagConstraints.NORTHWEST;
     gbc_snapshotLabel.gridx = 1;
     gbc_snapshotLabel.gridy = 0;
     add(getSnapshotLabel(), gbc_snapshotLabel);
     GridBagConstraints gbc_screenshotButton = new GridBagConstraints();
+    gbc_screenshotButton.weightx = 1.0;
     gbc_screenshotButton.anchor = GridBagConstraints.SOUTHWEST;
     gbc_screenshotButton.insets = new Insets(0, 0, 0, 5);
     gbc_screenshotButton.gridx = 1;
@@ -181,34 +188,9 @@ public class SaveStatePanel extends JPanel
     }
     // Read from model   
     getSnapshotTextField().setText(getSnapshotFileName());
-    getTimeField().setText(getPlayTime());
     reloadScreen();
     getRunButton().setEnabled(!getSnapshotTextField().getText().isEmpty());
     getTimeField().setEnabled(!getSnapshotTextField().getText().isEmpty());
-  }
-  
-  
-  private String getPlayTime()
-  {
-    String returnValue = "";
-    switch (saveState)
-    {
-    case Save0:
-      returnValue = stateModel.getState1time();
-      break;
-    case Save1:
-      returnValue = stateModel.getState2time();
-      break;
-    case Save2:
-      returnValue = stateModel.getState3time();
-      break;
-    case Save3:
-      returnValue = stateModel.getState4time();
-      break;
-    default:
-      break;
-    }
-    return returnValue;
   }
 
   private String getSnapshotFileName()
@@ -261,11 +243,12 @@ public class SaveStatePanel extends JPanel
     }
     if (screen1Image != null)
     {
-      if (!screen1Image.equals(currentScreen1Image))
+      if (!screen1Image.equals(currentScreenImage))
       {
         logger.debug("SETTING SCREEN 1 IMAGE");
-        getScreenshotLabel().setIcon(new ImageIcon(FileManager.scaleImageTo320x200x32bit(screen1Image)));
-        currentScreen1Image = screen1Image;
+        Image newImage = screen1Image.getScaledInstance(130, 82, Image.SCALE_SMOOTH);
+        getScreenshotLabel().setIcon(new ImageIcon(newImage));
+        currentScreenImage = screen1Image;
       }
     }
     else
@@ -295,7 +278,7 @@ public class SaveStatePanel extends JPanel
       }
       else if (!model.getInfoModel().getGamesFile().equals(currentGameFile))
       {
-        currentScreen1Image = loadScreen(modelScreenFile, getScreenshotLabel());
+        currentScreenImage = loadScreen(modelScreenFile, getScreenshotLabel());
       }
       //Keep track of which game is selected
       currentGameFile = model.getInfoModel().getGamesFile();
@@ -357,33 +340,12 @@ public class SaveStatePanel extends JPanel
     {
       screenshotLabel = new JLabel("");
       new FileDrop(screenshotLabel, new FileDrop.Listener()
-      {
-        public void filesDropped(java.io.File[] files)
         {
-          //TODO
-//          if (files.length > 0)
-//          {
-//            gamesFileUpdated = true;
-//            switch (saveState)
-//            {
-//            case Save0:
-//              stateModel.setState1Path(files[0].toPath());
-//              break;
-//            case Save1:
-//              stateModel.setState2Path(files[0].toPath());
-//              break;
-//            case Save2:
-//              stateModel.setState3Path(files[0].toPath());
-//              break;
-//            case Save3:
-//              stateModel.setState4Path(files[0].toPath());
-//              break;
-//            default:
-//              break;
-//            }
-//          }
-        }
-      });
+          public void filesDropped(java.io.File[] files)
+          {
+            setScreenshotFileToModel(files);
+          }
+        });
     }
     return screenshotLabel;
   }
@@ -394,7 +356,7 @@ public class SaveStatePanel extends JPanel
     {
       snapshotTextField = new JTextField();
       snapshotTextField.setEditable(false);
-      snapshotTextField.setPreferredSize(new Dimension(50, 20));
+      snapshotTextField.setPreferredSize(new Dimension(30, 20));
       new FileDrop(snapshotTextField, new FileDrop.Listener()
         {
           public void filesDropped(java.io.File[] files)
@@ -402,22 +364,9 @@ public class SaveStatePanel extends JPanel
             if (files.length > 0)
             {
               gamesFileUpdated = true;
-              switch (saveState)
+              if (files[0].getName().toLowerCase().endsWith(".vsf"))
               {
-              case Save0:
-                stateModel.setState1Path(files[0].toPath());
-                break;
-              case Save1:
-                stateModel.setState2Path(files[0].toPath());
-                break;
-              case Save2:
-                stateModel.setState3Path(files[0].toPath());
-                break;
-              case Save3:
-                stateModel.setState4Path(files[0].toPath());
-                break;
-              default:
-                break;
+                setSnapshotFileToModel(files[0]);
               }
             }
           }
@@ -447,9 +396,9 @@ public class SaveStatePanel extends JPanel
   private void selectSnapshotFile()
   {
     final JFileChooser fileChooser = new JFileChooser();
-    fileChooser.setDialogTitle("Select a valid game file for " + model.getInfoModel().getTitle());
+    fileChooser.setDialogTitle("Select a Vice snapsot file for " + model.getInfoModel().getTitle());
     fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-    String gameDir = null; //FileManager.getConfiguredProperties().getProperty(GAME_DIR_PROPERTY);
+    String gameDir = FileManager.getConfiguredProperties().getProperty(SNAPSHOT_DIR_PROPERTY);
     if (gameDir == null)
     {
       gameDir = ".";
@@ -463,25 +412,34 @@ public class SaveStatePanel extends JPanel
     if (value == JFileChooser.APPROVE_OPTION)
     {
       File selectedFile = fileChooser.getSelectedFile();
-      //      FileManager.getConfiguredProperties().put(GAME_DIR_PROPERTY, selectedFile.toPath().getParent().toString());
+      FileManager.getConfiguredProperties().put(SNAPSHOT_DIR_PROPERTY, selectedFile.toPath().getParent().toString());
       gamesFileUpdated = true;
-      switch (saveState)
-      {
-      case Save0:
-        stateModel.setState1Path(selectedFile.toPath());
-        break;
-      case Save1:
-        stateModel.setState2Path(selectedFile.toPath());
-        break;
-      case Save2:
-        stateModel.setState3Path(selectedFile.toPath());
-        break;
-      case Save3:
-        stateModel.setState4Path(selectedFile.toPath());
-        break;
-      default:
-        break;
-      }
+      setSnapshotFileToModel(selectedFile);
+    }
+  }
+  
+  private void setSnapshotFileToModel(File file)
+  {
+    switch (saveState)
+    {
+    case Save0:
+      stateModel.setState1File(SavedStatesManager.VSZ0);
+      stateModel.setState1Path(file.toPath());
+      break;
+    case Save1:
+      stateModel.setState2File(SavedStatesManager.VSZ1);
+      stateModel.setState2Path(file.toPath());
+      break;
+    case Save2:
+      stateModel.setState3File(SavedStatesManager.VSZ2);
+      stateModel.setState3Path(file.toPath());
+      break;
+    case Save3:
+      stateModel.setState4File(SavedStatesManager.VSZ3);
+      stateModel.setState4Path(file.toPath());
+      break;
+    default:
+      break;
     }
   }
 
@@ -544,30 +502,36 @@ public class SaveStatePanel extends JPanel
             }
             catch (ParseException e1)
             {
-              e1.printStackTrace();
+              ExceptionHandler.handleException(e1, "");
             }
-            switch (saveState)
-            {
-            case Save0:
-              stateModel.setState1time(timeField.getValue().toString());
-              break;
-            case Save1:
-              stateModel.setState2time(timeField.getValue().toString());
-              break;
-            case Save2:
-              stateModel.setState3time(timeField.getValue().toString());
-              break;
-            case Save3:
-              stateModel.setState4time(timeField.getValue().toString());
-              break;
-            default:
-              break;
-            }
+            setTimeToModel();
           }
         });
       timeField.setPreferredSize(new Dimension(55, 20));
+      timeField.setMinimumSize(new Dimension(55, 20));
     }
     return timeField;
+  }
+
+  private void setTimeToModel()
+  {
+    switch (saveState)
+    {
+    case Save0:
+      stateModel.setState1time(timeField.getText().toString());
+      break;
+    case Save1:
+      stateModel.setState2time(timeField.getText().toString());
+      break;
+    case Save2:
+      stateModel.setState3time(timeField.getText().toString());
+      break;
+    case Save3:
+      stateModel.setState4time(timeField.getText().toString());
+      break;
+    default:
+      break;
+    }
   }
 
   private JButton getRunButton()
@@ -604,11 +568,87 @@ public class SaveStatePanel extends JPanel
         {
           public void actionPerformed(ActionEvent e)
           {
-            //TODO
+            selectScreenshotFile();
           }
         });
       screenshotButton.setMargin(new Insets(1, 3, 1, 3));
     }
     return screenshotButton;
+  }
+
+  private void selectScreenshotFile()
+  {
+    final JFileChooser fileChooser = new JFileChooser();
+    fileChooser.setDialogTitle("Select screenshot for " + model.getInfoModel().getTitle() + " snapshot");
+    fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+    String screensDir = FileManager.getConfiguredProperties().getProperty(SNAPSHOT_DIR_PROPERTY);
+    if (screensDir == null)
+    {
+      screensDir = ".";
+    }
+    fileChooser.setCurrentDirectory(new File(screensDir));
+    fileChooser.addChoosableFileFilter(imagefilter);
+    fileChooser.setFileFilter(imagefilter);
+    int value = fileChooser.showOpenDialog(MainWindow.getInstance());
+    if (value == JFileChooser.APPROVE_OPTION)
+    {
+      File selectedFile = fileChooser.getSelectedFile();
+      FileManager.getConfiguredProperties().put(SNAPSHOT_DIR_PROPERTY, selectedFile.toPath().getParent().toString());
+      setScreenshotFileToModel(new File[] {selectedFile});
+    }
+  }
+  
+  private void setScreenshotFileToModel(File[] files)
+  {
+    switch (saveState)
+    {
+    case Save0:
+      stateModel.setState1PngImage(handleScreenFileDrop(files, getScreenshotLabel()));
+      break;
+    case Save1:
+      stateModel.setState2PngImage(handleScreenFileDrop(files, getScreenshotLabel()));
+      break;
+    case Save2:
+      stateModel.setState3PngImage(handleScreenFileDrop(files, getScreenshotLabel()));
+      break;
+    case Save3:
+      stateModel.setState4PngImage(handleScreenFileDrop(files, getScreenshotLabel()));
+      break;
+    default:
+      break;
+    }
+  }
+
+  private BufferedImage handleScreenFileDrop(File[] files, JLabel imageLabel)
+  {
+    BufferedImage returnImage = null;
+    if (files.length > 0)
+    {
+      try
+      {
+        returnImage = ImageIO.read(files[0]);
+        Image newImage = returnImage.getScaledInstance(130, 82, Image.SCALE_SMOOTH);
+        imageLabel.setIcon(new ImageIcon(newImage));
+      }
+      catch (IOException e)
+      {
+        logger.error("can't read file: " + files[0].getName(), e);
+        imageLabel.setIcon(getMissingScreenshotImageIcon());
+      }
+    }
+    return returnImage;
+  }
+
+  void commitEdits()
+  {
+    try
+    {
+      timeField.commitEdit();
+    }
+    catch (ParseException e1)
+    {
+      ExceptionHandler.handleException(e1, "");
+    }
+    setTimeToModel();
   }
 }
