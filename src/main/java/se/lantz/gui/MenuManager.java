@@ -32,15 +32,19 @@ import se.lantz.gui.dbrestore.RestoreWorker;
 import se.lantz.gui.exports.ExportFileLoaderWorker;
 import se.lantz.gui.exports.ExportGamesDialog;
 import se.lantz.gui.exports.ExportProgressDialog;
+import se.lantz.gui.exports.ExportSavedStatesDialog;
+import se.lantz.gui.exports.ExportSavedStatesWorker;
 import se.lantz.gui.exports.ExportWorker;
 import se.lantz.gui.imports.CarouselImportWorker;
 import se.lantz.gui.imports.GamebaseImportWorker;
 import se.lantz.gui.imports.ImportOptionsDialog;
 import se.lantz.gui.imports.ImportProgressDialog;
+import se.lantz.gui.imports.ImportSavedStatesDialog;
 import se.lantz.manager.BackupManager;
 import se.lantz.manager.ExportManager;
 import se.lantz.manager.ImportManager;
 import se.lantz.manager.RestoreManager;
+import se.lantz.manager.SavedStatesManager;
 import se.lantz.model.MainViewModel;
 import se.lantz.model.data.GameListData;
 import se.lantz.model.data.GameView;
@@ -63,8 +67,10 @@ public class MenuManager
   private JMenuItem runGameItem;
   private JMenuItem importCarouselItem;
   private JMenuItem importGamebaseItem;
+  private JMenuItem importSavedStatesItem;
   private JMenuItem exportItem;
   private JMenuItem exportFLItem;
+  private JMenuItem exportSavedStatesItem;
   private JMenuItem refreshItem;
 
   private JMenuItem toggleFavorite1Item;
@@ -95,7 +101,6 @@ public class MenuManager
 
   private JMenuItem convertScreensItem;
   private JMenuItem checkDescrItem;
-  private JMenuItem gzipVsfFileItem;
 
   private JMenuItem helpItem;
   private JMenuItem aboutItem;
@@ -108,6 +113,7 @@ public class MenuManager
   private ExportManager exportManager;
   private BackupManager backupManager;
   private RestoreManager restoreManager;
+  private SavedStatesManager savedStatesManager;
   private MainWindow mainWindow;
 
   public MenuManager(final MainViewModel uiModel, MainWindow mainWindow)
@@ -119,6 +125,8 @@ public class MenuManager
     this.exportManager = new ExportManager(uiModel);
     this.backupManager = new BackupManager(uiModel);
     this.restoreManager = new RestoreManager(uiModel);
+    this.savedStatesManager = new SavedStatesManager(uiModel);
+    uiModel.setSavedStatesManager(savedStatesManager);
     setupMenues();
   }
 
@@ -141,10 +149,12 @@ public class MenuManager
     fileMenu.add(importMenu);
     importMenu.add(getImportCarouselItem());
     importMenu.add(getImportGamebaseItem());
+    importMenu.add(getImportSavedStatesItem());
     exportMenu = new JMenu("Export");
-    exportMenu.setMnemonic('X');
+    exportMenu.setMnemonic('E');
     exportMenu.add(getExportItem());
     exportMenu.add(getExportFileLoaderItem());
+    exportMenu.add(getExportSavedStatesItem());
     fileMenu.add(exportMenu);
     fileMenu.addSeparator();
     fileMenu.add(getRefreshItem());
@@ -183,7 +193,6 @@ public class MenuManager
     toolsMenu.addSeparator();
     toolsMenu.add(getConvertScreensItem());
     toolsMenu.add(getCheckDescriptionsItem());
-    toolsMenu.add(getGzipVsfFileItem());
     helpMenu = new JMenu("Help");
     helpMenu.setMnemonic('H');
     helpMenu.add(getHelpItem());
@@ -220,7 +229,7 @@ public class MenuManager
     addGameItem = new JMenuItem("Add new game");
     KeyStroke keyStrokeToAddGame = KeyStroke.getKeyStroke(KeyEvent.VK_N, InputEvent.CTRL_DOWN_MASK);
     addGameItem.setAccelerator(keyStrokeToAddGame);
-    addGameItem.setMnemonic('N');
+    addGameItem.setMnemonic('A');
 
     addGameItem.addActionListener(e -> mainWindow.getMainPanel().addNewGame());
     return addGameItem;
@@ -276,6 +285,14 @@ public class MenuManager
     return importGamebaseItem;
   }
 
+  private JMenuItem getImportSavedStatesItem()
+  {
+    importSavedStatesItem = new JMenuItem("Import Saved states...");
+    importSavedStatesItem.setMnemonic('S');
+    importSavedStatesItem.addActionListener(e -> importSavedStates());
+    return importSavedStatesItem;
+  }
+
   private JMenuItem getExportItem()
   {
     exportItem = new JMenuItem("Export to Carousel...");
@@ -294,6 +311,14 @@ public class MenuManager
     exportFLItem.setMnemonic('L');
     exportFLItem.addActionListener(e -> exportGamesToFileLoader());
     return exportFLItem;
+  }
+
+  private JMenuItem getExportSavedStatesItem()
+  {
+    exportSavedStatesItem = new JMenuItem("Export Saved states...");
+    exportSavedStatesItem.setMnemonic('S');
+    exportSavedStatesItem.addActionListener(e -> exportSavedStates());
+    return exportSavedStatesItem;
   }
 
   private JMenuItem getRefreshItem()
@@ -632,14 +657,6 @@ public class MenuManager
     checkDescrItem.addActionListener(e -> fixInvalidCharsInDescriptions());
     return checkDescrItem;
   }
-  
-  private JMenuItem getGzipVsfFileItem()
-  {
-    gzipVsfFileItem = new JMenuItem("Gzip .VSF file...");
-    gzipVsfFileItem.setMnemonic('e');
-    gzipVsfFileItem.addActionListener(e -> gZipVsfFile());
-    return gzipVsfFileItem;
-  }
 
   private JMenuItem getHelpItem()
   {
@@ -741,6 +758,33 @@ public class MenuManager
     }
   }
 
+  private void importSavedStates()
+  {
+    final ImportSavedStatesDialog importSavedStatesDialog = new ImportSavedStatesDialog(MainWindow.getInstance());
+    importSavedStatesDialog.pack();
+    importSavedStatesDialog.setLocationRelativeTo(this.mainWindow);
+    if (importSavedStatesDialog.showDialog())
+    {
+      //Import here, delegate to SavedStatesManager
+    }
+  }
+
+  private void exportSavedStates()
+  {
+    final ExportSavedStatesDialog exportSavedStatesDialog = new ExportSavedStatesDialog(MainWindow.getInstance());
+    exportSavedStatesDialog.pack();
+    exportSavedStatesDialog.setLocationRelativeTo(this.mainWindow);
+    if (exportSavedStatesDialog.showDialog())
+    {
+      savedStatesManager.setExportDirectory(exportSavedStatesDialog.getTargetDirectory());
+      savedStatesManager.setExportOverwrite(exportSavedStatesDialog.isExportOverwrite());
+      ExportProgressDialog dialog = new ExportProgressDialog(this.mainWindow, "Export saved states");
+      ExportSavedStatesWorker worker = new ExportSavedStatesWorker(savedStatesManager, dialog);
+      worker.execute();
+      dialog.setVisible(true);
+    }
+  }
+
   private void exportGames()
   {
     final ExportGamesDialog exportSelectionDialog = new ExportGamesDialog(MainWindow.getInstance(), true);
@@ -756,7 +800,7 @@ public class MenuManager
           exportManager.setGameViewsToExport(viewList);
           exportManager.setTargetDirectory(exportSelectionDialog.getTargetDirectory(),
                                            exportSelectionDialog.deleteBeforeExport());
-          ExportProgressDialog dialog = new ExportProgressDialog(this.mainWindow);
+          ExportProgressDialog dialog = new ExportProgressDialog(this.mainWindow, "Export games");
           ExportWorker worker = new ExportWorker(exportManager, dialog);
           worker.execute();
           dialog.setVisible(true);
@@ -770,7 +814,7 @@ public class MenuManager
           exportManager.setGamesToExport(gamesList);
           exportManager.setTargetDirectory(exportSelectionDialog.getTargetDirectory(),
                                            exportSelectionDialog.deleteBeforeExport());
-          ExportProgressDialog dialog = new ExportProgressDialog(this.mainWindow);
+          ExportProgressDialog dialog = new ExportProgressDialog(this.mainWindow, "Export games");
           ExportWorker worker = new ExportWorker(exportManager, dialog);
           worker.execute();
           dialog.setVisible(true);
@@ -794,7 +838,7 @@ public class MenuManager
           exportManager.setGameViewsToExport(viewList);
           exportManager.setTargetDirectory(exportSelectionDialog.getTargetDirectory(),
                                            exportSelectionDialog.deleteBeforeExport());
-          ExportProgressDialog dialog = new ExportProgressDialog(this.mainWindow);
+          ExportProgressDialog dialog = new ExportProgressDialog(this.mainWindow, "Export games");
           ExportFileLoaderWorker worker = new ExportFileLoaderWorker(exportManager, dialog);
           worker.execute();
           dialog.setVisible(true);
@@ -808,7 +852,7 @@ public class MenuManager
           exportManager.setGamesToExport(gamesList);
           exportManager.setTargetDirectory(exportSelectionDialog.getTargetDirectory(),
                                            exportSelectionDialog.deleteBeforeExport());
-          ExportProgressDialog dialog = new ExportProgressDialog(this.mainWindow);
+          ExportProgressDialog dialog = new ExportProgressDialog(this.mainWindow, "Export games");
           ExportFileLoaderWorker worker = new ExportFileLoaderWorker(exportManager, dialog);
           worker.execute();
           dialog.setVisible(true);
@@ -924,42 +968,6 @@ public class MenuManager
       CheckDescrWorker worker = new CheckDescrWorker(dialog, this.uiModel.getDbConnector());
       worker.execute();
       dialog.setVisible(true);
-    }
-  }
-  
-  private void gZipVsfFile()
-  {
-    //TODO: Create a default png screenshot to use, and a default .mta file with some time (1 minute?) Look at an existing
-    //in the HEX editor at "hexed.it", the first 3 bytes, "24-bit heltal" to the left, specifies the time. 
-    
-    //import save states: select the ".THEC64SAVE" dir on a stick and read all matching folders (named after the executable file in the game manager).
-    //add to a new directory perhaps? With subfolders named after the game executable? 
-    
-    //Export save states: export existing ones to a  ".THEC64SAVE" folder you choose.
-    
-    //Add 4 save slots somewhere in the UI. Allow for selecting a screenshot, a vsf file and specify a "playtime" value that can be used to generate the mta file.
-    
-    final JFileChooser fileChooser = new JFileChooser();
-    fileChooser.setDialogTitle("Select a valid vsf file");
-    fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-    fileChooser.setCurrentDirectory(new File("."));
-
-    FileNameExtensionFilter vicefilter =
-      new FileNameExtensionFilter("Vice snapshot", "vsf");
-    fileChooser.addChoosableFileFilter(vicefilter);
-    fileChooser.setFileFilter(vicefilter);
-    int value = fileChooser.showOpenDialog(MainWindow.getInstance());
-    if (value == JFileChooser.APPROVE_OPTION)
-    {
-      File selectedFile = fileChooser.getSelectedFile();
-      try
-      {
-        FileManager.compressGzip(selectedFile.toPath(), selectedFile.toPath().getParent().resolve("1.vsz"));
-      }
-      catch (IOException e)
-      {
-        ExceptionHandler.handleException(e, "");
-      }
     }
   }
 

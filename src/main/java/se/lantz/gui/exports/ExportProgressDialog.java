@@ -11,9 +11,9 @@ public class ExportProgressDialog extends JDialog
 
   private ExportProgressPanel panel;
 
-  public ExportProgressDialog(Frame frame)
+  public ExportProgressDialog(Frame frame, String title)
   {
-    super(frame,"Export games", true);
+    super(frame, title, true);
     this.add(getExportProgressPanel());
     setSize(900, 600);
     setLocationRelativeTo(frame);

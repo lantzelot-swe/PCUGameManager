@@ -33,13 +33,13 @@ import javax.swing.text.MaskFormatter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import se.lantz.manager.SavedStatesManager;
 import se.lantz.model.MainViewModel;
 import se.lantz.model.SavedStatesModel;
 import se.lantz.model.SavedStatesModel.SAVESTATE;
 import se.lantz.util.ExceptionHandler;
 import se.lantz.util.FileDrop;
 import se.lantz.util.FileManager;
-import se.lantz.util.SavedStatesManager;
 
 public class SaveStatePanel extends JPanel
 {
@@ -417,7 +417,7 @@ public class SaveStatePanel extends JPanel
       setSnapshotFileToModel(selectedFile);
     }
   }
-  
+
   private void setSnapshotFileToModel(File file)
   {
     switch (saveState)
@@ -480,6 +480,24 @@ public class SaveStatePanel extends JPanel
 
       timeField.addKeyListener(new KeyAdapter()
         {
+          /**
+           * Handles increase/decrease of time value with arrow buttons
+           * 
+           * @param e keyevent
+           */
+          @Override
+          public void keyPressed(KeyEvent e)
+          {
+            if (e.getKeyCode() == KeyEvent.VK_UP)
+            {
+              increaseTime(timeField.getCaretPosition());
+            }
+            else if (e.getKeyCode() == KeyEvent.VK_DOWN)
+            {
+              decreaseTime(timeField.getCaretPosition());
+            }
+          }
+
           @Override
           public void keyReleased(KeyEvent e)
           {
@@ -511,6 +529,96 @@ public class SaveStatePanel extends JPanel
       timeField.setMinimumSize(new Dimension(55, 20));
     }
     return timeField;
+  }
+
+  private void increaseTime(int caretPosition)
+  {
+    String currentTime = timeField.getText().toString();
+    String[] splitTime = currentTime.split(":");
+    if (caretPosition < 2)
+    {
+      int newValue = Integer.parseInt(splitTime[0]) + 1;
+      if (newValue < 10)
+      {
+        splitTime[0] = "0" + Integer.toString(newValue);
+      }
+      else if (newValue < 100)
+      {
+        splitTime[0] = Integer.toString(newValue);
+      }
+    }
+    else if (caretPosition < 6)
+    {
+      int newValue = Integer.parseInt(splitTime[1]) + 1;
+      if (newValue < 10)
+      {
+        splitTime[1] = "0" + Integer.toString(newValue);
+      }
+      else if (newValue < 60)
+      {
+        splitTime[1] = Integer.toString(newValue);
+      }
+    }
+    else if (caretPosition < 9)
+    {
+      int newValue = Integer.parseInt(splitTime[2]) + 1;
+      if (newValue < 10)
+      {
+        splitTime[2] = "0" + Integer.toString(newValue);
+      }
+      else if (newValue < 60)
+      {
+        splitTime[2] = Integer.toString(newValue);
+      }
+    }
+
+    timeField.setText(splitTime[0] + ":" + splitTime[1] + ":" + splitTime[2]);
+    timeField.setCaretPosition(caretPosition);
+  }
+
+  private void decreaseTime(int caretPosition)
+  {
+    String currentTime = timeField.getText().toString();
+    String[] splitTime = currentTime.split(":");
+    if (caretPosition < 2)
+    {
+      int newValue = Integer.parseInt(splitTime[0]) - 1;
+      if (newValue < 10)
+      {
+        splitTime[0] = "0" + Integer.toString(newValue);
+      }
+      else if (newValue > 0)
+      {
+        splitTime[0] = Integer.toString(newValue);
+      }
+    }
+    else if (caretPosition < 6)
+    {
+      int newValue = Integer.parseInt(splitTime[1]) - 1;
+      if (newValue < 10)
+      {
+        splitTime[1] = "0" + Integer.toString(newValue);
+      }
+      else if (newValue > 0)
+      {
+        splitTime[1] = Integer.toString(newValue);
+      }
+    }
+    else if (caretPosition < 9)
+    {
+      int newValue = Integer.parseInt(splitTime[2]) - 1;
+      if (newValue < 10)
+      {
+        splitTime[2] = "0" + Integer.toString(newValue);
+      }
+      else if (newValue > 0)
+      {
+        splitTime[2] = Integer.toString(newValue);
+      }
+    }
+
+    timeField.setText(splitTime[0] + ":" + splitTime[1] + ":" + splitTime[2]);
+    timeField.setCaretPosition(caretPosition);
   }
 
   private void setTimeToModel()
@@ -594,10 +702,10 @@ public class SaveStatePanel extends JPanel
     {
       File selectedFile = fileChooser.getSelectedFile();
       FileManager.getConfiguredProperties().put(SNAPSHOT_DIR_PROPERTY, selectedFile.toPath().getParent().toString());
-      setScreenshotFileToModel(new File[] {selectedFile});
+      setScreenshotFileToModel(new File[] { selectedFile });
     }
   }
-  
+
   private void setScreenshotFileToModel(File[] files)
   {
     switch (saveState)

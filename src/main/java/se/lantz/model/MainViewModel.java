@@ -15,13 +15,13 @@ import org.slf4j.LoggerFactory;
 
 import se.lantz.db.DbConnector;
 import se.lantz.manager.ImportManager;
+import se.lantz.manager.SavedStatesManager;
 import se.lantz.model.data.GameDetails;
 import se.lantz.model.data.GameListData;
 import se.lantz.model.data.GameView;
 import se.lantz.scraper.MobyGamesScraper;
 import se.lantz.scraper.Scraper;
 import se.lantz.util.FileManager;
-import se.lantz.util.SavedStatesManager;
 import se.lantz.util.TextComponentSupport;
 
 public class MainViewModel extends AbstractModel
@@ -63,7 +63,7 @@ public class MainViewModel extends AbstractModel
   private SavedStatesModel stateModel = new SavedStatesModel();
 
   private FileManager fileManager = new FileManager(this);
-  private SavedStatesManager stateManager = new SavedStatesManager(this);
+  private SavedStatesManager stateManager;
 
   private String currentGameId = "";
   private GameDetails currentGameDetails = null;
@@ -72,6 +72,11 @@ public class MainViewModel extends AbstractModel
   private GameListData selectedData;
 
   Scraper scraper = new MobyGamesScraper();
+  
+  public void setSavedStatesManager(SavedStatesManager savedStatesManager)
+  {
+    this.stateManager = savedStatesManager;
+  }
 
   public void initialize()
   {

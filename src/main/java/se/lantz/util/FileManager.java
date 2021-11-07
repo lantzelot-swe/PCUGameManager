@@ -43,6 +43,7 @@ import com.github.junrar.Archive;
 import com.github.junrar.rarfile.FileHeader;
 
 import se.lantz.db.DbConnector;
+import se.lantz.manager.SavedStatesManager;
 import se.lantz.model.InfoModel;
 import se.lantz.model.MainViewModel;
 import se.lantz.model.SavedStatesModel;
@@ -140,11 +141,12 @@ public class FileManager
         if (cover.getWidth() != 122 || cover.getHeight() != 175)
         {
           Image scaledCoverImage = cover.getScaledInstance(122, 175, Image.SCALE_SMOOTH);
-          imageToSave =
-            new BufferedImage(scaledCoverImage.getWidth(null), scaledCoverImage.getHeight(null), BufferedImage.TYPE_INT_ARGB);
+          imageToSave = new BufferedImage(scaledCoverImage.getWidth(null),
+                                          scaledCoverImage.getHeight(null),
+                                          BufferedImage.TYPE_INT_ARGB);
           Graphics g = imageToSave.createGraphics();
           g.drawImage(scaledCoverImage, 0, 0, null);
-          g.dispose();         
+          g.dispose();
         }
         File outputfile = new File(COVERS + coverFileName);
         ImageIO.write(imageToSave, "png", outputfile);
@@ -222,7 +224,7 @@ public class FileManager
       }
     }
   }
-  
+
   public static boolean shouldCompressFile(String filePath)
   {
     String lowerCasePath = filePath.toLowerCase();
@@ -484,8 +486,7 @@ public class FileManager
   {
     return description.replaceAll("-", " ");
   }
-  
-  
+
   public void runGameInVice()
   {
     String gamePathString = "";
@@ -501,31 +502,31 @@ public class FileManager
     }
     runVice(true, gamePathString);
   }
-  
+
   public void runViceWithoutGame()
   {
     runVice(false, "");
   }
-  
+
   public void runSnapshotInVice(SAVESTATE saveState)
   {
     String gamePathString = "";
     Path vsfPath;
     switch (saveState)
     {
-      case Save0:
+    case Save0:
+    {
+      //Use path if available, otherwise the available game in /games.
+      vsfPath = savedStatesModel.getState1Path();
+      if (vsfPath != null)
       {
-        //Use path if available, otherwise the available game in /games.
-        vsfPath = savedStatesModel.getState1Path();
-        if (vsfPath != null)
-        {
-          gamePathString = vsfPath.toString();
-        }
-        else
-        {
-          gamePathString = SavedStatesManager.SAVES + infoModel.getGamesFile() + "/" + savedStatesModel.getState1File();
-        }
+        gamePathString = vsfPath.toString();
       }
+      else
+      {
+        gamePathString = SavedStatesManager.SAVES + infoModel.getGamesFile() + "/" + savedStatesModel.getState1File();
+      }
+    }
       break;
     case Save1:
       //Use path if available, otherwise the available game in /games.
@@ -568,7 +569,7 @@ public class FileManager
     }
     runVice(true, gamePathString);
   }
-  
+
   private void runVice(boolean appendGame, String gamePath)
   {
     StringBuilder command = new StringBuilder();
@@ -636,8 +637,8 @@ public class FileManager
 
     //Append game to autostart (not saved snapshots)
     if (appendGame && !gamePath.contains(".vsz"))
-    {     
-      appendCorrectFlagForGameFile(gamePath, command);  
+    {
+      appendCorrectFlagForGameFile(gamePath, command);
     }
 
     //Append truedrive
@@ -675,7 +676,7 @@ public class FileManager
         command.append("-joydev2 1");
       }
     }
-    
+
     //Used for saved snapshots, must be at the end of the commands
     if (appendGame && gamePath.contains(".vsz"))
     {

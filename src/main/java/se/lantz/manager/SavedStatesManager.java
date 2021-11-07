@@ -1,4 +1,4 @@
-package se.lantz.util;
+package se.lantz.manager;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -7,9 +7,11 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.TimeZone;
+import java.util.stream.Stream;
 
 import javax.imageio.ImageIO;
 
@@ -17,6 +19,8 @@ import org.apache.commons.io.FileUtils;
 
 import se.lantz.model.MainViewModel;
 import se.lantz.model.SavedStatesModel;
+import se.lantz.util.ExceptionHandler;
+import se.lantz.util.FileManager;
 
 public class SavedStatesManager
 {
@@ -40,6 +44,12 @@ public class SavedStatesManager
   private SavedStatesModel savedStatesModel;
   private MainViewModel model;
 
+  private File exportDir;
+
+  private boolean exportOverwrite;
+
+  private int noFilesCopied = 0;
+
   public SavedStatesManager(MainViewModel model)
   {
     this.model = model;
@@ -49,7 +59,7 @@ public class SavedStatesManager
   public void saveSavedStates()
   {
     //TODO How to handle when the title (and game name) is changed? 
-    
+
     String fileName = model.getInfoModel().getGamesFile();
     Path saveFolder = new File(SAVES + fileName).toPath();
     if (Files.exists(saveFolder))
@@ -60,7 +70,7 @@ public class SavedStatesManager
       Path png0Path = saveFolder.resolve(PNG0);
       if (Files.exists(mta0Path) || savedStatesModel.getState1Path() != null)
       {
-        storePlayTime(mta0Path, savedStatesModel.getState1time());       
+        storePlayTime(mta0Path, savedStatesModel.getState1time());
         copyVsfFile(vsz0Path, savedStatesModel.getState1Path());
         copyPngFile(png0Path, savedStatesModel.getState1PngImage());
       }
@@ -164,7 +174,7 @@ public class SavedStatesManager
     }
     return returnValue;
   }
-  
+
   private void storePlayTime(Path mtaFilePath, String playTime)
   {
     try
@@ -173,9 +183,11 @@ public class SavedStatesManager
       {
         FileUtils.copyInputStreamToFile(getClass().getResourceAsStream("/se/lantz/template.mta"), mtaFilePath.toFile());
       }
-      
+
       String[] timeparts = playTime.split(":");
-      int millis = (Integer.parseInt(timeparts[0])*3600 + Integer.parseInt(timeparts[1])*60 +  Integer.parseInt(timeparts[2]))*1000;
+      int millis =
+        (Integer.parseInt(timeparts[0]) * 3600 + Integer.parseInt(timeparts[1]) * 60 + Integer.parseInt(timeparts[2])) *
+          1000;
       byte[] fileContent = Files.readAllBytes(mtaFilePath);
       //Replace the first 4 bytes with the correct values
       ByteBuffer b = ByteBuffer.allocate(4);
@@ -186,7 +198,7 @@ public class SavedStatesManager
       fileContent[1] = result[1];
       fileContent[2] = result[2];
       fileContent[3] = result[3];
-      
+
       Files.write(mtaFilePath, fileContent);
     }
     catch (IOException e)
@@ -194,7 +206,7 @@ public class SavedStatesManager
       ExceptionHandler.handleException(e, "Could not write play time to " + mtaFilePath);
     }
   }
-  
+
   private String convertSecondToHHMMString(int secondtTime)
   {
     TimeZone tz = TimeZone.getTimeZone("UTC");
@@ -203,7 +215,7 @@ public class SavedStatesManager
     String time = df.format(new Date(secondtTime));
     return time;
   }
-  
+
   private void copyVsfFile(Path target, Path source)
   {
     if (source != null)
@@ -218,7 +230,7 @@ public class SavedStatesManager
       }
     }
   }
-  
+
   private void copyPngFile(Path target, BufferedImage image)
   {
     if (image != null)
@@ -234,4 +246,67 @@ public class SavedStatesManager
     }
   }
 
+  public void setExportDirectory(File exportDir)
+  {
+    this.exportDir = exportDir;
+  }
+
+  public void setExportOverwrite(boolean exportOverwrite)
+  {
+    this.exportOverwrite = exportOverwrite;
+  }
+
+  public boolean isExportOverwrite()
+  {
+    return this.exportOverwrite;
+  }
+
+  public void exportSavedStates(StringBuilder infoBuilder)
+  {
+    noFilesCopied = 0;
+    File saveFolder = new File(SAVES);
+    try (Stream<Path> stream = Files.walk(saveFolder.toPath().toAbsolutePath()))
+    {
+      stream.forEachOrdered(sourcePath -> {
+        try
+        {
+          //Ignore first folder
+          if (sourcePath.equals(saveFolder.toPath().toAbsolutePath()))
+          {
+            return;
+          }      
+          Path destinationPath = exportDir.toPath().resolve(saveFolder.toPath().toAbsolutePath().relativize(sourcePath));
+          //Ignore already existing directories: Files.copy() throws DirectoryNotEmptyException for them
+          if (destinationPath.toFile().exists() && destinationPath.toFile().isDirectory())
+          {
+            return;
+          }
+          if (!this.exportOverwrite && destinationPath.toFile().exists())
+          {
+            infoBuilder.append("Skipping " + sourcePath + "\n");
+          }
+          else
+          {
+            infoBuilder.append("Copying " + sourcePath + "\n");
+            Files.copy(sourcePath, destinationPath, StandardCopyOption.REPLACE_EXISTING);
+            noFilesCopied++;
+          }
+        }
+        catch (Exception e)
+        {
+          infoBuilder.append("Could not copy from " + sourcePath.toString() + "\n");
+          ExceptionHandler.logException(e, "Could not copy from " + sourcePath.toString());
+        }
+      });
+    }
+    catch (IOException e1)
+    {
+      ExceptionHandler.handleException(e1, "Could not export saved states folder.");
+    }
+  }
+  
+  public int getNumberOfFilesCopied()
+  {
+    return noFilesCopied;
+  }
 }
