@@ -56,7 +56,7 @@ public class RestoreDbPanel extends JPanel
   }
   private JLabel getInfoLabel() {
     if (infoLabel == null) {
-    	infoLabel = new JLabel("<html>Restoring a backup will overwrite the existing database and all covers, screens and game files. Custom views are also replaced.</html>");
+    	infoLabel = new JLabel("<html>Restoring a backup will overwrite the existing database and all covers, screens, games and saves files. Custom views are also replaced.</html>");
     	infoLabel.setIcon(UIManager.getIcon("OptionPane.warningIcon"));
     }
     return infoLabel;

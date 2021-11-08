@@ -11,9 +11,9 @@ public class ExportFileLoaderWorker extends SwingWorker<Void, String>
 {
 
   private ExportManager exportManager;
-  private ExportProgressDialog dialog;
+  private ImportExportProgressDialog dialog;
 
-  public ExportFileLoaderWorker(ExportManager importManager, ExportProgressDialog dialog)
+  public ExportFileLoaderWorker(ExportManager importManager, ImportExportProgressDialog dialog)
   {
     this.exportManager = importManager;
     this.dialog = dialog;

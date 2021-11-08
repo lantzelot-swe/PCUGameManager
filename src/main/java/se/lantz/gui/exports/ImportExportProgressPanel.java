@@ -10,14 +10,14 @@ import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 
-public class ExportProgressPanel extends JPanel
+public class ImportExportProgressPanel extends JPanel
 {
   private JProgressBar progressBar;
   private JTextArea textArea;
   private JScrollPane textScrollPane;
   private JButton closeButton;
 
-  public ExportProgressPanel()
+  public ImportExportProgressPanel()
   {
     GridBagLayout gridBagLayout = new GridBagLayout();
     setLayout(gridBagLayout);

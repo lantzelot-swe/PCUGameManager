@@ -5,13 +5,13 @@ import java.awt.Frame;
 import javax.swing.JDialog;
 import javax.swing.WindowConstants;
 
-public class ExportProgressDialog extends JDialog
+public class ImportExportProgressDialog extends JDialog
 {
   private static final long serialVersionUID = 1L;
 
-  private ExportProgressPanel panel;
+  private ImportExportProgressPanel panel;
 
-  public ExportProgressDialog(Frame frame, String title)
+  public ImportExportProgressDialog(Frame frame, String title)
   {
     super(frame, title, true);
     this.add(getExportProgressPanel());
@@ -31,11 +31,11 @@ public class ExportProgressDialog extends JDialog
     getExportProgressPanel().finish();
   }
 
-  public ExportProgressPanel getExportProgressPanel()
+  public ImportExportProgressPanel getExportProgressPanel()
   {
     if (panel == null)
     {
-      panel = new ExportProgressPanel();
+      panel = new ImportExportProgressPanel();
       panel.getCloseButton().addActionListener(e -> setVisible(false));
     }
     return panel;

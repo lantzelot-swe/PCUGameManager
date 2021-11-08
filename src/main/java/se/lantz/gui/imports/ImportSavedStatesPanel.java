@@ -9,6 +9,8 @@ import java.awt.GridBagConstraints;
 import se.lantz.gui.SelectDirPanel;
 import se.lantz.gui.SelectDirPanel.Mode;
 import java.awt.Insets;
+import java.io.File;
+
 import javax.swing.JRadioButton;
 import javax.swing.ButtonGroup;
 
@@ -114,5 +116,15 @@ public class ImportSavedStatesPanel extends JPanel
     	info2Label = new JLabel("<html>Saved states available in the import folder that doesn't match any games in the database will still be copied to the game manager's \"saves\" folder. They will also be copied when exporting.</html>");
     }
     return info2Label;
+  }
+  
+  File getTargetDirectory()
+  {
+    return getSelectDirPanel().getTargetDirectory();
+  }
+  
+  boolean isImportOverwrite()
+  {
+    return getOverwriteRadioButton().isSelected();
   }
 }

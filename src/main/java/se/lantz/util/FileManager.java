@@ -61,6 +61,7 @@ public class FileManager
   private static final String GAMES = "./games/";
   private static final String SCREENS = "./screens/";
   private static final String COVERS = "./covers/";
+  private static final String SAVES = "./saves/";
   private static final String BACKUP = "./backup/";
 
   private static final Path TEMP_PATH = Paths.get("./temp");
@@ -892,6 +893,21 @@ public class FileManager
     }
   }
 
+  public static void backupSaves(String targetFolderName)
+  {
+    File outputFolder = new File(BACKUP + "/" + targetFolderName + "/");
+    try
+    {
+      Files.createDirectories(outputFolder.toPath());
+      Path games = new File(SAVES).toPath();
+      copyDirectory(games.toString(), outputFolder.toPath().resolve("saves").toString());
+    }
+    catch (IOException e)
+    {
+      ExceptionHandler.handleException(e, "Could not create backup of games.");
+    }
+  }
+
   public static void copyDirectory(String sourceDirectoryLocation, String destinationDirectoryLocation)
     throws IOException
   {
@@ -927,6 +943,18 @@ public class FileManager
       {
         file.delete();
       }
+    }
+  }
+
+  private static void deleteSavesDirContent(File dir)
+  {
+    try
+    {
+      Files.walk(dir.toPath()).sorted(Comparator.reverseOrder()).map(Path::toFile).forEach(File::delete);
+    }
+    catch (IOException e)
+    {
+      ExceptionHandler.handleException(e, "Could not delete saves folder");
     }
   }
 
@@ -990,9 +1018,9 @@ public class FileManager
     File backupFolder = new File(BACKUP + "/" + backupFolderName + "/");
     try
     {
-      File coversDir = new File(SCREENS);
-      deleteDirContent(coversDir, true);
-      copyDirectory(backupFolder.toPath().resolve("screens").toString(), coversDir.toPath().toString());
+      File screensDir = new File(SCREENS);
+      deleteDirContent(screensDir, true);
+      copyDirectory(backupFolder.toPath().resolve("screens").toString(), screensDir.toPath().toString());
     }
     catch (IOException e)
     {
@@ -1005,9 +1033,24 @@ public class FileManager
     File backupFolder = new File(BACKUP + "/" + backupFolderName + "/");
     try
     {
-      File coversDir = new File(GAMES);
-      deleteDirContent(coversDir, true);
-      copyDirectory(backupFolder.toPath().resolve("games").toString(), coversDir.toPath().toString());
+      File gamesDir = new File(GAMES);
+      deleteDirContent(gamesDir, true);
+      copyDirectory(backupFolder.toPath().resolve("games").toString(), gamesDir.toPath().toString());
+    }
+    catch (IOException e)
+    {
+      ExceptionHandler.handleException(e, "Could not restore backup of games.");
+    }
+  }
+
+  public static void restoreSaves(String backupFolderName)
+  {
+    File backupFolder = new File(BACKUP + "/" + backupFolderName + "/");
+    try
+    {
+      File savesDir = new File(SAVES);
+      deleteSavesDirContent(savesDir);
+      copyDirectory(backupFolder.toPath().resolve("saves").toString(), savesDir.toPath().toString());
     }
     catch (IOException e)
     {

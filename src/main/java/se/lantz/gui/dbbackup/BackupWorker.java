@@ -38,6 +38,9 @@ public class BackupWorker extends SwingWorker<Void, String>
     publish("Backing up games directory...");
     backupManager.backupGames();
     publish("Done");
+    publish("Backing up saves directory...");
+    backupManager.backupSaves();
+    publish("Done");
     return null;
   }
 

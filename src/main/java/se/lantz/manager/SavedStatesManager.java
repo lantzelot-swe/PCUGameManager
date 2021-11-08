@@ -45,8 +45,10 @@ public class SavedStatesManager
   private MainViewModel model;
 
   private File exportDir;
+  private File importDir;
 
   private boolean exportOverwrite;
+  private boolean importOverwrite;
 
   private int noFilesCopied = 0;
 
@@ -260,6 +262,22 @@ public class SavedStatesManager
   {
     return this.exportOverwrite;
   }
+  
+  public void setImportDirectory(File importDir)
+  {
+    this.importDir = importDir;
+  }
+
+  
+  public void setImportOverwrite(boolean importOverwrite)
+  {
+    this.importOverwrite = importOverwrite;
+  }
+
+  public boolean isImportOverwrite()
+  {
+    return this.importOverwrite;
+  }
 
   public void exportSavedStates(StringBuilder infoBuilder)
   {
@@ -304,6 +322,51 @@ public class SavedStatesManager
       ExceptionHandler.handleException(e1, "Could not export saved states folder.");
     }
   }
+  
+  public void importSavedStates(StringBuilder infoBuilder)
+  {
+    noFilesCopied = 0;
+    File saveFolder = new File(SAVES);
+    try (Stream<Path> stream = Files.walk(importDir.toPath().toAbsolutePath()))
+    {
+      stream.forEachOrdered(sourcePath -> {
+        try
+        {
+          //Ignore first folder
+          if (sourcePath.equals(importDir.toPath().toAbsolutePath()))
+          {
+            return;
+          }      
+          Path destinationPath = saveFolder.toPath().resolve(importDir.toPath().toAbsolutePath().relativize(sourcePath));
+          //Ignore already existing directories: Files.copy() throws DirectoryNotEmptyException for them
+          if (destinationPath.toFile().exists() && destinationPath.toFile().isDirectory())
+          {
+            return;
+          }
+          if (!this.importOverwrite && destinationPath.toFile().exists())
+          {
+            infoBuilder.append("Skipping " + sourcePath + "\n");
+          }
+          else
+          {
+            infoBuilder.append("Copying " + sourcePath + "\n");
+            Files.copy(sourcePath, destinationPath, StandardCopyOption.REPLACE_EXISTING);
+            noFilesCopied++;
+          }
+        }
+        catch (Exception e)
+        {
+          infoBuilder.append("Could not copy from " + sourcePath.toString() + "\n");
+          ExceptionHandler.logException(e, "Could not copy from " + sourcePath.toString());
+        }
+      });
+    }
+    catch (IOException e1)
+    {
+      ExceptionHandler.handleException(e1, "Could not import to saved folder.");
+    }
+  }
+  
   
   public int getNumberOfFilesCopied()
   {

@@ -1,19 +1,20 @@
-package se.lantz.gui.exports;
+package se.lantz.gui.imports;
 
 import java.util.List;
 
 import javax.swing.SwingWorker;
 
+import se.lantz.gui.exports.ImportExportProgressDialog;
 import se.lantz.manager.SavedStatesManager;
 import se.lantz.util.ExceptionHandler;
 
-public class ExportSavedStatesWorker extends SwingWorker<Void, String>
+public class ImportSavedStatesWorker extends SwingWorker<Void, String>
 {
 
   private SavedStatesManager savedStatesManager;
   private ImportExportProgressDialog dialog;
 
-  public ExportSavedStatesWorker(SavedStatesManager savedStatesManager, ImportExportProgressDialog dialog)
+  public ImportSavedStatesWorker(SavedStatesManager savedStatesManager, ImportExportProgressDialog dialog)
   {
     this.savedStatesManager = savedStatesManager;
     this.dialog = dialog;
@@ -22,16 +23,16 @@ public class ExportSavedStatesWorker extends SwingWorker<Void, String>
   @Override
   protected Void doInBackground() throws Exception
   {
-    if (savedStatesManager.isExportOverwrite())
+    if (savedStatesManager.isImportOverwrite())
     {
-      publish("Overwriting existing saved states in the export folder.\n");
+      publish("Overwriting existing saved states in the saves folder.\n");
     }
     else
     {
-      publish("Skipping already existing saved states in the export folder.\n");
+      publish("Skipping already existing saved states in the saves folder.\n");
     }
     StringBuilder infoBuilder = new StringBuilder();
-    savedStatesManager.exportSavedStates(infoBuilder);
+    savedStatesManager.importSavedStates(infoBuilder);
     publish(infoBuilder.toString());
     publish("Copied " + savedStatesManager.getNumberOfFilesCopied() + " files.");
     publish("Done!");
@@ -50,14 +51,14 @@ public class ExportSavedStatesWorker extends SwingWorker<Void, String>
   @Override
   protected void done()
   {
-  	try
-		{
-			get();
-		}
-  	catch (Exception e)
-		{
-			ExceptionHandler.handleException(e, "Error during export");
-		}
+    try
+    {
+      get();
+    }
+    catch (Exception e)
+    {
+      ExceptionHandler.handleException(e, "Error during import");
+    }
     dialog.finish();
   }
 }
