@@ -88,7 +88,7 @@ public class ImportExportProgressPanel extends JPanel
     getTextArea().append(infoText);
   }
   
-  public void finish()
+  public void finish(boolean isImport)
   {
     getCloseButton().setEnabled(true);
     getProgressBar().setIndeterminate(false);
@@ -96,13 +96,21 @@ public class ImportExportProgressPanel extends JPanel
     //Check for errors
     String text = getTextArea().getText();
     int count = text.length() - text.replace("ERROR:", "").length();
-    if (count > 0)
+    if (isImport)
     {
-      getTextArea().append("\nExport ended with " + count/6 + " errors. See pcusb.log for details.");
+      getTextArea().append("\nImport ");
     }
     else
     {
-      getTextArea().append("\nExport completed successfully.");
+      getTextArea().append("\nExport ");
+    }
+    if (count > 0)
+    {
+      getTextArea().append("ended with " + count/6 + " errors. See pcusb.log for details.");
+    }
+    else
+    {
+      getTextArea().append("completed successfully.");
     }
   }
 }

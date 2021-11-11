@@ -11,9 +11,12 @@ public class ImportExportProgressDialog extends JDialog
 
   private ImportExportProgressPanel panel;
 
-  public ImportExportProgressDialog(Frame frame, String title)
+  private final boolean isImport;
+
+  public ImportExportProgressDialog(Frame frame, String title, boolean isImport)
   {
     super(frame, title, true);
+    this.isImport = isImport;
     this.add(getExportProgressPanel());
     setSize(900, 600);
     setLocationRelativeTo(frame);
@@ -28,7 +31,7 @@ public class ImportExportProgressDialog extends JDialog
   
   public void finish()
   {
-    getExportProgressPanel().finish();
+    getExportProgressPanel().finish(isImport);
   }
 
   public ImportExportProgressPanel getExportProgressPanel()

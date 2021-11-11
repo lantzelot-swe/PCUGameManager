@@ -5,8 +5,10 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.PathMatcher;
 import java.nio.file.StandardCopyOption;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -60,49 +62,56 @@ public class SavedStatesManager
 
   public void saveSavedStates()
   {
-    //TODO How to handle when the title (and game name) is changed? 
+    //If the game has been renamed, make sure to rename the saves folder also
+    if (model.getInfoModel().isTitleChanged())
+    {
+      String oldFileName = model.getInfoModel().getOldGamesFile();
+      File oldSaveFolder = new File(SAVES + oldFileName);
+      if (oldSaveFolder.exists())
+      {
+        //Rename old folder to new name
+        oldSaveFolder.renameTo(new File(SAVES + model.getInfoModel().getGamesFile()));
+      }
+    }
 
     String fileName = model.getInfoModel().getGamesFile();
     Path saveFolder = new File(SAVES + fileName).toPath();
-    if (Files.exists(saveFolder))
+    //Check which ones are available
+    Path mta0Path = saveFolder.resolve(MTA0);
+    Path vsz0Path = saveFolder.resolve(VSZ0);
+    Path png0Path = saveFolder.resolve(PNG0);
+    if (Files.exists(mta0Path) || savedStatesModel.getState1Path() != null)
     {
-      //Check which ones are available
-      Path mta0Path = saveFolder.resolve(MTA0);
-      Path vsz0Path = saveFolder.resolve(VSZ0);
-      Path png0Path = saveFolder.resolve(PNG0);
-      if (Files.exists(mta0Path) || savedStatesModel.getState1Path() != null)
-      {
-        storePlayTime(mta0Path, savedStatesModel.getState1time());
-        copyVsfFile(vsz0Path, savedStatesModel.getState1Path());
-        copyPngFile(png0Path, savedStatesModel.getState1PngImage());
-      }
-      Path mta1Path = saveFolder.resolve(MTA1);
-      Path vsz1Path = saveFolder.resolve(VSZ1);
-      Path png1Path = saveFolder.resolve(PNG1);
-      if (Files.exists(mta1Path) || savedStatesModel.getState2Path() != null)
-      {
-        storePlayTime(mta1Path, savedStatesModel.getState2time());
-        copyVsfFile(vsz1Path, savedStatesModel.getState2Path());
-        copyPngFile(png1Path, savedStatesModel.getState2PngImage());
-      }
-      Path mta2Path = saveFolder.resolve(MTA2);
-      Path vsz2Path = saveFolder.resolve(VSZ2);
-      Path png2Path = saveFolder.resolve(PNG2);
-      if (Files.exists(mta2Path) || savedStatesModel.getState3Path() != null)
-      {
-        storePlayTime(mta2Path, savedStatesModel.getState3time());
-        copyVsfFile(vsz2Path, savedStatesModel.getState3Path());
-        copyPngFile(png2Path, savedStatesModel.getState3PngImage());
-      }
-      Path mta3Path = saveFolder.resolve(MTA3);
-      Path vsz3Path = saveFolder.resolve(VSZ3);
-      Path png3Path = saveFolder.resolve(PNG3);
-      if (Files.exists(mta3Path) || savedStatesModel.getState4Path() != null)
-      {
-        storePlayTime(mta3Path, savedStatesModel.getState4time());
-        copyVsfFile(vsz3Path, savedStatesModel.getState4Path());
-        copyPngFile(png3Path, savedStatesModel.getState4PngImage());
-      }
+      storePlayTime(mta0Path, savedStatesModel.getState1time());
+      copyVsfFile(vsz0Path, savedStatesModel.getState1Path());
+      copyPngFile(png0Path, savedStatesModel.getState1PngImage());
+    }
+    Path mta1Path = saveFolder.resolve(MTA1);
+    Path vsz1Path = saveFolder.resolve(VSZ1);
+    Path png1Path = saveFolder.resolve(PNG1);
+    if (Files.exists(mta1Path) || savedStatesModel.getState2Path() != null)
+    {
+      storePlayTime(mta1Path, savedStatesModel.getState2time());
+      copyVsfFile(vsz1Path, savedStatesModel.getState2Path());
+      copyPngFile(png1Path, savedStatesModel.getState2PngImage());
+    }
+    Path mta2Path = saveFolder.resolve(MTA2);
+    Path vsz2Path = saveFolder.resolve(VSZ2);
+    Path png2Path = saveFolder.resolve(PNG2);
+    if (Files.exists(mta2Path) || savedStatesModel.getState3Path() != null)
+    {
+      storePlayTime(mta2Path, savedStatesModel.getState3time());
+      copyVsfFile(vsz2Path, savedStatesModel.getState3Path());
+      copyPngFile(png2Path, savedStatesModel.getState3PngImage());
+    }
+    Path mta3Path = saveFolder.resolve(MTA3);
+    Path vsz3Path = saveFolder.resolve(VSZ3);
+    Path png3Path = saveFolder.resolve(PNG3);
+    if (Files.exists(mta3Path) || savedStatesModel.getState4Path() != null)
+    {
+      storePlayTime(mta3Path, savedStatesModel.getState4time());
+      copyVsfFile(vsz3Path, savedStatesModel.getState4Path());
+      copyPngFile(png3Path, savedStatesModel.getState4PngImage());
     }
   }
 
@@ -262,13 +271,12 @@ public class SavedStatesManager
   {
     return this.exportOverwrite;
   }
-  
+
   public void setImportDirectory(File importDir)
   {
     this.importDir = importDir;
   }
 
-  
   public void setImportOverwrite(boolean importOverwrite)
   {
     this.importOverwrite = importOverwrite;
@@ -292,8 +300,14 @@ public class SavedStatesManager
           if (sourcePath.equals(saveFolder.toPath().toAbsolutePath()))
           {
             return;
-          }      
-          Path destinationPath = exportDir.toPath().resolve(saveFolder.toPath().toAbsolutePath().relativize(sourcePath));
+          }
+          if (!isValidSaveStatePath(sourcePath))
+          {
+            infoBuilder.append("Skipping " + sourcePath + " (not a valid save state file)\n");
+            return;
+          }
+          Path destinationPath =
+            exportDir.toPath().resolve(saveFolder.toPath().toAbsolutePath().relativize(sourcePath));
           //Ignore already existing directories: Files.copy() throws DirectoryNotEmptyException for them
           if (destinationPath.toFile().exists() && destinationPath.toFile().isDirectory())
           {
@@ -301,13 +315,16 @@ public class SavedStatesManager
           }
           if (!this.exportOverwrite && destinationPath.toFile().exists())
           {
-            infoBuilder.append("Skipping " + sourcePath + "\n");
+            infoBuilder.append("Skipping " + sourcePath + " (already exists)\n");
           }
           else
           {
             infoBuilder.append("Copying " + sourcePath + "\n");
             Files.copy(sourcePath, destinationPath, StandardCopyOption.REPLACE_EXISTING);
-            noFilesCopied++;
+            if (!sourcePath.toFile().isDirectory())
+            {
+              noFilesCopied++;
+            }
           }
         }
         catch (Exception e)
@@ -322,7 +339,7 @@ public class SavedStatesManager
       ExceptionHandler.handleException(e1, "Could not export saved states folder.");
     }
   }
-  
+
   public void importSavedStates(StringBuilder infoBuilder)
   {
     noFilesCopied = 0;
@@ -332,12 +349,18 @@ public class SavedStatesManager
       stream.forEachOrdered(sourcePath -> {
         try
         {
-          //Ignore first folder
+          //Ignore first folder or any files that are not save state files
           if (sourcePath.equals(importDir.toPath().toAbsolutePath()))
           {
             return;
-          }      
-          Path destinationPath = saveFolder.toPath().resolve(importDir.toPath().toAbsolutePath().relativize(sourcePath));
+          }
+          if (!isValidSaveStatePath(sourcePath))
+          {
+            infoBuilder.append("Skipping " + sourcePath + " (not a valid save state file)\n");
+            return;
+          }
+          Path destinationPath =
+            saveFolder.toPath().resolve(importDir.toPath().toAbsolutePath().relativize(sourcePath));
           //Ignore already existing directories: Files.copy() throws DirectoryNotEmptyException for them
           if (destinationPath.toFile().exists() && destinationPath.toFile().isDirectory())
           {
@@ -345,13 +368,16 @@ public class SavedStatesManager
           }
           if (!this.importOverwrite && destinationPath.toFile().exists())
           {
-            infoBuilder.append("Skipping " + sourcePath + "\n");
+            infoBuilder.append("Skipping " + sourcePath + " (already exists)\n");
           }
           else
           {
             infoBuilder.append("Copying " + sourcePath + "\n");
             Files.copy(sourcePath, destinationPath, StandardCopyOption.REPLACE_EXISTING);
-            noFilesCopied++;
+            if (!sourcePath.toFile().isDirectory())
+            {
+              noFilesCopied++;
+            }
           }
         }
         catch (Exception e)
@@ -366,8 +392,13 @@ public class SavedStatesManager
       ExceptionHandler.handleException(e1, "Could not import to saved folder.");
     }
   }
-  
-  
+
+  private boolean isValidSaveStatePath(Path path)
+  {
+    PathMatcher matcher = FileSystems.getDefault().getPathMatcher("glob:**.{mta,png,vsz}");
+    return matcher.matches(path) || path.toFile().isDirectory();
+  }
+
   public int getNumberOfFilesCopied()
   {
     return noFilesCopied;

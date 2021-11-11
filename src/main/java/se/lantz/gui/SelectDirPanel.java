@@ -30,6 +30,8 @@ import se.lantz.util.FileManager;
 
 public class SelectDirPanel extends JPanel
 {
+  private static final String THEC64SAVE = ".THEC64SAVE";
+
   public enum Mode
   {
     CAROUSEL_IMPORT, GB_IMPORT, CAROUSEL_EXPORT, FILELOADER_EXPORT, SAVEDSTATES_IMPORT, SAVEDSTATES_EXPORT
@@ -276,13 +278,27 @@ public class SelectDirPanel extends JPanel
   private void selectSavedStatesImportDirectory()
   {
     final JFileChooser fileChooser = new JFileChooser();
-    fileChooser.setDialogTitle("Select the \".THEC64SAVE\" directory to import from");
+    fileChooser.setDialogTitle("Select the \"" + THEC64SAVE + "\" directory to import from");
     fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
     fileChooser.setCurrentDirectory(new File(configuredDir));
     int value = fileChooser.showDialog(this, "OK");
     if (value == JFileChooser.APPROVE_OPTION)
     {
       targetDirectory = fileChooser.getSelectedFile();
+      if (!targetDirectory.getName().toUpperCase().equals(THEC64SAVE))
+      {
+        String message = "<html>You have not selected a \"" + THEC64SAVE +
+          "\" directory.<br> Are you sure you want to import from the selected directory?</html>";
+        int choice = JOptionPane.showConfirmDialog(SwingUtilities.getAncestorOfClass(JDialog.class, this),
+                                                   message,
+                                                   "Folder name",
+                                                   JOptionPane.YES_NO_OPTION,
+                                                   JOptionPane.WARNING_MESSAGE);
+        if (choice == JOptionPane.NO_OPTION)
+        {
+          selectSavedStatesImportDirectory();
+        }
+      }
       configuredDir = targetDirectory.toPath().toString();
       FileManager.getConfiguredProperties().put(SAVEDSTATES_IMPORT_DIR_PROPERTY, configuredDir);
       getDirTextField().setText(configuredDir);
@@ -301,17 +317,17 @@ public class SelectDirPanel extends JPanel
           return dlg;
         }
       };
-    fileChooser.setDialogTitle("Select the \".THEC64SAVE\" directory on your PCUAE USB stick");
+    fileChooser.setDialogTitle("Select the \"" + THEC64SAVE + "\" directory on your PCUAE USB stick");
     fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
     fileChooser.setCurrentDirectory(new File(configuredDir));
     int value = fileChooser.showDialog(this, "OK");
     if (value == JFileChooser.APPROVE_OPTION)
     {
       targetDirectory = fileChooser.getSelectedFile();
-      if (!targetDirectory.getName().toUpperCase().equals(".THEC64SAVE"))
+      if (!targetDirectory.getName().toUpperCase().equals(THEC64SAVE))
       {
-        String message =
-          "<html>You have not selected the \".THEC64SAVE\" directory.<br> Are you sure you want to export to the selected directory?</html>";
+        String message = "<html>You have not selected a \"" + THEC64SAVE +
+          "\" directory.<br> Are you sure you want to export to the selected directory?</html>";
         int choice = JOptionPane.showConfirmDialog(SwingUtilities.getAncestorOfClass(JDialog.class, this),
                                                    message,
                                                    "Folder name",
