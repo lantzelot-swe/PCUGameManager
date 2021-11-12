@@ -5,15 +5,18 @@ import java.awt.Frame;
 import javax.swing.JDialog;
 import javax.swing.WindowConstants;
 
-public class ExportProgressDialog extends JDialog
+public class ImportExportProgressDialog extends JDialog
 {
   private static final long serialVersionUID = 1L;
 
-  private ExportProgressPanel panel;
+  private ImportExportProgressPanel panel;
 
-  public ExportProgressDialog(Frame frame)
+  private final boolean isImport;
+
+  public ImportExportProgressDialog(Frame frame, String title, boolean isImport)
   {
-    super(frame,"Export games", true);
+    super(frame, title, true);
+    this.isImport = isImport;
     this.add(getExportProgressPanel());
     setSize(900, 600);
     setLocationRelativeTo(frame);
@@ -28,14 +31,14 @@ public class ExportProgressDialog extends JDialog
   
   public void finish()
   {
-    getExportProgressPanel().finish();
+    getExportProgressPanel().finish(isImport);
   }
 
-  public ExportProgressPanel getExportProgressPanel()
+  public ImportExportProgressPanel getExportProgressPanel()
   {
     if (panel == null)
     {
-      panel = new ExportProgressPanel();
+      panel = new ImportExportProgressPanel();
       panel.getCloseButton().addActionListener(e -> setVisible(false));
     }
     return panel;

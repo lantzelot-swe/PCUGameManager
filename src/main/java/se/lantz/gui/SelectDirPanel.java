@@ -30,9 +30,11 @@ import se.lantz.util.FileManager;
 
 public class SelectDirPanel extends JPanel
 {
+  private static final String THEC64SAVE = ".THEC64SAVE";
+
   public enum Mode
   {
-    CAROUSEL_IMPORT, GB_IMPORT, CAROUSEL_EXPORT, FILELOADER_EXPORT
+    CAROUSEL_IMPORT, GB_IMPORT, CAROUSEL_EXPORT, FILELOADER_EXPORT, SAVEDSTATES_IMPORT, SAVEDSTATES_EXPORT
   }
 
   private static final Logger logger = LoggerFactory.getLogger(SelectDirPanel.class);
@@ -40,6 +42,8 @@ public class SelectDirPanel extends JPanel
   private static final String GB_IMPORT_DIR_PROPERTY = "gbImportDir";
   private static final String CAROUSEL_EXPORT_DIR_PROPERTY = "exportDir";
   private static final String FILELOADER_EXPORT_DIR_PROPERTY = "flexportDir";
+  private static final String SAVEDSTATES_IMPORT_DIR_PROPERTY = "savedStatesImportDir";
+  private static final String SAVEDSTATES_EXPORT_DIR_PROPERTY = "savedStatesExportDir";
   private JTextField dirTextField;
   private JButton selectDirButton;
 
@@ -101,6 +105,20 @@ public class SelectDirPanel extends JPanel
         configuredDir = new File("export").getAbsolutePath();
       }
       break;
+    case SAVEDSTATES_IMPORT:
+      configuredDir = FileManager.getConfiguredProperties().getProperty(SAVEDSTATES_IMPORT_DIR_PROPERTY);
+      if (configuredDir == null)
+      {
+        configuredDir = new File(".").getAbsolutePath();
+      }
+      break;
+    case SAVEDSTATES_EXPORT:
+      configuredDir = FileManager.getConfiguredProperties().getProperty(SAVEDSTATES_EXPORT_DIR_PROPERTY);
+      if (configuredDir == null)
+      {
+        configuredDir = new File(".").getAbsolutePath();
+      }
+      break;
     default:
       break;
     }
@@ -142,6 +160,12 @@ public class SelectDirPanel extends JPanel
               break;
             case FILELOADER_EXPORT:
               selectExportDirectory(false);
+              break;
+            case SAVEDSTATES_IMPORT:
+              selectSavedStatesImportDirectory();
+              break;
+            case SAVEDSTATES_EXPORT:
+              selectSavedStatesExportDirectory();
               break;
             default:
               break;
@@ -197,7 +221,7 @@ public class SelectDirPanel extends JPanel
         configuredDir = targetDirectory.toPath().toString();
         FileManager.getConfiguredProperties().put(GB_IMPORT_DIR_PROPERTY, configuredDir);
         getDirTextField().setText(configuredDir);
-        gbDbFileSelectedlistener.actionPerformed(new ActionEvent(this,0,""));
+        gbDbFileSelectedlistener.actionPerformed(new ActionEvent(this, 0, ""));
       }
       else
       {
@@ -247,6 +271,75 @@ public class SelectDirPanel extends JPanel
       configuredDir = targetDirectory.toPath().toString();
       FileManager.getConfiguredProperties()
         .put(carousel ? CAROUSEL_EXPORT_DIR_PROPERTY : FILELOADER_EXPORT_DIR_PROPERTY, configuredDir);
+      getDirTextField().setText(configuredDir);
+    }
+  }
+
+  private void selectSavedStatesImportDirectory()
+  {
+    final JFileChooser fileChooser = new JFileChooser();
+    fileChooser.setDialogTitle("Select the \"" + THEC64SAVE + "\" directory to import from");
+    fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+    fileChooser.setCurrentDirectory(new File(configuredDir));
+    int value = fileChooser.showDialog(this, "OK");
+    if (value == JFileChooser.APPROVE_OPTION)
+    {
+      targetDirectory = fileChooser.getSelectedFile();
+      if (!targetDirectory.getName().toUpperCase().equals(THEC64SAVE))
+      {
+        String message = "<html>You have not selected a \"" + THEC64SAVE +
+          "\" directory.<br> Are you sure you want to import from the selected directory?</html>";
+        int choice = JOptionPane.showConfirmDialog(SwingUtilities.getAncestorOfClass(JDialog.class, this),
+                                                   message,
+                                                   "Folder name",
+                                                   JOptionPane.YES_NO_OPTION,
+                                                   JOptionPane.WARNING_MESSAGE);
+        if (choice == JOptionPane.NO_OPTION)
+        {
+          selectSavedStatesImportDirectory();
+        }
+      }
+      configuredDir = targetDirectory.toPath().toString();
+      FileManager.getConfiguredProperties().put(SAVEDSTATES_IMPORT_DIR_PROPERTY, configuredDir);
+      getDirTextField().setText(configuredDir);
+    }
+  }
+
+  private void selectSavedStatesExportDirectory()
+  {
+    final JFileChooser fileChooser = new JFileChooser()
+      {
+        @Override
+        protected JDialog createDialog(Component parent) throws HeadlessException
+        {
+          //Set parent to the export dialog
+          JDialog dlg = super.createDialog(SwingUtilities.getAncestorOfClass(JDialog.class, SelectDirPanel.this));
+          return dlg;
+        }
+      };
+    fileChooser.setDialogTitle("Select the \"" + THEC64SAVE + "\" directory on your PCUAE USB stick");
+    fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+    fileChooser.setCurrentDirectory(new File(configuredDir));
+    int value = fileChooser.showDialog(this, "OK");
+    if (value == JFileChooser.APPROVE_OPTION)
+    {
+      targetDirectory = fileChooser.getSelectedFile();
+      if (!targetDirectory.getName().toUpperCase().equals(THEC64SAVE))
+      {
+        String message = "<html>You have not selected a \"" + THEC64SAVE +
+          "\" directory.<br> Are you sure you want to export to the selected directory?</html>";
+        int choice = JOptionPane.showConfirmDialog(SwingUtilities.getAncestorOfClass(JDialog.class, this),
+                                                   message,
+                                                   "Folder name",
+                                                   JOptionPane.YES_NO_OPTION,
+                                                   JOptionPane.WARNING_MESSAGE);
+        if (choice == JOptionPane.NO_OPTION)
+        {
+          selectSavedStatesExportDirectory();
+        }
+      }
+      configuredDir = targetDirectory.toPath().toString();
+      FileManager.getConfiguredProperties().put(SAVEDSTATES_EXPORT_DIR_PROPERTY, configuredDir);
       getDirTextField().setText(configuredDir);
     }
   }
@@ -309,10 +402,9 @@ public class SelectDirPanel extends JPanel
       }
     }
   }
-  
+
   public void registerGBFileSelectedActionListener(ActionListener listener)
   {
     this.gbDbFileSelectedlistener = listener;
-    
   }
 }

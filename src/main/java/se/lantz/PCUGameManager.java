@@ -54,6 +54,7 @@ public class PCUGameManager
         Files.createDirectories(Paths.get("./screens/"));
         Files.createDirectories(Paths.get("./covers/"));
         Files.createDirectories(Paths.get("./games/"));
+        Files.createDirectories(Paths.get("./saves/"));
       }
       catch (IOException e)
       {

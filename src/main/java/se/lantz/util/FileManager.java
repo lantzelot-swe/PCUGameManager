@@ -43,8 +43,11 @@ import com.github.junrar.Archive;
 import com.github.junrar.rarfile.FileHeader;
 
 import se.lantz.db.DbConnector;
+import se.lantz.manager.SavedStatesManager;
 import se.lantz.model.InfoModel;
 import se.lantz.model.MainViewModel;
+import se.lantz.model.SavedStatesModel;
+import se.lantz.model.SavedStatesModel.SAVESTATE;
 import se.lantz.model.SystemModel;
 import se.lantz.model.data.GameDetails;
 
@@ -58,6 +61,7 @@ public class FileManager
   private static final String GAMES = "./games/";
   private static final String SCREENS = "./screens/";
   private static final String COVERS = "./covers/";
+  private static final String SAVES = "./saves/";
   private static final String BACKUP = "./backup/";
 
   private static final Path TEMP_PATH = Paths.get("./temp");
@@ -68,6 +72,7 @@ public class FileManager
   private MainViewModel model;
   private InfoModel infoModel;
   private SystemModel systemModel;
+  private SavedStatesModel savedStatesModel;
   private static ExecutorService executor = Executors.newSingleThreadExecutor();
 
   private static List<String> validFileEndingList =
@@ -92,6 +97,7 @@ public class FileManager
   {
     this.infoModel = model.getInfoModel();
     this.systemModel = model.getSystemModel();
+    this.savedStatesModel = model.getSavedStatesModel();
     this.model = model;
   }
 
@@ -136,11 +142,12 @@ public class FileManager
         if (cover.getWidth() != 122 || cover.getHeight() != 175)
         {
           Image scaledCoverImage = cover.getScaledInstance(122, 175, Image.SCALE_SMOOTH);
-          imageToSave =
-            new BufferedImage(scaledCoverImage.getWidth(null), scaledCoverImage.getHeight(null), BufferedImage.TYPE_INT_ARGB);
+          imageToSave = new BufferedImage(scaledCoverImage.getWidth(null),
+                                          scaledCoverImage.getHeight(null),
+                                          BufferedImage.TYPE_INT_ARGB);
           Graphics g = imageToSave.createGraphics();
           g.drawImage(scaledCoverImage, 0, 0, null);
-          g.dispose();         
+          g.dispose();
         }
         File outputfile = new File(COVERS + coverFileName);
         ImageIO.write(imageToSave, "png", outputfile);
@@ -481,9 +488,91 @@ public class FileManager
     return description.replaceAll("-", " ");
   }
 
-  public void runVice(boolean appendGame)
+  public void runGameInVice()
   {
-    String gameFile = GAMES + infoModel.getGamesFile();
+    String gamePathString = "";
+    //Use path if available, otherwise the available game in /games.
+    Path gamePath = infoModel.getGamesPath();
+    if (gamePath != null)
+    {
+      gamePathString = gamePath.toString();
+    }
+    else
+    {
+      gamePathString = GAMES + infoModel.getGamesFile();
+    }
+    runVice(true, gamePathString);
+  }
+
+  public void runViceWithoutGame()
+  {
+    runVice(false, "");
+  }
+
+  public void runSnapshotInVice(SAVESTATE saveState)
+  {
+    String gamePathString = "";
+    Path vsfPath;
+    switch (saveState)
+    {
+    case Save0:
+    {
+      //Use path if available, otherwise the available game in /games.
+      vsfPath = savedStatesModel.getState1Path();
+      if (vsfPath != null)
+      {
+        gamePathString = vsfPath.toString();
+      }
+      else
+      {
+        gamePathString = SavedStatesManager.SAVES + infoModel.getGamesFile() + "/" + savedStatesModel.getState1File();
+      }
+    }
+      break;
+    case Save1:
+      //Use path if available, otherwise the available game in /games.
+      vsfPath = savedStatesModel.getState2Path();
+      if (vsfPath != null)
+      {
+        gamePathString = vsfPath.toString();
+      }
+      else
+      {
+        gamePathString = SavedStatesManager.SAVES + infoModel.getGamesFile() + "/" + savedStatesModel.getState2File();
+      }
+      break;
+    case Save2:
+      //Use path if available, otherwise the available game in /games.
+      vsfPath = savedStatesModel.getState3Path();
+      if (vsfPath != null)
+      {
+        gamePathString = vsfPath.toString();
+      }
+      else
+      {
+        gamePathString = SavedStatesManager.SAVES + infoModel.getGamesFile() + "/" + savedStatesModel.getState3File();
+      }
+      break;
+    case Save3:
+      //Use path if available, otherwise the available game in /games.
+      vsfPath = savedStatesModel.getState4Path();
+      if (vsfPath != null)
+      {
+        gamePathString = vsfPath.toString();
+      }
+      else
+      {
+        gamePathString = SavedStatesManager.SAVES + infoModel.getGamesFile() + "/" + savedStatesModel.getState4File();
+      }
+      break;
+    default:
+      break;
+    }
+    runVice(true, gamePathString);
+  }
+
+  private void runVice(boolean appendGame, String gamePath)
+  {
     StringBuilder command = new StringBuilder();
     if (systemModel.isC64())
     {
@@ -547,19 +636,10 @@ public class FileManager
       command.append("-ntsc ");
     }
 
-    if (appendGame)
+    //Append game to autostart (not saved snapshots)
+    if (appendGame && !gamePath.contains(".vsz"))
     {
-
-      //Append game file
-      Path gamePath = infoModel.getGamesPath();
-      if (gamePath != null)
-      {
-        appendCorrectFlagForGameFile(gamePath.toString(), command);
-      }
-      else
-      {
-        appendCorrectFlagForGameFile(gameFile, command);
-      }
+      appendCorrectFlagForGameFile(gamePath, command);
     }
 
     //Append truedrive
@@ -596,6 +676,13 @@ public class FileManager
       {
         command.append("-joydev2 1");
       }
+    }
+
+    //Used for saved snapshots, must be at the end of the commands
+    if (appendGame && gamePath.contains(".vsz"))
+    {
+      command.append(" ");
+      command.append(gamePath);
     }
 
     //Launch Vice
@@ -806,6 +893,21 @@ public class FileManager
     }
   }
 
+  public static void backupSaves(String targetFolderName)
+  {
+    File outputFolder = new File(BACKUP + "/" + targetFolderName + "/");
+    try
+    {
+      Files.createDirectories(outputFolder.toPath());
+      Path games = new File(SAVES).toPath();
+      copyDirectory(games.toString(), outputFolder.toPath().resolve("saves").toString());
+    }
+    catch (IOException e)
+    {
+      ExceptionHandler.handleException(e, "Could not create backup of games.");
+    }
+  }
+
   public static void copyDirectory(String sourceDirectoryLocation, String destinationDirectoryLocation)
     throws IOException
   {
@@ -844,6 +946,18 @@ public class FileManager
     }
   }
 
+  private static void deleteSavesDirContent(File dir)
+  {
+    try
+    {
+      Files.walk(dir.toPath()).sorted(Comparator.reverseOrder()).map(Path::toFile).forEach(File::delete);
+    }
+    catch (IOException e)
+    {
+      ExceptionHandler.handleException(e, "Could not delete saves folder");
+    }
+  }
+
   public static void deleteFilesForGame(GameDetails details)
   {
     if (!details.getCover().isEmpty())
@@ -866,6 +980,7 @@ public class FileManager
       File gameFile = new File(GAMES + details.getGame());
       gameFile.delete();
     }
+    //TODO: Shall we delete saved states also?? Or should the saved states be kept?
   }
 
   public static void restoreDb(String backupFolderName)
@@ -903,9 +1018,9 @@ public class FileManager
     File backupFolder = new File(BACKUP + "/" + backupFolderName + "/");
     try
     {
-      File coversDir = new File(SCREENS);
-      deleteDirContent(coversDir, true);
-      copyDirectory(backupFolder.toPath().resolve("screens").toString(), coversDir.toPath().toString());
+      File screensDir = new File(SCREENS);
+      deleteDirContent(screensDir, true);
+      copyDirectory(backupFolder.toPath().resolve("screens").toString(), screensDir.toPath().toString());
     }
     catch (IOException e)
     {
@@ -918,9 +1033,24 @@ public class FileManager
     File backupFolder = new File(BACKUP + "/" + backupFolderName + "/");
     try
     {
-      File coversDir = new File(GAMES);
-      deleteDirContent(coversDir, true);
-      copyDirectory(backupFolder.toPath().resolve("games").toString(), coversDir.toPath().toString());
+      File gamesDir = new File(GAMES);
+      deleteDirContent(gamesDir, true);
+      copyDirectory(backupFolder.toPath().resolve("games").toString(), gamesDir.toPath().toString());
+    }
+    catch (IOException e)
+    {
+      ExceptionHandler.handleException(e, "Could not restore backup of games.");
+    }
+  }
+
+  public static void restoreSaves(String backupFolderName)
+  {
+    File backupFolder = new File(BACKUP + "/" + backupFolderName + "/");
+    try
+    {
+      File savesDir = new File(SAVES);
+      deleteSavesDirContent(savesDir);
+      copyDirectory(backupFolder.toPath().resolve("saves").toString(), savesDir.toPath().toString());
     }
     catch (IOException e)
     {

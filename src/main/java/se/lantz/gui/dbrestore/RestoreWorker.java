@@ -38,6 +38,9 @@ public class RestoreWorker extends SwingWorker<Void, String>
     publish("Restoring games directory...");
     restoreManager.restoreGames();
     publish("Done");
+    publish("Restoring saves directory...");
+    restoreManager.restoreSaves();
+    publish("Done");
     return null;
   }
 

@@ -3,6 +3,7 @@ package se.lantz.gui;
 import java.awt.Desktop;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
+import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -11,10 +12,12 @@ import java.util.List;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
+import javax.swing.JFileChooser;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 import se.lantz.gamebase.GamebaseImporter;
 import se.lantz.gui.checkdescriptions.CheckDescrProgressDialog;
@@ -28,16 +31,21 @@ import se.lantz.gui.dbrestore.RestoreProgressDialog;
 import se.lantz.gui.dbrestore.RestoreWorker;
 import se.lantz.gui.exports.ExportFileLoaderWorker;
 import se.lantz.gui.exports.ExportGamesDialog;
-import se.lantz.gui.exports.ExportProgressDialog;
+import se.lantz.gui.exports.ImportExportProgressDialog;
+import se.lantz.gui.exports.ExportSavedStatesDialog;
+import se.lantz.gui.exports.ExportSavedStatesWorker;
 import se.lantz.gui.exports.ExportWorker;
 import se.lantz.gui.imports.CarouselImportWorker;
 import se.lantz.gui.imports.GamebaseImportWorker;
 import se.lantz.gui.imports.ImportOptionsDialog;
 import se.lantz.gui.imports.ImportProgressDialog;
+import se.lantz.gui.imports.ImportSavedStatesDialog;
+import se.lantz.gui.imports.ImportSavedStatesWorker;
 import se.lantz.manager.BackupManager;
 import se.lantz.manager.ExportManager;
 import se.lantz.manager.ImportManager;
 import se.lantz.manager.RestoreManager;
+import se.lantz.manager.SavedStatesManager;
 import se.lantz.model.MainViewModel;
 import se.lantz.model.data.GameListData;
 import se.lantz.model.data.GameView;
@@ -60,8 +68,10 @@ public class MenuManager
   private JMenuItem runGameItem;
   private JMenuItem importCarouselItem;
   private JMenuItem importGamebaseItem;
+  private JMenuItem importSavedStatesItem;
   private JMenuItem exportItem;
   private JMenuItem exportFLItem;
+  private JMenuItem exportSavedStatesItem;
   private JMenuItem refreshItem;
 
   private JMenuItem toggleFavorite1Item;
@@ -104,6 +114,7 @@ public class MenuManager
   private ExportManager exportManager;
   private BackupManager backupManager;
   private RestoreManager restoreManager;
+  private SavedStatesManager savedStatesManager;
   private MainWindow mainWindow;
 
   public MenuManager(final MainViewModel uiModel, MainWindow mainWindow)
@@ -115,6 +126,8 @@ public class MenuManager
     this.exportManager = new ExportManager(uiModel);
     this.backupManager = new BackupManager(uiModel);
     this.restoreManager = new RestoreManager(uiModel);
+    this.savedStatesManager = new SavedStatesManager(uiModel);
+    uiModel.setSavedStatesManager(savedStatesManager);
     setupMenues();
   }
 
@@ -137,10 +150,12 @@ public class MenuManager
     fileMenu.add(importMenu);
     importMenu.add(getImportCarouselItem());
     importMenu.add(getImportGamebaseItem());
+    importMenu.add(getImportSavedStatesItem());
     exportMenu = new JMenu("Export");
-    exportMenu.setMnemonic('X');
+    exportMenu.setMnemonic('E');
     exportMenu.add(getExportItem());
     exportMenu.add(getExportFileLoaderItem());
+    exportMenu.add(getExportSavedStatesItem());
     fileMenu.add(exportMenu);
     fileMenu.addSeparator();
     fileMenu.add(getRefreshItem());
@@ -215,7 +230,7 @@ public class MenuManager
     addGameItem = new JMenuItem("Add new game");
     KeyStroke keyStrokeToAddGame = KeyStroke.getKeyStroke(KeyEvent.VK_N, InputEvent.CTRL_DOWN_MASK);
     addGameItem.setAccelerator(keyStrokeToAddGame);
-    addGameItem.setMnemonic('N');
+    addGameItem.setMnemonic('A');
 
     addGameItem.addActionListener(e -> mainWindow.getMainPanel().addNewGame());
     return addGameItem;
@@ -271,6 +286,14 @@ public class MenuManager
     return importGamebaseItem;
   }
 
+  private JMenuItem getImportSavedStatesItem()
+  {
+    importSavedStatesItem = new JMenuItem("Import Saved states...");
+    importSavedStatesItem.setMnemonic('S');
+    importSavedStatesItem.addActionListener(e -> importSavedStates());
+    return importSavedStatesItem;
+  }
+
   private JMenuItem getExportItem()
   {
     exportItem = new JMenuItem("Export to Carousel...");
@@ -289,6 +312,14 @@ public class MenuManager
     exportFLItem.setMnemonic('L');
     exportFLItem.addActionListener(e -> exportGamesToFileLoader());
     return exportFLItem;
+  }
+
+  private JMenuItem getExportSavedStatesItem()
+  {
+    exportSavedStatesItem = new JMenuItem("Export Saved states...");
+    exportSavedStatesItem.setMnemonic('S');
+    exportSavedStatesItem.addActionListener(e -> exportSavedStates());
+    return exportSavedStatesItem;
   }
 
   private JMenuItem getRefreshItem()
@@ -728,6 +759,38 @@ public class MenuManager
     }
   }
 
+  private void importSavedStates()
+  {
+    final ImportSavedStatesDialog importSavedStatesDialog = new ImportSavedStatesDialog(MainWindow.getInstance());
+    importSavedStatesDialog.pack();
+    importSavedStatesDialog.setLocationRelativeTo(this.mainWindow);
+    if (importSavedStatesDialog.showDialog())
+    {
+      savedStatesManager.setImportDirectory(importSavedStatesDialog.getTargetDirectory());
+      savedStatesManager.setImportOverwrite(importSavedStatesDialog.isImportOverwrite());
+      ImportExportProgressDialog dialog = new ImportExportProgressDialog(this.mainWindow, "Import saved states", true);
+      ImportSavedStatesWorker worker = new ImportSavedStatesWorker(savedStatesManager, dialog);
+      worker.execute();
+      dialog.setVisible(true);
+    }
+  }
+
+  private void exportSavedStates()
+  {
+    final ExportSavedStatesDialog exportSavedStatesDialog = new ExportSavedStatesDialog(MainWindow.getInstance());
+    exportSavedStatesDialog.pack();
+    exportSavedStatesDialog.setLocationRelativeTo(this.mainWindow);
+    if (exportSavedStatesDialog.showDialog())
+    {
+      savedStatesManager.setExportDirectory(exportSavedStatesDialog.getTargetDirectory());
+      savedStatesManager.setExportOverwrite(exportSavedStatesDialog.isExportOverwrite());
+      ImportExportProgressDialog dialog = new ImportExportProgressDialog(this.mainWindow, "Export saved states", false);
+      ExportSavedStatesWorker worker = new ExportSavedStatesWorker(savedStatesManager, dialog);
+      worker.execute();
+      dialog.setVisible(true);
+    }
+  }
+
   private void exportGames()
   {
     final ExportGamesDialog exportSelectionDialog = new ExportGamesDialog(MainWindow.getInstance(), true);
@@ -743,7 +806,7 @@ public class MenuManager
           exportManager.setGameViewsToExport(viewList);
           exportManager.setTargetDirectory(exportSelectionDialog.getTargetDirectory(),
                                            exportSelectionDialog.deleteBeforeExport());
-          ExportProgressDialog dialog = new ExportProgressDialog(this.mainWindow);
+          ImportExportProgressDialog dialog = new ImportExportProgressDialog(this.mainWindow, "Export games", false);
           ExportWorker worker = new ExportWorker(exportManager, dialog);
           worker.execute();
           dialog.setVisible(true);
@@ -757,7 +820,7 @@ public class MenuManager
           exportManager.setGamesToExport(gamesList);
           exportManager.setTargetDirectory(exportSelectionDialog.getTargetDirectory(),
                                            exportSelectionDialog.deleteBeforeExport());
-          ExportProgressDialog dialog = new ExportProgressDialog(this.mainWindow);
+          ImportExportProgressDialog dialog = new ImportExportProgressDialog(this.mainWindow, "Export games", false);
           ExportWorker worker = new ExportWorker(exportManager, dialog);
           worker.execute();
           dialog.setVisible(true);
@@ -781,7 +844,7 @@ public class MenuManager
           exportManager.setGameViewsToExport(viewList);
           exportManager.setTargetDirectory(exportSelectionDialog.getTargetDirectory(),
                                            exportSelectionDialog.deleteBeforeExport());
-          ExportProgressDialog dialog = new ExportProgressDialog(this.mainWindow);
+          ImportExportProgressDialog dialog = new ImportExportProgressDialog(this.mainWindow, "Export games", false);
           ExportFileLoaderWorker worker = new ExportFileLoaderWorker(exportManager, dialog);
           worker.execute();
           dialog.setVisible(true);
@@ -795,7 +858,7 @@ public class MenuManager
           exportManager.setGamesToExport(gamesList);
           exportManager.setTargetDirectory(exportSelectionDialog.getTargetDirectory(),
                                            exportSelectionDialog.deleteBeforeExport());
-          ExportProgressDialog dialog = new ExportProgressDialog(this.mainWindow);
+          ImportExportProgressDialog dialog = new ImportExportProgressDialog(this.mainWindow, "Export games", false);
           ExportFileLoaderWorker worker = new ExportFileLoaderWorker(exportManager, dialog);
           worker.execute();
           dialog.setVisible(true);

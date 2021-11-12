@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 
 import se.lantz.db.DbConnector;
 import se.lantz.manager.ImportManager;
+import se.lantz.manager.SavedStatesManager;
 import se.lantz.model.data.GameDetails;
 import se.lantz.model.data.GameListData;
 import se.lantz.model.data.GameView;
@@ -59,8 +60,10 @@ public class MainViewModel extends AbstractModel
   private JoystickModel joy1Model = new JoystickModel(true);
   private JoystickModel joy2Model = new JoystickModel(false);
   private SystemModel systemModel = new SystemModel();
+  private SavedStatesModel stateModel = new SavedStatesModel();
 
   private FileManager fileManager = new FileManager(this);
+  private SavedStatesManager stateManager;
 
   private String currentGameId = "";
   private GameDetails currentGameDetails = null;
@@ -69,6 +72,11 @@ public class MainViewModel extends AbstractModel
   private GameListData selectedData;
 
   Scraper scraper = new MobyGamesScraper();
+  
+  public void setSavedStatesManager(SavedStatesManager savedStatesManager)
+  {
+    this.stateManager = savedStatesManager;
+  }
 
   public void initialize()
   {
@@ -99,6 +107,7 @@ public class MainViewModel extends AbstractModel
     joy1Model.disableChangeNotification(disable);
     joy2Model.disableChangeNotification(disable);
     systemModel.disableChangeNotification(disable);
+    stateModel.disableChangeNotification(disable);
   }
 
   protected void notifyChangeForAllModels()
@@ -107,6 +116,7 @@ public class MainViewModel extends AbstractModel
     joy1Model.notifyChange();
     joy2Model.notifyChange();
     systemModel.notifyChange();
+    stateModel.notifyChange();
   }
 
   private void setupGameViews()
@@ -239,6 +249,9 @@ public class MainViewModel extends AbstractModel
     {
       infoModel.setTitle("");
     }
+    //Read available saved states
+    stateManager.readSavedStates();
+    
     disableChangeNotification(false);
     notifyChangeForAllModels();
     //Do not reset unsaved for new entry
@@ -303,6 +316,11 @@ public class MainViewModel extends AbstractModel
   public SystemModel getSystemModel()
   {
     return systemModel;
+  }
+  
+  public SavedStatesModel getSavedStatesModel()
+  {
+    return stateModel;
   }
 
   public void reloadCurrentGameView()
@@ -421,6 +439,7 @@ public class MainViewModel extends AbstractModel
     getJoy1Model().addPropertyChangeListener(saveChangeListener);
     getJoy2Model().addPropertyChangeListener(saveChangeListener);
     getSystemModel().addPropertyChangeListener(saveChangeListener);
+    getSavedStatesModel().addPropertyChangeListener(saveChangeListener);
   }
 
   public void addRequireFieldsListener(PropertyChangeListener requiredFieldsListener)
@@ -432,7 +451,7 @@ public class MainViewModel extends AbstractModel
   public boolean isDataChanged()
   {
     return infoModel.isDataChanged() || joy1Model.isDataChanged() || joy2Model.isDataChanged() ||
-      systemModel.isDataChanged();
+      systemModel.isDataChanged() || stateModel.isDataChanged();
   }
 
   @Override
@@ -442,6 +461,7 @@ public class MainViewModel extends AbstractModel
     joy1Model.resetDataChanged();
     joy2Model.resetDataChanged();
     systemModel.resetDataChanged();
+    stateModel.resetDataChanged();
   }
 
   @Override
@@ -451,6 +471,7 @@ public class MainViewModel extends AbstractModel
     joy1Model.resetDataChangedAfterInit();
     joy2Model.resetDataChangedAfterInit();
     systemModel.resetDataChangedAfterInit();
+    stateModel.resetDataChangedAfterInit();
   }
 
   /**
@@ -559,6 +580,8 @@ public class MainViewModel extends AbstractModel
       gameListModel.notifyChange();
 
       fileManager.saveFiles();
+      stateManager.saveSavedStates();
+      
       //Reset and images that where added previously
       infoModel.resetImagesAndOldFileNames();
       //Reset all models
@@ -566,6 +589,7 @@ public class MainViewModel extends AbstractModel
       joy1Model.resetDataChanged();
       joy2Model.resetDataChanged();
       systemModel.resetDataChanged();
+      stateModel.resetDataChanged();
 
       //Update db title once done
       infoModel.setTitleFromDb(infoModel.getTitle());
@@ -796,11 +820,16 @@ public class MainViewModel extends AbstractModel
 
   public void runGameInVice()
   {
-    fileManager.runVice(true);
+    fileManager.runGameInVice();
   }
 
   public void runVice()
   {
-    fileManager.runVice(false);
+    fileManager.runViceWithoutGame();
+  }
+  
+  public void runSnapshotInVice(SavedStatesModel.SAVESTATE saveState)
+  {
+    fileManager.runSnapshotInVice(saveState);
   }
 }

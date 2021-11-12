@@ -44,4 +44,9 @@ public class RestoreManager
   {
     FileManager.restoreGames(currentFolderName);
   }
+  
+  public void restoreSaves()
+  {
+    FileManager.restoreSaves(currentFolderName);
+  }
 }
