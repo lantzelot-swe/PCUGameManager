@@ -13,6 +13,8 @@ import java.awt.image.BufferedImage;
 import java.beans.Beans;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.FileSystems;
+import java.nio.file.PathMatcher;
 
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
@@ -20,6 +22,7 @@ import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JTextField;
@@ -33,7 +36,6 @@ import se.lantz.gui.screenshot.EditScreenshotDialog;
 import se.lantz.model.InfoModel;
 import se.lantz.model.MainViewModel;
 import se.lantz.util.CustomUndoPlainDocument;
-import se.lantz.util.ExceptionHandler;
 import se.lantz.util.FileDrop;
 import se.lantz.util.FileManager;
 
@@ -590,8 +592,22 @@ public class ScreenshotsPanel extends JPanel
           {
             if (files.length > 0)
             {
-              gamesFileUpdated = true;
-              infomodel.setGamesPath(files[0]);
+              //Matcher for valid files
+              PathMatcher matcher =
+                FileSystems.getDefault().getPathMatcher("glob:**.{d64,t64,tap,vsf,vsz,gz,crt,prg,g64,zip}");
+              if (!matcher.matches(files[0].toPath()))
+              {
+                JOptionPane
+                  .showMessageDialog(getGameTextField(),
+                                     "Invalid file format, it must be a d64, t64, tap, vsf, vsz, crt, prg, g64, gz or zip file.",
+                                     "Game file",
+                                     JOptionPane.ERROR_MESSAGE);
+              }
+              else
+              {
+                gamesFileUpdated = true;
+                infomodel.setGamesPath(files[0]);
+              }
             }
           }
         });
@@ -710,6 +726,14 @@ public class ScreenshotsPanel extends JPanel
       try
       {
         returnImage = ImageIO.read(files[0]);
+        if (returnImage == null)
+        {
+          JOptionPane.showMessageDialog(getCoverImageLabel(),
+                                        "Invalid file format, it must be a png, gif, jpeg or bmp file.",
+                                        "Cover file",
+                                        JOptionPane.ERROR_MESSAGE);
+          return null;
+        }
         Image newImage = returnImage.getScaledInstance(130, 200, Image.SCALE_SMOOTH);
         imageLabel.setIcon(new ImageIcon(newImage));
       }
@@ -730,7 +754,14 @@ public class ScreenshotsPanel extends JPanel
       try
       {
         returnImage = ImageIO.read(files[0]);
-
+        if (returnImage == null)
+        {
+          JOptionPane.showMessageDialog(getScreenshotPanel(),
+                                        "Invalid file format, it must be a png, gif, jpeg or bmp file.",
+                                        "Screenshot file",
+                                        JOptionPane.ERROR_MESSAGE);
+          return null;
+        }
         setEditButtonVisibility(returnImage, editButton);
         imageLabel.setIcon(new ImageIcon(FileManager.scaleImageTo320x200x32bit(returnImage)));
       }
@@ -768,7 +799,7 @@ public class ScreenshotsPanel extends JPanel
     fileChooser.setCurrentDirectory(new File(gameDir));
 
     FileNameExtensionFilter vicefilter =
-      new FileNameExtensionFilter("Vice runnable files", "d64", "t64", "tap", "VSF", "GZ", "crt", "prg", "g64");
+      new FileNameExtensionFilter("Vice runnable files", "d64", "t64", "tap", "VSF", "VSZ", "GZ", "crt", "prg", "g64");
     fileChooser.addChoosableFileFilter(vicefilter);
     fileChooser.setFileFilter(vicefilter);
     int value = fileChooser.showOpenDialog(MainWindow.getInstance());
@@ -866,22 +897,22 @@ public class ScreenshotsPanel extends JPanel
       viewTagTextField = new JTextField();
       viewTagTextField.setColumns(10);
       viewTagTextField.setDocument(new CustomUndoPlainDocument()
-      {
-        @Override
-        public void updateModel()
         {
-          infomodel.setViewTag(viewTagTextField.getText());
-        }
-      });
+          @Override
+          public void updateModel()
+          {
+            infomodel.setViewTag(viewTagTextField.getText());
+          }
+        });
       viewTagTextField.addKeyListener(new KeyAdapter()
-      {
-        @Override
-        public void keyReleased(KeyEvent e)
         {
-          JTextField textField = (JTextField) e.getSource();
-          infomodel.setViewTag(textField.getText());
-        }
-      });
+          @Override
+          public void keyReleased(KeyEvent e)
+          {
+            JTextField textField = (JTextField) e.getSource();
+            infomodel.setViewTag(textField.getText());
+          }
+        });
     }
     return viewTagTextField;
   }

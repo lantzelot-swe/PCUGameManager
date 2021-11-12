@@ -15,7 +15,9 @@ import java.awt.image.BufferedImage;
 import java.beans.Beans;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.FileSystems;
 import java.nio.file.Path;
+import java.nio.file.PathMatcher;
 import java.text.ParseException;
 
 import javax.imageio.ImageIO;
@@ -24,6 +26,7 @@ import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSeparator;
 import javax.swing.JTextField;
@@ -363,9 +366,17 @@ public class SaveStatePanel extends JPanel
           {
             if (files.length > 0)
             {
-              gamesFileUpdated = true;
-              if (files[0].getName().toLowerCase().endsWith(".vsf"))
+              PathMatcher matcher = FileSystems.getDefault().getPathMatcher("glob:**.{vsf,vsz}");
+              if (!matcher.matches(files[0].toPath()))
               {
+                JOptionPane.showMessageDialog(getSnapshotTextField(),
+                                              "Invalid file format, it must be a Vice snapshot file (vsf or vsz)",
+                                              "Snapshot file",
+                                              JOptionPane.ERROR_MESSAGE);
+              }
+              else
+              {
+                gamesFileUpdated = true;
                 setSnapshotFileToModel(files[0]);
               }
             }
@@ -405,7 +416,7 @@ public class SaveStatePanel extends JPanel
     }
     fileChooser.setCurrentDirectory(new File(gameDir));
 
-    FileNameExtensionFilter vicefilter = new FileNameExtensionFilter("Vice snapshot", "vsf");
+    FileNameExtensionFilter vicefilter = new FileNameExtensionFilter("Vice snapshot (vsf, vsz)", "vsf", "vsz");
     fileChooser.addChoosableFileFilter(vicefilter);
     fileChooser.setFileFilter(vicefilter);
     int value = fileChooser.showOpenDialog(MainWindow.getInstance());
@@ -735,6 +746,14 @@ public class SaveStatePanel extends JPanel
       try
       {
         returnImage = ImageIO.read(files[0]);
+        if (returnImage == null)
+        {
+          JOptionPane.showMessageDialog(this,
+                                        "Invalid file format, it must be a png, gif, jpeg or bmp file.",
+                                        "Screenshot file",
+                                        JOptionPane.ERROR_MESSAGE);
+          return null;
+        }
         Image newImage = returnImage.getScaledInstance(130, 82, Image.SCALE_SMOOTH);
         imageLabel.setIcon(new ImageIcon(newImage));
       }
