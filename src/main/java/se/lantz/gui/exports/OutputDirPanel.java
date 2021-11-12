@@ -70,7 +70,6 @@ public class OutputDirPanel extends JPanel
     if (deleteCheckBox == null)
     {
       deleteCheckBox = new JCheckBox();
-      deleteCheckBox.setSelected(true);
       updateDeleteCheckBoxText(true);
     }
     return deleteCheckBox;
