@@ -202,7 +202,7 @@ public class MainViewModel extends AbstractModel
     this.disableChangeNotification(false);
   }
 
-  public ListModel<GameListData> getGameListModel()
+  public GameListModel getGameListModel()
   {
     return gameListModel;
   }
@@ -582,6 +582,7 @@ public class MainViewModel extends AbstractModel
         dbConnector.saveGame(currentGameId, updatedGame);
       }
       selectedData.setTitle(updatedGame.getTitle());
+      selectedData.setGameFileName(updatedGame.getGame());
       gameListModel.notifyChange();
 
       fileManager.saveFiles();

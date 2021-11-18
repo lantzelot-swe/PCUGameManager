@@ -32,6 +32,11 @@ public class GameListDataRenderer extends DefaultListCellRenderer
   private Color fav5Color = Color.RED;
   private Color fav5ColorSelected = Color.PINK;
 
+  private ImageIcon saves1Icon = new ImageIcon(this.getClass().getResource("/se/lantz/16x16SaveIcon-1.png"));
+  private ImageIcon saves2Icon = new ImageIcon(this.getClass().getResource("/se/lantz/16x16SaveIcon-2.png"));
+  private ImageIcon saves3Icon = new ImageIcon(this.getClass().getResource("/se/lantz/16x16SaveIcon-3.png"));
+  private ImageIcon saves4Icon = new ImageIcon(this.getClass().getResource("/se/lantz/16x16SaveIcon-4.png"));
+
   private final Font bold;
   private final Font boldItalic;
   private SavedStatesManager savedStatesManager;
@@ -117,19 +122,19 @@ public class GameListDataRenderer extends DefaultListCellRenderer
     int numberOfSavedStates = savedStatesManager.getNumberOfSavedStatesForGame(listData.getGameFileName());
     if (numberOfSavedStates == 1)
     {
-      this.setIcon(new ImageIcon(this.getClass().getResource("/se/lantz/16x16SaveIcon-1.png")));
+      this.setIcon(saves1Icon);
     }
     else if (numberOfSavedStates == 2)
     {
-      this.setIcon(new ImageIcon(this.getClass().getResource("/se/lantz/16x16SaveIcon-2.png")));
+      this.setIcon(saves2Icon);
     }
     else if (numberOfSavedStates == 3)
     {
-      this.setIcon(new ImageIcon(this.getClass().getResource("/se/lantz/16x16SaveIcon-3.png")));
+      this.setIcon(saves3Icon);
     }
     else if (numberOfSavedStates == 4)
     {
-      this.setIcon(new ImageIcon(this.getClass().getResource("/se/lantz/16x16SaveIcon-4.png")));
+      this.setIcon(saves4Icon);
     }
     else
     {

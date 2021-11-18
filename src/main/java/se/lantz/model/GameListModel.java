@@ -10,7 +10,7 @@ public class GameListModel extends DefaultListModel<GameListData>
 { 
   private boolean disableIntervalChange = false;
   
-  void notifyChange()
+  public void notifyChange()
   {
     fireContentsChanged(this, 0, getSize()-1);
   }

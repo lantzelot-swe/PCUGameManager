@@ -407,6 +407,10 @@ public class SavedStatesManager
     {
       ExceptionHandler.handleException(e1, "Could not import to saved folder.");
     }
+    //Update saved states map
+    readSavedStatesAndUpdateMap();
+    //Update model list after import
+    model.getGameListModel().notifyChange();
   }
 
   private boolean isValidSaveStatePath(Path path)
@@ -422,6 +426,7 @@ public class SavedStatesManager
   
   private void readSavedStatesAndUpdateMap()
   {
+    savedStatesMap.clear();
     //Read all files in the saves folder
     File saveFolder = new File(SAVES);
     try (Stream<Path> stream = Files.walk(saveFolder.toPath().toAbsolutePath(), 1))
