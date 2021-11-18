@@ -3,10 +3,13 @@ package se.lantz.gui;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Font;
+import java.awt.Insets;
 
 import javax.swing.BorderFactory;
 import javax.swing.DefaultListCellRenderer;
+import javax.swing.ImageIcon;
 import javax.swing.JList;
+import javax.swing.SwingConstants;
 
 import se.lantz.model.data.GameListData;
 import se.lantz.model.data.GameView;
@@ -35,6 +38,8 @@ public class GameListDataRenderer extends DefaultListCellRenderer
   {
     this.boldItalic = getFont().deriveFont(Font.BOLD + Font.ITALIC);
     this.bold = getFont().deriveFont(Font.BOLD);
+    this.setHorizontalTextPosition(SwingConstants.LEADING);
+    this.setHorizontalAlignment(SwingConstants.LEADING);
   }
 
   @Override
@@ -59,6 +64,7 @@ public class GameListDataRenderer extends DefaultListCellRenderer
 
   private void handleGameListData(Object value, boolean isSelected)
   {
+    this.setIcon(null);
     GameListData listData = (GameListData) value;
     if (listData.isFavorite())
     {
@@ -68,6 +74,7 @@ public class GameListDataRenderer extends DefaultListCellRenderer
       {
       case 1:
         this.setForeground(isSelected ? fav1ColorSelected : fav1Color);
+        this.setIcon(new ImageIcon(this.getClass().getResource("/se/lantz/16x16SaveIcon-1.png")));
         break;
       case 2:
         this.setForeground(isSelected ? fav2ColorSelected : fav2Color);
@@ -105,6 +112,7 @@ public class GameListDataRenderer extends DefaultListCellRenderer
         break;
       }
     }
+    
   }
   
   private void handleGameListView(Object value, boolean isSelected, int index)
@@ -169,5 +177,19 @@ public class GameListDataRenderer extends DefaultListCellRenderer
         this.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Color.LIGHT_GRAY));
       }     
     }
+  }
+  
+  @Override
+  public void setBounds(int x, int y, int width, int height) {
+      super.setBounds(x, y, width, height);
+      if (getIcon() != null) {
+          int padding = 1;
+          int textWidth = getFontMetrics(getFont()).stringWidth(getText());
+          Insets insets = getInsets();
+          int iconTextGap = width - textWidth - getIcon().getIconWidth() - insets.left - insets.right - padding;
+          setIconTextGap(iconTextGap);
+      } else {
+          setIconTextGap(0);
+      }
   }
 }
