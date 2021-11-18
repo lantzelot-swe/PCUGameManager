@@ -16,7 +16,7 @@ public class GamebaseAccessTest
   public static void main(String[] args)
   {
 
-    String databaseURL = "jdbc:ucanaccess://F://Github//PCUGameManager//GBC_v16.mdb";
+    String databaseURL = "jdbc:ucanaccess://C://C64//Github//PCUGameManager//GBC_v16.mdb";
 
     try (Connection connection = DriverManager.getConnection(databaseURL))
     {
