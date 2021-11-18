@@ -20,6 +20,8 @@ import java.util.stream.Stream;
 import javax.imageio.ImageIO;
 
 import org.apache.commons.io.FileUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import se.lantz.model.MainViewModel;
 import se.lantz.model.SavedStatesModel;
@@ -28,6 +30,8 @@ import se.lantz.util.FileManager;
 
 public class SavedStatesManager
 {
+  private static final Logger logger = LoggerFactory.getLogger(SavedStatesManager.class);
+  
   public static final String SAVES = "./saves/";
 
   private static final String MTA0 = "0.mta";
@@ -58,7 +62,7 @@ public class SavedStatesManager
 
   /**
    * Map holding available saved states with fileName (subfolder) as key and number of saved states available as value
-   * (1-4).
+   * (0-4).
    */
   private Map<String, Integer> savedStatesMap = new HashMap<>();
 
@@ -136,7 +140,6 @@ public class SavedStatesManager
     savedStatesModel.resetProperties();
     //Read from state directory, update model
     String fileName = model.getInfoModel().getGamesFile();
-    System.out.println(fileName.toString());
     if (!fileName.isEmpty())
     {
       //Check if folder is available
@@ -191,9 +194,9 @@ public class SavedStatesManager
       byte[] timeArray = new byte[] { fileContent[0], fileContent[1], fileContent[2], fileContent[3] };
       //The value seems to be in milliseconds
       int milliSeconds = ByteBuffer.wrap(timeArray).order(java.nio.ByteOrder.LITTLE_ENDIAN).getInt();
-      System.out.println("24 bit value Little endian x= " + milliSeconds);
-      returnValue = convertSecondToHHMMString(milliSeconds);// LocalTime.MIN.plusSeconds(seconds).toString(); 
-      System.out.println("Converted string = " + returnValue);
+      logger.debug("24 bit value Little endian x= " + milliSeconds);
+      returnValue = convertSecondToHHMMString(milliSeconds);
+      logger.debug("Converted string = " + returnValue);
     }
     catch (IOException e)
     {
@@ -423,7 +426,7 @@ public class SavedStatesManager
   {
     return noFilesCopied;
   }
-  
+
   private void readSavedStatesAndUpdateMap()
   {
     savedStatesMap.clear();
@@ -439,31 +442,31 @@ public class SavedStatesManager
           {
             return;
           }
-          
+
           //Check which files are available
           Path save1 = sourcePath.resolve(MTA0);
           Path save2 = sourcePath.resolve(MTA1);
           Path save3 = sourcePath.resolve(MTA2);
           Path save4 = sourcePath.resolve(MTA3);
-          int noSavesAvailable = 0;
+          int savesAvailable = 0;
           if (save1.toFile().exists())
           {
-            noSavesAvailable++;
+            savesAvailable++;
           }
           if (save2.toFile().exists())
           {
-            noSavesAvailable++;
+            savesAvailable++;
           }
           if (save3.toFile().exists())
           {
-            noSavesAvailable++;
+            savesAvailable++;
           }
           if (save4.toFile().exists())
           {
-            noSavesAvailable++;
-          }      
+            savesAvailable++;
+          }
           //Add to map
-          savedStatesMap.put(sourcePath.toFile().getName(), noSavesAvailable);
+          savedStatesMap.put(sourcePath.toFile().getName(), savesAvailable);
         }
         catch (Exception e)
         {
@@ -476,7 +479,7 @@ public class SavedStatesManager
       ExceptionHandler.handleException(e1, "Could not construct savedStates Map");
     }
   }
-  
+
   public int getNumberOfSavedStatesForGame(String gameFileName)
   {
     return savedStatesMap.get(gameFileName) != null ? savedStatesMap.get(gameFileName) : 0;
