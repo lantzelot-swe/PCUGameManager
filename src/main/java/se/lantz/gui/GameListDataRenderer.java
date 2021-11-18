@@ -11,6 +11,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JList;
 import javax.swing.SwingConstants;
 
+import se.lantz.manager.SavedStatesManager;
 import se.lantz.model.data.GameListData;
 import se.lantz.model.data.GameView;
 
@@ -33,9 +34,11 @@ public class GameListDataRenderer extends DefaultListCellRenderer
 
   private final Font bold;
   private final Font boldItalic;
+  private SavedStatesManager savedStatesManager;
 
-  public GameListDataRenderer()
+  public GameListDataRenderer(SavedStatesManager savedStatesManager)
   {
+    this.savedStatesManager = savedStatesManager;
     this.boldItalic = getFont().deriveFont(Font.BOLD + Font.ITALIC);
     this.bold = getFont().deriveFont(Font.BOLD);
     this.setHorizontalTextPosition(SwingConstants.LEADING);
@@ -64,7 +67,6 @@ public class GameListDataRenderer extends DefaultListCellRenderer
 
   private void handleGameListData(Object value, boolean isSelected)
   {
-    this.setIcon(null);
     GameListData listData = (GameListData) value;
     if (listData.isFavorite())
     {
@@ -74,7 +76,6 @@ public class GameListDataRenderer extends DefaultListCellRenderer
       {
       case 1:
         this.setForeground(isSelected ? fav1ColorSelected : fav1Color);
-        this.setIcon(new ImageIcon(this.getClass().getResource("/se/lantz/16x16SaveIcon-1.png")));
         break;
       case 2:
         this.setForeground(isSelected ? fav2ColorSelected : fav2Color);
@@ -112,18 +113,40 @@ public class GameListDataRenderer extends DefaultListCellRenderer
         break;
       }
     }
-    
+    //Decide which icon to use
+    int numberOfSavedStates = savedStatesManager.getNumberOfSavedStatesForGame(listData.getGameFileName());
+    if (numberOfSavedStates == 1)
+    {
+      this.setIcon(new ImageIcon(this.getClass().getResource("/se/lantz/16x16SaveIcon-1.png")));
+    }
+    else if (numberOfSavedStates == 2)
+    {
+      this.setIcon(new ImageIcon(this.getClass().getResource("/se/lantz/16x16SaveIcon-2.png")));
+    }
+    else if (numberOfSavedStates == 3)
+    {
+      this.setIcon(new ImageIcon(this.getClass().getResource("/se/lantz/16x16SaveIcon-3.png")));
+    }
+    else if (numberOfSavedStates == 4)
+    {
+      this.setIcon(new ImageIcon(this.getClass().getResource("/se/lantz/16x16SaveIcon-4.png")));
+    }
+    else
+    {
+      this.setIcon(null);
+    }
   }
-  
+
   private void handleGameListView(Object value, boolean isSelected, int index)
   {
+    this.setIcon(null);
     this.setBorder(null);
     GameView view = (GameView) value;
     if (view.getGameViewId() == GameView.FAVORITES_ID)
     {
       this.setFont(bold);
       this.setForeground(isSelected ? fav1ColorSelected : fav1Color);
-      if(index > -1)
+      if (index > -1)
       {
         this.setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, Color.LIGHT_GRAY));
       }
@@ -172,24 +195,28 @@ public class GameListDataRenderer extends DefaultListCellRenderer
     {
       this.setFont(boldItalic);
       this.setForeground(isSelected ? fav5ColorSelected : fav5Color);
-      if(index > -1)
+      if (index > -1)
       {
         this.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Color.LIGHT_GRAY));
-      }     
+      }
     }
   }
-  
+
   @Override
-  public void setBounds(int x, int y, int width, int height) {
-      super.setBounds(x, y, width, height);
-      if (getIcon() != null) {
-          int padding = 1;
-          int textWidth = getFontMetrics(getFont()).stringWidth(getText());
-          Insets insets = getInsets();
-          int iconTextGap = width - textWidth - getIcon().getIconWidth() - insets.left - insets.right - padding;
-          setIconTextGap(iconTextGap);
-      } else {
-          setIconTextGap(0);
-      }
+  public void setBounds(int x, int y, int width, int height)
+  {
+    super.setBounds(x, y, width, height);
+    if (getIcon() != null)
+    {
+      int padding = 1;
+      int textWidth = getFontMetrics(getFont()).stringWidth(getText());
+      Insets insets = getInsets();
+      int iconTextGap = width - textWidth - getIcon().getIconWidth() - insets.left - insets.right - padding;
+      setIconTextGap(iconTextGap);
+    }
+    else
+    {
+      setIconTextGap(0);
+    }
   }
 }

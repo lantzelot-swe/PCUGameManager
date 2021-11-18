@@ -77,6 +77,11 @@ public class MainViewModel extends AbstractModel
   {
     this.stateManager = savedStatesManager;
   }
+  
+  public SavedStatesManager getSavedStatesManager()
+  {
+    return this.stateManager;
+  }
 
   public void initialize()
   {
@@ -688,7 +693,7 @@ public class MainViewModel extends AbstractModel
 
   public void addNewGameListData()
   {
-    gameListModel.addElement(new GameListData("New Game", "", 0));
+    gameListModel.addElement(new GameListData("New Game", "", "", 0));
     selectedGameView.setGameCount(gameListModel.getSize());
     //Update all games count 
     allGamesCount++;

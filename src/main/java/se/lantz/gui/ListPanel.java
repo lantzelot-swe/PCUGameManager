@@ -172,7 +172,7 @@ public class ListPanel extends JPanel
           }
         });
       listViewComboBox.setModel(uiModel.getGameViewModel());
-      listViewComboBox.setRenderer(new GameListDataRenderer());
+      listViewComboBox.setRenderer(new GameListDataRenderer(uiModel.getSavedStatesManager()));
       listViewComboBox.addPopupMenuListener(new PopupMenuListener()
         {
           @Override
@@ -434,7 +434,7 @@ public class ListPanel extends JPanel
         }
       });
       list.setModel(uiModel.getGameListModel());
-      list.setCellRenderer(new GameListDataRenderer());
+      list.setCellRenderer(new GameListDataRenderer(uiModel.getSavedStatesManager()));
       //Remove from tootlipManager to avoid throwing a nullpointer for CTRL+F1
       ToolTipManager.sharedInstance().unregisterComponent(list);
     }

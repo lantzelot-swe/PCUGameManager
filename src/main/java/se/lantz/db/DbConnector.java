@@ -220,7 +220,7 @@ public class DbConnector
 
     //Construct SQL
     StringBuilder sqlBuilder = new StringBuilder();
-    sqlBuilder.append("SELECT title, rowid, favorite FROM gameinfo ");
+    sqlBuilder.append("SELECT title, gamefile, rowid, favorite FROM gameinfo ");
     sqlBuilder.append(view.getSqlQuery());
     sqlBuilder.append(" ORDER BY title COLLATE NOCASE ASC");
 
@@ -232,7 +232,7 @@ public class DbConnector
       while (rs.next())
       {
         GameListData data =
-          new GameListData(rs.getString("Title"), Integer.toString(rs.getInt("rowid")), rs.getInt("Favorite"));
+          new GameListData(rs.getString("Title"), rs.getString("GameFile"), Integer.toString(rs.getInt("rowid")), rs.getInt("Favorite"));
         returnList.add(data);
       }
     }

@@ -12,6 +12,8 @@ import java.nio.file.PathMatcher;
 import java.nio.file.StandardCopyOption;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.TimeZone;
 import java.util.stream.Stream;
 
@@ -54,10 +56,17 @@ public class SavedStatesManager
 
   private int noFilesCopied = 0;
 
+  /**
+   * Map holding available saved states with fileName (subfolder) as key and number of saved states available as value
+   * (1-4).
+   */
+  private Map<String, Integer> savedStatesMap = new HashMap<>();
+
   public SavedStatesManager(MainViewModel model)
   {
     this.model = model;
     this.savedStatesModel = model.getSavedStatesModel();
+    readSavedStatesAndUpdateMap();
   }
 
   public void saveSavedStates()
@@ -76,6 +85,7 @@ public class SavedStatesManager
 
     String fileName = model.getInfoModel().getGamesFile();
     Path saveFolder = new File(SAVES + fileName).toPath();
+    int numberofSaves = 0;
     //Check which ones are available
     Path mta0Path = saveFolder.resolve(MTA0);
     Path vsz0Path = saveFolder.resolve(VSZ0);
@@ -85,6 +95,7 @@ public class SavedStatesManager
       storePlayTime(mta0Path, savedStatesModel.getState1time());
       copyVsfFile(vsz0Path, savedStatesModel.getState1Path());
       copyPngFile(png0Path, savedStatesModel.getState1PngImage());
+      numberofSaves++;
     }
     Path mta1Path = saveFolder.resolve(MTA1);
     Path vsz1Path = saveFolder.resolve(VSZ1);
@@ -94,6 +105,7 @@ public class SavedStatesManager
       storePlayTime(mta1Path, savedStatesModel.getState2time());
       copyVsfFile(vsz1Path, savedStatesModel.getState2Path());
       copyPngFile(png1Path, savedStatesModel.getState2PngImage());
+      numberofSaves++;
     }
     Path mta2Path = saveFolder.resolve(MTA2);
     Path vsz2Path = saveFolder.resolve(VSZ2);
@@ -103,6 +115,7 @@ public class SavedStatesManager
       storePlayTime(mta2Path, savedStatesModel.getState3time());
       copyVsfFile(vsz2Path, savedStatesModel.getState3Path());
       copyPngFile(png2Path, savedStatesModel.getState3PngImage());
+      numberofSaves++;
     }
     Path mta3Path = saveFolder.resolve(MTA3);
     Path vsz3Path = saveFolder.resolve(VSZ3);
@@ -112,7 +125,10 @@ public class SavedStatesManager
       storePlayTime(mta3Path, savedStatesModel.getState4time());
       copyVsfFile(vsz3Path, savedStatesModel.getState4Path());
       copyPngFile(png3Path, savedStatesModel.getState4PngImage());
+      numberofSaves++;
     }
+    //Update current map also
+    savedStatesMap.put(fileName, numberofSaves);
   }
 
   public void readSavedStates()
@@ -402,5 +418,62 @@ public class SavedStatesManager
   public int getNumberOfFilesCopied()
   {
     return noFilesCopied;
+  }
+  
+  private void readSavedStatesAndUpdateMap()
+  {
+    //Read all files in the saves folder
+    File saveFolder = new File(SAVES);
+    try (Stream<Path> stream = Files.walk(saveFolder.toPath().toAbsolutePath(), 1))
+    {
+      stream.forEachOrdered(sourcePath -> {
+        try
+        {
+          //Ignore first folder
+          if (sourcePath.equals(saveFolder.toPath().toAbsolutePath()))
+          {
+            return;
+          }
+          
+          //Check which files are available
+          Path save1 = sourcePath.resolve(MTA0);
+          Path save2 = sourcePath.resolve(MTA1);
+          Path save3 = sourcePath.resolve(MTA2);
+          Path save4 = sourcePath.resolve(MTA3);
+          int noSavesAvailable = 0;
+          if (save1.toFile().exists())
+          {
+            noSavesAvailable++;
+          }
+          if (save2.toFile().exists())
+          {
+            noSavesAvailable++;
+          }
+          if (save3.toFile().exists())
+          {
+            noSavesAvailable++;
+          }
+          if (save4.toFile().exists())
+          {
+            noSavesAvailable++;
+          }      
+          //Add to map
+          savedStatesMap.put(sourcePath.toFile().getName(), noSavesAvailable);
+        }
+        catch (Exception e)
+        {
+          ExceptionHandler.logException(e, "Could not check available saved states for " + sourcePath.toString());
+        }
+      });
+    }
+    catch (IOException e1)
+    {
+      ExceptionHandler.handleException(e1, "Could not construct savedStates Map");
+    }
+  }
+  
+  public int getNumberOfSavedStatesForGame(String gameFileName)
+  {
+    return savedStatesMap.get(gameFileName) != null ? savedStatesMap.get(gameFileName) : 0;
   }
 }
