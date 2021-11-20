@@ -331,6 +331,8 @@ public class MainViewModel extends AbstractModel
   public void reloadCurrentGameView()
   {
     setSelectedGameView(getSelectedGameView());
+    //Update the available saves states map also
+    this.stateManager.readSavedStatesAndUpdateMap();
     resetDataChanged();
   }
 

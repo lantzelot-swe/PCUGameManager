@@ -427,7 +427,7 @@ public class SavedStatesManager
     return noFilesCopied;
   }
 
-  private void readSavedStatesAndUpdateMap()
+  public void readSavedStatesAndUpdateMap()
   {
     savedStatesMap.clear();
     //Read all files in the saves folder
