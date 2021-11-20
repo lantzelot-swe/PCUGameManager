@@ -334,7 +334,7 @@ public class SaveStatePanel extends JPanel
     }
     return image;
   }
-  
+
   private ImageIcon getNoScreenshotImageIcon()
   {
     if (noSceenshotIcon == null)
@@ -826,10 +826,11 @@ public class SaveStatePanel extends JPanel
         {
           public void actionPerformed(ActionEvent e)
           {
-            int value = JOptionPane.showConfirmDialog(SaveStatePanel.this,
-                                                      "Are you sure you want to delete the saved state?",
-                                                      "Delete saved state",
-                                                      JOptionPane.YES_NO_OPTION);
+            int value = JOptionPane
+              .showConfirmDialog(SaveStatePanel.this,
+                                 "Are you sure you want to delete the saved state?\nIt will be deleted when you save the changes for the current game.",
+                                 "Delete saved state",
+                                 JOptionPane.YES_NO_OPTION);
             if (value == JOptionPane.YES_OPTION)
             {
               gamesFileUpdated = false;
