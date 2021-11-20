@@ -25,13 +25,14 @@ import org.slf4j.LoggerFactory;
 
 import se.lantz.model.MainViewModel;
 import se.lantz.model.SavedStatesModel;
+import se.lantz.model.SavedStatesModel.SAVESTATE;
 import se.lantz.util.ExceptionHandler;
 import se.lantz.util.FileManager;
 
 public class SavedStatesManager
 {
   private static final Logger logger = LoggerFactory.getLogger(SavedStatesManager.class);
-  
+
   public static final String SAVES = "./saves/";
 
   private static final String MTA0 = "0.mta";
@@ -75,6 +76,24 @@ public class SavedStatesManager
 
   public void saveSavedStates()
   {
+    //First, check if any saved states has been deleted. Delete the corresponding files.
+    if (savedStatesModel.isState1Deleted())
+    {
+      deleteSavedState(SAVESTATE.Save0);
+    }
+    if (savedStatesModel.isState2Deleted())
+    {
+      deleteSavedState(SAVESTATE.Save1);
+    }
+    if (savedStatesModel.isState3Deleted())
+    {
+      deleteSavedState(SAVESTATE.Save2);
+    }
+    if (savedStatesModel.isState4Deleted())
+    {
+      deleteSavedState(SAVESTATE.Save3);
+    }
+
     //If the game has been renamed, make sure to rename the saves folder also
     if (model.getInfoModel().isTitleChanged())
     {
@@ -304,6 +323,56 @@ public class SavedStatesManager
   public boolean isImportOverwrite()
   {
     return this.importOverwrite;
+  }
+
+  private void deleteSavedState(SAVESTATE state)
+  {
+    String fileName = model.getInfoModel().getGamesFile();
+    Path saveFolder = new File(SAVES + fileName).toPath();
+    try
+    {
+      switch (state)
+      {
+      case Save0:
+        Path mta0Path = saveFolder.resolve(MTA0);
+        Path vsz0Path = saveFolder.resolve(VSZ0);
+        Path png0Path = saveFolder.resolve(PNG0);
+        Files.deleteIfExists(mta0Path);
+        Files.deleteIfExists(vsz0Path);
+        Files.deleteIfExists(png0Path);
+        break;
+      case Save1:
+        Path mta1Path = saveFolder.resolve(MTA1);
+        Path vsz1Path = saveFolder.resolve(VSZ1);
+        Path png1Path = saveFolder.resolve(PNG1);
+        Files.deleteIfExists(mta1Path);
+        Files.deleteIfExists(vsz1Path);
+        Files.deleteIfExists(png1Path);
+        break;
+      case Save2:
+        Path mta2Path = saveFolder.resolve(MTA2);
+        Path vsz2Path = saveFolder.resolve(VSZ2);
+        Path png2Path = saveFolder.resolve(PNG2);
+        Files.deleteIfExists(mta2Path);
+        Files.deleteIfExists(vsz2Path);
+        Files.deleteIfExists(png2Path);
+        break;
+      case Save3:
+        Path mta3Path = saveFolder.resolve(MTA3);
+        Path vsz3Path = saveFolder.resolve(VSZ3);
+        Path png3Path = saveFolder.resolve(PNG3);
+        Files.deleteIfExists(mta3Path);
+        Files.deleteIfExists(vsz3Path);
+        Files.deleteIfExists(png3Path);
+        break;
+      default:
+        break;
+      }
+    }
+    catch (IOException e)
+    {
+      ExceptionHandler.handleException(e, "Could not delete saved state files.");
+    }
   }
 
   public void exportSavedStates(StringBuilder infoBuilder)

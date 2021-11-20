@@ -4,6 +4,8 @@ import java.awt.image.BufferedImage;
 import java.nio.file.Path;
 import java.util.Objects;
 
+import se.lantz.model.SavedStatesModel.SAVESTATE;
+
 public class SavedStatesModel extends AbstractModel
 {
   public static enum SAVESTATE {Save0, Save1, Save2, Save3};
@@ -31,6 +33,11 @@ public class SavedStatesModel extends AbstractModel
   private String state2time = "00:00:00";
   private String state3time = "00:00:00";
   private String state4time = "00:00:00";
+  
+  private boolean state1Deleted = false;
+  private boolean state2Deleted = false;
+  private boolean state3Deleted = false;
+  private boolean state4Deleted = false;
   
   public String getState1PngFile()
   {
@@ -295,6 +302,63 @@ public class SavedStatesModel extends AbstractModel
       notifyChange();
     }
   }
+  public boolean isState1Deleted()
+  {
+    return state1Deleted;
+  }
+  public void setState1Deleted(boolean state1Deleted)
+  {
+    this.state1Deleted = state1Deleted;
+    state1PngImage = null;
+    state1PngFile = "";
+    state1Path = null;
+    state1time = "00:00:00";
+    state1File = "";
+    notifyChange();
+  }
+  public boolean isState2Deleted()
+  {
+    return state2Deleted;
+  }
+  public void setState2Deleted(boolean state2Deleted)
+  {
+    this.state2Deleted = state2Deleted;
+    state2PngImage = null;
+    state2PngFile = "";
+    state2Path = null;
+    state2time = "00:00:00";
+    state2File = "";
+    notifyChange();
+  }
+  public boolean isState3Deleted()
+  {
+    return state3Deleted;
+  }
+  public void setState3Deleted(boolean state3Deleted)
+  {
+    this.state3Deleted = state3Deleted;
+    state3PngImage = null;
+    state3PngFile = "";
+    state3Path = null;
+    state3time = "00:00:00";
+    state3File = "";
+    notifyChange();
+  }
+  public boolean isState4Deleted()
+  {
+    return state4Deleted;
+  }
+  public void setState4Deleted(boolean state4Deleted)
+  {
+    this.state4Deleted = state4Deleted;
+    state4PngImage = null;
+    state4PngFile = "";
+    state4Path = null;
+    state4time = "00:00:00";
+    state4File = "";
+    notifyChange();
+  }
+  
   public void resetProperties()
   {
     state1PngFile = "";
@@ -317,6 +381,10 @@ public class SavedStatesModel extends AbstractModel
     state2File = "";
     state3File = "";
     state4File = "";
+    state1Deleted = false;
+    state2Deleted = false;
+    state3Deleted = false;
+    state4Deleted = false;
   }
   
   public void notifyChange()
@@ -337,5 +405,5 @@ public class SavedStatesModel extends AbstractModel
       timeparts[2] = "00";
     }
     return timeparts[0] + ":" + timeparts[1] + ":" + timeparts[2];
-  }
+  }  
 }

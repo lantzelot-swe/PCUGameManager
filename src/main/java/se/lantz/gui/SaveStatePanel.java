@@ -67,6 +67,7 @@ public class SaveStatePanel extends JPanel
 
   private FileNameExtensionFilter imagefilter =
     new FileNameExtensionFilter("png, gif, jpeg, bmp", "png", "gif", "jpg", "jpeg", "bmp");
+  private JButton deleteButton;
 
   public SaveStatePanel(MainViewModel model, SAVESTATE saveState)
   {
@@ -83,7 +84,7 @@ public class SaveStatePanel extends JPanel
     gbc_screenshotLabel.weighty = 1.0;
     gbc_screenshotLabel.gridheight = 3;
     gbc_screenshotLabel.anchor = GridBagConstraints.NORTHWEST;
-    gbc_screenshotLabel.insets = new Insets(1, 1, 0, 1);
+    gbc_screenshotLabel.insets = new Insets(1, 1, 0, 5);
     gbc_screenshotLabel.gridx = 0;
     gbc_screenshotLabel.gridy = 0;
     add(getScreenshotLabel(), gbc_screenshotLabel);
@@ -91,11 +92,12 @@ public class SaveStatePanel extends JPanel
     gbc_timeTextField.fill = GridBagConstraints.HORIZONTAL;
     gbc_timeTextField.anchor = GridBagConstraints.NORTHWEST;
     gbc_timeTextField.weighty = 1.0;
-    gbc_timeTextField.insets = new Insets(0, 5, 5, 5);
-    gbc_timeTextField.gridx = 3;
+    gbc_timeTextField.insets = new Insets(0, 0, 5, 5);
+    gbc_timeTextField.gridx = 4;
     gbc_timeTextField.gridy = 1;
     add(getTimeField(), gbc_timeTextField);
     GridBagConstraints gbc_snapshotTextField = new GridBagConstraints();
+    gbc_snapshotTextField.gridwidth = 2;
     gbc_snapshotTextField.weightx = 1.0;
     gbc_snapshotTextField.anchor = GridBagConstraints.NORTHWEST;
     gbc_snapshotTextField.insets = new Insets(0, 0, 5, 5);
@@ -105,43 +107,50 @@ public class SaveStatePanel extends JPanel
     add(getSnapshotTextField(), gbc_snapshotTextField);
     GridBagConstraints gbc_snapshotButton = new GridBagConstraints();
     gbc_snapshotButton.insets = new Insets(-1, 0, 5, 5);
-    gbc_snapshotButton.anchor = GridBagConstraints.NORTHWEST;
-    gbc_snapshotButton.gridx = 2;
+    gbc_snapshotButton.anchor = GridBagConstraints.NORTHEAST;
+    gbc_snapshotButton.gridx = 3;
     gbc_snapshotButton.gridy = 1;
     add(getGameButton(), gbc_snapshotButton);
     GridBagConstraints gbc_timeLabel = new GridBagConstraints();
     gbc_timeLabel.anchor = GridBagConstraints.NORTHWEST;
-    gbc_timeLabel.insets = new Insets(5, 5, 0, 0);
-    gbc_timeLabel.gridx = 3;
+    gbc_timeLabel.insets = new Insets(5, 5, 5, 0);
+    gbc_timeLabel.gridx = 4;
     gbc_timeLabel.gridy = 0;
     add(getTimeLabel(), gbc_timeLabel);
     GridBagConstraints gbc_snapshotLabel = new GridBagConstraints();
+    gbc_snapshotLabel.gridwidth = 2;
     gbc_snapshotLabel.weightx = 1.0;
-    gbc_snapshotLabel.insets = new Insets(5, 0, 0, 5);
+    gbc_snapshotLabel.insets = new Insets(5, 0, 5, 5);
     gbc_snapshotLabel.anchor = GridBagConstraints.NORTHWEST;
     gbc_snapshotLabel.gridx = 1;
     gbc_snapshotLabel.gridy = 0;
     add(getSnapshotLabel(), gbc_snapshotLabel);
     GridBagConstraints gbc_screenshotButton = new GridBagConstraints();
-    gbc_screenshotButton.weightx = 1.0;
     gbc_screenshotButton.anchor = GridBagConstraints.SOUTHWEST;
     gbc_screenshotButton.insets = new Insets(0, 0, 0, 5);
     gbc_screenshotButton.gridx = 1;
     gbc_screenshotButton.gridy = 2;
     add(getScreenshotButton(), gbc_screenshotButton);
+    GridBagConstraints gbc_deleteButton = new GridBagConstraints();
+    gbc_deleteButton.gridwidth = 2;
+    gbc_deleteButton.anchor = GridBagConstraints.SOUTHEAST;
+    gbc_deleteButton.insets = new Insets(0, 0, 0, 5);
+    gbc_deleteButton.gridx = 2;
+    gbc_deleteButton.gridy = 2;
+    add(getDeleteButton(), gbc_deleteButton);
     GridBagConstraints gbc_runButton = new GridBagConstraints();
     gbc_runButton.insets = new Insets(0, 0, 0, 5);
     gbc_runButton.weighty = 1.0;
     gbc_runButton.anchor = GridBagConstraints.SOUTHEAST;
-    gbc_runButton.gridx = 3;
+    gbc_runButton.gridx = 4;
     gbc_runButton.gridy = 2;
     add(getRunButton(), gbc_runButton);
     if (saveState != SAVESTATE.Save3)
     {
       GridBagConstraints gbc_separator = new GridBagConstraints();
       gbc_separator.fill = GridBagConstraints.HORIZONTAL;
-      gbc_separator.insets = new Insets(5, 20, 0, 20);
-      gbc_separator.gridwidth = 4;
+      gbc_separator.insets = new Insets(5, 5, 0, 5);
+      gbc_separator.gridwidth = 5;
       gbc_separator.gridx = 0;
       gbc_separator.gridy = 3;
       add(getSeparator(), gbc_separator);
@@ -193,6 +202,7 @@ public class SaveStatePanel extends JPanel
     getSnapshotTextField().setText(getSnapshotFileName());
     reloadScreen();
     getRunButton().setEnabled(!getSnapshotTextField().getText().isEmpty());
+    getDeleteButton().setEnabled(!getSnapshotTextField().getText().isEmpty());
     getTimeField().setEnabled(!getSnapshotTextField().getText().isEmpty());
   }
 
@@ -777,5 +787,45 @@ public class SaveStatePanel extends JPanel
       ExceptionHandler.handleException(e1, "");
     }
     setTimeToModel();
+  }
+
+  private JButton getDeleteButton()
+  {
+    if (deleteButton == null)
+    {
+      deleteButton = new JButton("Delete");
+      deleteButton.addActionListener(new ActionListener()
+        {
+          public void actionPerformed(ActionEvent e)
+          {
+            int value = JOptionPane.showConfirmDialog(SaveStatePanel.this,
+                                                      "Are you sure you want to delete the saved state?",
+                                                      "Delete saved state",
+                                                      JOptionPane.YES_NO_OPTION);
+            if (value == JOptionPane.YES_OPTION)
+            {
+              gamesFileUpdated = false;
+              switch (saveState)
+              {
+              case Save0:
+                stateModel.setState1Deleted(true);
+                break;
+              case Save1:
+                stateModel.setState2Deleted(true);
+                break;
+              case Save2:
+                stateModel.setState3Deleted(true);
+                break;
+              case Save3:
+                stateModel.setState4Deleted(true);
+                break;
+              default:
+                break;
+              }
+            }
+          }
+        });
+    }
+    return deleteButton;
   }
 }
