@@ -56,6 +56,7 @@ public class SaveStatePanel extends JPanel
   private BufferedImage currentScreenImage = null;
   private String currentGameFile = "";
   private ImageIcon missingSceenshotIcon = null;
+  private ImageIcon noSceenshotIcon = null;
   private JLabel timeLabel;
   private JLabel snapshotLabel;
   private JFormattedTextField timeField;
@@ -287,7 +288,14 @@ public class SaveStatePanel extends JPanel
       }
       if (modelScreenFile.isEmpty())
       {
-        getScreenshotLabel().setIcon(getMissingScreenshotImageIcon());
+        if (getSnapshotTextField().getText().isEmpty())
+        {
+          getScreenshotLabel().setIcon(getMissingScreenshotImageIcon());
+        }
+        else
+        {
+          getScreenshotLabel().setIcon(getNoScreenshotImageIcon());
+        }
       }
       else if (!model.getInfoModel().getGamesFile().equals(currentGameFile))
       {
@@ -317,7 +325,7 @@ public class SaveStatePanel extends JPanel
       catch (IOException e)
       {
         logger.error("can't read file: " + filename, e);
-        screenLabel.setIcon(getMissingScreenshotImageIcon());
+        screenLabel.setIcon(getNoScreenshotImageIcon());
       }
     }
     else
@@ -325,6 +333,26 @@ public class SaveStatePanel extends JPanel
       screenLabel.setIcon(getMissingScreenshotImageIcon());
     }
     return image;
+  }
+  
+  private ImageIcon getNoScreenshotImageIcon()
+  {
+    if (noSceenshotIcon == null)
+    {
+      BufferedImage image = null;
+      try
+      {
+        image = ImageIO.read(FileManager.class.getResource("/se/lantz/NoScreenSaveSlot.png"));
+        Image newImage = image.getScaledInstance(130, 82, Image.SCALE_SMOOTH);
+        noSceenshotIcon = new ImageIcon(newImage);
+      }
+      catch (IOException e)
+      {
+        logger.error("can't read missing icon", e);
+
+      }
+    }
+    return noSceenshotIcon;
   }
 
   private ImageIcon getMissingScreenshotImageIcon()
