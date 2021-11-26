@@ -116,11 +116,13 @@ public class GameDetailsBackgroundPanel extends JPanel
     if (data == null)
     {
       cardLayout.show(this, EMPTY);
+      model.checkEnablementOfPalNtscMenuItem(false);
     }
     else
     {
       cardLayout.show(this, DETAILS);
       model.readGameDetails(data);
+      model.checkEnablementOfPalNtscMenuItem(true);
     }
   }
 

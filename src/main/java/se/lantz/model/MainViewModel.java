@@ -840,4 +840,9 @@ public class MainViewModel extends AbstractModel
   {
     fileManager.runSnapshotInVice(saveState);
   }
+  
+  public void checkEnablementOfPalNtscMenuItem(boolean check)
+  {
+    stateManager.checkEnablementOfPalNtscMenuItem(check);   
+  }
 }

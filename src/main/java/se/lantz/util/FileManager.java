@@ -58,7 +58,7 @@ public class FileManager
   public static BufferedImage emptyC64Screenshot;
   public static BufferedImage emptyVic20Screenshot;
 
-  private static final String GAMES = "./games/";
+  public static final String GAMES = "./games/";
   private static final String SCREENS = "./screens/";
   private static final String COVERS = "./covers/";
   private static final String SAVES = "./saves/";

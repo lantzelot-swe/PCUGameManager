@@ -12,11 +12,14 @@ import java.util.List;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
+import javax.swing.JEditorPane;
 import javax.swing.JFileChooser;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
+import javax.swing.UIManager;
+import javax.swing.event.HyperlinkEvent;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import se.lantz.gamebase.GamebaseImporter;
@@ -102,6 +105,7 @@ public class MenuManager
 
   private JMenuItem convertScreensItem;
   private JMenuItem checkDescrItem;
+  private JMenuItem palNtscFixItem;
 
   private JMenuItem helpItem;
   private JMenuItem aboutItem;
@@ -126,7 +130,7 @@ public class MenuManager
     this.exportManager = new ExportManager(uiModel);
     this.backupManager = new BackupManager(uiModel);
     this.restoreManager = new RestoreManager(uiModel);
-    this.savedStatesManager = new SavedStatesManager(uiModel);
+    this.savedStatesManager = new SavedStatesManager(uiModel, getPalNtscFixMenuItem());
     uiModel.setSavedStatesManager(savedStatesManager);
     setupMenues();
   }
@@ -194,6 +198,9 @@ public class MenuManager
     toolsMenu.addSeparator();
     toolsMenu.add(getConvertScreensItem());
     toolsMenu.add(getCheckDescriptionsItem());
+    toolsMenu.addSeparator();
+    toolsMenu.add(getPalNtscFixMenuItem());
+    
     helpMenu = new JMenu("Help");
     helpMenu.setMnemonic('H');
     helpMenu.add(getHelpItem());
@@ -658,6 +665,17 @@ public class MenuManager
     checkDescrItem.addActionListener(e -> fixInvalidCharsInDescriptions());
     return checkDescrItem;
   }
+  
+  private JMenuItem getPalNtscFixMenuItem()
+  {
+    if (palNtscFixItem == null)
+    {
+      palNtscFixItem = new JMenuItem("Swap game file and first saved state to fix NTSC/PAL issue");
+      palNtscFixItem.setMnemonic('s');
+    palNtscFixItem.addActionListener(e -> fixPalNtscIssue());
+    }
+    return palNtscFixItem;
+  }
 
   private JMenuItem getHelpItem()
   {
@@ -975,6 +993,49 @@ public class MenuManager
       worker.execute();
       dialog.setVisible(true);
     }
+  }
+  
+  private void fixPalNtscIssue()
+  {
+    int option = JOptionPane.showConfirmDialog(MainWindow.getInstance()
+      .getMainPanel(), getPalNtscEditorPane(), "Swap game file and first saved state", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+    if (option == JOptionPane.YES_OPTION)
+    {
+      if (savedStatesManager.swapGameFileAndSavedState())
+      {
+        JOptionPane.showMessageDialog(MainWindow.getInstance()
+      .getMainPanel(), "Game file and saved state successfully swapped. System type was also switched.", "Swap game file and first saved state", JOptionPane.INFORMATION_MESSAGE);
+      }
+    }
+  }
+  
+  private JEditorPane getPalNtscEditorPane()
+  {
+    String message =
+      "<html>Some VICE snapshots of games made for NTSC does not run properly on a PAL machine, and vice versa. You need to start them twice from the carousel." +
+        "<br>See this thread on <a href=\"https://thec64community.online/thread/790/pcuae-problem-starting-games-first\">TheC64 Community forum</a>." +
+        "<br><br>Do you want to swap the game file with the first saved state and change system type for the selected game?</html>";
+
+    JEditorPane infoEditorPane = new JEditorPane("text/html", message);
+    infoEditorPane.putClientProperty(JEditorPane.HONOR_DISPLAY_PROPERTIES, Boolean.TRUE);
+    infoEditorPane.setFont(UIManager.getDefaults().getFont("Label.font"));
+    infoEditorPane.setEditable(false);
+    infoEditorPane.setOpaque(false);
+    infoEditorPane.addHyperlinkListener((hle) -> {
+      if (HyperlinkEvent.EventType.ACTIVATED.equals(hle.getEventType()) && Desktop.isDesktopSupported() &&
+        Desktop.getDesktop().isSupported(Desktop.Action.BROWSE))
+      {
+        try
+        {
+          Desktop.getDesktop().browse(hle.getURL().toURI());
+        }
+        catch (IOException | URISyntaxException e)
+        {
+          ExceptionHandler.handleException(e, "Could not open default browser");
+        }
+      }
+    });
+    return infoEditorPane;
   }
 
   private void clearFavorites(int number)

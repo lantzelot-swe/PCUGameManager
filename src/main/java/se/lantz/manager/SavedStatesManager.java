@@ -18,6 +18,7 @@ import java.util.TimeZone;
 import java.util.stream.Stream;
 
 import javax.imageio.ImageIO;
+import javax.swing.JMenuItem;
 
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
@@ -67,9 +68,12 @@ public class SavedStatesManager
    */
   private Map<String, Integer> savedStatesMap = new HashMap<>();
 
-  public SavedStatesManager(MainViewModel model)
+  private JMenuItem palNtscFixMenuItem;
+
+  public SavedStatesManager(MainViewModel model, JMenuItem palNtscFixMenuItem)
   {
     this.model = model;
+    this.palNtscFixMenuItem = palNtscFixMenuItem;
     this.savedStatesModel = model.getSavedStatesModel();
     readSavedStatesAndUpdateMap();
   }
@@ -552,5 +556,62 @@ public class SavedStatesManager
   public int getNumberOfSavedStatesForGame(String gameFileName)
   {
     return savedStatesMap.get(gameFileName) != null ? savedStatesMap.get(gameFileName) : 0;
+  }
+  
+  public void checkEnablementOfPalNtscMenuItem(boolean check)
+  {
+    boolean palNtscItemEnabled = false;
+  
+    if (check)
+    {
+      //Check if current game has a 0.vsf file and the current game file is a snapshot
+      String fileName = model.getInfoModel().getGamesFile();
+      if (!fileName.isEmpty() && fileName.contains(".vsf"))
+      {
+        //Check if folder is available
+        Path saveFolder = new File(SAVES + fileName).toPath();
+        if (Files.exists(saveFolder))
+        {
+          //Check which ones are available
+          Path vsz0Path = saveFolder.resolve(VSZ0);
+          if (Files.exists(vsz0Path))
+          {
+            palNtscItemEnabled = true;
+          }
+        }
+      }
+    }
+    palNtscFixMenuItem.setEnabled(palNtscItemEnabled);
+  }
+  
+  public boolean swapGameFileAndSavedState()
+  {
+    String gamesFile = model.getInfoModel().getGamesFile();
+    Path gameFilePath = new File(FileManager.GAMES + gamesFile).toPath();
+    Path firstSavedStatePath = new File(SAVES + gamesFile).toPath().resolve(VSZ0);
+    
+    Path tempFilePath = new File(FileManager.GAMES + "temp.gz").toPath();
+    try
+    {
+      Files.copy(gameFilePath, tempFilePath, StandardCopyOption.REPLACE_EXISTING);
+      Files.copy(firstSavedStatePath, gameFilePath, StandardCopyOption.REPLACE_EXISTING);
+      Files.copy(tempFilePath, firstSavedStatePath, StandardCopyOption.REPLACE_EXISTING);
+      Files.delete(tempFilePath);
+      if (model.getSystemModel().isPal())
+      {
+        model.getSystemModel().setNtsc(true);
+      }
+      else
+      {
+        model.getSystemModel().setPal(true);
+      }
+      model.saveData();
+      return true;
+    }
+    catch (IOException e)
+    {
+      ExceptionHandler.handleException(e, "Could not swap game file and first saved state.");
+    }
+    return false;
   }
 }
