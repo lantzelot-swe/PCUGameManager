@@ -38,11 +38,10 @@ public class VersionDownloadPanel extends JPanel
     if (editorPane == null)
     {
       String downloadUrl = VersionChecker.getDownloadUrl();
-      String info = "<html>There is a new version of PCU Game Manager available: <b>" +
-        VersionChecker.getLatestVersion() + "</b><p>" + "Go to <a href='" + downloadUrl + "'>" + downloadUrl +
-        "</a> and download PCUGameManager.exe.<p>" +
-        "Exit PCU Game Manager and replace the existing PCUGameManager.exe with the downloaded file to upgrade.</html>";
-
+      
+      String info = "<html>There is a new version of PCU Game Manager available: <a href='" + downloadUrl  + "'>" + 
+        VersionChecker.getLatestVersion() + "</a><p>" + "Do you want to update to the new version now?</html>";
+      
       editorPane = new JEditorPane("text/html", info);
       editorPane.putClientProperty(JEditorPane.HONOR_DISPLAY_PROPERTIES, Boolean.TRUE);
       editorPane.setFont(UIManager.getDefaults().getFont("Label.font"));

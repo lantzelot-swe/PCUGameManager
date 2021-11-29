@@ -11,8 +11,8 @@ public class VersionDownloadDialog extends BaseDialog
     super(owner);
     setTitle("New version available");
     addContent(getVersionDownloadPanel());
-    getOkButton().setText("Exit");
-    getCancelButton().setText("Close");
+//    getOkButton().setText("Yes");
+//    getCancelButton().setText("No");
     this.setResizable(false);
   }
 

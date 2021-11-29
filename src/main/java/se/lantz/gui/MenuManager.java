@@ -3,7 +3,6 @@ package se.lantz.gui;
 import java.awt.Desktop;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
-import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -13,14 +12,13 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 import javax.swing.JEditorPane;
-import javax.swing.JFileChooser;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
+import javax.swing.JProgressBar;
 import javax.swing.KeyStroke;
 import javax.swing.UIManager;
 import javax.swing.event.HyperlinkEvent;
-import javax.swing.filechooser.FileNameExtensionFilter;
 
 import se.lantz.gamebase.GamebaseImporter;
 import se.lantz.gui.checkdescriptions.CheckDescrProgressDialog;
@@ -34,10 +32,10 @@ import se.lantz.gui.dbrestore.RestoreProgressDialog;
 import se.lantz.gui.dbrestore.RestoreWorker;
 import se.lantz.gui.exports.ExportFileLoaderWorker;
 import se.lantz.gui.exports.ExportGamesDialog;
-import se.lantz.gui.exports.ImportExportProgressDialog;
 import se.lantz.gui.exports.ExportSavedStatesDialog;
 import se.lantz.gui.exports.ExportSavedStatesWorker;
 import se.lantz.gui.exports.ExportWorker;
+import se.lantz.gui.exports.ImportExportProgressDialog;
 import se.lantz.gui.imports.CarouselImportWorker;
 import se.lantz.gui.imports.GamebaseImportWorker;
 import se.lantz.gui.imports.ImportOptionsDialog;
@@ -47,6 +45,7 @@ import se.lantz.gui.imports.ImportSavedStatesWorker;
 import se.lantz.manager.BackupManager;
 import se.lantz.manager.ExportManager;
 import se.lantz.manager.ImportManager;
+import se.lantz.manager.InstallPCUAEManager;
 import se.lantz.manager.RestoreManager;
 import se.lantz.manager.SavedStatesManager;
 import se.lantz.model.MainViewModel;
@@ -63,6 +62,7 @@ public class MenuManager
   private JMenu exportMenu;
   private JMenu editMenu;
   private JMenu toolsMenu;
+  private JMenu pcuaeMenu;
   private JMenu helpMenu;
 
   private JMenuItem addGameItem;
@@ -106,6 +106,9 @@ public class MenuManager
   private JMenuItem convertScreensItem;
   private JMenuItem checkDescrItem;
   private JMenuItem palNtscFixItem;
+  
+  private JMenuItem installPCUAEItem;
+  private JMenuItem downloadPCUAEItem;
 
   private JMenuItem helpItem;
   private JMenuItem aboutItem;
@@ -119,6 +122,7 @@ public class MenuManager
   private BackupManager backupManager;
   private RestoreManager restoreManager;
   private SavedStatesManager savedStatesManager;
+  private InstallPCUAEManager installPCUAEManager;
   private MainWindow mainWindow;
 
   public MenuManager(final MainViewModel uiModel, MainWindow mainWindow)
@@ -131,6 +135,7 @@ public class MenuManager
     this.backupManager = new BackupManager(uiModel);
     this.restoreManager = new RestoreManager(uiModel);
     this.savedStatesManager = new SavedStatesManager(uiModel, getPalNtscFixMenuItem());
+    this.installPCUAEManager = new InstallPCUAEManager();
     uiModel.setSavedStatesManager(savedStatesManager);
     setupMenues();
   }
@@ -201,6 +206,10 @@ public class MenuManager
     toolsMenu.addSeparator();
     toolsMenu.add(getPalNtscFixMenuItem());
     
+    pcuaeMenu = new JMenu("PCUAE");
+    pcuaeMenu.add(getInstallPCUAEItem());
+    pcuaeMenu.add(getDownloadPCUAEItem());
+    
     helpMenu = new JMenu("Help");
     helpMenu.setMnemonic('H');
     helpMenu.add(getHelpItem());
@@ -228,6 +237,7 @@ public class MenuManager
     menuList.add(fileMenu);
     menuList.add(editMenu);
     menuList.add(toolsMenu);
+    menuList.add(pcuaeMenu);
     menuList.add(helpMenu);
     return menuList;
   }
@@ -676,6 +686,28 @@ public class MenuManager
     }
     return palNtscFixItem;
   }
+  
+  private JMenuItem getInstallPCUAEItem()
+  {
+    if (installPCUAEItem == null)
+    {
+      installPCUAEItem = new JMenuItem("Install PCUAE to a USB stick...");
+      installPCUAEItem.setMnemonic('i');
+      installPCUAEItem.addActionListener(e -> installPCUAE());
+    }
+    return installPCUAEItem;
+  }
+  
+  private JMenuItem getDownloadPCUAEItem()
+  {
+    if (downloadPCUAEItem == null)
+    {
+      downloadPCUAEItem = new JMenuItem("Download PCUEA");
+      downloadPCUAEItem.setMnemonic('d');
+      downloadPCUAEItem.addActionListener(e -> downloadPCUAE());
+    }
+    return downloadPCUAEItem;
+  }
 
   private JMenuItem getHelpItem()
   {
@@ -1009,6 +1041,18 @@ public class MenuManager
     }
   }
   
+  private void installPCUAE()
+  {
+    installPCUAEManager.install(getExportItem());
+  }
+  
+  private void downloadPCUAE()
+  {
+    JProgressBar progress = new JProgressBar();
+    installPCUAEManager.downloadTest(progress);
+    JOptionPane.showMessageDialog(MainWindow.getInstance(), progress, "Downloading PCUAE", JOptionPane.OK_OPTION);
+  }
+  
   private JEditorPane getPalNtscEditorPane()
   {
     String message =
@@ -1062,7 +1106,8 @@ public class MenuManager
       dialog.setLocationRelativeTo(MainWindow.getInstance());
       if (dialog.showDialog())
       {
-        getExitItem().doClick();
+        VersionChecker.updateVersion();
+//        getExitItem().doClick();
       }
     }
     else
