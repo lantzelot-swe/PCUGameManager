@@ -46,7 +46,7 @@ public final class MainWindow extends JFrame
   private MainWindow()
   {
     this.setIconImage(new ImageIcon(getClass().getResource("/se/lantz/FrameIcon.png")).getImage());
-    this.setTitle("PCU Game Manager");
+    this.setTitle("PCUAE Manager");
     uiModel = new MainViewModel();
     menuManager = new MenuManager(uiModel, this);
     this.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
@@ -66,7 +66,7 @@ public final class MainWindow extends JFrame
     String versionValue = FileManager.getPcuVersionFromManifest();
     if (!versionValue.isEmpty())
     {
-      setTitle("PCU Game Manager v." + versionValue);
+      setTitle("PCUAE Manager v." + versionValue);
     }
   }
 

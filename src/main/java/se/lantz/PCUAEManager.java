@@ -11,10 +11,13 @@ import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 
 import se.lantz.gui.MainWindow;
+import se.lantz.gui.install.VersionDownloadDialog;
 import se.lantz.util.ExceptionHandler;
+import se.lantz.util.FileManager;
+import se.lantz.util.ManagerVersionChecker;
 import se.lantz.util.TopLevelExceptionHandler;
 
-public class PCUGameManager
+public class PCUAEManager
 {
 
   /**
@@ -55,11 +58,27 @@ public class PCUGameManager
         Files.createDirectories(Paths.get("./covers/"));
         Files.createDirectories(Paths.get("./games/"));
         Files.createDirectories(Paths.get("./saves/"));
+        Files.createDirectories(Paths.get("./pcuae-install/"));
       }
       catch (IOException e)
       {
-        // TODO Auto-generated catch block
         e.printStackTrace();
+      }
+      
+      //Check for new versions at startup, but only when running stadalone, not during development.
+      if (!FileManager.getPcuVersionFromManifest().isEmpty())
+      {
+        ManagerVersionChecker.fetchLatestVersionFromGithub();
+        if (ManagerVersionChecker.isNewVersionAvailable())
+        {
+          VersionDownloadDialog dialog = new VersionDownloadDialog(MainWindow.getInstance());
+          dialog.pack();
+          dialog.setLocationRelativeTo(MainWindow.getInstance());
+          if (dialog.showDialog())
+          {
+            ManagerVersionChecker.updateVersion();
+          }
+        }
       }
     });
   }

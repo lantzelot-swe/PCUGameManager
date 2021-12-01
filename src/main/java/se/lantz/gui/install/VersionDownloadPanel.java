@@ -1,4 +1,4 @@
-package se.lantz.gui;
+package se.lantz.gui.install;
 
 import java.awt.Desktop;
 import java.awt.GridBagConstraints;
@@ -13,14 +13,16 @@ import javax.swing.UIManager;
 import javax.swing.event.HyperlinkEvent;
 
 import se.lantz.util.ExceptionHandler;
-import se.lantz.util.VersionChecker;
+import se.lantz.util.ManagerVersionChecker;
 
 public class VersionDownloadPanel extends JPanel
 {
   private JEditorPane editorPane;
+  private String message;
 
-  public VersionDownloadPanel()
+  public VersionDownloadPanel(String message)
   {
+    this.message = message;
     GridBagLayout gridBagLayout = new GridBagLayout();
     setLayout(gridBagLayout);
     GridBagConstraints gbc_editorPane = new GridBagConstraints();
@@ -37,12 +39,7 @@ public class VersionDownloadPanel extends JPanel
   {
     if (editorPane == null)
     {
-      String downloadUrl = VersionChecker.getDownloadUrl();
-      
-      String info = "<html>There is a new version of PCU Game Manager available: <a href='" + downloadUrl  + "'>" + 
-        VersionChecker.getLatestVersion() + "</a><p>" + "Do you want to update to the new version now?</html>";
-      
-      editorPane = new JEditorPane("text/html", info);
+      editorPane = new JEditorPane("text/html", message);
       editorPane.putClientProperty(JEditorPane.HONOR_DISPLAY_PROPERTIES, Boolean.TRUE);
       editorPane.setFont(UIManager.getDefaults().getFont("Label.font"));
       editorPane.setEditable(false);

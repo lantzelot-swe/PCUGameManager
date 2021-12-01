@@ -7,26 +7,28 @@ import se.lantz.gui.MainWindow;
 
 public class DownloadDialog extends BaseDialog
 {
-  DownloadPanel deletePanel;
+  DownloadPanel downloadPanel;
   private boolean complete = false;
 
-  public DownloadDialog(String title)
+  public DownloadDialog(String downloadLabel)
   {
     super(MainWindow.getInstance());
-    setTitle(title);
+//    setTitle(title);
     addContent(getDownloadPanel());
     this.setResizable(false);
     getCancelButton().setVisible(false);
     getOkButton().setVisible(false);
+    
+    getDownloadPanel().getInfoLabel().setText(downloadLabel);
   }
 
   private DownloadPanel getDownloadPanel()
   {
-    if (deletePanel == null)
+    if (downloadPanel == null)
     {
-      deletePanel = new DownloadPanel();
+      downloadPanel = new DownloadPanel();
     }
-    return deletePanel;
+    return downloadPanel;
   }
 
   @Override

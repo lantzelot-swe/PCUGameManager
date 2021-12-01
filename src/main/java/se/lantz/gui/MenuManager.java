@@ -42,10 +42,11 @@ import se.lantz.gui.imports.ImportOptionsDialog;
 import se.lantz.gui.imports.ImportProgressDialog;
 import se.lantz.gui.imports.ImportSavedStatesDialog;
 import se.lantz.gui.imports.ImportSavedStatesWorker;
+import se.lantz.gui.install.VersionDownloadDialog;
 import se.lantz.manager.BackupManager;
 import se.lantz.manager.ExportManager;
 import se.lantz.manager.ImportManager;
-import se.lantz.manager.InstallPCUAEManager;
+import se.lantz.manager.PCUAEInstallManager;
 import se.lantz.manager.RestoreManager;
 import se.lantz.manager.SavedStatesManager;
 import se.lantz.model.MainViewModel;
@@ -53,7 +54,7 @@ import se.lantz.model.data.GameListData;
 import se.lantz.model.data.GameView;
 import se.lantz.util.ExceptionHandler;
 import se.lantz.util.FileManager;
-import se.lantz.util.VersionChecker;
+import se.lantz.util.ManagerVersionChecker;
 
 public class MenuManager
 {
@@ -108,7 +109,6 @@ public class MenuManager
   private JMenuItem palNtscFixItem;
   
   private JMenuItem installPCUAEItem;
-  private JMenuItem downloadPCUAEItem;
 
   private JMenuItem helpItem;
   private JMenuItem aboutItem;
@@ -122,7 +122,7 @@ public class MenuManager
   private BackupManager backupManager;
   private RestoreManager restoreManager;
   private SavedStatesManager savedStatesManager;
-  private InstallPCUAEManager installPCUAEManager;
+  private PCUAEInstallManager installPCUAEManager;
   private MainWindow mainWindow;
 
   public MenuManager(final MainViewModel uiModel, MainWindow mainWindow)
@@ -135,7 +135,7 @@ public class MenuManager
     this.backupManager = new BackupManager(uiModel);
     this.restoreManager = new RestoreManager(uiModel);
     this.savedStatesManager = new SavedStatesManager(uiModel, getPalNtscFixMenuItem());
-    this.installPCUAEManager = new InstallPCUAEManager();
+    this.installPCUAEManager = new PCUAEInstallManager(getExportItem());
     uiModel.setSavedStatesManager(savedStatesManager);
     setupMenues();
   }
@@ -208,7 +208,6 @@ public class MenuManager
     
     pcuaeMenu = new JMenu("PCUAE");
     pcuaeMenu.add(getInstallPCUAEItem());
-    pcuaeMenu.add(getDownloadPCUAEItem());
     
     helpMenu = new JMenu("Help");
     helpMenu.setMnemonic('H');
@@ -691,24 +690,13 @@ public class MenuManager
   {
     if (installPCUAEItem == null)
     {
-      installPCUAEItem = new JMenuItem("Install PCUAE to a USB stick...");
+      installPCUAEItem = new JMenuItem("Install PCUAE to a USB drive...");
       installPCUAEItem.setMnemonic('i');
       installPCUAEItem.addActionListener(e -> installPCUAE());
     }
     return installPCUAEItem;
   }
   
-  private JMenuItem getDownloadPCUAEItem()
-  {
-    if (downloadPCUAEItem == null)
-    {
-      downloadPCUAEItem = new JMenuItem("Download PCUEA");
-      downloadPCUAEItem.setMnemonic('d');
-      downloadPCUAEItem.addActionListener(e -> downloadPCUAE());
-    }
-    return downloadPCUAEItem;
-  }
-
   private JMenuItem getHelpItem()
   {
     helpItem = new JMenuItem("Help");
@@ -1014,7 +1002,7 @@ public class MenuManager
   private void fixInvalidCharsInDescriptions()
   {
     String message =
-      "Do you want to check all description texts in the database and remove all carrage return (CR) characters?\nEarlier versions of the game manager allowed for CR characters, the Carousel " +
+      "Do you want to check all description texts in the database and remove all carrage return (CR) characters?\nEarlier versions of the manager allowed for CR characters, the Carousel " +
         "does not handle that properly.\nCR characters will be replaced by a space character.";
     int option = JOptionPane.showConfirmDialog(MainWindow.getInstance()
       .getMainPanel(), message, "Check description texts", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
@@ -1043,14 +1031,7 @@ public class MenuManager
   
   private void installPCUAE()
   {
-    installPCUAEManager.install(getExportItem());
-  }
-  
-  private void downloadPCUAE()
-  {
-    JProgressBar progress = new JProgressBar();
-    installPCUAEManager.downloadTest(progress);
-    JOptionPane.showMessageDialog(MainWindow.getInstance(), progress, "Downloading PCUAE", JOptionPane.OK_OPTION);
+    installPCUAEManager.installPCUAE();
   }
   
   private JEditorPane getPalNtscEditorPane()
@@ -1098,16 +1079,15 @@ public class MenuManager
 
   private void checkForNewRelease()
   {
-    VersionChecker.fetchLatestVersionFromGithub();
-    if (VersionChecker.isNewVersionAvailable())
+    ManagerVersionChecker.fetchLatestVersionFromGithub();
+    if (ManagerVersionChecker.isNewVersionAvailable())
     {
       VersionDownloadDialog dialog = new VersionDownloadDialog(MainWindow.getInstance());
       dialog.pack();
       dialog.setLocationRelativeTo(MainWindow.getInstance());
       if (dialog.showDialog())
       {
-        VersionChecker.updateVersion();
-//        getExitItem().doClick();
+        ManagerVersionChecker.updateVersion();
       }
     }
     else

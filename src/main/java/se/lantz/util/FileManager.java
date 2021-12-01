@@ -1101,7 +1101,6 @@ public class FileManager
       }
       catch (IOException e1)
       {
-        // TODO Auto-generated catch block
         ExceptionHandler.handleException(e1, "Could not read manifest");
       }
     }

@@ -12,8 +12,8 @@ public class ManagerUpdater
 {
   public static void main(String[] args)
   {
-    Path newFile = new File("./temp/PCUGameManager.exe").toPath().toAbsolutePath();
-    Path originalFile = new File("./PCUGameManager.exe").toPath().toAbsolutePath();
+    Path newFile = new File("./temp/PCUAEManager.exe").toPath().toAbsolutePath();
+    Path originalFile = new File("./PCUAEManager.exe").toPath().toAbsolutePath();
     int tries = 0;
     boolean copied = false;
     //Try 3 times with a delay before quitting
@@ -43,7 +43,7 @@ public class ManagerUpdater
       //Launch the new version
       try
       {
-        Runtime.getRuntime().exec("PCUGameManager.exe");
+        Runtime.getRuntime().exec("PCUAEManager.exe");
       }
       catch (Exception e)
       {

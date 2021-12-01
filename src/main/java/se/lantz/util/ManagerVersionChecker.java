@@ -8,7 +8,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
 import java.net.HttpURLConnection;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -17,7 +16,6 @@ import java.util.Scanner;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import javax.swing.JOptionPane;
 import javax.swing.JProgressBar;
 import javax.swing.SwingUtilities;
 
@@ -28,14 +26,17 @@ import com.google.gson.stream.JsonReader;
 import se.lantz.gui.MainWindow;
 import se.lantz.gui.download.DownloadDialog;
 
-public class VersionChecker
+public class ManagerVersionChecker
 {
   public static final String TEMP_FOLDER = "./temp/";
   private static String latestVersion = "";
   private static String tagloadUrl = "";
   private static String downloadUrl = "";
+  private static String managerMainInstallFile;
+  private static boolean downloadIterrupted = false;
+  
   private static ExecutorService singleThreadExecutor = Executors.newSingleThreadExecutor();
-  private VersionChecker()
+  private ManagerVersionChecker()
   {
     //Empty
   }
@@ -63,6 +64,7 @@ public class VersionChecker
       latestVersion = root.getAsJsonObject().get("tag_name").getAsString();
       tagloadUrl = root.getAsJsonObject().get("html_url").getAsString();
       downloadUrl = root.getAsJsonObject().get("assets").getAsJsonArray().get(0).getAsJsonObject().get("browser_download_url").getAsString();
+      managerMainInstallFile = downloadUrl.substring(downloadUrl.lastIndexOf("/") + 1);
     }
     catch (IOException ex)
     {
@@ -72,7 +74,7 @@ public class VersionChecker
   
   public static void updateVersion()
   {  
-    DownloadDialog progressDialog = new DownloadDialog("Update version");
+    DownloadDialog progressDialog = new DownloadDialog("Downloading version " + latestVersion);
     singleThreadExecutor.execute(() -> startDownload(progressDialog));  
     progressDialog.pack();
     progressDialog.setLocationRelativeTo(MainWindow.getInstance());
@@ -81,7 +83,7 @@ public class VersionChecker
       //Copy the updater jar to temp
       try
       {
-        InputStream updaterFileStream = VersionChecker.class.getResourceAsStream("/se/lantz/updater.jar");
+        InputStream updaterFileStream = ManagerVersionChecker.class.getResourceAsStream("/se/lantz/updater.jar");
         Path tempDestination = new File(TEMP_FOLDER + "updater.jar").toPath();
         Files.copy(updaterFileStream, tempDestination, StandardCopyOption.REPLACE_EXISTING);
       }
@@ -103,11 +105,27 @@ public class VersionChecker
         ExceptionHandler.handleException(e, "Fail");
       }
     }
+    else
+    {
+      downloadIterrupted = true;
+      //Make sure this executes after the downloading has been interrupted
+      singleThreadExecutor.execute(() -> {
+        try
+        {
+          Files.deleteIfExists(new File(TEMP_FOLDER + managerMainInstallFile).toPath());
+        }
+        catch (IOException e)
+        {
+          ExceptionHandler.handleException(e, "Could not delete partially downloaded file");
+        }
+      });
+    }
   }
   
   
   public static void startDownload(final DownloadDialog downloadDialog)
   {
+    downloadIterrupted = false;
     JProgressBar progressBar = downloadDialog.getProgressBar();
     progressBar.setMaximum(100000);
     URL url;
@@ -119,12 +137,12 @@ public class VersionChecker
       HttpURLConnection httpConnection = (HttpURLConnection) (url.openConnection());
       long completeFileSize = httpConnection.getContentLength();
       BufferedInputStream in = new BufferedInputStream(httpConnection.getInputStream());
-      FileOutputStream fos = new FileOutputStream(TEMP_FOLDER + "PcuGameManager.exe");
+      FileOutputStream fos = new FileOutputStream(TEMP_FOLDER + managerMainInstallFile);
       BufferedOutputStream bout = new BufferedOutputStream(fos, 1024);
       byte[] data = new byte[1024];
       long downloadedFileSize = 0;
       int x = 0;
-      while ((x = in.read(data, 0, 1024)) >= 0)
+      while ((x = in.read(data, 0, 1024)) >= 0 && !downloadIterrupted)
       {
         downloadedFileSize += x;
         // calculate progress
@@ -156,7 +174,8 @@ public class VersionChecker
   
   public static boolean isNewVersionAvailable()
   {
-    return !FileManager.getPcuVersionFromManifest().equals(latestVersion);
+    //Ignore all versions that starts with 1
+    return !latestVersion.startsWith("1") && !FileManager.getPcuVersionFromManifest().equals(latestVersion);
   }
 
   public static String getLatestVersion()

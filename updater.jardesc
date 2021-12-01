@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="WINDOWS-1252" standalone="no"?>
 <jardesc>
-    <jar path="PCUGameManager/src/main/resources/se/lantz/updater.jar"/>
-    <options buildIfNeeded="true" compress="true" descriptionLocation="/PCUGameManager/updater.jardesc" exportErrors="true" exportWarnings="true" includeDirectoryEntries="false" overwrite="false" saveDescription="true" storeRefactorings="false" useSourceFolders="false"/>
+    <jar path="PCUAEManager/src/main/resources/se/lantz/updater.jar"/>
+    <options buildIfNeeded="true" compress="true" descriptionLocation="/PCUAEManager/updater.jardesc" exportErrors="true" exportWarnings="true" includeDirectoryEntries="false" overwrite="false" saveDescription="true" storeRefactorings="false" useSourceFolders="false"/>
     <storedRefactorings deprecationInfo="true" structuralOnly="false"/>
     <selectedProjects/>
     <manifest generateManifest="true" manifestLocation="" manifestVersion="1.0" reuseManifest="false" saveManifest="false" usesManifest="true">
@@ -11,6 +11,6 @@
         </sealing>
     </manifest>
     <selectedElements exportClassFiles="true" exportJavaFiles="false" exportOutputFolder="false">
-        <javaElement handleIdentifier="=PCUGameManager/src\/test\/java&lt;se.lantz.updater"/>
+        <javaElement handleIdentifier="=PCUAEManager/src\/test\/java&lt;se.lantz.updater"/>
     </selectedElements>
 </jardesc>

@@ -135,7 +135,7 @@ public class ImportSavedStatesPanel extends JPanel
     if (info2Label == null)
     {
       info2Label =
-        new JLabel("<html>Saved states available in the import folder that doesn't match any games in the database will still be copied to the game manager's \"saves\" folder. They will also be copied when exporting.</html>");
+        new JLabel("<html>Saved states available in the import folder that doesn't match any games in the database will still be copied to the manager's \"saves\" folder. They will also be copied when exporting.</html>");
     }
     return info2Label;
   }

@@ -81,13 +81,13 @@ public class BaseDialog extends JDialog
       GridBagConstraints gbc_okButton = new GridBagConstraints();
       gbc_okButton.anchor = GridBagConstraints.EAST;
       gbc_okButton.weightx = 0.5;
-      gbc_okButton.insets = new Insets(5, 5, 5, 5);
+      gbc_okButton.insets = new Insets(5, 5, 15, 5);
       gbc_okButton.gridx = 0;
       gbc_okButton.gridy = 0;
       buttonPanel.add(getOkButton(), gbc_okButton);
       GridBagConstraints gbc_cancelButton = new GridBagConstraints();
       gbc_cancelButton.weightx = 0.5;
-      gbc_cancelButton.insets = new Insets(5, 5, 5, 5);
+      gbc_cancelButton.insets = new Insets(5, 5, 15, 5);
       gbc_cancelButton.anchor = GridBagConstraints.WEST;
       gbc_cancelButton.gridx = 1;
       gbc_cancelButton.gridy = 0;
@@ -126,6 +126,7 @@ public class BaseDialog extends JDialog
   public boolean showDialog()
   {
     okPressed = false;
+    getOkButton().requestFocusInWindow();
     this.setVisible(true);
     return okPressed;
   }

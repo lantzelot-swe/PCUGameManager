@@ -1,13 +1,12 @@
 package se.lantz.gui.download;
 
-import java.awt.LayoutManager;
-
-import javax.swing.JPanel;
-import java.awt.GridBagLayout;
-import javax.swing.JProgressBar;
 import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.Insets;
+
 import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JProgressBar;
 
 public class DownloadPanel extends JPanel
 {
@@ -24,7 +23,7 @@ public class DownloadPanel extends JPanel
     gbc_progressBar.gridy = 0;
     add(getProgressBar(), gbc_progressBar);
     GridBagConstraints gbc_infoLabel = new GridBagConstraints();
-    gbc_infoLabel.insets = new Insets(5, 10, 10, 10);
+    gbc_infoLabel.insets = new Insets(5, 20, 10, 20);
     gbc_infoLabel.gridx = 0;
     gbc_infoLabel.gridy = 1;
     add(getInfoLabel(), gbc_infoLabel);
@@ -37,9 +36,9 @@ public class DownloadPanel extends JPanel
     }
     return progressBar;
   }
-  private JLabel getInfoLabel() {
+  protected JLabel getInfoLabel() {
     if (infoLabel == null) {
-    	infoLabel = new JLabel("New label");
+    	infoLabel = new JLabel("Downloading");
     }
     return infoLabel;
   }

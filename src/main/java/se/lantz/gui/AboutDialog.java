@@ -114,7 +114,7 @@ public class AboutDialog extends JDialog
   {
     if (titleLabel == null)
     {
-      titleLabel = new JLabel("Project Carousel USB Game Manager");
+      titleLabel = new JLabel("PCUAE Manager");
     }
     return titleLabel;
   }
