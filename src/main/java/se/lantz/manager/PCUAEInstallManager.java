@@ -25,6 +25,7 @@ import javax.swing.JProgressBar;
 import javax.swing.SwingUtilities;
 
 import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.stream.JsonReader;
 
@@ -46,6 +47,7 @@ public class PCUAEInstallManager implements AWTEventListener
   private String downloadUrl = "";
   private String pcuaeMainInstallFile = "";
   private static String pcuaeLatestInInstallFolder = "";
+  private static String latestReleaseDescription = "";
 
   private JMenuItem exportMenuItem;
   private volatile boolean downloadIterrupted = false;
@@ -215,7 +217,11 @@ public class PCUAEInstallManager implements AWTEventListener
   {
     try
     {
+      //TODO: To get all releases, use "https://CommodoreOS@api.github.com/repos/CommodoreOS/PCUAE/releases"-
+      //How to handle mode packs?
+      
       URL url = new URL("https://CommodoreOS@api.github.com/repos/CommodoreOS/PCUAE/releases/latest");
+      
       HttpURLConnection con = (HttpURLConnection) url.openConnection();
       con.setRequestProperty("accept", "application/vnd.github.v3+json");
       con.setRequestMethod("GET");
@@ -231,10 +237,13 @@ public class PCUAEInstallManager implements AWTEventListener
       JsonReader reader = new JsonReader(new StringReader(builder.toString()));
       reader.setLenient(true);
       JsonElement root = new JsonParser().parse(reader);
-      latestVersion = root.getAsJsonObject().get("tag_name").getAsString();
-      tagloadUrl = root.getAsJsonObject().get("html_url").getAsString();
-      downloadUrl = root.getAsJsonObject().get("assets").getAsJsonArray().get(0).getAsJsonObject()
+      JsonObject jsonObject = root.getAsJsonObject();
+      latestVersion = jsonObject.get("tag_name").getAsString();
+      tagloadUrl = jsonObject.get("html_url").getAsString();
+      downloadUrl = jsonObject.get("assets").getAsJsonArray().get(0).getAsJsonObject()
         .get("browser_download_url").getAsString();
+      latestReleaseDescription = jsonObject.get("body").getAsString();
+        
       pcuaeMainInstallFile = downloadUrl.substring(downloadUrl.lastIndexOf("/") + 1);
     }
     catch (IOException ex)
@@ -341,5 +350,10 @@ public class PCUAEInstallManager implements AWTEventListener
   public static String getDownloadUrl()
   {
     return tagloadUrl;
+  }
+  
+  public static String getLatestReleaseDescription()
+  {
+    return latestReleaseDescription;
   }
 }

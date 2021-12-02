@@ -20,6 +20,7 @@ import javax.swing.JProgressBar;
 import javax.swing.SwingUtilities;
 
 import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.stream.JsonReader;
 
@@ -33,6 +34,7 @@ public class ManagerVersionChecker
   private static String tagloadUrl = "";
   private static String downloadUrl = "";
   private static String managerMainInstallFile;
+  private static String latestReleaseDescription = "";
   private static boolean downloadIterrupted = false;
   
   private static ExecutorService singleThreadExecutor = Executors.newSingleThreadExecutor();
@@ -61,9 +63,11 @@ public class ManagerVersionChecker
       JsonReader reader = new JsonReader(new StringReader(builder.toString()));
       reader.setLenient(true);
       JsonElement root = new JsonParser().parse(reader);
-      latestVersion = root.getAsJsonObject().get("tag_name").getAsString();
-      tagloadUrl = root.getAsJsonObject().get("html_url").getAsString();
-      downloadUrl = root.getAsJsonObject().get("assets").getAsJsonArray().get(0).getAsJsonObject().get("browser_download_url").getAsString();
+      JsonObject jsonObject = root.getAsJsonObject();
+      latestVersion = jsonObject.get("tag_name").getAsString();
+      tagloadUrl = jsonObject.get("html_url").getAsString();
+      downloadUrl = jsonObject.get("assets").getAsJsonArray().get(0).getAsJsonObject().get("browser_download_url").getAsString();
+      latestReleaseDescription = jsonObject.get("body").getAsString();
       managerMainInstallFile = downloadUrl.substring(downloadUrl.lastIndexOf("/") + 1);
     }
     catch (IOException ex)
@@ -186,6 +190,11 @@ public class ManagerVersionChecker
   public static String getDownloadUrl()
   {
     return tagloadUrl;
+  }
+  
+  public static String getLatestReleaseDescription()
+  {
+    return latestReleaseDescription;
   }
 
 }

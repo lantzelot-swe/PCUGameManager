@@ -15,7 +15,7 @@ public class PCUAEVersionDownloadDialog extends BaseDialog
   {
     super(owner);
     this.firstDownload = firstDownload;
-    setTitle(firstDownload? "Download PCUAE" : "New version available");
+    setTitle(firstDownload ? "Download PCUAE" : "New version available");
     addContent(getVersionDownloadPanel());
     this.setResizable(false);
     getOkButton().setText("Yes");
@@ -24,24 +24,27 @@ public class PCUAEVersionDownloadDialog extends BaseDialog
     getCancelButton().setPreferredSize(new Dimension(73, 23));
   }
 
-  private VersionDownloadPanel getVersionDownloadPanel() {
-    if (panel == null) {
+  private VersionDownloadPanel getVersionDownloadPanel()
+  {
+    if (panel == null)
+    {
       String downloadUrl = PCUAEInstallManager.getDownloadUrl();
       String message = "";
       if (firstDownload)
       {
-        message = "<html>You have to download PCUAE before installing it. The latest version is <a href='" + downloadUrl  + "'>" + 
-          PCUAEInstallManager.getLatestVersion() + "</a><p>" + "Do you want to download it now?</html>";
+        message = "<html>You have to download PCUAE before installing it. The latest version is <a href='" +
+          downloadUrl + "'>" + PCUAEInstallManager.getLatestVersion() + "</a><p>Do you want to download now?</html>";
       }
       else
       {
-        message = "<html><a href='" + downloadUrl  + "'>" + 
-          PCUAEInstallManager.getLatestVersion() + "</a> is available. (Current install file: " + PCUAEInstallManager.getLatestInInstallFolder()+ ").<p>Do you want to download the new version?</html>";
+        message = "<html>PCUAE <a href='" + downloadUrl + "'>" + PCUAEInstallManager.getLatestVersion() +
+          "</a> is available.<p>(Current install file: " + PCUAEInstallManager.getLatestInInstallFolder() +
+          ").<br>Do you want to download and install the new version?</html>";
       }
-      
-    	panel = new VersionDownloadPanel(message);
+
+      panel = new VersionDownloadPanel(message);
     }
     return panel;
   }
- 
+
 }
