@@ -4,7 +4,7 @@ import java.awt.Dimension;
 import java.awt.Frame;
 
 import se.lantz.gui.BaseDialog;
-import se.lantz.manager.PCUAEInstallManager;
+import se.lantz.manager.pcuae.PCUAEInstallManager;
 
 public class PCUAEVersionDownloadDialog extends BaseDialog
 {

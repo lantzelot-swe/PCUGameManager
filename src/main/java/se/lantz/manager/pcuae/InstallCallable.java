@@ -1,4 +1,4 @@
-package se.lantz.manager;
+package se.lantz.manager.pcuae;
 
 import java.io.File;
 import java.io.IOException;

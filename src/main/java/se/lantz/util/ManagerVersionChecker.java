@@ -15,9 +15,14 @@ import java.nio.file.StandardCopyOption;
 import java.util.Scanner;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.swing.JProgressBar;
 import javax.swing.SwingUtilities;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -29,6 +34,7 @@ import se.lantz.gui.download.DownloadDialog;
 
 public class ManagerVersionChecker
 {
+  private static final Logger logger = LoggerFactory.getLogger(FileManager.class);
   public static final String TEMP_FOLDER = "./temp/";
   private static String latestVersion = "";
   private static String tagloadUrl = "";
@@ -178,8 +184,31 @@ public class ManagerVersionChecker
   
   public static boolean isNewVersionAvailable()
   {
-    //Ignore all versions that starts with 1
-    return !latestVersion.startsWith("1") && !FileManager.getPcuVersionFromManifest().equals(latestVersion);
+    logger.debug("Manifest version=" + FileManager.getPcuVersionFromManifest());
+    //Ignore versions starting with 1, the comparison does not work well with that.
+    //Once 2.x is available it will be calculated correctly
+    if (latestVersion.startsWith("1"))
+    {
+      return false;
+    }
+    return getIntVersion(FileManager.getPcuVersionFromManifest()) < getIntVersion(latestVersion);
+  }
+  
+  public static int getIntVersion(String versionString)
+  {
+    //Regular expression to match digits in a string
+    String regex = "\\d+";
+    Pattern pattern = Pattern.compile(regex);
+    Matcher matcher = pattern.matcher(versionString);
+    String numbers = "";
+    while(matcher.find()) {
+       numbers = numbers + matcher.group();
+    }
+    if (numbers.isEmpty())
+    {
+      return 0;
+    }
+    return Integer.parseInt(numbers);
   }
 
   public static String getLatestVersion()
