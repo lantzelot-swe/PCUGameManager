@@ -42,13 +42,18 @@ import se.lantz.gui.imports.ImportOptionsDialog;
 import se.lantz.gui.imports.ImportProgressDialog;
 import se.lantz.gui.imports.ImportSavedStatesDialog;
 import se.lantz.gui.imports.ImportSavedStatesWorker;
-import se.lantz.gui.install.VersionDownloadDialog;
+import se.lantz.gui.install.ManagerDownloadDialog;
 import se.lantz.manager.BackupManager;
 import se.lantz.manager.ExportManager;
 import se.lantz.manager.ImportManager;
 import se.lantz.manager.RestoreManager;
 import se.lantz.manager.SavedStatesManager;
+import se.lantz.manager.pcuae.AmigaModeInstallManager;
+import se.lantz.manager.pcuae.AtariModeInstallManager;
+import se.lantz.manager.pcuae.LinuxModeInstallManager;
 import se.lantz.manager.pcuae.PCUAEInstallManager;
+import se.lantz.manager.pcuae.RetroarchModeInstallManager;
+import se.lantz.manager.pcuae.ViceModeInstallManager;
 import se.lantz.model.MainViewModel;
 import se.lantz.model.data.GameListData;
 import se.lantz.model.data.GameView;
@@ -64,6 +69,7 @@ public class MenuManager
   private JMenu editMenu;
   private JMenu toolsMenu;
   private JMenu pcuaeMenu;
+  private JMenu pcuaeModeMenu;
   private JMenu helpMenu;
 
   private JMenuItem addGameItem;
@@ -109,6 +115,11 @@ public class MenuManager
   private JMenuItem palNtscFixItem;
   
   private JMenuItem installPCUAEItem;
+  private JMenuItem installAmigaModeItem;
+  private JMenuItem installAtariModeItem;
+  private JMenuItem installLinuxModeItem;
+  private JMenuItem installRetroarchModeItem;
+  private JMenuItem installViceModeItem;
 
   private JMenuItem helpItem;
   private JMenuItem aboutItem;
@@ -123,6 +134,11 @@ public class MenuManager
   private RestoreManager restoreManager;
   private SavedStatesManager savedStatesManager;
   private PCUAEInstallManager installPCUAEManager;
+  private AmigaModeInstallManager installAmigaManager;
+  private AtariModeInstallManager installAtariManager;
+  private LinuxModeInstallManager installLinuxManager;
+  private RetroarchModeInstallManager installRetroarchManager;
+  private ViceModeInstallManager installViceManager;
   private MainWindow mainWindow;
 
   public MenuManager(final MainViewModel uiModel, MainWindow mainWindow)
@@ -136,6 +152,11 @@ public class MenuManager
     this.restoreManager = new RestoreManager(uiModel);
     this.savedStatesManager = new SavedStatesManager(uiModel, getPalNtscFixMenuItem());
     this.installPCUAEManager = new PCUAEInstallManager(getExportItem());
+    this.installAmigaManager = new AmigaModeInstallManager();
+    this.installAtariManager = new AtariModeInstallManager();
+    this.installLinuxManager = new LinuxModeInstallManager();
+    this.installRetroarchManager = new RetroarchModeInstallManager();
+    this.installViceManager = new ViceModeInstallManager();
     uiModel.setSavedStatesManager(savedStatesManager);
     setupMenues();
   }
@@ -208,6 +229,13 @@ public class MenuManager
     
     pcuaeMenu = new JMenu("PCUAE");
     pcuaeMenu.add(getInstallPCUAEItem());
+    pcuaeModeMenu = new JMenu("Mode Packs");
+    pcuaeModeMenu.add(getInstallAmigaModeItem());
+    pcuaeModeMenu.add(getInstallAtariModeItem());
+    pcuaeModeMenu.add(getInstallLinuxModeItem());
+    pcuaeModeMenu.add(getInstallRetroarchModeItem());
+    pcuaeModeMenu.add(getInstallViceModeItem());
+    pcuaeMenu.add(pcuaeModeMenu);
     
     helpMenu = new JMenu("Help");
     helpMenu.setMnemonic('H');
@@ -697,6 +725,62 @@ public class MenuManager
     return installPCUAEItem;
   }
   
+  private JMenuItem getInstallAmigaModeItem()
+  {
+    if (installAmigaModeItem == null)
+    {
+      installAmigaModeItem = new JMenuItem("Install Amiga mode...");
+      installAmigaModeItem.setMnemonic('a');
+      installAmigaModeItem.addActionListener(e -> installAmigaMode());
+    }
+    return installAmigaModeItem;
+  }
+  
+  private JMenuItem getInstallAtariModeItem()
+  {
+    if (installAtariModeItem == null)
+    {
+      installAtariModeItem = new JMenuItem("Install Atari mode...");
+      installAtariModeItem.setMnemonic('t');
+      installAtariModeItem.addActionListener(e -> installAtariMode());
+    }
+    return installAtariModeItem;
+  }
+  
+  private JMenuItem getInstallLinuxModeItem()
+  {
+    if (installLinuxModeItem == null)
+    {
+      installLinuxModeItem = new JMenuItem("Install Linux mode...");
+      installLinuxModeItem.setMnemonic('l');
+      installLinuxModeItem.addActionListener(e -> installLinuxMode());
+    }
+    return installLinuxModeItem;
+  }
+  
+  private JMenuItem getInstallRetroarchModeItem()
+  {
+    if (installRetroarchModeItem == null)
+    {
+      installRetroarchModeItem = new JMenuItem("Install Retroarch mode...");
+      installRetroarchModeItem.setMnemonic('r');
+      installRetroarchModeItem.addActionListener(e -> installRetroarchMode());
+    }
+    return installRetroarchModeItem;
+  }
+  
+  private JMenuItem getInstallViceModeItem()
+  {
+    if (installViceModeItem == null)
+    {
+      installViceModeItem = new JMenuItem("Install Vice mode...");
+      installViceModeItem.setMnemonic('v');
+      installViceModeItem.addActionListener(e -> installViceMode());
+    }
+    return installViceModeItem;
+  }
+  
+  
   private JMenuItem getHelpItem()
   {
     helpItem = new JMenuItem("Help");
@@ -1034,6 +1118,31 @@ public class MenuManager
     installPCUAEManager.installPCUAE();
   }
   
+  private void installAmigaMode()
+  {
+    installAmigaManager.installAmigaMode();
+  }
+  
+  private void installAtariMode()
+  {
+    installAtariManager.installAtariMode();
+  }
+  
+  private void installLinuxMode()
+  {
+    installLinuxManager.installLinuxMode();
+  }
+  
+  private void installRetroarchMode()
+  {
+    installRetroarchManager.installRetroarchMode();
+  }
+  
+  private void installViceMode()
+  {
+    installViceManager.installViceMode();
+  }
+  
   private JEditorPane getPalNtscEditorPane()
   {
     String message =
@@ -1082,7 +1191,7 @@ public class MenuManager
     ManagerVersionChecker.fetchLatestVersionFromGithub();
     if (ManagerVersionChecker.isNewVersionAvailable())
     {
-      VersionDownloadDialog dialog = new VersionDownloadDialog(MainWindow.getInstance());
+      ManagerDownloadDialog dialog = new ManagerDownloadDialog(MainWindow.getInstance());
       dialog.pack();
       dialog.setLocationRelativeTo(MainWindow.getInstance());
       if (dialog.showDialog())

@@ -30,6 +30,8 @@ covers/
 backup/
 vice/
 images/
+saves/
+pcuae-install/
 
 pcu.properties
 

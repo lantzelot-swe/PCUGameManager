@@ -19,9 +19,11 @@ import java.util.Scanner;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import javax.swing.JOptionPane;
 import javax.swing.JProgressBar;
 import javax.swing.SwingUtilities;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -31,14 +33,27 @@ import dyorgio.runtime.out.process.CallableSerializable;
 import dyorgio.runtime.run.as.root.RootExecutor;
 import se.lantz.gui.MainWindow;
 import se.lantz.gui.download.DownloadDialog;
+import se.lantz.gui.install.PCUAEProductDownloadDialog;
 import se.lantz.util.ExceptionHandler;
+import se.lantz.util.ManagerVersionChecker;
 
 public abstract class BaseInstallManger implements AWTEventListener
 {
   public static final String INSTALL_FOLDER = "./pcuae-install/";
 
+  protected static final String PCUAE_INSTALL_NAME = "pcuae";
+  protected static final String AMIGA_MODE_INSTALL_NAME = "amiga";
+  protected static final String ATARI_MODE_INSTALL_NAME = "atari";
+  protected static final String LINUX_MODE_INSTALL_NAME = "linux";
+  protected static final String RETROARCH_MODE_INSTALL_NAME = "retroarch";
+  protected static final String VICE_MODE_INSTALL_NAME = "vice";
+
   private boolean blockEvents = false;
   protected ExecutorService singleThreadExecutor = Executors.newSingleThreadExecutor();
+
+  protected String latestInInstallFolder = "";
+
+  protected GithubAssetInformation gitHubReleaseInformation = new GithubAssetInformation();
 
   protected volatile boolean downloadIterrupted = false;
 
@@ -91,15 +106,25 @@ public abstract class BaseInstallManger implements AWTEventListener
     frame.getGlassPane().setVisible(false);
   }
 
-  protected String readVersionFromInstallFolder(String installFileName)
+  protected void readVersionFromInstallFolder(String installFileName)
   {
-    String latestInInstallFolder = "";
+    latestInInstallFolder = "";
     FilenameFilter filter = new FilenameFilter()
       {
         @Override
         public boolean accept(File f, String name)
         {
-          return name.contains(installFileName) && name.endsWith(".exe");
+          if (PCUAE_INSTALL_NAME.equals(installFileName))
+          {
+            //Check so that no other is part of the name
+           return !(name.contains(AMIGA_MODE_INSTALL_NAME) || name.contains(ATARI_MODE_INSTALL_NAME) ||
+              name.contains(LINUX_MODE_INSTALL_NAME) || name.contains(RETROARCH_MODE_INSTALL_NAME) ||
+              name.contains(VICE_MODE_INSTALL_NAME)) && name.endsWith(".exe");
+          }
+          else
+          {
+            return name.contains(installFileName) && name.endsWith(".exe");
+          }
         }
       };
     File installFolder = new File(INSTALL_FOLDER);
@@ -120,7 +145,6 @@ public abstract class BaseInstallManger implements AWTEventListener
     {
       latestInInstallFolder = latestFile.getName();
     }
-    return latestInInstallFolder;
   }
 
   public GithubAssetInformation fetchLatestVersionFromGithub(String assetsName)
@@ -131,7 +155,7 @@ public abstract class BaseInstallManger implements AWTEventListener
       //TODO: To get all releases, use "https://CommodoreOS@api.github.com/repos/CommodoreOS/PCUAE/releases"-
       //Get all releases, check which one contains the latest file with assetName (part of the name)
 
-      URL url = new URL("https://CommodoreOS@api.github.com/repos/CommodoreOS/PCUAE/releases/latest");
+      URL url = new URL("https://CommodoreOS@api.github.com/repos/CommodoreOS/PCUAE/releases");
 
       HttpURLConnection con = (HttpURLConnection) url.openConnection();
       con.setRequestProperty("accept", "application/vnd.github.v3+json");
@@ -148,14 +172,89 @@ public abstract class BaseInstallManger implements AWTEventListener
       JsonReader reader = new JsonReader(new StringReader(builder.toString()));
       reader.setLenient(true);
       JsonElement root = new JsonParser().parse(reader);
-      JsonObject jsonObject = root.getAsJsonObject();
-      githubInfo.setLatestVersion(jsonObject.get("tag_name").getAsString());
-      githubInfo.setReleaseTagUrl(jsonObject.get("html_url").getAsString());
-      //TODO: fix
-      String downloadUrl =
-        jsonObject.get("assets").getAsJsonArray().get(0).getAsJsonObject().get("browser_download_url").getAsString();
-      githubInfo.setDownloadUrl(downloadUrl);
-      githubInfo.setInstallFile(downloadUrl.substring(downloadUrl.lastIndexOf("/") + 1));
+      JsonArray releases = root.getAsJsonArray();
+      //Find the latest one containing in assetName. Releases seem to be return in the right order (latest first)
+      boolean foundRelease = false;
+      for (JsonElement release : releases)
+      {
+        if (foundRelease)
+        {
+          break;
+        }
+        JsonObject jsonObject = release.getAsJsonObject();
+        JsonArray assets = jsonObject.get("assets").getAsJsonArray();
+        String downloadUrl = "";
+
+        for (JsonElement asset : assets)
+        {
+          String assetName = asset.getAsJsonObject().get("name").getAsString();
+          switch (assetsName)
+          {
+          case AMIGA_MODE_INSTALL_NAME:
+          {
+            if (assetName.contains(AMIGA_MODE_INSTALL_NAME))
+            {
+              downloadUrl = asset.getAsJsonObject().get("browser_download_url").getAsString();
+            }
+            break;
+          }
+          case ATARI_MODE_INSTALL_NAME:
+          {
+            if (assetName.contains(ATARI_MODE_INSTALL_NAME))
+            {
+              downloadUrl = asset.getAsJsonObject().get("browser_download_url").getAsString();
+            }
+            break;
+          }
+          case LINUX_MODE_INSTALL_NAME:
+          {
+            if (assetName.contains(LINUX_MODE_INSTALL_NAME))
+            {
+              downloadUrl = asset.getAsJsonObject().get("browser_download_url").getAsString();
+            }
+            break;
+          }
+          case RETROARCH_MODE_INSTALL_NAME:
+          {
+            if (assetName.contains(RETROARCH_MODE_INSTALL_NAME))
+            {
+              downloadUrl = asset.getAsJsonObject().get("browser_download_url").getAsString();
+            }
+            break;
+          }
+          case VICE_MODE_INSTALL_NAME:
+          {
+            if (assetName.contains(VICE_MODE_INSTALL_NAME))
+            {
+              downloadUrl = asset.getAsJsonObject().get("browser_download_url").getAsString();
+            }
+            break;
+          }
+          case PCUAE_INSTALL_NAME:
+          {
+            if (!(assetName.contains(AMIGA_MODE_INSTALL_NAME) || assetName.contains(ATARI_MODE_INSTALL_NAME) ||
+              assetName.contains(LINUX_MODE_INSTALL_NAME) || assetName.contains(RETROARCH_MODE_INSTALL_NAME) ||
+              assetName.contains(VICE_MODE_INSTALL_NAME)))
+            {
+              downloadUrl = asset.getAsJsonObject().get("browser_download_url").getAsString();
+            }
+            break;
+          }
+          default:
+            throw new IllegalArgumentException("Unexpected value: " + assetsName);
+          }
+
+          if (!downloadUrl.isEmpty())
+          {
+            githubInfo.setLatestVersion(release.getAsJsonObject().get("tag_name").getAsString());
+            githubInfo.setReleaseTagUrl(release.getAsJsonObject().get("html_url").getAsString());
+            githubInfo.setInstallFile(assetName);
+            githubInfo.setDownloadUrl(downloadUrl);
+            foundRelease = true;
+            break;
+          }
+        }
+      }
     }
     catch (IOException ex)
     {
@@ -164,7 +263,7 @@ public abstract class BaseInstallManger implements AWTEventListener
     return githubInfo;
   }
 
-  protected void runAndWaitForInstallation(String fileToInstall)
+  protected void runAndWaitForInstallation()
   {
     switchToBusyCursor(MainWindow.getInstance());
     RootExecutor rootExecutor;
@@ -172,19 +271,19 @@ public abstract class BaseInstallManger implements AWTEventListener
     {
       rootExecutor = new RootExecutor("-Xmx64m");
       // Execute privileged action without return
-      CallableSerializable<Integer> installCallable = new InstallCallable(fileToInstall);
+      CallableSerializable<Integer> installCallable = new InstallCallable(latestInInstallFolder);
       int value = rootExecutor.call(installCallable);
 
       //0 -> installed
       //255 -> aborted
       if (value == 0)
       {
-        executeAfterInstallation();
+        SwingUtilities.invokeLater(() -> executeAfterInstallation());
       }
     }
     catch (Exception e1)
     {
-      ExceptionHandler.logException(e1, "Could not execute RootExecutor");
+      ExceptionHandler.handleException(e1, "Something went wrong during install.");
     }
     finally
     {
@@ -241,20 +340,97 @@ public abstract class BaseInstallManger implements AWTEventListener
     }
   }
 
-  protected void cleanupInterruptedDownload(String fileName)
+  protected void cleanupInterruptedDownload()
   {
     downloadIterrupted = true;
     //Make sure this executes after the downloading has been interrupted
     singleThreadExecutor.execute(() -> {
       try
       {
-        Files.deleteIfExists(new File(INSTALL_FOLDER + fileName).toPath());
+        Files.deleteIfExists(new File(INSTALL_FOLDER + gitHubReleaseInformation.getInstallFile()).toPath());
       }
       catch (IOException e)
       {
         ExceptionHandler.handleException(e, "Could not delete partially downloaded file");
       }
     });
+  }
+
+  protected void askToInstallExistingVersion(String productName)
+  {
+    int value =
+      JOptionPane.showConfirmDialog(MainWindow.getInstance(),
+                                    "Do you want to install " + productName + " (" + latestInInstallFolder + ") now?",
+                                    "Install " + productName,
+                                    JOptionPane.YES_NO_OPTION);
+    if (value == JOptionPane.YES_OPTION)
+    {
+      singleThreadExecutor.execute(() -> runAndWaitForInstallation());
+    }
+  }
+
+  protected boolean isNewVersionAvailable(String installName)
+  {
+    gitHubReleaseInformation = fetchLatestVersionFromGithub(installName);
+    return ManagerVersionChecker.getIntVersion(latestInInstallFolder) < ManagerVersionChecker
+      .getIntVersion(gitHubReleaseInformation.getInstallFile());
+  }
+
+  public String getLatestInInstallFolder()
+  {
+    return latestInInstallFolder;
+  }
+
+  public String getLatestVersion()
+  {
+    return gitHubReleaseInformation.getLatestVersion();
+  }
+
+  public String getDownloadUrl()
+  {
+    return gitHubReleaseInformation.getDownloadUrl();
+  }
+
+  protected void askAndStartDownload(String productName)
+  {
+    PCUAEProductDownloadDialog dialog =
+      new PCUAEProductDownloadDialog(latestInInstallFolder.isEmpty(), this, productName);
+    dialog.pack();
+    dialog.setLocationRelativeTo(MainWindow.getInstance());
+    if (dialog.showDialog())
+    {
+      downloadLatestVersion(productName);
+    }
+    else if (!latestInInstallFolder.isEmpty())
+    {
+      askToInstallExistingVersion(productName);
+    }
+  }
+
+  protected void downloadLatestVersion(String productName)
+  {
+    DownloadDialog progressDialog =
+      new DownloadDialog("Downloading " + productName + " version " + gitHubReleaseInformation.getLatestVersion());
+    singleThreadExecutor.execute(() -> startDownload(progressDialog, gitHubReleaseInformation));
+    progressDialog.pack();
+    progressDialog.setLocationRelativeTo(MainWindow.getInstance());
+    if (progressDialog.showDialog())
+    {
+      latestInInstallFolder = gitHubReleaseInformation.getInstallFile();
+      int value = JOptionPane.showConfirmDialog(MainWindow.getInstance(),
+                                                "Download completed, do you want to install " + productName + " " +
+                                                  gitHubReleaseInformation.getLatestVersion() + " now?",
+                                                "Download Complete",
+                                                JOptionPane.YES_NO_OPTION);
+      if (value == JOptionPane.YES_OPTION)
+      {
+        singleThreadExecutor.execute(() -> runAndWaitForInstallation());
+      }
+    }
+    else
+    {
+      cleanupInterruptedDownload();
+    }
   }
 
   protected abstract void executeAfterInstallation();

@@ -11,7 +11,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 
 import se.lantz.gui.MainWindow;
-import se.lantz.gui.install.VersionDownloadDialog;
+import se.lantz.gui.install.ManagerDownloadDialog;
 import se.lantz.util.ExceptionHandler;
 import se.lantz.util.FileManager;
 import se.lantz.util.ManagerVersionChecker;
@@ -71,7 +71,7 @@ public class PCUAEManager
         ManagerVersionChecker.fetchLatestVersionFromGithub();
         if (ManagerVersionChecker.isNewVersionAvailable())
         {
-          VersionDownloadDialog dialog = new VersionDownloadDialog(MainWindow.getInstance());
+          ManagerDownloadDialog dialog = new ManagerDownloadDialog(MainWindow.getInstance());
           dialog.pack();
           dialog.setLocationRelativeTo(MainWindow.getInstance());
           if (dialog.showDialog())

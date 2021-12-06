@@ -6,11 +6,11 @@ import java.awt.Frame;
 import se.lantz.gui.BaseDialog;
 import se.lantz.util.ManagerVersionChecker;
 
-public class VersionDownloadDialog extends BaseDialog
+public class ManagerDownloadDialog extends BaseDialog
 {
-  private VersionDownloadPanel panel;
+  private ManagerDownloadPanel panel;
 
-  public VersionDownloadDialog(Frame owner)
+  public ManagerDownloadDialog(Frame owner)
   {
     super(owner);
     setTitle("New version available");
@@ -22,12 +22,12 @@ public class VersionDownloadDialog extends BaseDialog
     getCancelButton().setPreferredSize(new Dimension(73, 23));
   }
 
-  private VersionDownloadPanel getVersionDownloadPanel() {
+  private ManagerDownloadPanel getVersionDownloadPanel() {
     if (panel == null) {
       String downloadUrl = ManagerVersionChecker.getDownloadUrl();    
       String message = "<html>There is a new version of PCUAE Manager available: <a href='" + downloadUrl  + "'>" + 
         ManagerVersionChecker.getLatestVersion() + "</a><p>" + "Do you want to update to the new version now?</html>";
-    	panel = new VersionDownloadPanel(message);
+    	panel = new ManagerDownloadPanel(message);
     }
     return panel;
   }

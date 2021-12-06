@@ -15,12 +15,12 @@ import javax.swing.event.HyperlinkEvent;
 import se.lantz.util.ExceptionHandler;
 import se.lantz.util.ManagerVersionChecker;
 
-public class VersionDownloadPanel extends JPanel
+public class ManagerDownloadPanel extends JPanel
 {
   private JEditorPane editorPane;
   private String message;
 
-  public VersionDownloadPanel(String message)
+  public ManagerDownloadPanel(String message)
   {
     this.message = message;
     GridBagLayout gridBagLayout = new GridBagLayout();
