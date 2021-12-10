@@ -390,6 +390,11 @@ public abstract class BaseInstallManger implements AWTEventListener
   {
     return gitHubReleaseInformation.getDownloadUrl();
   }
+  
+  public String getReleaseTagUrl()
+  {
+    return gitHubReleaseInformation.getReleaseTagUrl();
+  }
 
   protected void askAndStartDownload(String productName)
   {

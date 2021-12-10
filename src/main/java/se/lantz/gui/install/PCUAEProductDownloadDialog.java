@@ -32,7 +32,7 @@ public class PCUAEProductDownloadDialog extends BaseDialog
   {
     if (panel == null)
     {
-      String downloadUrl = manager.getDownloadUrl();
+      String downloadUrl = manager.getReleaseTagUrl();
       String message = "";
       if (firstDownload)
       {
