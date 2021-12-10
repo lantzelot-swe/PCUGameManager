@@ -329,8 +329,8 @@ public class ScreenshotsPanel extends JPanel
     if (coverPanel == null)
     {
       coverPanel = new JPanel();
-      coverPanel.setMinimumSize(new Dimension(152, 255));
-      coverPanel.setPreferredSize(new Dimension(152, 255));
+      coverPanel.setMinimumSize(new Dimension(154, 255));
+      coverPanel.setPreferredSize(new Dimension(154, 255));
       coverPanel.setBorder(new TitledBorder(null, "Cover", TitledBorder.LEADING, TitledBorder.TOP, null, null));
       GridBagLayout gbl_coverPanel = new GridBagLayout();
       coverPanel.setLayout(gbl_coverPanel);
