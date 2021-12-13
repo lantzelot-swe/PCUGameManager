@@ -8,7 +8,6 @@ import java.util.Collections;
 import java.util.List;
 
 import javax.swing.DefaultComboBoxModel;
-import javax.swing.ListModel;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -72,12 +71,12 @@ public class MainViewModel extends AbstractModel
   private GameListData selectedData;
 
   Scraper scraper = new MobyGamesScraper();
-  
+
   public void setSavedStatesManager(SavedStatesManager savedStatesManager)
   {
     this.stateManager = savedStatesManager;
   }
-  
+
   public SavedStatesManager getSavedStatesManager()
   {
     return this.stateManager;
@@ -256,7 +255,7 @@ public class MainViewModel extends AbstractModel
     }
     //Read available saved states
     stateManager.readSavedStates();
-    
+
     disableChangeNotification(false);
     notifyChangeForAllModels();
     //Do not reset unsaved for new entry
@@ -322,7 +321,7 @@ public class MainViewModel extends AbstractModel
   {
     return systemModel;
   }
-  
+
   public SavedStatesModel getSavedStatesModel()
   {
     return stateModel;
@@ -492,7 +491,8 @@ public class MainViewModel extends AbstractModel
       if (infoModel.isNewGame() || infoModel.isTitleChanged())
       {
         //Update duplicate index 
-        infoModel.setDuplicateIndex(dbConnector.getGameDuplicateIndexToUse(infoModel.getTitle()));
+        infoModel.setDuplicateIndex(dbConnector.getGameDuplicateIndexToUse(infoModel.getTitle(),
+                                                                           this.selectedData.getGameId()));
       }
 
       if (!validateRequiredFields().isEmpty())
@@ -589,7 +589,7 @@ public class MainViewModel extends AbstractModel
 
       fileManager.saveFiles();
       stateManager.saveSavedStates();
-      
+
       //Reset and images that where added previously
       infoModel.resetImagesAndOldFileNames();
       //Reset all models
@@ -835,14 +835,14 @@ public class MainViewModel extends AbstractModel
   {
     fileManager.runViceWithoutGame();
   }
-  
+
   public void runSnapshotInVice(SavedStatesModel.SAVESTATE saveState)
   {
     fileManager.runSnapshotInVice(saveState);
   }
-  
+
   public void checkEnablementOfPalNtscMenuItem(boolean check)
   {
-    stateManager.checkEnablementOfPalNtscMenuItem(check);   
+    stateManager.checkEnablementOfPalNtscMenuItem(check);
   }
 }

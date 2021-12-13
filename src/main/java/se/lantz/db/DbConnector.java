@@ -24,6 +24,7 @@ import se.lantz.model.data.GameView;
 import se.lantz.model.data.ViewFilter;
 import se.lantz.util.DbConstants;
 import se.lantz.util.ExceptionHandler;
+import se.lantz.util.FileManager;
 import se.lantz.util.GameListDataComparator;
 
 public class DbConnector
@@ -755,12 +756,19 @@ public class DbConnector
     return returnValue;
   }
 
-  public int getGameDuplicateIndexToUse(String title)
+  public int getGameDuplicateIndexToUse(String title, String gameId)
   {
+    //This is only called when the title changes for an existing game or when adding a new game 
+    //Use generated name, that is what decides if a duplicate index needs to be used.
+    //Look at the coverFile column since all covers have the same name ending.
+    String fileName = FileManager.generateFileNameFromTitle(title, 0);
+    
     StringBuilder sqlBuilder = new StringBuilder();
-    sqlBuilder.append("SELECT Duplicate FROM gameinfo WHERE title LIKE \"");
-    sqlBuilder.append(title);
-    sqlBuilder.append("\";");
+    sqlBuilder.append("SELECT rowId, Duplicate FROM gameinfo WHERE Coverfile GLOB \'");
+    sqlBuilder.append(fileName);
+    sqlBuilder.append("-cover*\' OR CoverFile GLOB \'");
+    sqlBuilder.append(fileName);
+    sqlBuilder.append("[0-9][0-9]-cover*\';");
     String sql = sqlBuilder.toString();
     logger.debug("Checking if game is in db already: {}", sql);
     int returnIndex = 0;
@@ -769,8 +777,13 @@ public class DbConnector
       ResultSet rs = pstmt.executeQuery();
       while (rs.next())
       {
-        //Increase one to the available index since it's the one supposed to be used.
-        returnIndex = Math.max(returnIndex, rs.getInt(DbConstants.DUPLICATE_INDEX) + 1);
+        int rowId = rs.getInt("rowId");
+        //Ignore the current game if the query matches it
+        if (gameId.isEmpty() || rowId != Integer.parseInt(gameId))
+        {
+          //Increase one to the available index since it's the one supposed to be used.
+          returnIndex = Math.max(returnIndex, rs.getInt(DbConstants.DUPLICATE_INDEX) + 1);
+        }
       }
     }
     catch (SQLException e)

@@ -468,7 +468,7 @@ public class ImportManager
     int duplicateIndex = 0;
     if (selectedOption == Options.ADD)
     {
-      duplicateIndex = uiModel.getDbConnector().getGameDuplicateIndexToUse(title);
+      duplicateIndex = uiModel.getDbConnector().getGameDuplicateIndexToUse(title, "");
     }
     //Check any duplicates in added rows, always use this otherwise duplicates uses same names.
     duplicateIndex = duplicateIndex + getDbRowDuplicate(title);

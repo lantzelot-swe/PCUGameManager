@@ -113,12 +113,8 @@ public class FileManager
 
   public void saveFiles()
   {
-    //Check if title is different that in db, then rename existing files!
-    if (infoModel.isTitleChanged() || infoModel.isAnyScreenRenamed())
-    {
-      //Rename existing covers and screens and game file
-      renameFiles();
-    }
+    //Rename existing covers and screens and game file if needed
+    renameFiles();
 
     //Fetch images that has been added
     BufferedImage cover = infoModel.getCoverImage();
@@ -352,14 +348,7 @@ public class FileManager
   public static String generateFileNameFromTitle(String title, int duplicateIndex)
   {
     // All uppercase letters
-    // No spaces or special characters
-    //The maxi game tool seems to work like this: truncate to 23 characters and then remove all special characters.
-    if (title.length() > 23)
-    {
-      title = title.substring(0, 23);
-      logger.debug("FileName: truncating to : {}", title);
-    }
-    // Do the conversion
+    // No spaces or special characters, remove them first
     List<Character> forbiddenCharsList =
       " ,:'�-.!+*<>()/[]?|".chars().mapToObj(item -> (char) item).collect(Collectors.toList());
 
@@ -367,10 +356,22 @@ public class FileManager
       title.chars().mapToObj(item -> (char) item).filter(character -> !forbiddenCharsList.contains(character))
         .map(Character::toUpperCase).collect(Collectors.toList());
     String newNameString = newName.stream().map(String::valueOf).collect(Collectors.joining());
-    if (duplicateIndex > 0)
+
+    //The maxi game tool seems to truncate to a maximum length of 23 characters. Let's do the same here.
+    if (newNameString.length() > 23)
     {
-      //Just add the duplicate index if there are several games with the same name
+      newNameString = newNameString.substring(0, 23);
+      logger.debug("FileName: truncating to : {}", title);
+    }
+
+    //Just add the duplicate index if there are several games with the same name
+    if (duplicateIndex > 0 && duplicateIndex < 10)
+    {
       newNameString = newNameString + "0" + duplicateIndex;
+    }
+    else if (duplicateIndex > 9)
+    {
+      newNameString = newNameString + duplicateIndex;
     }
 
     logger.debug("Game title: \"{}\" ---- New fileName: \"{}\"", title, newNameString);

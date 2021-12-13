@@ -367,39 +367,34 @@ public class InfoModel extends AbstractModel
     }
   }
 
-  public boolean updateFileNames()
+  public void updateFileNames()
   {
-    if (isNewGame() || isTitleChanged() || screenNamesNeedsUpdate())
-    {
-      //Keep track of the old names, used when renaming files when saving
-      oldCoverFile = getCoverFile();
-      oldScreens1File = getScreens1File();
-      oldScreens2File = getScreens2File();
-      oldGamesFile = getGamesFile();
+    //Keep track of the old names, used when renaming files when saving
+    oldCoverFile = getCoverFile();
+    oldScreens1File = getScreens1File();
+    oldScreens2File = getScreens2File();
+    oldGamesFile = getGamesFile();
 
-      disableChangeNotification(true);
-      String fileName = FileManager.generateFileNameFromTitle(this.title, getDuplicateIndex());
-      if (!getCoverFile().isEmpty() || getCoverImage() != null)
-      {
-        setCoverFile(fileName + "-cover.png");
-      }
-      if (!getScreens1File().isEmpty() || getScreen1Image() != null)
-      {
-        setScreens1File(fileName + "-00.png");
-      }
-      if (!getScreens2File().isEmpty() || getScreen2Image() != null)
-      {
-        setScreens2File(fileName + "-01.png");
-      }
-      if (!getGamesFile().isEmpty())
-      {
-        String fileEnding = getGamesFile().substring(getGamesFile().indexOf("."));
-        setGamesFile(fileName + fileEnding);
-      }
-      disableChangeNotification(false);
-      return true;
+    disableChangeNotification(true);
+    String fileName = FileManager.generateFileNameFromTitle(this.title, getDuplicateIndex());
+    if (!getCoverFile().isEmpty() || getCoverImage() != null)
+    {
+      setCoverFile(fileName + "-cover.png");
     }
-    return false;
+    if (!getScreens1File().isEmpty() || getScreen1Image() != null)
+    {
+      setScreens1File(fileName + "-00.png");
+    }
+    if (!getScreens2File().isEmpty() || getScreen2Image() != null)
+    {
+      setScreens2File(fileName + "-01.png");
+    }
+    if (!getGamesFile().isEmpty())
+    {
+      String fileEnding = getGamesFile().substring(getGamesFile().indexOf("."));
+      setGamesFile(fileName + fileEnding);
+    }
+    disableChangeNotification(false);
   }
 
   public void updateCoverAndScreensIfEmpty(boolean isC64)

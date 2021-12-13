@@ -99,15 +99,13 @@ public class SavedStatesManager
     }
 
     //If the game has been renamed, make sure to rename the saves folder also
-    if (model.getInfoModel().isTitleChanged())
+    String oldFileName = model.getInfoModel().getOldGamesFile();
+    String newFileName = model.getInfoModel().getGamesFile();
+    File oldSaveFolder = new File(SAVES + oldFileName);
+    if (!oldFileName.equals(newFileName) && oldSaveFolder.exists())
     {
-      String oldFileName = model.getInfoModel().getOldGamesFile();
-      File oldSaveFolder = new File(SAVES + oldFileName);
-      if (oldSaveFolder.exists())
-      {
-        //Rename old folder to new name
-        oldSaveFolder.renameTo(new File(SAVES + model.getInfoModel().getGamesFile()));
-      }
+      //Rename old folder to new name
+      oldSaveFolder.renameTo(new File(SAVES + model.getInfoModel().getGamesFile()));
     }
 
     String fileName = model.getInfoModel().getGamesFile();
@@ -557,11 +555,11 @@ public class SavedStatesManager
   {
     return savedStatesMap.get(gameFileName) != null ? savedStatesMap.get(gameFileName) : 0;
   }
-  
+
   public void checkEnablementOfPalNtscMenuItem(boolean check)
   {
     boolean palNtscItemEnabled = false;
-  
+
     if (check)
     {
       //Check if current game has a 0.vsf file and the current game file is a snapshot
@@ -583,13 +581,13 @@ public class SavedStatesManager
     }
     palNtscFixMenuItem.setEnabled(palNtscItemEnabled);
   }
-  
+
   public boolean swapGameFileAndSavedState()
   {
     String gamesFile = model.getInfoModel().getGamesFile();
     Path gameFilePath = new File(FileManager.GAMES + gamesFile).toPath();
     Path firstSavedStatePath = new File(SAVES + gamesFile).toPath().resolve(VSZ0);
-    
+
     Path tempFilePath = new File(FileManager.GAMES + "temp.gz").toPath();
     try
     {
