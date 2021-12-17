@@ -22,13 +22,6 @@ public class DbValidationWorker extends SwingWorker<Integer, String>
   @Override
   protected Integer doInBackground() throws Exception
   {
-    publish("Checking screenshots for 32-bit color depth...");
-    List<String> convertionList = FileManager.convertAllScreenshotsTo32Bit();
-    for (String screenshot : convertionList)
-    {
-      publish(screenshot);
-    }
-    publish("");
     publish("Checking descriptions for CR characters...");
     List<String> fixedEntriesList = dbConnector.fixDescriptions();
     for (String game : fixedEntriesList)
@@ -36,8 +29,15 @@ public class DbValidationWorker extends SwingWorker<Integer, String>
       publish("Fixed " + game);
     }
     publish("");
+    publish("Checking screenshots for 32-bit color depth...");
+    List<String> convertionList = FileManager.convertAllScreenshotsTo32Bit();
+    for (String screenshot : convertionList)
+    {
+      publish(screenshot);
+    }
+    publish("");
     
-    publish("Checking covers and screens directories for missing files...");
+    publish("Checking covers, screens and games directories for missing files...");
     List<String> fixedGamesList = FileManager.checkAllFilesForDbValidation(dbConnector.fetchAllGamesForDbValdation());
     for (String game : fixedGamesList)
     {

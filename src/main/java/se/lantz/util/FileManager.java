@@ -35,6 +35,7 @@ import java.util.zip.ZipEntry;
 import javax.imageio.ImageIO;
 
 import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -1495,6 +1496,14 @@ public class FileManager
         fixScreenImages(gameData.isVic20(), screens1File, screens2File);
         fixedGamesList.add("screenshot files for " + gameData.getTitle());
       }
+      
+      //Check game file also
+      File gameFile = Paths.get(GAMES + gameData.getGame()).toFile();
+      if (!gameFile.exists())
+      {
+        copyMissingGameFile(gameData.isVic20(), gameFile);
+        fixedGamesList.add("missing game file for " + gameData.getTitle());
+      }
     }
     return fixedGamesList;
   }
@@ -1539,6 +1548,20 @@ public class FileManager
     catch (IOException e)
     {
       ExceptionHandler.handleException(e, "Could not store screens");
+    }
+  }
+  
+  private static void copyMissingGameFile(boolean vic20, File gameFile)
+  {
+    try
+    {
+      InputStream missingFileStream =
+        vic20 ? FileManager.getMissingVIC20GameFile() : FileManager.getMissingC64GameFile();
+      FileUtils.copyInputStreamToFile(missingFileStream, gameFile);
+    }
+    catch (Exception e)
+    {
+      ExceptionHandler.handleException(e, "Could not store game file");
     }
   }
 

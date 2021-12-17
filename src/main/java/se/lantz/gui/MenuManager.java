@@ -1079,7 +1079,7 @@ public class MenuManager
     String message =
       "<html>Do you want to validate the database? The following actions will be performed: <ul><li>Check all description texts in the database and remove all carrage return (CR) characters.<br>Earlier versions of the manager allowed for CR characters, the Carousel " +
         "does not handle that properly.<br>CR characters will be replaced by a space character.</li><br><li>Check all screenshots and convert them to use 32-bit color depths.<br>The Carousel Gamelist Loader screen requires 32-bit depths for the screenshots to be rendered properly.</li><br>" + 
-        "<li>Verify that all covers and screenshots are available in the folders and replace any missing ones with generic versions.</li></ul></html>";
+        "<li>Verify that all covers, screenshots and game files are available in the folders<br>and replace any missing ones with generic versions.</li></ul></html>";
     int option = JOptionPane.showConfirmDialog(MainWindow.getInstance()
       .getMainPanel(), message, "Validate database", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
     if (option == JOptionPane.YES_OPTION)
