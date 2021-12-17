@@ -1,19 +1,19 @@
-package se.lantz.gui.convertscreens;
+package se.lantz.gui.dbvalidation;
 
 import java.awt.Frame;
 
 import javax.swing.JDialog;
 import javax.swing.WindowConstants;
 
-public class ConvertProgressDialog extends JDialog
+public class DbValidationProgressDialog extends JDialog
 {
   private static final long serialVersionUID = 1L;
 
-  private ConvertProgressPanel panel;
+  private DbValidationProgressPanel panel;
 
-  public ConvertProgressDialog(Frame frame)
+  public DbValidationProgressDialog(Frame frame)
   {
-    super(frame, "Convert screenshots", true);
+    super(frame, "Validate database", true);
     this.add(getConvertProgressPanel());
     setSize(900, 600);
     setLocationRelativeTo(frame);
@@ -31,11 +31,11 @@ public class ConvertProgressDialog extends JDialog
     getConvertProgressPanel().finish(count, e);
   }
 
-  public ConvertProgressPanel getConvertProgressPanel()
+  public DbValidationProgressPanel getConvertProgressPanel()
   {
     if (panel == null)
     {
-      panel = new ConvertProgressPanel();
+      panel = new DbValidationProgressPanel();
       panel.getCloseButton().addActionListener(e -> setVisible(false));
     }
     return panel;

@@ -50,6 +50,7 @@ import se.lantz.model.SavedStatesModel;
 import se.lantz.model.SavedStatesModel.SAVESTATE;
 import se.lantz.model.SystemModel;
 import se.lantz.model.data.GameDetails;
+import se.lantz.model.data.GameValidationDetails;
 
 public class FileManager
 {
@@ -1474,6 +1475,71 @@ public class FileManager
     });
 
     return convertedScreensList;
+  }
+  
+  public static List<String> checkAllFilesForDbValidation(List<GameValidationDetails> gameList)
+  {
+    List<String> fixedGamesList = new ArrayList<>();
+    for (GameValidationDetails gameData : gameList)
+    {
+      File coverFile = Paths.get(COVERS + gameData.getCover()).toFile();
+      if (!coverFile.exists())
+      {
+        saveEmptyCoverImage(gameData.isVic20(), coverFile);
+        fixedGamesList.add("missing cover file for " + gameData.getTitle());
+      }
+      File screens1File = Paths.get(SCREENS + gameData.getScreen1()).toFile();
+      File screens2File = Paths.get(SCREENS + gameData.getScreen2()).toFile();
+      if (!screens1File.exists() || !screens2File.exists())
+      {
+        fixScreenImages(gameData.isVic20(), screens1File, screens2File);
+        fixedGamesList.add("screenshot files for " + gameData.getTitle());
+      }
+    }
+    return fixedGamesList;
+  }
+  
+  private static void saveEmptyCoverImage(boolean vic20, File coverFile)
+  {
+    BufferedImage imageToSave = vic20 ? emptyVic20Cover : emptyC64Cover;
+    //Copy the missing cover image
+    try
+    {
+      ImageIO.write(imageToSave, "png", coverFile);
+    }
+    catch (IOException e)
+    {
+      ExceptionHandler.handleException(e, "Could not store cover");
+    }
+  }
+  
+  private static void fixScreenImages(boolean vic20, File screen1File, File screen2File)
+  {
+    BufferedImage emptyImage = vic20 ? emptyVic20Screenshot : emptyC64Screenshot;
+    //Copy the missing cover image
+    try
+    {
+      if (screen1File.exists())
+      {
+        //Copy to screen2
+        Files.copy(screen1File.toPath(), screen2File.toPath());
+      }
+      else if (screen2File.exists())
+      {
+        //Copy to screen1
+        Files.copy(screen2File.toPath(), screen1File.toPath());
+      }
+      else
+      {
+        //Both are missing, write empty to both
+        ImageIO.write(emptyImage, "png", screen1File);
+        ImageIO.write(emptyImage, "png", screen2File);
+      }      
+    }
+    catch (IOException e)
+    {
+      ExceptionHandler.handleException(e, "Could not store screens");
+    }
   }
 
 }

@@ -22,6 +22,8 @@ public class DescriptionTranslater
       System.out.println("es = " + translatedText);
       translatedText = translate("en", "it", englishText);
       System.out.println("it = " + translatedText);
+      translatedText = translate("en", "nl", englishText);
+      System.out.println("nl = " + translatedText);
     }
     catch (IOException e)
     {

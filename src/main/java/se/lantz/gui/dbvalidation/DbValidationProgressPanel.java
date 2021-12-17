@@ -1,4 +1,4 @@
-package se.lantz.gui.convertscreens;
+package se.lantz.gui.dbvalidation;
 
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -13,15 +13,15 @@ import javax.swing.JTextArea;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class ConvertProgressPanel extends JPanel
+public class DbValidationProgressPanel extends JPanel
 {
-  private static final Logger logger = LoggerFactory.getLogger(ConvertProgressPanel.class);
+  private static final Logger logger = LoggerFactory.getLogger(DbValidationProgressPanel.class);
   private JProgressBar progressBar;
   private JTextArea textArea;
   private JScrollPane textScrollPane;
   private JButton closeButton;
 
-  public ConvertProgressPanel()
+  public DbValidationProgressPanel()
   {
     GridBagLayout gridBagLayout = new GridBagLayout();
     setLayout(gridBagLayout);
@@ -99,16 +99,20 @@ public class ConvertProgressPanel extends JPanel
     getProgressBar().setValue(getProgressBar().getMaximum());
     if (e != null)
     {
-      logger.error("Screen convertion failed", e);
-      getTextArea().append("\nConvertion failed: " + e.getMessage());
+      logger.error("Db validation failed", e);
+      getTextArea().append("\nValidation failed: " + e.getMessage());
     }
     else if (count == 0)
     {
-      getTextArea().append("\nNothing to convert, all up to date.");
+      getTextArea().append("\nNothing to fix, all looks good!");
+    }
+    else if (count == 1)
+    {
+      getTextArea().append("\nPerformed " + count + " fix successfully.");
     }
     else
     {
-      getTextArea().append("\nConverted " + count + " screens successfully.");
+      getTextArea().append("\nPerformed " + count + " fixes successfully.");
     }
   }
 }

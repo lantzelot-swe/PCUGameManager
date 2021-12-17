@@ -20,6 +20,7 @@ import org.slf4j.LoggerFactory;
 import se.lantz.manager.ImportManager;
 import se.lantz.model.data.GameDetails;
 import se.lantz.model.data.GameListData;
+import se.lantz.model.data.GameValidationDetails;
 import se.lantz.model.data.GameView;
 import se.lantz.model.data.ViewFilter;
 import se.lantz.util.DbConstants;
@@ -245,6 +246,35 @@ public class DbConnector
     Collections.sort(returnList, new GameListDataComparator());
     return returnList;
   }
+  
+  public List<GameValidationDetails> fetchAllGamesForDbValdation()
+  {
+    List<GameValidationDetails> returnList = new ArrayList<>();
+    StringBuilder sqlBuilder = new StringBuilder();
+    sqlBuilder.append("SELECT title, gamefile, Coverfile, Screen1file, Screen2file, System FROM gameinfo ORDER BY title COLLATE NOCASE ASC");
+    try (Connection conn = this.connect(); Statement stmt = conn.createStatement();
+      ResultSet rs = stmt.executeQuery(sqlBuilder.toString()))
+    {
+      // loop through the result set
+      while (rs.next())
+      {
+        GameValidationDetails data = new GameValidationDetails();
+        data.setTitle(rs.getString("Title"));
+        data.setGame(rs.getString("GameFile"));
+        data.setCover(rs.getString("Coverfile"));
+        data.setScreen1(rs.getString("Screen1file"));
+        data.setScreen2(rs.getString("Screen2file"));
+        data.setSystem(rs.getString("System"));
+        returnList.add(data);
+      }
+    }
+    catch (SQLException e)
+    {
+      ExceptionHandler.handleException(e, "Could not fetch games for db validation");
+    }
+    return returnList;
+  }
+  
 
   public List<GameView> loadGameViews()
   {

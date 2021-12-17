@@ -15,21 +15,18 @@ import javax.swing.JEditorPane;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
-import javax.swing.JProgressBar;
 import javax.swing.KeyStroke;
 import javax.swing.UIManager;
 import javax.swing.event.HyperlinkEvent;
 
 import se.lantz.gamebase.GamebaseImporter;
-import se.lantz.gui.checkdescriptions.CheckDescrProgressDialog;
-import se.lantz.gui.checkdescriptions.CheckDescrWorker;
-import se.lantz.gui.convertscreens.ConvertProgressDialog;
-import se.lantz.gui.convertscreens.ConvertWorker;
 import se.lantz.gui.dbbackup.BackupProgressDialog;
 import se.lantz.gui.dbbackup.BackupWorker;
 import se.lantz.gui.dbrestore.RestoreDbDialog;
 import se.lantz.gui.dbrestore.RestoreProgressDialog;
 import se.lantz.gui.dbrestore.RestoreWorker;
+import se.lantz.gui.dbvalidation.DbValidationProgressDialog;
+import se.lantz.gui.dbvalidation.DbValidationWorker;
 import se.lantz.gui.exports.ExportFileLoaderWorker;
 import se.lantz.gui.exports.ExportGamesDialog;
 import se.lantz.gui.exports.ExportSavedStatesDialog;
@@ -110,8 +107,7 @@ public class MenuManager
   private JMenuItem deleteAllGamesItem;
   private JMenuItem deleteGamesForViewItem;
 
-  private JMenuItem convertScreensItem;
-  private JMenuItem checkDescrItem;
+  private JMenuItem validateDbItem;
   private JMenuItem palNtscFixItem;
   
   private JMenuItem installPCUAEItem;
@@ -222,8 +218,9 @@ public class MenuManager
     toolsMenu.add(getDeleteAllGamesItem());
     toolsMenu.add(getDeleteGamesForViewMenuItem());
     toolsMenu.addSeparator();
-    toolsMenu.add(getConvertScreensItem());
-    toolsMenu.add(getCheckDescriptionsItem());
+//    toolsMenu.add(getConvertScreensItem());
+//    toolsMenu.add(getCheckDescriptionsItem());
+    toolsMenu.add(getValidateDbItem());
     toolsMenu.addSeparator();
     toolsMenu.add(getPalNtscFixMenuItem());
     
@@ -687,20 +684,15 @@ public class MenuManager
     return deleteAllGamesItem;
   }
 
-  private JMenuItem getConvertScreensItem()
+  private JMenuItem getValidateDbItem()
   {
-    convertScreensItem = new JMenuItem("Convert screenshots...");
-    convertScreensItem.setMnemonic('c');
-    convertScreensItem.addActionListener(e -> convertScreens());
-    return convertScreensItem;
-  }
-
-  private JMenuItem getCheckDescriptionsItem()
-  {
-    checkDescrItem = new JMenuItem("Check descriptions...");
-    checkDescrItem.setMnemonic('e');
-    checkDescrItem.addActionListener(e -> fixInvalidCharsInDescriptions());
-    return checkDescrItem;
+    if (validateDbItem == null)
+    {
+      validateDbItem = new JMenuItem("Validate database...");
+      validateDbItem.setMnemonic('v');
+      validateDbItem.addActionListener(e -> validateDb());
+    }
+    return validateDbItem;
   }
   
   private JMenuItem getPalNtscFixMenuItem()
@@ -1068,37 +1060,6 @@ public class MenuManager
     delDialog.setVisible(true);
   }
 
-  private void convertScreens()
-  {
-    String message =
-      "Do you want to check all screenshots in the database and convert them to use 32-bit color depths?\nThe PCU list selector screen requires 32-bit depths for the screenshots to be rendered properly.";
-    int option = JOptionPane.showConfirmDialog(MainWindow.getInstance()
-      .getMainPanel(), message, "Convert screenshots", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
-    if (option == JOptionPane.YES_OPTION)
-    {
-      ConvertProgressDialog dialog = new ConvertProgressDialog(this.mainWindow);
-      ConvertWorker worker = new ConvertWorker(dialog);
-      worker.execute();
-      dialog.setVisible(true);
-    }
-  }
-
-  private void fixInvalidCharsInDescriptions()
-  {
-    String message =
-      "Do you want to check all description texts in the database and remove all carrage return (CR) characters?\nEarlier versions of the manager allowed for CR characters, the Carousel " +
-        "does not handle that properly.\nCR characters will be replaced by a space character.";
-    int option = JOptionPane.showConfirmDialog(MainWindow.getInstance()
-      .getMainPanel(), message, "Check description texts", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
-    if (option == JOptionPane.YES_OPTION)
-    {
-      CheckDescrProgressDialog dialog = new CheckDescrProgressDialog(this.mainWindow);
-      CheckDescrWorker worker = new CheckDescrWorker(dialog, this.uiModel.getDbConnector());
-      worker.execute();
-      dialog.setVisible(true);
-    }
-  }
-  
   private void fixPalNtscIssue()
   {
     int option = JOptionPane.showConfirmDialog(MainWindow.getInstance()
@@ -1110,6 +1071,23 @@ public class MenuManager
         JOptionPane.showMessageDialog(MainWindow.getInstance()
       .getMainPanel(), "Game file and saved state successfully swapped. System type was also switched.", "Swap game file and first saved state", JOptionPane.INFORMATION_MESSAGE);
       }
+    }
+  }
+  
+  private void validateDb()
+  {
+    String message =
+      "<html>Do you want to validate the database? The following actions will be performed: <ul><li>Check all description texts in the database and remove all carrage return (CR) characters.<br>Earlier versions of the manager allowed for CR characters, the Carousel " +
+        "does not handle that properly.<br>CR characters will be replaced by a space character.</li><br><li>Check all screenshots and convert them to use 32-bit color depths.<br>The Carousel Gamelist Loader screen requires 32-bit depths for the screenshots to be rendered properly.</li><br>" + 
+        "<li>Verify that all covers and screenshots are available in the folders and replace any missing ones with generic versions.</li></ul></html>";
+    int option = JOptionPane.showConfirmDialog(MainWindow.getInstance()
+      .getMainPanel(), message, "Validate database", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+    if (option == JOptionPane.YES_OPTION)
+    {
+      DbValidationProgressDialog dialog = new DbValidationProgressDialog(this.mainWindow);
+      DbValidationWorker worker = new DbValidationWorker(dialog, this.uiModel.getDbConnector());
+      worker.execute();
+      dialog.setVisible(true);
     }
   }
   
