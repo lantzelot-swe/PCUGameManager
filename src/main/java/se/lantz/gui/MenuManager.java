@@ -119,6 +119,7 @@ public class MenuManager
   private JMenuItem installViceModeItem;
 
   private JMenuItem helpItem;
+  private JMenuItem pcuaeWikiItem;
   private JMenuItem aboutItem;
   private JMenuItem newVersionItem;
 
@@ -237,6 +238,7 @@ public class MenuManager
     helpMenu = new JMenu("Help");
     helpMenu.setMnemonic('H');
     helpMenu.add(getHelpItem());
+    helpMenu.add(getPcuaeWikiItem());
     helpMenu.add(getCheckVersionItem());
     helpMenu.add(getAboutItem());
   }
@@ -804,6 +806,28 @@ public class MenuManager
       }
     });
     return helpItem;
+  }
+  
+  private JMenuItem getPcuaeWikiItem()
+  {
+    pcuaeWikiItem = new JMenuItem("PCUAE wiki");
+    KeyStroke keyStrokeToImportGames = KeyStroke.getKeyStroke(KeyEvent.VK_F2, 0);
+    pcuaeWikiItem.setAccelerator(keyStrokeToImportGames);
+    pcuaeWikiItem.setMnemonic('p');
+    pcuaeWikiItem.addActionListener(e -> {
+      try
+      {
+        Desktop.getDesktop().browse(new URI("https://projectcarouselusb.online/help-2"));
+      }
+      catch (IOException | URISyntaxException ex)
+      {
+        JOptionPane.showMessageDialog(MainWindow.getInstance(),
+                                      "Could not open PCUAE wiki",
+                                      "Help missing",
+                                      JOptionPane.ERROR_MESSAGE);
+      }
+    });
+    return pcuaeWikiItem;
   }
 
   private JMenuItem getAboutItem()
