@@ -130,23 +130,37 @@ public class FileManager
 
   public static BufferedImage getInfoSlotScreenImage(boolean first)
   {
-    BufferedImage coverImage = null;
+    BufferedImage screenImage = null;
     try
     {
       if (first)
       {
-        coverImage = ImageIO.read(FileManager.class.getResource("/se/lantz/InfoSlotScreen1.png"));
+        screenImage = ImageIO.read(FileManager.class.getResource("/se/lantz/InfoSlotScreen1.png"));
       }
       else
       {
-        coverImage = ImageIO.read(FileManager.class.getResource("/se/lantz/InfoSlotScreen2.png"));
+        screenImage = ImageIO.read(FileManager.class.getResource("/se/lantz/InfoSlotScreen2.png"));
       }
     }
     catch (IOException e)
     {
       ExceptionHandler.handleException(e, "Could not read info slot screen image.");
     }
-    return coverImage;
+    return screenImage;
+  }
+  
+  public static BufferedImage getInfoSlotTextBox()
+  {
+    BufferedImage textBoxImage = null;
+    try
+    {      
+       textBoxImage = ImageIO.read(FileManager.class.getResource("/se/lantz/InfoSlotTextBox.png"));
+    }
+    catch (IOException e)
+    {
+      ExceptionHandler.handleException(e, "Could not read info slot screen image.");
+    }
+    return textBoxImage;
   }
 
   public void saveFiles()

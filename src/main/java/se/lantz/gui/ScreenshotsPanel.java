@@ -1,5 +1,6 @@
 package se.lantz.gui;
 
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -466,7 +467,7 @@ public class ScreenshotsPanel extends JPanel
         {
           public void filesDropped(java.io.File[] files)
           {
-            infomodel.setScreen1Image(handleScreenFileDrop(files, screen1ImageLabel, edit1Button));
+            infomodel.setScreen1Image(handleScreenFileDrop(files, screen1ImageLabel, edit1Button, true));
           }
         });
     }
@@ -499,7 +500,7 @@ public class ScreenshotsPanel extends JPanel
         {
           public void filesDropped(java.io.File[] files)
           {
-            infomodel.setScreen2Image(handleScreenFileDrop(files, screen2ImageLabel, edit2Button));
+            infomodel.setScreen2Image(handleScreenFileDrop(files, screen2ImageLabel, edit2Button, false));
           }
         });
     }
@@ -746,7 +747,7 @@ public class ScreenshotsPanel extends JPanel
     return returnImage;
   }
 
-  private BufferedImage handleScreenFileDrop(File[] files, JLabel imageLabel, JButton editButton)
+  private BufferedImage handleScreenFileDrop(File[] files, JLabel imageLabel, JButton editButton, boolean first)
   {
     BufferedImage returnImage = null;
     if (files.length > 0)
@@ -761,6 +762,19 @@ public class ScreenshotsPanel extends JPanel
                                         "Screenshot file",
                                         JOptionPane.ERROR_MESSAGE);
           return null;
+        }
+        if (infomodel.isInfoSlot())
+        {
+          //Ask if text shall be added
+          int value = JOptionPane.showConfirmDialog(getScreenshotPanel(),
+                                        "Do you want to add the gamelist view name to the screenshot?",
+                                        "Screenshot file",
+                                        JOptionPane.YES_NO_OPTION,
+                                        JOptionPane.INFORMATION_MESSAGE);
+          if (value == JOptionPane.YES_OPTION)
+          {
+            model.writeGameViewTextOnScreen(returnImage, first ? Color.yellow : Color.red);
+          }
         }
         setEditButtonVisibility(returnImage, editButton);
         imageLabel.setIcon(new ImageIcon(FileManager.scaleImageTo320x200x32bit(returnImage)));
@@ -854,11 +868,11 @@ public class ScreenshotsPanel extends JPanel
       FileManager.getConfiguredProperties().put(SCREENS_DIR_PROPERTY, selectedFile.toPath().getParent().toString());
       if (first)
       {
-        infomodel.setScreen1Image(handleScreenFileDrop(new File[] { selectedFile }, screen1ImageLabel, edit1Button));
+        infomodel.setScreen1Image(handleScreenFileDrop(new File[] { selectedFile }, screen1ImageLabel, edit1Button, true));
       }
       else
       {
-        infomodel.setScreen2Image(handleScreenFileDrop(new File[] { selectedFile }, screen2ImageLabel, edit2Button));
+        infomodel.setScreen2Image(handleScreenFileDrop(new File[] { selectedFile }, screen2ImageLabel, edit2Button, false));
       }
     }
   }

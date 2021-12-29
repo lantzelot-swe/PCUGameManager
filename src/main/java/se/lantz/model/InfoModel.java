@@ -425,6 +425,11 @@ public class InfoModel extends AbstractModel
   {
     return titleInDb.isEmpty();
   }
+  
+  public boolean isInfoSlot()
+  {
+    return viewTag.contains("GIS:");
+  }
 
   public boolean isTitleChanged()
   {
