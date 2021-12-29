@@ -13,6 +13,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -111,6 +112,41 @@ public class FileManager
   public static InputStream getMissingVIC20GameFile() throws URISyntaxException
   {
     return FileManager.class.getResourceAsStream("/se/lantz/MissingGame-Vic20.vsf.gz");
+  }
+
+  public static BufferedImage getInfoSlotCoverImage()
+  {
+    BufferedImage coverImage = null;
+    try
+    {
+      coverImage = ImageIO.read(FileManager.class.getResource("/se/lantz/InfoSlotCover.png"));
+    }
+    catch (IOException e)
+    {
+      ExceptionHandler.handleException(e, "Could not read cover image.");
+    }
+    return coverImage;
+  }
+
+  public static BufferedImage getInfoSlotScreenImage(boolean first)
+  {
+    BufferedImage coverImage = null;
+    try
+    {
+      if (first)
+      {
+        coverImage = ImageIO.read(FileManager.class.getResource("/se/lantz/InfoSlotScreen1.png"));
+      }
+      else
+      {
+        coverImage = ImageIO.read(FileManager.class.getResource("/se/lantz/InfoSlotScreen2.png"));
+      }
+    }
+    catch (IOException e)
+    {
+      ExceptionHandler.handleException(e, "Could not read info slot screen image.");
+    }
+    return coverImage;
   }
 
   public void saveFiles()
@@ -433,7 +469,7 @@ public class FileManager
     Path outDirPath = targetDir.toPath();
     Path filePath = outDirPath.resolve(fileName);
     filePath.toFile().createNewFile();
-    FileWriter fw = new FileWriter(filePath.toFile());
+    FileWriter fw = new FileWriter(filePath.toFile(), StandardCharsets.UTF_8);
 
     if (!fileLoader)
     {
@@ -932,17 +968,16 @@ public class FileManager
 
   public static void deleteAllFolderContent()
   {
-    deleteDirContent(new File(COVERS), false);
-    deleteDirContent(new File(SCREENS), false);
-    deleteDirContent(new File(GAMES), false);
+    deleteDirContent(new File(COVERS));
+    deleteDirContent(new File(SCREENS));
+    deleteDirContent(new File(GAMES));
   }
 
-  private static void deleteDirContent(File dir, boolean deleteAll)
+  private static void deleteDirContent(File dir)
   {
     for (File file : dir.listFiles())
     {
-      if (!file.isDirectory() &&
-        (deleteAll || !(file.getName().contains("THEC64") || file.getName().contains("VIC20"))))
+      if (!file.isDirectory())
       {
         file.delete();
       }
@@ -1007,7 +1042,7 @@ public class FileManager
     try
     {
       File coversDir = new File(COVERS);
-      deleteDirContent(coversDir, true);
+      deleteDirContent(coversDir);
       copyDirectory(backupFolder.toPath().resolve("covers").toString(), coversDir.toPath().toString());
     }
     catch (IOException e)
@@ -1022,7 +1057,7 @@ public class FileManager
     try
     {
       File screensDir = new File(SCREENS);
-      deleteDirContent(screensDir, true);
+      deleteDirContent(screensDir);
       copyDirectory(backupFolder.toPath().resolve("screens").toString(), screensDir.toPath().toString());
     }
     catch (IOException e)
@@ -1037,7 +1072,7 @@ public class FileManager
     try
     {
       File gamesDir = new File(GAMES);
-      deleteDirContent(gamesDir, true);
+      deleteDirContent(gamesDir);
       copyDirectory(backupFolder.toPath().resolve("games").toString(), gamesDir.toPath().toString());
     }
     catch (IOException e)
@@ -1477,7 +1512,7 @@ public class FileManager
 
     return convertedScreensList;
   }
-  
+
   public static List<String> checkAllFilesForDbValidation(List<GameValidationDetails> gameList)
   {
     List<String> fixedGamesList = new ArrayList<>();
@@ -1496,7 +1531,7 @@ public class FileManager
         fixScreenImages(gameData.isVic20(), screens1File, screens2File);
         fixedGamesList.add("screenshot files for " + gameData.getTitle());
       }
-      
+
       //Check game file also
       File gameFile = Paths.get(GAMES + gameData.getGame()).toFile();
       if (!gameFile.exists())
@@ -1507,7 +1542,7 @@ public class FileManager
     }
     return fixedGamesList;
   }
-  
+
   private static void saveEmptyCoverImage(boolean vic20, File coverFile)
   {
     BufferedImage imageToSave = vic20 ? emptyVic20Cover : emptyC64Cover;
@@ -1521,7 +1556,7 @@ public class FileManager
       ExceptionHandler.handleException(e, "Could not store cover");
     }
   }
-  
+
   private static void fixScreenImages(boolean vic20, File screen1File, File screen2File)
   {
     BufferedImage emptyImage = vic20 ? emptyVic20Screenshot : emptyC64Screenshot;
@@ -1543,14 +1578,14 @@ public class FileManager
         //Both are missing, write empty to both
         ImageIO.write(emptyImage, "png", screen1File);
         ImageIO.write(emptyImage, "png", screen2File);
-      }      
+      }
     }
     catch (IOException e)
     {
       ExceptionHandler.handleException(e, "Could not store screens");
     }
   }
-  
+
   private static void copyMissingGameFile(boolean vic20, File gameFile)
   {
     try
