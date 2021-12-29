@@ -913,20 +913,25 @@ public class MainViewModel extends AbstractModel
     infoModel.setCoverImage(FileManager.getInfoSlotCoverImage());
     //Screen images
     BufferedImage screenImage1 = FileManager.getInfoSlotScreenImage(true);
-    writeGameViewTextOnScreen(screenImage1, Color.yellow, gameViewTitle.toUpperCase());
+    writeGameViewTextOnScreen(screenImage1, Color.yellow);
     infoModel.setScreen1Image(screenImage1);
 
     BufferedImage screenImage2 = FileManager.getInfoSlotScreenImage(false);
-    writeGameViewTextOnScreen(screenImage2, Color.red, gameViewTitle.toUpperCase());
+    writeGameViewTextOnScreen(screenImage2, Color.red);
     infoModel.setScreen2Image(screenImage2);
   }
 
-  private void writeGameViewTextOnScreen(BufferedImage image, Color color, String title)
+  public void writeGameViewTextOnScreen(BufferedImage image, Color color)
   {
+    String title = this.selectedGameView.getName().toUpperCase();
+    BufferedImage infoSlotTextBox = FileManager.getInfoSlotTextBox();
     Graphics2D g = image.createGraphics();
     int imgWidth = image.getWidth();
     int imgHeight = image.getHeight();
     g = image.createGraphics();
+    
+    g.drawImage(infoSlotTextBox, imgWidth / 2 - infoSlotTextBox.getWidth() / 2, 55, null);
+    
     g.setFont(new Font("C64 Pro", 0, 0).deriveFont(10f));
 
     TextLayout textLayout = new TextLayout(title, g.getFont(), g.getFontRenderContext());
@@ -936,7 +941,7 @@ public class MainViewModel extends AbstractModel
     {
       //Draw a black rectangle first
       g.setColor(Color.black);
-      g.fillRect(imgWidth / 2 - (int) textWidth / 2 - 5, imgHeight / 2 - 21, (int) textWidth + 10, 40);
+      g.fillRect(imgWidth / 2 - (int) textWidth / 2 - 5, imgHeight / 2 - 11, (int) textWidth + 10, 21);
     }
 
     g.setColor(color);
