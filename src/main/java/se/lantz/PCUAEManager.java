@@ -1,9 +1,11 @@
 package se.lantz;
 
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
@@ -31,6 +33,10 @@ public class PCUAEManager
       Thread.setDefaultUncaughtExceptionHandler(new TopLevelExceptionHandler());
       // Set System L&F
       UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+      //Setup C64 font
+      GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+      InputStream fontStream = PCUAEManager.class.getResourceAsStream("/se/lantz/C64_Pro-STYLE.ttf");
+      ge.registerFont(Font.createFont(Font.TRUETYPE_FONT, fontStream));
     }
     catch (Exception e)
     {
@@ -40,17 +46,17 @@ public class PCUAEManager
     SwingUtilities.invokeLater(() -> {
 
       MainWindow mainWindow = MainWindow.getInstance();
-      
+
       GraphicsDevice gd = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
       int width = gd.getDisplayMode().getWidth();
       int height = gd.getDisplayMode().getHeight();
-      
-      mainWindow.setSize(Math.min(width, 1500), Math.min(height-40, 825));
-      mainWindow.setMinimumSize(new Dimension(Math.min(width, 1300), Math.min(height-40, 700)));
+
+      mainWindow.setSize(Math.min(width, 1500), Math.min(height - 40, 825));
+      mainWindow.setMinimumSize(new Dimension(Math.min(width, 1300), Math.min(height - 40, 700)));
       mainWindow.setVisible(true);
       mainWindow.setLocationRelativeTo(null);
       mainWindow.initialize();
-      
+
       //Make sure all folders are available
       try
       {
@@ -64,7 +70,7 @@ public class PCUAEManager
       {
         e.printStackTrace();
       }
-      
+
       //Check for new versions at startup, but only when running stadalone, not during development.
       if (!FileManager.getPcuVersionFromManifest().isEmpty())
       {

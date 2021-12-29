@@ -1,10 +1,16 @@
 package se.lantz.model;
 
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.Graphics2D;
+import java.awt.font.TextLayout;
+import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.swing.DefaultComboBoxModel;
@@ -135,43 +141,43 @@ public class MainViewModel extends AbstractModel
     //Add favorites views
     favorites1View = new GameView(GameView.FAVORITES_ID);
     favorites1View.setName("Favorites 1");
-    favorites1View.setSqlQuery(" WHERE Favorite = 1");
+    favorites1View.setSqlQuery("WHERE Favorite = 1");
 
     favorites2View = new GameView(GameView.FAVORITES_2_ID);
     favorites2View.setName("Favorites 2");
-    favorites2View.setSqlQuery(" WHERE Favorite = 2");
+    favorites2View.setSqlQuery("WHERE Favorite = 2");
 
     favorites3View = new GameView(GameView.FAVORITES_3_ID);
     favorites3View.setName("Favorites 3");
-    favorites3View.setSqlQuery(" WHERE Favorite = 3");
+    favorites3View.setSqlQuery("WHERE Favorite = 3");
 
     favorites4View = new GameView(GameView.FAVORITES_4_ID);
     favorites4View.setName("Favorites 4");
-    favorites4View.setSqlQuery(" WHERE Favorite = 4");
+    favorites4View.setSqlQuery("WHERE Favorite = 4");
 
     favorites5View = new GameView(GameView.FAVORITES_5_ID);
     favorites5View.setName("Favorites 5");
-    favorites5View.setSqlQuery(" WHERE Favorite = 5");
+    favorites5View.setSqlQuery("WHERE Favorite = 5");
 
     favorites6View = new GameView(GameView.FAVORITES_6_ID);
     favorites6View.setName("Favorites 6");
-    favorites6View.setSqlQuery(" WHERE Favorite = 6");
+    favorites6View.setSqlQuery("WHERE Favorite = 6");
 
     favorites7View = new GameView(GameView.FAVORITES_7_ID);
     favorites7View.setName("Favorites 7");
-    favorites7View.setSqlQuery(" WHERE Favorite = 7");
+    favorites7View.setSqlQuery("WHERE Favorite = 7");
 
     favorites8View = new GameView(GameView.FAVORITES_8_ID);
     favorites8View.setName("Favorites 8");
-    favorites8View.setSqlQuery(" WHERE Favorite = 8");
+    favorites8View.setSqlQuery("WHERE Favorite = 8");
 
     favorites9View = new GameView(GameView.FAVORITES_9_ID);
     favorites9View.setName("Favorites 9");
-    favorites9View.setSqlQuery(" WHERE Favorite = 9");
+    favorites9View.setSqlQuery("WHERE Favorite = 9");
 
     favorites10View = new GameView(GameView.FAVORITES_10_ID);
     favorites10View.setName("Favorites 10");
-    favorites10View.setSqlQuery(" WHERE Favorite = 10");
+    favorites10View.setSqlQuery("WHERE Favorite = 10");
 
     gameViewModel.addElement(allGameView);
     gameViewModel.addElement(favorites1View);
@@ -210,21 +216,30 @@ public class MainViewModel extends AbstractModel
   {
     this.selectedData = selectedData;
     currentGameId = selectedData.getGameId();
+    disableChangeNotification(true);
+
+    //Clear some properties first
+    infoModel.resetImagesAndOldFileNames();
+    infoModel.setTitleFromDb("");
+
     if (selectedData.getGameId().isEmpty())
     {
-      //Create a default GameDetails and return
+      //Create a default GameDetails
       currentGameDetails = new GameDetails();
+      infoModel.setTitle("");
+      if (selectedData.isInfoSlot())
+      {
+        generateInfoSlot(currentGameDetails);
+      }
     }
     else
     {
       // Read from db, update all models after that.
       currentGameDetails = dbConnector.getGameDetails(selectedData.getGameId());
+      infoModel.setTitleFromDb(currentGameDetails.getTitle());
     }
-    disableChangeNotification(true);
 
     // Map to models
-    infoModel.setTitleFromDb(currentGameDetails.getTitle());
-
     infoModel.setTitle(currentGameDetails.getTitle());
     infoModel.setDescription(currentGameDetails.getDescription());
     infoModel.setDescriptionDe(currentGameDetails.getDescriptionDe());
@@ -241,18 +256,10 @@ public class MainViewModel extends AbstractModel
     infoModel.setScreens2File(currentGameDetails.getScreen2());
     infoModel.setDuplicateIndex(currentGameDetails.getDuplicateIndex());
     infoModel.setViewTag(currentGameDetails.getViewTag());
-    //Reset and images that where added previously
-    infoModel.resetImagesAndOldFileNames();
     joy1Model.setConfigStringFromDb(currentGameDetails.getJoy1());
     joy2Model.setConfigStringFromDb(currentGameDetails.getJoy2());
     systemModel.setConfigStringFromDb(currentGameDetails.getSystem());
     systemModel.setVerticalShift(currentGameDetails.getVerticalShift());
-
-    //Set empty title to trigger a change
-    if (selectedData.getGameId().isEmpty())
-    {
-      infoModel.setTitle("");
-    }
     //Read available saved states
     stateManager.readSavedStates();
 
@@ -265,6 +272,12 @@ public class MainViewModel extends AbstractModel
     }
     //Reset The undo managers for a new game
     TextComponentSupport.clearUndoManagers();
+
+    if (selectedData.isInfoSlot() && selectedData.getGameId().isEmpty())
+    {
+      //Trigger a save directly when adding a info slot
+      saveData();
+    }
   }
 
   public StringBuilder importGameInfo(List<String> rowValues,
@@ -362,6 +375,8 @@ public class MainViewModel extends AbstractModel
         favorites8Count = 0;
         favorites9Count = 0;
         favorites10Count = 0;
+        //Fetch all entries to be able to update counts with infoslots also
+        gamesList = dbConnector.fetchAllGamesForGameCount();
         for (GameListData gameListData : gamesList)
         {
           if (gameListData.isFavorite())
@@ -451,6 +466,18 @@ public class MainViewModel extends AbstractModel
   public void addRequireFieldsListener(PropertyChangeListener requiredFieldsListener)
   {
     this.requiredFieldsListener = requiredFieldsListener;
+  }
+  
+  public boolean isInfoSlotAvailableForCurrentView()
+  {
+    for (int i = 0; i < this.gameListModel.size(); i++)
+    {
+      if (this.gameListModel.elementAt(i).isInfoSlot())
+      {
+        return true;
+      }
+    }
+    return false;
   }
 
   @Override
@@ -642,13 +669,10 @@ public class MainViewModel extends AbstractModel
     for (int i = 0; i < getGameListModel().getSize(); i++)
     {
       GameListData currentData = getGameListModel().getElementAt(i);
-      if (!currentData.getTitle().contains("THEC64") || currentData.getTitle().contains("VIC20"))
-      {
-        GameDetails details = dbConnector.getGameDetails(currentData.getGameId());
-        FileManager.deleteFilesForGame(details);
-        allGamesCount--;
-        allGameView.setGameCount(allGamesCount);
-      }
+      GameDetails details = dbConnector.getGameDetails(currentData.getGameId());
+      FileManager.deleteFilesForGame(details);
+      allGamesCount--;
+      allGameView.setGameCount(allGamesCount);
     }
     dbConnector.deleteAllGamesInView(getSelectedGameView());
     //Reload the current view
@@ -696,9 +720,20 @@ public class MainViewModel extends AbstractModel
 
   public void addNewGameListData()
   {
-    gameListModel.addElement(new GameListData("New Game", "", "", 0));
+    gameListModel.addElement(new GameListData("New Game", "", "", 0, false));
     selectedGameView.setGameCount(gameListModel.getSize());
     //Update all games count 
+    allGamesCount++;
+    allGameView.setGameCount(allGamesCount);
+  }
+
+  public void addNewInfoSlotData()
+  {
+    int favorite = selectedGameView.getGameViewId() < -1 ? selectedGameView.getGameViewId() : 0;
+
+    gameListModel.addElement(new GameListData("New Info Slot", "", "", favorite, true));
+    selectedGameView.setGameCount(gameListModel.getSize());
+    //Update all games count
     allGamesCount++;
     allGameView.setGameCount(allGamesCount);
   }
@@ -844,5 +879,68 @@ public class MainViewModel extends AbstractModel
   public void checkEnablementOfPalNtscMenuItem(boolean check)
   {
     stateManager.checkEnablementOfPalNtscMenuItem(check);
+  }
+
+  private void generateInfoSlot(GameDetails gameDetails)
+  {
+    String gameViewTitle = this.selectedGameView.getName();
+    String newTitle = "0 <----- " + gameViewTitle + " -----> 0";
+    if (newTitle.length() > 35)
+    {
+      //Trim the title a bit, by removing "--" until just one left
+      newTitle = newTitle.replace("--", "-");
+      if (newTitle.length() > 35)
+      {
+        newTitle = newTitle.replace("--", "-");
+        if (newTitle.length() > 35)
+        {
+          newTitle = newTitle.replace("--", "-");
+        }
+      }
+    }
+    String description =
+      "For more Info on PCUAE look in The Help Menu. Main keys are CTRL + F1 for The Help Menu, CTRL + F3 for Carousel Version Changer, CTRL + F5 for Mode Changer, CTRL + F7 for PCUAE Option Menu, CTRL + SHIFT + F7 for Carousel Gamelist Changer.";
+    gameDetails.setTitle(newTitle);
+    gameDetails.setDescription(description);
+    gameDetails.setViewTag("GIS:" + this.selectedGameView.getGameViewId());
+    gameDetails.setSystem("64,pal,driveicon,accuratedisk,sid6581,basic");
+    gameDetails.setJoy1("J:1*:,,,,,,,,,,,,,,");
+    gameDetails.setJoy2("J:2:,,,,,,,,,,,,,,");
+    gameDetails.setComposer("C64 SID Background Music");
+
+    infoModel.resetOldFileNames();
+    //Cover image
+    infoModel.setCoverImage(FileManager.getInfoSlotCoverImage());
+    //Screen images
+    BufferedImage screenImage1 = FileManager.getInfoSlotScreenImage(true);
+    writeGameViewTextOnScreen(screenImage1, Color.yellow, gameViewTitle.toUpperCase());
+    infoModel.setScreen1Image(screenImage1);
+
+    BufferedImage screenImage2 = FileManager.getInfoSlotScreenImage(false);
+    writeGameViewTextOnScreen(screenImage2, Color.red, gameViewTitle.toUpperCase());
+    infoModel.setScreen2Image(screenImage2);
+  }
+
+  private void writeGameViewTextOnScreen(BufferedImage image, Color color, String title)
+  {
+    Graphics2D g = image.createGraphics();
+    int imgWidth = image.getWidth();
+    int imgHeight = image.getHeight();
+    g = image.createGraphics();
+    g.setFont(new Font("C64 Pro", 0, 0).deriveFont(10f));
+
+    TextLayout textLayout = new TextLayout(title, g.getFont(), g.getFontRenderContext());
+    double textHeight = textLayout.getBounds().getHeight();
+    double textWidth = textLayout.getBounds().getWidth();
+    if (textWidth > 170)
+    {
+      //Draw a black rectangle first
+      g.setColor(Color.black);
+      g.fillRect(imgWidth / 2 - (int) textWidth / 2 - 5, imgHeight / 2 - 21, (int) textWidth + 10, 40);
+    }
+
+    g.setColor(color);
+    g.drawString(title, imgWidth / 2 - (int) textWidth / 2, imgHeight / 2 + (int) textHeight / 2);
+    g.dispose();
   }
 }

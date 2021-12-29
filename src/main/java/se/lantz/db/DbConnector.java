@@ -222,7 +222,7 @@ public class DbConnector
 
     //Construct SQL
     StringBuilder sqlBuilder = new StringBuilder();
-    sqlBuilder.append("SELECT title, gamefile, rowid, favorite FROM gameinfo ");
+    sqlBuilder.append("SELECT title, gamefile, rowid, favorite, viewtag FROM gameinfo ");
     sqlBuilder.append(view.getSqlQuery());
     sqlBuilder.append(" ORDER BY title COLLATE NOCASE ASC");
 
@@ -233,9 +233,21 @@ public class DbConnector
       // loop through the result set
       while (rs.next())
       {
-        GameListData data =
-          new GameListData(rs.getString("Title"), rs.getString("GameFile"), Integer.toString(rs.getInt("rowid")), rs.getInt("Favorite"));
-        returnList.add(data);
+        String viewTag = rs.getString("Viewtag");
+        GameListData data = new GameListData(rs.getString("Title"),
+                                             rs.getString("GameFile"),
+                                             Integer.toString(rs.getInt("rowid")),
+                                             rs.getInt("Favorite"),
+                                             viewTag != null && viewTag.contains("GIS:"));
+        //Filter out all info slots that are not supposed to be shown in "all games"
+        if (data.isInfoSlot() && view.getGameViewId() == -1 && !viewTag.equalsIgnoreCase("GIS:-1"))
+        {
+          //Ignore all info slots not created for "all games"
+        }
+        else
+        {
+          returnList.add(data);
+        }
       }
     }
     catch (SQLException e)
@@ -246,12 +258,39 @@ public class DbConnector
     Collections.sort(returnList, new GameListDataComparator());
     return returnList;
   }
-  
+
+  public List<GameListData> fetchAllGamesForGameCount()
+  {
+    List<GameListData> returnList = new ArrayList<>();
+
+    //Construct SQL
+    StringBuilder sqlBuilder = new StringBuilder();
+    sqlBuilder.append("SELECT favorite FROM gameinfo ORDER BY title COLLATE NOCASE ASC");
+
+    logger.debug("Generated View SQL: {}", sqlBuilder);
+    try (Connection conn = this.connect(); Statement stmt = conn.createStatement();
+      ResultSet rs = stmt.executeQuery(sqlBuilder.toString()))
+    {
+      // loop through the result set
+      while (rs.next())
+      {
+        GameListData data = new GameListData("", "", "", rs.getInt("Favorite"), false);
+        returnList.add(data);
+      }
+    }
+    catch (SQLException e)
+    {
+      ExceptionHandler.handleException(e, "Could not fetch all games for count");
+    }
+    return returnList;
+  }
+
   public List<GameValidationDetails> fetchAllGamesForDbValdation()
   {
     List<GameValidationDetails> returnList = new ArrayList<>();
     StringBuilder sqlBuilder = new StringBuilder();
-    sqlBuilder.append("SELECT title, gamefile, Coverfile, Screen1file, Screen2file, System FROM gameinfo ORDER BY title COLLATE NOCASE ASC");
+    sqlBuilder
+      .append("SELECT title, gamefile, Coverfile, Screen1file, Screen2file, System FROM gameinfo ORDER BY title COLLATE NOCASE ASC");
     try (Connection conn = this.connect(); Statement stmt = conn.createStatement();
       ResultSet rs = stmt.executeQuery(sqlBuilder.toString()))
     {
@@ -274,7 +313,6 @@ public class DbConnector
     }
     return returnList;
   }
-  
 
   public List<GameView> loadGameViews()
   {
@@ -666,7 +704,7 @@ public class DbConnector
     String[] splittedRowData = rowData.split(COMMA);
     return splittedRowData[21].split("\"")[0];
   }
-  
+
   private String getSystemInfo(String rowData)
   {
     String[] splittedRowData = rowData.split(COMMA);
@@ -792,7 +830,7 @@ public class DbConnector
     //Use generated name, that is what decides if a duplicate index needs to be used.
     //Look at the coverFile column since all covers have the same name ending.
     String fileName = FileManager.generateFileNameFromTitle(title, 0);
-    
+
     StringBuilder sqlBuilder = new StringBuilder();
     sqlBuilder.append("SELECT rowId, Duplicate FROM gameinfo WHERE Coverfile GLOB \'");
     sqlBuilder.append(fileName);
@@ -1024,7 +1062,7 @@ public class DbConnector
 
   public void deleteAllGames()
   {
-    String sql = "DELETE FROM gameinfo WHERE title NOT LIKE '%THEC64%' AND title NOT LIKE '%VIC-20%'";
+    String sql = "DELETE FROM gameinfo";
     logger.debug("Generated DELETE String:\n{}", sql);
     try (Connection conn = this.connect(); PreparedStatement pstmt = conn.prepareStatement(sql))
     {
@@ -1039,8 +1077,7 @@ public class DbConnector
 
   public void deleteAllGamesInView(GameView view)
   {
-    String sql =
-      "DELETE FROM gameinfo " + view.getSqlQuery() + " AND title NOT LIKE '%THEC64%' AND title NOT LIKE '%VIC-20%'";
+    String sql = "DELETE FROM gameinfo " + view.getSqlQuery();
     logger.debug("Generated DELETE String:\n{}", sql);
     try (Connection conn = this.connect(); PreparedStatement pstmt = conn.prepareStatement(sql))
     {
@@ -1088,7 +1125,8 @@ public class DbConnector
 
   public void clearFavorites(int favoriteNumber)
   {
-    String sql = "UPDATE gameinfo SET Favorite = 0 where Favorite = " + favoriteNumber + ";";
+    String sql =
+      "UPDATE gameinfo SET Favorite = 0 where Favorite = " + favoriteNumber + " AND ViewTag NOT LIKE '%GIS:%';";
     try (Connection conn = this.connect(); PreparedStatement favoritestmt = conn.prepareStatement(sql))
     {
       int value = favoritestmt.executeUpdate();

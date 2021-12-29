@@ -471,13 +471,27 @@ public class ListPanel extends JPanel
     mainPanel.getGameDetailsBackgroundPanel().focusTitleField();
   }
 
+  public void addNewInfoSlot()
+  {
+    //Add new entry and select in the list
+    uiModel.addNewInfoSlotData();
+    int rowToSelect = getList().getModel().getSize() - 1;
+    getList().setSelectionInterval(rowToSelect, rowToSelect);
+    getList().ensureIndexIsVisible(rowToSelect);
+    mainPanel.getGameDetailsBackgroundPanel().updateSelectedGame(list.getSelectedValue());
+    mainPanel.getGameDetailsBackgroundPanel().focusTitleField();
+  }
+
   public void toggleFavorite()
   {
     if (!uiModel.isDataChanged())
     {
       for (GameListData glData : list.getSelectedValuesList())
       {
-        uiModel.toggleFavorite(glData);
+        if (!glData.isInfoSlot())
+        {
+          uiModel.toggleFavorite(glData);
+        }
       }
       mainPanel.repaintAfterModifications();
     }
@@ -489,7 +503,10 @@ public class ListPanel extends JPanel
     {
       for (GameListData glData : list.getSelectedValuesList())
       {
-        uiModel.toggleFavorite2(glData);
+        if (!glData.isInfoSlot())
+        {
+          uiModel.toggleFavorite2(glData);
+        }
       }
       mainPanel.repaintAfterModifications();
     }
@@ -501,7 +518,10 @@ public class ListPanel extends JPanel
     {
       for (GameListData glData : list.getSelectedValuesList())
       {
-        uiModel.toggleFavorite3(glData);
+        if (!glData.isInfoSlot())
+        {
+          uiModel.toggleFavorite3(glData);
+        }
       }
       mainPanel.repaintAfterModifications();
     }
@@ -513,7 +533,10 @@ public class ListPanel extends JPanel
     {
       for (GameListData glData : list.getSelectedValuesList())
       {
-        uiModel.toggleFavorite4(glData);
+        if (!glData.isInfoSlot())
+        {
+          uiModel.toggleFavorite4(glData);
+        }
       }
       mainPanel.repaintAfterModifications();
     }
@@ -525,72 +548,90 @@ public class ListPanel extends JPanel
     {
       for (GameListData glData : list.getSelectedValuesList())
       {
-        uiModel.toggleFavorite5(glData);
+        if (!glData.isInfoSlot())
+        {
+          uiModel.toggleFavorite5(glData);
+        }
       }
       mainPanel.repaintAfterModifications();
     }
   }
-  
+
   public void toggleFavorite6()
   {
     if (!uiModel.isDataChanged())
     {
       for (GameListData glData : list.getSelectedValuesList())
       {
-        uiModel.toggleFavorite6(glData);
+        if (!glData.isInfoSlot())
+        {
+          uiModel.toggleFavorite6(glData);
+        }
       }
       mainPanel.repaintAfterModifications();
     }
   }
-  
+
   public void toggleFavorite7()
   {
     if (!uiModel.isDataChanged())
     {
       for (GameListData glData : list.getSelectedValuesList())
       {
-        uiModel.toggleFavorite7(glData);
+        if (!glData.isInfoSlot())
+        {
+          uiModel.toggleFavorite7(glData);
+        }
       }
       mainPanel.repaintAfterModifications();
     }
   }
-  
+
   public void toggleFavorite8()
   {
     if (!uiModel.isDataChanged())
     {
       for (GameListData glData : list.getSelectedValuesList())
       {
-        uiModel.toggleFavorite8(glData);
+        if (!glData.isInfoSlot())
+        {
+          uiModel.toggleFavorite8(glData);
+        }
       }
       mainPanel.repaintAfterModifications();
     }
   }
-  
+
   public void toggleFavorite9()
   {
     if (!uiModel.isDataChanged())
     {
       for (GameListData glData : list.getSelectedValuesList())
       {
-        uiModel.toggleFavorite9(glData);
+        if (!glData.isInfoSlot())
+        {
+          uiModel.toggleFavorite9(glData);
+        }
       }
       mainPanel.repaintAfterModifications();
     }
   }
-  
+
   public void toggleFavorite10()
   {
     if (!uiModel.isDataChanged())
     {
       for (GameListData glData : list.getSelectedValuesList())
       {
-        uiModel.toggleFavorite10(glData);
+        if (!glData.isInfoSlot())
+        {
+          uiModel.toggleFavorite10(glData);
+        }
       }
       mainPanel.repaintAfterModifications();
     }
   }
-  
+
   public void reloadCurrentGameView()
   {
     GameListData selectedData = getList().getSelectedValue();

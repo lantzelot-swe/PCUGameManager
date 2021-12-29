@@ -103,11 +103,30 @@ public class MainPanel extends JPanel
     repaintAfterModifications();
   }
 
+  public void addNewInfoSlot()
+  {
+    if (uiModel.isInfoSlotAvailableForCurrentView())
+    {
+      int value = JOptionPane
+        .showConfirmDialog(this,
+                           "There is already an info slot for the current gamelist view. Do you want to add another one?",
+                           "Add info slot",
+                           JOptionPane.YES_NO_OPTION,
+                           JOptionPane.INFORMATION_MESSAGE);
+      if (value == JOptionPane.NO_OPTION)
+      {
+        return;
+      }
+    }
+    getListPanel().addNewInfoSlot();
+    reloadCurrentGameView();
+    repaintAfterModifications();
+  }
+
   public void deleteCurrentGame()
   {
     List<GameListData> selectedGameListData = getListPanel().getSelectedGameListData();
-    
-    
+
     if (getListPanel().getSelectedIndexInList() > -1)
     {
       int value = showDeleteDialog(selectedGameListData.size());
@@ -118,20 +137,20 @@ public class MainPanel extends JPanel
         {
           getGameDetailsBackgroundPanel().updateSelectedGame(gameListData);
           uiModel.deleteCurrentGame();
-        }        
+        }
         repaintAfterModifications();
         getListPanel().setSelectedIndexInList(currentSelectedIndex);
       }
     }
   }
-  
+
   int showDeleteDialog(int numberOfGamesSelected)
   {
     String message = "";
     if (numberOfGamesSelected == 1)
     {
       message = "Do you want to delete " + uiModel.getInfoModel().getTitle() + " from the database?";
-      
+
     }
     else
     {
@@ -144,17 +163,18 @@ public class MainPanel extends JPanel
     return JOptionPane
       .showConfirmDialog(MainPanel.this, message, "Delete", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
   }
-  
+
   int showDeleteAllGamesDialog()
   {
-    String message = "Do you want to delete all games from the database? A backup will added to the backups folder before deleting.\nCover, screenshot and game files will not be deleted.";
-    return  JOptionPane.showConfirmDialog(MainPanel.this,
+    String message =
+      "Do you want to delete all games from the database? A backup will added to the backups folder before deleting.\nCover, screenshot and game files will not be deleted.";
+    return JOptionPane.showConfirmDialog(MainPanel.this,
                                          message,
                                          "Delete all games",
                                          JOptionPane.YES_NO_OPTION,
                                          JOptionPane.QUESTION_MESSAGE);
   }
-  
+
   public void selectViewAfterRestore()
   {
     getListPanel().getListViewComboBox().setSelectedIndex(0);
@@ -167,62 +187,62 @@ public class MainPanel extends JPanel
     this.repaint();
     getListPanel().updateViewInfoLabel();
   }
-  
+
   public void clearGameListSelection()
   {
     getListPanel().clearGameListSelection();
   }
-  
+
   public void toggleFavorite()
   {
     getListPanel().toggleFavorite();
   }
-  
+
   public void toggleFavorite2()
   {
     getListPanel().toggleFavorite2();
   }
-  
+
   public void toggleFavorite3()
   {
     getListPanel().toggleFavorite3();
   }
-  
+
   public void toggleFavorite4()
   {
     getListPanel().toggleFavorite4();
   }
-  
+
   public void toggleFavorite5()
   {
     getListPanel().toggleFavorite5();
   }
-  
+
   public void toggleFavorite6()
   {
     getListPanel().toggleFavorite6();
   }
-  
+
   public void toggleFavorite7()
   {
     getListPanel().toggleFavorite7();
   }
-  
+
   public void toggleFavorite8()
   {
     getListPanel().toggleFavorite8();
   }
-  
+
   public void toggleFavorite9()
   {
     getListPanel().toggleFavorite9();
   }
-  
+
   public void toggleFavorite10()
   {
     getListPanel().toggleFavorite10();
   }
-  
+
   public void runCurrentGame()
   {
     if (getListPanel().isSingleGameSelected() && getListPanel().getSelectedIndexInList() > -1)
@@ -230,12 +250,12 @@ public class MainPanel extends JPanel
       getGameDetailsBackgroundPanel().runCurrentGame();
     }
   }
-  
+
   public void selectEnDescriptionTab()
   {
     getGameDetailsBackgroundPanel().getInfoBackgroundPanel().selectEnDescriptionTab();
   }
-  
+
   public void reloadCurrentGameView()
   {
     getListPanel().reloadCurrentGameView();

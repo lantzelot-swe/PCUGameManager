@@ -6,6 +6,8 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import se.lantz.util.DbConstants;
+
 public class GameView implements Comparable
 {
   public static final int ALL_GAMES_ID = -1;
@@ -90,6 +92,14 @@ public class GameView implements Comparable
 
     StringBuilder builder = new StringBuilder();
     builder.append("WHERE ");
+    //Add info slot condition first
+    builder.append(DbConstants.VIEW_TAG);
+    builder.append(" LIKE '");
+    builder.append("GIS:");
+    builder.append(gameViewId);
+    builder.append("'");
+    builder.append(" OR ");
+
     int index = 0;
     for (ViewFilter viewFilter : andFiltersList)
     {
@@ -118,7 +128,7 @@ public class GameView implements Comparable
         builder.append(viewFilter.getFilterData());
         builder.append("%'");
         break;
-        
+
       case ViewFilter.NOT_CONTAINS_TEXT:
         builder.append(" NOT LIKE '%");
         builder.append(viewFilter.getFilterData());
@@ -134,7 +144,7 @@ public class GameView implements Comparable
       case ViewFilter.NOT_EMPTY:
         builder.append(" <> ''");
         break;
-        
+
       case ViewFilter.EMPTY:
         builder.append(" is null or ");
         builder.append(viewFilter.getField());
@@ -214,7 +224,7 @@ public class GameView implements Comparable
       case ViewFilter.NOT_EMPTY:
         builder.append(" <> ''");
         break;
-        
+
       case ViewFilter.EMPTY:
         builder.append(" is null or ");
         builder.append(viewFilter.getField());

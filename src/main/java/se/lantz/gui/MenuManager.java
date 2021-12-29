@@ -70,6 +70,7 @@ public class MenuManager
   private JMenu helpMenu;
 
   private JMenuItem addGameItem;
+  private JMenuItem addInfoSlotItem;
   private JMenuItem deleteGameItem;
 
   private JMenuItem runGameItem;
@@ -109,7 +110,7 @@ public class MenuManager
 
   private JMenuItem validateDbItem;
   private JMenuItem palNtscFixItem;
-  
+
   private JMenuItem installPCUAEItem;
   private JMenuItem installAmigaModeItem;
   private JMenuItem installAtariModeItem;
@@ -167,6 +168,7 @@ public class MenuManager
     fileMenu = new JMenu("File");
     fileMenu.setMnemonic('F');
     fileMenu.add(getAddGameMenuItem());
+    fileMenu.add(getAddInfoSlotMenuItem());
     fileMenu.add(getDeleteGameMenuItem());
     fileMenu.addSeparator();
     fileMenu.add(getRunGameMenuItem());
@@ -218,12 +220,10 @@ public class MenuManager
     toolsMenu.add(getDeleteAllGamesItem());
     toolsMenu.add(getDeleteGamesForViewMenuItem());
     toolsMenu.addSeparator();
-//    toolsMenu.add(getConvertScreensItem());
-//    toolsMenu.add(getCheckDescriptionsItem());
     toolsMenu.add(getValidateDbItem());
     toolsMenu.addSeparator();
     toolsMenu.add(getPalNtscFixMenuItem());
-    
+
     pcuaeMenu = new JMenu("PCUAE");
     pcuaeMenu.add(getInstallPCUAEItem());
     pcuaeModeMenu = new JMenu("Mode Packs");
@@ -233,7 +233,7 @@ public class MenuManager
     pcuaeModeMenu.add(getInstallRetroarchModeItem());
     pcuaeModeMenu.add(getInstallViceModeItem());
     pcuaeMenu.add(pcuaeModeMenu);
-    
+
     helpMenu = new JMenu("Help");
     helpMenu.setMnemonic('H');
     helpMenu.add(getHelpItem());
@@ -246,6 +246,7 @@ public class MenuManager
     uiModel.addSaveChangeListener(e -> {
       boolean okToEnable = !uiModel.isDataChanged();
       addGameItem.setEnabled(okToEnable);
+      addInfoSlotItem.setEnabled(okToEnable);
       importMenu.setEnabled(okToEnable);
       exportItem.setEnabled(okToEnable);
       toolsMenu.setEnabled(okToEnable);
@@ -275,6 +276,17 @@ public class MenuManager
 
     addGameItem.addActionListener(e -> mainWindow.getMainPanel().addNewGame());
     return addGameItem;
+  }
+
+  JMenuItem getAddInfoSlotMenuItem()
+  {
+    addInfoSlotItem = new JMenuItem("Add info slot for current view");
+    KeyStroke keyStrokeToAddGame = KeyStroke.getKeyStroke(KeyEvent.VK_I, InputEvent.CTRL_DOWN_MASK);
+    addInfoSlotItem.setAccelerator(keyStrokeToAddGame);
+    addInfoSlotItem.setMnemonic('I');
+
+    addInfoSlotItem.addActionListener(e -> mainWindow.getMainPanel().addNewInfoSlot());
+    return addInfoSlotItem;
   }
 
   JMenuItem getDeleteGameMenuItem()
@@ -694,18 +706,18 @@ public class MenuManager
     }
     return validateDbItem;
   }
-  
+
   private JMenuItem getPalNtscFixMenuItem()
   {
     if (palNtscFixItem == null)
     {
       palNtscFixItem = new JMenuItem("Swap game file and first saved state to fix NTSC/PAL issue");
       palNtscFixItem.setMnemonic('s');
-    palNtscFixItem.addActionListener(e -> fixPalNtscIssue());
+      palNtscFixItem.addActionListener(e -> fixPalNtscIssue());
     }
     return palNtscFixItem;
   }
-  
+
   private JMenuItem getInstallPCUAEItem()
   {
     if (installPCUAEItem == null)
@@ -716,7 +728,7 @@ public class MenuManager
     }
     return installPCUAEItem;
   }
-  
+
   private JMenuItem getInstallAmigaModeItem()
   {
     if (installAmigaModeItem == null)
@@ -727,7 +739,7 @@ public class MenuManager
     }
     return installAmigaModeItem;
   }
-  
+
   private JMenuItem getInstallAtariModeItem()
   {
     if (installAtariModeItem == null)
@@ -738,7 +750,7 @@ public class MenuManager
     }
     return installAtariModeItem;
   }
-  
+
   private JMenuItem getInstallLinuxModeItem()
   {
     if (installLinuxModeItem == null)
@@ -749,7 +761,7 @@ public class MenuManager
     }
     return installLinuxModeItem;
   }
-  
+
   private JMenuItem getInstallRetroarchModeItem()
   {
     if (installRetroarchModeItem == null)
@@ -760,7 +772,7 @@ public class MenuManager
     }
     return installRetroarchModeItem;
   }
-  
+
   private JMenuItem getInstallViceModeItem()
   {
     if (installViceModeItem == null)
@@ -771,8 +783,7 @@ public class MenuManager
     }
     return installViceModeItem;
   }
-  
-  
+
   private JMenuItem getHelpItem()
   {
     helpItem = new JMenuItem("Help");
@@ -1062,23 +1073,28 @@ public class MenuManager
 
   private void fixPalNtscIssue()
   {
-    int option = JOptionPane.showConfirmDialog(MainWindow.getInstance()
-      .getMainPanel(), getPalNtscEditorPane(), "Swap game file and first saved state", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+    int option = JOptionPane.showConfirmDialog(MainWindow.getInstance().getMainPanel(),
+                                               getPalNtscEditorPane(),
+                                               "Swap game file and first saved state",
+                                               JOptionPane.YES_NO_OPTION,
+                                               JOptionPane.QUESTION_MESSAGE);
     if (option == JOptionPane.YES_OPTION)
     {
       if (savedStatesManager.swapGameFileAndSavedState())
       {
-        JOptionPane.showMessageDialog(MainWindow.getInstance()
-      .getMainPanel(), "Game file and saved state successfully swapped. System type was also switched.", "Swap game file and first saved state", JOptionPane.INFORMATION_MESSAGE);
+        JOptionPane.showMessageDialog(MainWindow.getInstance().getMainPanel(),
+                                      "Game file and saved state successfully swapped. System type was also switched.",
+                                      "Swap game file and first saved state",
+                                      JOptionPane.INFORMATION_MESSAGE);
       }
     }
   }
-  
+
   private void validateDb()
   {
     String message =
       "<html>Do you want to validate the database? The following actions will be performed: <ul><li>Check all description texts in the database and remove all carrage return (CR) characters.<br>Earlier versions of the manager allowed for CR characters, the Carousel " +
-        "does not handle that properly.<br>CR characters will be replaced by a space character.</li><br><li>Check all screenshots and convert them to use 32-bit color depths.<br>The Carousel Gamelist Loader screen requires 32-bit depths for the screenshots to be rendered properly.</li><br>" + 
+        "does not handle that properly.<br>CR characters will be replaced by a space character.</li><br><li>Check all screenshots and convert them to use 32-bit color depths.<br>The Carousel Gamelist Loader screen requires 32-bit depths for the screenshots to be rendered properly.</li><br>" +
         "<li>Verify that all covers, screenshots and game files are available in the folders<br>and replace any missing ones with generic versions.</li></ul></html>";
     int option = JOptionPane.showConfirmDialog(MainWindow.getInstance()
       .getMainPanel(), message, "Validate database", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
@@ -1090,37 +1106,37 @@ public class MenuManager
       dialog.setVisible(true);
     }
   }
-  
+
   private void installPCUAE()
   {
     installPCUAEManager.installPCUAE();
   }
-  
+
   private void installAmigaMode()
   {
     installAmigaManager.installAmigaMode();
   }
-  
+
   private void installAtariMode()
   {
     installAtariManager.installAtariMode();
   }
-  
+
   private void installLinuxMode()
   {
     installLinuxManager.installLinuxMode();
   }
-  
+
   private void installRetroarchMode()
   {
     installRetroarchManager.installRetroarchMode();
   }
-  
+
   private void installViceMode()
   {
     installViceManager.installViceMode();
   }
-  
+
   private JEditorPane getPalNtscEditorPane()
   {
     String message =

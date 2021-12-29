@@ -2,18 +2,20 @@ package se.lantz.model.data;
 
 public class GameListData implements Comparable
 {
-  private String title;
-  private String gameFileName;
-  private String gameId;
-  private int favorite;
+  private String title = "";
+  private String gameFileName = "";
+  private String gameId = "";
+  private int favorite = 0;
+  private boolean infoSlot = false;
 
-  public GameListData(String title, String gameFileName, String gameId, int favorite)
+  public GameListData(String title, String gameFileName, String gameId, int favorite, boolean infoSlot)
   {
     super();
     this.title = title;
     this.gameFileName = gameFileName;
     this.gameId = gameId;
     this.favorite = favorite;
+    this.infoSlot = infoSlot;
   }
 
   public String getTitle()
@@ -40,17 +42,22 @@ public class GameListData implements Comparable
   {
     return favorite;
   }
-  
+
   public void toggleFavorite(int number)
   {
     this.favorite = favorite == number ? 0 : number;
   }
-  
+
   public boolean isFavorite()
   {
     return favorite > 0;
   }
-  
+
+  public boolean isInfoSlot()
+  {
+    return infoSlot;
+  }
+
   public int getFavoriteNumber()
   {
     return favorite;

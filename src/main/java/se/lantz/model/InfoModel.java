@@ -457,6 +457,11 @@ public class InfoModel extends AbstractModel
     this.screen1Image = null;
     this.screen2Image = null;
     this.gamesPath = null;
+    resetOldFileNames();
+  }
+  
+  public void resetOldFileNames()
+  {
     this.oldGamesFile = "";
     this.oldCoverFile = "";
     this.oldScreens1File = "";
