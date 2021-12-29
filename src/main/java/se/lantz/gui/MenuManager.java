@@ -1201,4 +1201,9 @@ public class MenuManager
                                     JOptionPane.INFORMATION_MESSAGE);
     }
   }
+  
+  void checkForNewPCUAEVersionAtStartup()
+  {
+    installPCUAEManager.checkForNewVersionAtStartup();
+  }
 }

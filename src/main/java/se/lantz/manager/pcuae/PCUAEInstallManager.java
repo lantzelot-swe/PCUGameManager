@@ -15,6 +15,15 @@ public class PCUAEInstallManager extends BaseInstallManger
   {
     this.exportMenuItem = exportMenuItem;
   }
+  
+  public void checkForNewVersionAtStartup()
+  {
+    readVersionFromInstallFolder(PCUAE_INSTALL_NAME);
+    if (isNewVersionAvailable(PCUAE_INSTALL_NAME))
+    {
+      askAndStartDownloadAtStartup(PRODUCT_NAME);
+    }
+  }
 
   public void installPCUAE()
   {

@@ -12,13 +12,15 @@ public class PCUAEProductDownloadDialog extends BaseDialog
   private boolean firstDownload;
   private String productText;
   private BaseInstallManger manager;
+  private boolean startupCheck;
 
-  public PCUAEProductDownloadDialog(final boolean firstDownload, final BaseInstallManger manager, String productName)
+  public PCUAEProductDownloadDialog(final boolean firstDownload, final BaseInstallManger manager, String productName, final boolean startupCheck)
   {
     super(MainWindow.getInstance());
     this.firstDownload = firstDownload;
     this.manager = manager;
     this.productText = productName;
+    this.startupCheck = startupCheck;
     setTitle(firstDownload ? "Download " + productName : "New version available");
     addContent(getVersionDownloadPanel());
     this.setResizable(false);
@@ -41,9 +43,17 @@ public class PCUAEProductDownloadDialog extends BaseDialog
       }
       else
       {
-        message = "<html>PCUAE <a href='" + downloadUrl + "'>" + manager.getLatestVersion() +
-          "</a> is available.<p>(Current install file: " + manager.getLatestInInstallFolder() +
-          ").<br>Do you want to download and install the new version?</html>";
+        if (startupCheck)
+        {
+          message = "<html>PCUAE <a href='" + downloadUrl + "'>" + manager.getLatestVersion() +
+            "</a> is available.<p>Do you want to download this version?</html>";
+        }
+        else
+        {
+          message = "<html>PCUAE <a href='" + downloadUrl + "'>" + manager.getLatestVersion() +
+            "</a> is available.<p>(Current install file: " + manager.getLatestInInstallFolder() +
+            ").<br>Do you want to download and install the new version?</html>";
+        }
       }
 
       panel = new ManagerDownloadPanel(message);

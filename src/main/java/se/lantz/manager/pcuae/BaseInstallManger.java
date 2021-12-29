@@ -395,11 +395,23 @@ public abstract class BaseInstallManger implements AWTEventListener
   {
     return gitHubReleaseInformation.getReleaseTagUrl();
   }
+  
+  protected void askAndStartDownloadAtStartup(String productName)
+  {
+    PCUAEProductDownloadDialog dialog =
+      new PCUAEProductDownloadDialog(false, this, productName, true);
+    dialog.pack();
+    dialog.setLocationRelativeTo(MainWindow.getInstance());
+    if (dialog.showDialog())
+    {
+      downloadLatestVersion(productName);
+    }
+  }
 
   protected void askAndStartDownload(String productName)
   {
     PCUAEProductDownloadDialog dialog =
-      new PCUAEProductDownloadDialog(latestInInstallFolder.isEmpty(), this, productName);
+      new PCUAEProductDownloadDialog(latestInInstallFolder.isEmpty(), this, productName, false);
     dialog.pack();
     dialog.setLocationRelativeTo(MainWindow.getInstance());
     if (dialog.showDialog())

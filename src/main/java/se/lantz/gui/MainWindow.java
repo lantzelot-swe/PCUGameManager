@@ -124,4 +124,9 @@ public final class MainWindow extends JFrame
       this.setCursor(defaultCursor);
     }
   }
+  
+  public void checkForNewPCUAEVersionAtStartup()
+  {
+    this.menuManager.checkForNewPCUAEVersionAtStartup();
+  }
 }

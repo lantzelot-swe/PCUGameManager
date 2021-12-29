@@ -85,6 +85,11 @@ public class PCUAEManager
             ManagerVersionChecker.updateVersion();
           }
         }
+        else
+        {
+          //Check main PCUAE install file version
+          mainWindow.checkForNewPCUAEVersionAtStartup();
+        }
       }
     });
   }
