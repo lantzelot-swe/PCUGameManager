@@ -58,8 +58,11 @@ public class JoystickBottomPanel extends JPanel
   private void modelChanged()
   {
     getAComboBox().setSelectedCode(model.getA());
+    getAComboBox().setEnabled(!model.isMouse());
     getBComboBox().setSelectedCode(model.getB());
+    getBComboBox().setEnabled(!model.isMouse());
     getCComboBox().setSelectedCode(model.getC());
+    getCComboBox().setEnabled(!model.isMouse());
   }
 
   private KeySelectionComboBox getAComboBox()

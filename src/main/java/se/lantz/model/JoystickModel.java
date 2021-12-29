@@ -14,6 +14,7 @@ public class JoystickModel extends AbstractModel
   public static final String DEFAULT_CONFIG = "JU,JD,JL,JR,JF,JF,SP,EN,,F1,F3,F5,,,";
   private final boolean port1;
   private boolean primary = false;
+  private boolean mouse = false;
 
   private List<String> configList = new ArrayList<>();
   private ActionListener primaryListener;
@@ -130,20 +131,26 @@ public class JoystickModel extends AbstractModel
     {
       builder.append("J:2");
     }
-    if (primary)
+    if (mouse)
     {
-      builder.append("*");
+      builder.append("M:");
     }
-    builder.append(":");
-    builder.append(String.join(",", configList));
-
+    else
+    {
+      if (primary)
+      {
+        builder.append("*");
+      }
+      builder.append(":");
+      builder.append(String.join(",", configList));
+    }
     return builder.toString();
   }
 
   public void setConfigStringFromDb(String configString)
   {
     this.latestConfigString = configString;
-    if (configString == null || configString.isEmpty())
+    if (configString == null || configString.isEmpty() || configString.endsWith("M:"))
     {
       configList = new ArrayList<>();
       for (int i = 0; i < 15; i++)
@@ -177,45 +184,72 @@ public class JoystickModel extends AbstractModel
       return;
     }
     disableChangeNotification(true);
-    String definitions = configString;
-    // Set all other fields based on configString
-    String[] colonSplit = configString.split(":");
-    if (colonSplit.length == 3)
+    
+    if (configString.endsWith("M:"))
     {
-      definitions = colonSplit[2];
-      setPrimary(colonSplit[1].contains("*"));
+      //Mouse
+      setMouse(true);
+      setPrimary(false);
+      setUp("");
+      setDown("");
+      setLeft("");
+      setRight("");
+      setLeftFire("");
+      setRightFire("");
+      setTl("");
+      setTr("");
+      setUnused1("");
+      setA("");
+      setB("");
+      setC("");
+      setUnused2("");
+      setUnused3("");
+      setUnused4("");
+      this.latestConfigString = configString;
     }
-
-    ArrayList<String> newConfigList = new ArrayList<>(Arrays.asList(definitions.split(",")));
-    while (newConfigList.size() < 15)
+    else
     {
-      newConfigList.add("");
-    }
-    //Validate all entries
-    for (int i = 0; i < newConfigList.size(); i++)
-    {
-      String value = newConfigList.get(i);
-      if (!keyCodeList.contains(value) && !keyCodeMap.keySet().contains(value))
+      String definitions = configString;
+      // Set all other fields based on configString
+      String[] colonSplit = configString.split(":");
+      if (colonSplit.length == 3)
       {
-        newConfigList.set(i, "");
+        definitions = colonSplit[2];
+        setPrimary(colonSplit[1].contains("*"));
       }
+  
+      ArrayList<String> newConfigList = new ArrayList<>(Arrays.asList(definitions.split(",")));
+      while (newConfigList.size() < 15)
+      {
+        newConfigList.add("");
+      }
+      //Validate all entries
+      for (int i = 0; i < newConfigList.size(); i++)
+      {
+        String value = newConfigList.get(i);
+        if (!keyCodeList.contains(value) && !keyCodeMap.keySet().contains(value))
+        {
+          newConfigList.set(i, "");
+        }
+      }
+      setMouse(false);
+      setUp(newConfigList.get(0));
+      setDown(newConfigList.get(1));
+      setLeft(newConfigList.get(2));
+      setRight(newConfigList.get(3));
+      setLeftFire(newConfigList.get(4));
+      setRightFire(newConfigList.get(5));
+      setTl(newConfigList.get(6));
+      setTr(newConfigList.get(7));
+      setUnused1(newConfigList.get(8));
+      setA(newConfigList.get(9));
+      setB(newConfigList.get(10));
+      setC(newConfigList.get(11));
+      setUnused2(newConfigList.get(12));
+      setUnused3(newConfigList.get(13));
+      setUnused4(newConfigList.get(14));
+      this.latestConfigString = configString;
     }
-    setUp(newConfigList.get(0));
-    setDown(newConfigList.get(1));
-    setLeft(newConfigList.get(2));
-    setRight(newConfigList.get(3));
-    setLeftFire(newConfigList.get(4));
-    setRightFire(newConfigList.get(5));
-    setTl(newConfigList.get(6));
-    setTr(newConfigList.get(7));
-    setUnused1(newConfigList.get(8));
-    setA(newConfigList.get(9));
-    setB(newConfigList.get(10));
-    setC(newConfigList.get(11));
-    setUnused2(newConfigList.get(12));
-    setUnused3(newConfigList.get(13));
-    setUnused4(newConfigList.get(14));
-    this.latestConfigString = configString;
     disableChangeNotification(false);
     notifyChange();
   }
@@ -466,6 +500,11 @@ public class JoystickModel extends AbstractModel
 
   void setPrimaryWithoutListenerNotification(boolean primary)
   {
+    if (isMouse())
+    {
+      //Do nothing
+      return;
+    }
     boolean old = isPrimary();
     this.primary = primary;
     if ((Boolean.compare(old, primary) != 0))
@@ -477,5 +516,36 @@ public class JoystickModel extends AbstractModel
   void setPrimaryChangeListener(ActionListener e)
   {
     this.primaryListener = e;
+  }
+  
+  public boolean isMouse()
+  {
+    return mouse;
+  }
+  
+  public void setMouse(boolean mouse)
+  {
+    boolean old = isMouse();
+    this.mouse = mouse;
+    if ((Boolean.compare(old, mouse) != 0))
+    {
+      if (mouse)
+      {
+        setConfigString(getConfigString());
+      }
+      else
+      {
+        //Set default config string
+        if (port1)
+        {
+          setConfigString("J:1:" + DEFAULT_CONFIG);
+        }
+        else
+        {
+          setConfigString("J:2*:" + DEFAULT_CONFIG);
+        }
+      }
+      notifyChange();
+    }
   }
 }
