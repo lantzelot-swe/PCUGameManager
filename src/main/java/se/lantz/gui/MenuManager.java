@@ -239,6 +239,7 @@ public class MenuManager
     helpMenu.setMnemonic('H');
     helpMenu.add(getHelpItem());
     helpMenu.add(getPcuaeWikiItem());
+    helpMenu.addSeparator();
     helpMenu.add(getCheckVersionItem());
     helpMenu.add(getAboutItem());
   }
