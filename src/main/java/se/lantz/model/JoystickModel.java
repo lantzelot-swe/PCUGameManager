@@ -156,7 +156,9 @@ public class JoystickModel extends AbstractModel
       for (int i = 0; i < 15; i++)
       {
         configList.add("");
-      }
+      }     
+      this.mouse = configString.endsWith("M:");
+      this.primary = false;
     }
     else
     {
@@ -171,6 +173,7 @@ public class JoystickModel extends AbstractModel
       {
         configList.add("");
       }
+      this.mouse = false;
       setPrimaryWithoutListenerNotification(colonSplit[1].contains("*"));
     }
     resetDataChanged();
