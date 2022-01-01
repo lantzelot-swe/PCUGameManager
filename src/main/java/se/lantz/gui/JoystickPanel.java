@@ -23,6 +23,8 @@ import se.lantz.util.TextComponentSupport;
 
 public class JoystickPanel extends JPanel
 {
+  ImageIcon joyImage = new ImageIcon(getClass().getResource("/se/lantz/joystick.png"));
+  ImageIcon mouseImage = new ImageIcon(getClass().getResource("/se/lantz/mouse.png"));
   private JCheckBox primaryJoyCheckBox;
   private JoystickStickPanel joystickStickPanel;
   private KeySelectionComboBox leftFireComboBox;
@@ -144,6 +146,7 @@ public class JoystickPanel extends JPanel
     {
       getConfigTextField().setText(model.getConfigString());
     }
+    getImageLabel().setIcon(model.isMouse() ? mouseImage : joyImage);
   }
 
   private JCheckBox getPrimaryJoyCheckBox()
@@ -192,7 +195,6 @@ public class JoystickPanel extends JPanel
     {
       imageLabel = new JLabel();
       imageLabel.setHorizontalAlignment(SwingConstants.CENTER);
-      ImageIcon joyImage = new ImageIcon(getClass().getResource("/se/lantz/joystick.png"));
       imageLabel.setIcon(joyImage);
     }
     return imageLabel;
