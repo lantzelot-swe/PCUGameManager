@@ -1613,5 +1613,30 @@ public class FileManager
       ExceptionHandler.handleException(e, "Could not store game file");
     }
   }
-
+  
+  public static String getPCUAEUSBPath(boolean savedStates)
+  {
+    File[] roots = File.listRoots();
+    File deviceRoot = null;
+    for (File root : roots)
+    {
+      Path startShPath = root.toPath().resolve("start.sh");
+      //Check for known files 
+      if (startShPath.toFile().exists())
+      {
+        deviceRoot = root;
+        break;
+      }
+    }
+    if (deviceRoot == null)
+    {
+      return "";
+    }
+    Path gamesPath = deviceRoot.toPath().resolve("Carousel_Games/Games");
+    if (savedStates)
+    {
+      gamesPath = deviceRoot.toPath().resolve(".THEC64SAVE");
+    }   
+    return gamesPath.toString();
+  }
 }

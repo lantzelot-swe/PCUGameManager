@@ -77,7 +77,11 @@ public class SelectDirPanel extends JPanel
     switch (mode)
     {
     case CAROUSEL_IMPORT:
-      configuredDir = FileManager.getConfiguredProperties().getProperty(IMPORT_DIR_PROPERTY);
+      configuredDir = FileManager.getPCUAEUSBPath(false);
+      if (configuredDir.isEmpty())
+      {
+        configuredDir = FileManager.getConfiguredProperties().getProperty(IMPORT_DIR_PROPERTY);
+      }
       if (configuredDir == null)
       {
         configuredDir = new File(".").getAbsolutePath();
@@ -92,28 +96,44 @@ public class SelectDirPanel extends JPanel
       }
       break;
     case CAROUSEL_EXPORT:
-      configuredDir = FileManager.getConfiguredProperties().getProperty(CAROUSEL_EXPORT_DIR_PROPERTY);
+      configuredDir = FileManager.getPCUAEUSBPath(false);
+      if (configuredDir.isEmpty())
+      {
+        configuredDir = FileManager.getConfiguredProperties().getProperty(CAROUSEL_EXPORT_DIR_PROPERTY);
+      }
       if (configuredDir == null)
       {
         configuredDir = new File("export").getAbsolutePath();
       }
       break;
     case FILELOADER_EXPORT:
-      configuredDir = FileManager.getConfiguredProperties().getProperty(FILELOADER_EXPORT_DIR_PROPERTY);
+      configuredDir = FileManager.getPCUAEUSBPath(false);
+      if (configuredDir.isEmpty())
+      {
+        configuredDir = FileManager.getConfiguredProperties().getProperty(FILELOADER_EXPORT_DIR_PROPERTY);
+      }
       if (configuredDir == null)
       {
         configuredDir = new File("export").getAbsolutePath();
       }
       break;
     case SAVEDSTATES_IMPORT:
-      configuredDir = FileManager.getConfiguredProperties().getProperty(SAVEDSTATES_IMPORT_DIR_PROPERTY);
+      configuredDir = FileManager.getPCUAEUSBPath(true);
+      if (configuredDir.isEmpty())
+      {
+        configuredDir = FileManager.getConfiguredProperties().getProperty(SAVEDSTATES_IMPORT_DIR_PROPERTY);
+      }
       if (configuredDir == null)
       {
         configuredDir = new File(".").getAbsolutePath();
       }
       break;
     case SAVEDSTATES_EXPORT:
-      configuredDir = FileManager.getConfiguredProperties().getProperty(SAVEDSTATES_EXPORT_DIR_PROPERTY);
+      configuredDir = FileManager.getPCUAEUSBPath(true);
+      if (configuredDir.isEmpty())
+      {
+        configuredDir = FileManager.getConfiguredProperties().getProperty(SAVEDSTATES_EXPORT_DIR_PROPERTY);
+      }
       if (configuredDir == null)
       {
         configuredDir = new File(".").getAbsolutePath();
