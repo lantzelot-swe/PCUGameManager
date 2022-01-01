@@ -2,10 +2,8 @@ package se.lantz.gui.gameview;
 
 import javax.swing.JComboBox;
 import javax.swing.JOptionPane;
-import javax.swing.SwingUtilities;
 
 import se.lantz.gui.ListPanel;
-import se.lantz.gui.MainPanel;
 import se.lantz.gui.MainWindow;
 import se.lantz.model.MainViewModel;
 import se.lantz.model.data.GameView;
@@ -15,7 +13,7 @@ public class GameViewManager
   private JComboBox<GameView> viewCombobox;
   private final MainViewModel uiModel;
   private ListPanel mainPanel;
-  
+
   public GameViewManager(ListPanel mainPanel, MainViewModel uiModel)
   {
     this.mainPanel = mainPanel;
@@ -59,11 +57,12 @@ public class GameViewManager
       }
     }
   }
-  
+
   public void deleteView(GameView view)
   {
     String message = "Do you want to delete the gamelist view  \"" + view.getName() + "\"?";
-    int value = JOptionPane.showConfirmDialog(MainWindow.getInstance().getMainPanel(), message, "Delete gamelist view", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+    int value = JOptionPane.showConfirmDialog(MainWindow.getInstance()
+      .getMainPanel(), message, "Delete gamelist view", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
     if (value == JOptionPane.YES_OPTION)
     {
       uiModel.deleteGameView(view);

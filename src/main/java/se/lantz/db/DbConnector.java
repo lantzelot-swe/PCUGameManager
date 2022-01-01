@@ -239,10 +239,10 @@ public class DbConnector
                                              Integer.toString(rs.getInt("rowid")),
                                              rs.getInt("Favorite"),
                                              viewTag != null && viewTag.contains("GIS:"));
-        //Filter out all info slots that are not supposed to be shown in "all games"
-        if (data.isInfoSlot() && view.getGameViewId() == -1 && !viewTag.equalsIgnoreCase("GIS:-1"))
+
+        if (data.isInfoSlot() && !viewTag.equalsIgnoreCase("GIS:" + view.getGameViewId()))
         {
-          //Ignore all info slots not created for "all games"
+          //Ignore all info slots not created for this specific view
         }
         else
         {
@@ -446,6 +446,8 @@ public class DbConnector
         }
         insertViewFilterstmnt.executeUpdate();
       }
+      //Make sure SQL statement is updated correctly for new views
+      view.setViewFilters(view.getViewFilters());
     }
     catch (SQLException e)
     {
@@ -1094,13 +1096,17 @@ public class DbConnector
   {
     String viewFilterSql = "DELETE FROM viewfilter WHERE gameview = " + view.getGameViewId();
     String gameViewSql = "DELETE FROM gameview WHERE viewId = " + view.getGameViewId();
+    String infoSlotSql = "DELETE FROM gameinfo WHERE viewTag LIKE 'GIS:" + view.getGameViewId() + "'";
     try (Connection conn = this.connect(); PreparedStatement viewFilterstmt = conn.prepareStatement(viewFilterSql);
-      PreparedStatement gameViewStmt = conn.prepareStatement(gameViewSql))
+      PreparedStatement gameViewStmt = conn.prepareStatement(gameViewSql);
+      PreparedStatement infoSlotStmt = conn.prepareStatement(infoSlotSql))
     {
       int value = viewFilterstmt.executeUpdate();
-      logger.debug("Executed successfully, value = {}", value);
+      logger.debug("{} Executed successfully, value = {}", viewFilterSql, value);
       value = gameViewStmt.executeUpdate();
-      logger.debug("Executed successfully, value = {}", value);
+      logger.debug("{} Executed successfully, value = {}", gameViewSql, value);
+      value = infoSlotStmt.executeUpdate();
+      logger.debug("{} Executed successfully, value = {}", infoSlotSql, value);
     }
     catch (SQLException e)
     {
