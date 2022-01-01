@@ -15,7 +15,7 @@ public class ImportSavedStatesDialog extends BaseDialog
     super(owner);
     addContent(getImportSavedStatesPanel());
     setTitle("Import saved states");
-    this.setPreferredSize(new Dimension(435, 280));
+    this.setPreferredSize(new Dimension(435, 310));
     getOkButton().setText("Import");
     this.setResizable(false);
   }

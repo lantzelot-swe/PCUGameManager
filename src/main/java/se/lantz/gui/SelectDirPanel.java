@@ -2,6 +2,7 @@ package se.lantz.gui;
 
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.HeadlessException;
@@ -27,6 +28,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import se.lantz.util.FileManager;
+import javax.swing.JLabel;
 
 public class SelectDirPanel extends JPanel
 {
@@ -52,6 +54,7 @@ public class SelectDirPanel extends JPanel
 
   private String configuredDir = "";
   private ActionListener gbDbFileSelectedlistener;
+  private JLabel usbInfoLabel;
 
   public SelectDirPanel(Mode mode)
   {
@@ -60,24 +63,24 @@ public class SelectDirPanel extends JPanel
     setLayout(gridBagLayout);
     GridBagConstraints gbc_dirTextField = new GridBagConstraints();
     gbc_dirTextField.anchor = GridBagConstraints.NORTHWEST;
-    gbc_dirTextField.weighty = 1.0;
     gbc_dirTextField.weightx = 1.0;
-    gbc_dirTextField.insets = new Insets(0, 5, 0, 5);
+    gbc_dirTextField.insets = new Insets(0, 5, 5, 5);
     gbc_dirTextField.fill = GridBagConstraints.HORIZONTAL;
     gbc_dirTextField.gridx = 0;
     gbc_dirTextField.gridy = 0;
     add(getDirTextField(), gbc_dirTextField);
     GridBagConstraints gbc_selectDirButton = new GridBagConstraints();
+    gbc_selectDirButton.gridheight = 2;
+    gbc_selectDirButton.insets = new Insets(0, 0, 5, 5);
     gbc_selectDirButton.weighty = 1.0;
     gbc_selectDirButton.anchor = GridBagConstraints.NORTHWEST;
-    gbc_selectDirButton.insets = new Insets(0, 0, 0, 5);
     gbc_selectDirButton.gridx = 1;
     gbc_selectDirButton.gridy = 0;
     add(getSelectDirButton(), gbc_selectDirButton);
     switch (mode)
     {
     case CAROUSEL_IMPORT:
-      configuredDir = FileManager.getPCUAEUSBPath(false);
+      configuredDir = getUsbFilePath(false);
       if (configuredDir.isEmpty())
       {
         configuredDir = FileManager.getConfiguredProperties().getProperty(IMPORT_DIR_PROPERTY);
@@ -96,7 +99,7 @@ public class SelectDirPanel extends JPanel
       }
       break;
     case CAROUSEL_EXPORT:
-      configuredDir = FileManager.getPCUAEUSBPath(false);
+      configuredDir = getUsbFilePath(false);
       if (configuredDir.isEmpty())
       {
         configuredDir = FileManager.getConfiguredProperties().getProperty(CAROUSEL_EXPORT_DIR_PROPERTY);
@@ -107,7 +110,7 @@ public class SelectDirPanel extends JPanel
       }
       break;
     case FILELOADER_EXPORT:
-      configuredDir = FileManager.getPCUAEUSBPath(false);
+      configuredDir = getUsbFilePath(false);
       if (configuredDir.isEmpty())
       {
         configuredDir = FileManager.getConfiguredProperties().getProperty(FILELOADER_EXPORT_DIR_PROPERTY);
@@ -118,7 +121,7 @@ public class SelectDirPanel extends JPanel
       }
       break;
     case SAVEDSTATES_IMPORT:
-      configuredDir = FileManager.getPCUAEUSBPath(true);
+      configuredDir = getUsbFilePath(true);
       if (configuredDir.isEmpty())
       {
         configuredDir = FileManager.getConfiguredProperties().getProperty(SAVEDSTATES_IMPORT_DIR_PROPERTY);
@@ -129,7 +132,7 @@ public class SelectDirPanel extends JPanel
       }
       break;
     case SAVEDSTATES_EXPORT:
-      configuredDir = FileManager.getPCUAEUSBPath(true);
+      configuredDir = getUsbFilePath(true);
       if (configuredDir.isEmpty())
       {
         configuredDir = FileManager.getConfiguredProperties().getProperty(SAVEDSTATES_EXPORT_DIR_PROPERTY);
@@ -144,6 +147,27 @@ public class SelectDirPanel extends JPanel
     }
     targetDirectory = new File(configuredDir);
     getDirTextField().setText(configuredDir);
+    GridBagConstraints gbc_usbInfoLabel = new GridBagConstraints();
+    gbc_usbInfoLabel.anchor = GridBagConstraints.NORTHWEST;
+    gbc_usbInfoLabel.weighty = 1.0;
+    gbc_usbInfoLabel.insets = new Insets(0, 5, 0, 5);
+    gbc_usbInfoLabel.gridx = 0;
+    gbc_usbInfoLabel.gridy = 1;
+    add(getUsbInfoLabel(), gbc_usbInfoLabel);
+  }
+  
+  private String getUsbFilePath(boolean saveState)
+  {
+    String usbDir = FileManager.getPCUAEUSBPath(saveState);
+    if (!usbDir.isEmpty())
+    {
+      getUsbInfoLabel().setText("PCUAE USB detected (" + usbDir.substring(0, usbDir.indexOf("\\")) + ")");
+    }
+    else
+    {
+      getUsbInfoLabel().setText("");
+    }
+    return usbDir;
   }
 
   private JTextField getDirTextField()
@@ -426,5 +450,15 @@ public class SelectDirPanel extends JPanel
   public void registerGBFileSelectedActionListener(ActionListener listener)
   {
     this.gbDbFileSelectedlistener = listener;
+  }
+
+  private JLabel getUsbInfoLabel()
+  {
+    if (usbInfoLabel == null)
+    {
+      usbInfoLabel = new JLabel("");
+      usbInfoLabel.setFont(usbInfoLabel.getFont().deriveFont(Font.BOLD));
+    }
+    return usbInfoLabel;
   }
 }

@@ -21,12 +21,12 @@ public class ImportOptionsDialog extends BaseDialog
     if (isCarouselImport)
     {
       setTitle("Import carousel folder");
-      this.setPreferredSize(new Dimension(450, 345));
+      this.setPreferredSize(new Dimension(450, 365));
     }
     else
     {
       setTitle("Import games from Gamebase");
-      this.setPreferredSize(new Dimension(450, 595));
+      this.setPreferredSize(new Dimension(450, 605));
     }
     addContent(getImportOptionsPanel());
     getOkButton().setText("Import");
