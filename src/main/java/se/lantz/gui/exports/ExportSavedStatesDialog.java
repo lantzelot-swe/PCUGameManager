@@ -15,7 +15,7 @@ public class ExportSavedStatesDialog extends BaseDialog
     super(owner);
     addContent(getExportSavedStatesPanel());
     setTitle("Export saved states");
-    this.setPreferredSize(new Dimension(435, 220));
+    this.setPreferredSize(new Dimension(435, 240));
     getOkButton().setText("Export");
     this.setResizable(false);
   }
