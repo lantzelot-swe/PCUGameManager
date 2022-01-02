@@ -13,8 +13,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.io.FilenameUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import se.lantz.model.MainViewModel;
 import se.lantz.model.data.GameDetails;
@@ -25,7 +23,6 @@ import se.lantz.util.FileManager;
 
 public class ExportManager
 {
-  private static final Logger logger = LoggerFactory.getLogger(ExportManager.class);
   private List<GameListData> gamesList = new ArrayList<>();
   private List<GameDetails> gameDetailsList = new ArrayList<>();
   private List<GameView> gameViewList = new ArrayList<>();
@@ -53,59 +50,61 @@ public class ExportManager
     gameViewMode = true;
   }
 
-  public void setTargetDirectory(File targetDir, boolean delete)
+  public void setTargetDirectory(File targetDir)
   {
-    
-    this.deleteBeforeExport = delete;
-    Path targetDirPath = targetDir.toPath();
-    if (delete)
-    {
-      if (gameViewMode)
-      {
-        //Delete only subfolders
-        try
-        {
-          if (Files.exists(targetDirPath))
-          {         
-            File[] directories = targetDir.listFiles(File::isDirectory);
-            for (File dir : directories)
-            {
-              //Delete entire folder
-              Files.walk(dir.toPath()).sorted(Comparator.reverseOrder()).map(Path::toFile).forEach(File::delete);
-            }
-          }
-        }
-        catch (IOException e)
-        {
-          ExceptionHandler.handleException(e, "Could not delete target folder");
-        }
-      }
-      else
-      {
-        //Delete entire target folder
-        try
-        {
-          if (Files.exists(targetDirPath))
-          {
-            //Delete entire folder
-            Files.walk(targetDirPath).sorted(Comparator.reverseOrder()).map(Path::toFile).forEach(File::delete);
-          }
-        }
-        catch (IOException e)
-        {
-          ExceptionHandler.handleException(e, "Could not delete target folder");
-        }
-      }
-    }
-
-    this.targetDir = targetDirPath.toFile();
+    this.targetDir = targetDir;
+  }
+  
+  public void createDirectoriesBeforeExport()
+  {
     try
     {
-      Files.createDirectories(targetDirPath);
+      Files.createDirectories(targetDir.toPath());
     }
     catch (IOException e)
     {
-      ExceptionHandler.handleException(e, "Could not create " + targetDirPath);
+      ExceptionHandler.handleException(e, "Could not create " + targetDir.toPath());
+    }
+  }
+  
+  public void deleteBeforeExport()
+  {
+    Path targetDirPath = this.targetDir.toPath();
+    if (gameViewMode)
+    {
+      //Delete only subfolders
+      try
+      {
+        if (Files.exists(targetDirPath))
+        {         
+          File[] directories = targetDir.listFiles(File::isDirectory);
+          for (File dir : directories)
+          {
+            //Delete entire folder
+            Files.walk(dir.toPath()).sorted(Comparator.reverseOrder()).map(Path::toFile).forEach(File::delete);
+          }
+        }
+      }
+      catch (IOException e)
+      {
+        ExceptionHandler.handleException(e, "Could not delete target folder");
+      }
+    }
+    else
+    {
+      //Delete entire target folder
+      try
+      {
+        if (Files.exists(targetDirPath))
+        {
+          //Delete entire folder
+          Files.walk(targetDirPath).sorted(Comparator.reverseOrder()).map(Path::toFile).forEach(File::delete);
+        }
+      }
+      catch (IOException e)
+      {
+        ExceptionHandler.handleException(e, "Could not delete target folder");
+      }
     }
   }
 
@@ -161,6 +160,11 @@ public class ExportManager
   public boolean isDeleteBeforeExport()
   {
     return deleteBeforeExport;
+  }
+  
+  public void setDeleteBeforeExport(boolean delete)
+  {
+    this.deleteBeforeExport = delete;
   }
 
   public void copyFilesForCarousel(StringBuilder infoBuilder)
