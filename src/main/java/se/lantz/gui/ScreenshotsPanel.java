@@ -595,12 +595,12 @@ public class ScreenshotsPanel extends JPanel
             {
               //Matcher for valid files
               PathMatcher matcher =
-                FileSystems.getDefault().getPathMatcher("glob:**.{d64,t64,tap,vsf,vsz,gz,crt,prg,g64,zip}");
+                FileSystems.getDefault().getPathMatcher("glob:**.{d64,t64,tap,vsf,vsz,gz,crt,prg,g64,zip,d81,d82}");
               if (!matcher.matches(files[0].toPath()))
               {
                 JOptionPane
                   .showMessageDialog(getGameTextField(),
-                                     "Invalid file format, it must be a d64, t64, tap, vsf, vsz, crt, prg, g64, gz or zip file.",
+                                     "Invalid file format, it must be a d64, t64, tap, vsf, vsz, crt, prg, g64, d81, d82, gz or zip file.",
                                      "Game file",
                                      JOptionPane.ERROR_MESSAGE);
               }

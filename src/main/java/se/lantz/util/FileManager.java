@@ -79,7 +79,7 @@ public class FileManager
   private static ExecutorService executor = Executors.newSingleThreadExecutor();
 
   private static List<String> validFileEndingList =
-    Arrays.asList("d64", "t64", "prg", "p00", "d81", "d71", "x64", "g64", "tap", "crt", "vsf");
+    Arrays.asList("d64", "t64", "prg", "p00", "d81", "d82", "d71", "x64", "g64", "tap", "crt", "vsf");
 
   static
   {
@@ -644,6 +644,20 @@ public class FileManager
       {
         command.append("258 ");
       }
+      
+      //Append REU
+      if (systemModel.isREU512K())
+      {
+        command.append("-reu -reusize 512 ");
+      }
+      else if (systemModel.isREU2Mb())
+      {
+        command.append("-reu -reusize 2048 ");
+      }
+      else if (systemModel.isREU16Mb())
+      {
+        command.append("-reu -reusize 16384 ");
+      }    
     }
     else
     {
