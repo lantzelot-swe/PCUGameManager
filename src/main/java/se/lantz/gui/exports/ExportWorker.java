@@ -24,8 +24,10 @@ public class ExportWorker extends SwingWorker<Void, String>
   {
     if (exportManager.isDeleteBeforeExport())
     {
-      publish("Deleting existing games before exporting.\n");
+      publish("Deleting existing games before exporting...\n");
+      exportManager.deleteBeforeExport();
     }
+    exportManager.createDirectoriesBeforeExport();
     publish("Exporting from db...");
     StringBuilder infoBuilder = new StringBuilder();
     exportManager.readFromDb(infoBuilder);
@@ -34,7 +36,7 @@ public class ExportWorker extends SwingWorker<Void, String>
     infoBuilder = new StringBuilder();
     exportManager.createGameInfoFiles(infoBuilder, false);
     publish(infoBuilder.toString());
-    publish("Copy screenshots, covers and game files...");
+    publish("Copying screenshots, covers and game files...");
     infoBuilder = new StringBuilder();
     exportManager.copyFilesForCarousel(infoBuilder);
     publish(infoBuilder.toString());

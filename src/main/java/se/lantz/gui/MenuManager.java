@@ -954,8 +954,8 @@ public class MenuManager
         if (!viewList.isEmpty())
         {
           exportManager.setGameViewsToExport(viewList);
-          exportManager.setTargetDirectory(exportSelectionDialog.getTargetDirectory(),
-                                           exportSelectionDialog.deleteBeforeExport());
+          exportManager.setDeleteBeforeExport(exportSelectionDialog.deleteBeforeExport());
+          exportManager.setTargetDirectory(exportSelectionDialog.getTargetDirectory());
           ImportExportProgressDialog dialog = new ImportExportProgressDialog(this.mainWindow, "Export games", false);
           ExportWorker worker = new ExportWorker(exportManager, dialog);
           worker.execute();
@@ -968,8 +968,8 @@ public class MenuManager
         if (!gamesList.isEmpty())
         {
           exportManager.setGamesToExport(gamesList);
-          exportManager.setTargetDirectory(exportSelectionDialog.getTargetDirectory(),
-                                           exportSelectionDialog.deleteBeforeExport());
+          exportManager.setDeleteBeforeExport(exportSelectionDialog.deleteBeforeExport());
+          exportManager.setTargetDirectory(exportSelectionDialog.getTargetDirectory());
           ImportExportProgressDialog dialog = new ImportExportProgressDialog(this.mainWindow, "Export games", false);
           ExportWorker worker = new ExportWorker(exportManager, dialog);
           worker.execute();
@@ -992,8 +992,8 @@ public class MenuManager
         if (!viewList.isEmpty())
         {
           exportManager.setGameViewsToExport(viewList);
-          exportManager.setTargetDirectory(exportSelectionDialog.getTargetDirectory(),
-                                           exportSelectionDialog.deleteBeforeExport());
+          exportManager.setDeleteBeforeExport(exportSelectionDialog.deleteBeforeExport());
+          exportManager.setTargetDirectory(exportSelectionDialog.getTargetDirectory());
           ImportExportProgressDialog dialog = new ImportExportProgressDialog(this.mainWindow, "Export games", false);
           ExportFileLoaderWorker worker = new ExportFileLoaderWorker(exportManager, dialog);
           worker.execute();
@@ -1006,8 +1006,8 @@ public class MenuManager
         if (!gamesList.isEmpty())
         {
           exportManager.setGamesToExport(gamesList);
-          exportManager.setTargetDirectory(exportSelectionDialog.getTargetDirectory(),
-                                           exportSelectionDialog.deleteBeforeExport());
+          exportManager.setDeleteBeforeExport(exportSelectionDialog.deleteBeforeExport());
+          exportManager.setTargetDirectory(exportSelectionDialog.getTargetDirectory());
           ImportExportProgressDialog dialog = new ImportExportProgressDialog(this.mainWindow, "Export games", false);
           ExportFileLoaderWorker worker = new ExportFileLoaderWorker(exportManager, dialog);
           worker.execute();
