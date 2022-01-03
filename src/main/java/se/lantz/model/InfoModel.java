@@ -350,7 +350,7 @@ public class InfoModel extends AbstractModel
     this.gamesPath = file.toPath();
     //Set games name, always add ".gz"??
     String fileName = FileManager.generateFileNameFromTitle(this.title, getDuplicateIndex());
-    String fileEnding = file.getName().substring(file.getName().indexOf("."));
+    String fileEnding = file.getName().substring(file.getName().lastIndexOf("."));
 
     if (FileManager.shouldCompressFile(file.getName()))
     {
