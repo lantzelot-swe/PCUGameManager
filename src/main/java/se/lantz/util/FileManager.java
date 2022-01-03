@@ -277,7 +277,7 @@ public class FileManager
   public static boolean shouldCompressFile(String filePath)
   {
     String lowerCasePath = filePath.toLowerCase();
-    return !(lowerCasePath.endsWith(".gz") || lowerCasePath.endsWith(".d81") || lowerCasePath.endsWith(".prg") ||
+    return !(lowerCasePath.endsWith(".gz") || lowerCasePath.endsWith(".d81") || lowerCasePath.endsWith(".d82") || lowerCasePath.endsWith(".prg") ||
       lowerCasePath.endsWith(".p00"));
   }
 
