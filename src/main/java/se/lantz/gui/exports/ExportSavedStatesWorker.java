@@ -24,11 +24,11 @@ public class ExportSavedStatesWorker extends SwingWorker<Void, String>
   {
     if (savedStatesManager.isExportOverwrite())
     {
-      publish("Overwriting existing saved states in the export folder.\n");
+      publish("Overwriting existing saved states in the export folder...\n");
     }
     else
     {
-      publish("Skipping already existing saved states in the export folder.\n");
+      publish("Skipping already existing saved states in the export folder...\n");
     }
     StringBuilder infoBuilder = new StringBuilder();
     savedStatesManager.exportSavedStates(infoBuilder);
