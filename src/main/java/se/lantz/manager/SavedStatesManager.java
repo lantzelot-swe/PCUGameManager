@@ -24,6 +24,7 @@ import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import se.lantz.gui.exports.PublishWorker;
 import se.lantz.model.MainViewModel;
 import se.lantz.model.SavedStatesModel;
 import se.lantz.model.SavedStatesModel.SAVESTATE;
@@ -377,7 +378,7 @@ public class SavedStatesManager
     }
   }
 
-  public void exportSavedStates(StringBuilder infoBuilder)
+  public void exportSavedStates(PublishWorker worker)
   {
     noFilesCopied = 0;
     File saveFolder = new File(SAVES);
@@ -393,7 +394,7 @@ public class SavedStatesManager
           }
           if (!isValidSaveStatePath(sourcePath))
           {
-            infoBuilder.append("Skipping " + sourcePath + " (not a valid save state file)\n");
+            worker.publishMessage("Skipping " + sourcePath + " (not a valid save state file)");
             return;
           }
           Path destinationPath =
@@ -405,11 +406,11 @@ public class SavedStatesManager
           }
           if (!this.exportOverwrite && destinationPath.toFile().exists())
           {
-            infoBuilder.append("Skipping " + sourcePath + " (already exists)\n");
+            worker.publishMessage("Skipping " + sourcePath + " (already exists)");
           }
           else
           {
-            infoBuilder.append("Copying " + sourcePath + "\n");
+            worker.publishMessage("Copying " + sourcePath);
             Files.copy(sourcePath, destinationPath, StandardCopyOption.REPLACE_EXISTING);
             if (!sourcePath.toFile().isDirectory())
             {
@@ -419,7 +420,7 @@ public class SavedStatesManager
         }
         catch (Exception e)
         {
-          infoBuilder.append("Could not copy from " + sourcePath.toString() + "\n");
+          worker.publishMessage("Could not copy from " + sourcePath.toString());
           ExceptionHandler.logException(e, "Could not copy from " + sourcePath.toString());
         }
       });
@@ -430,7 +431,7 @@ public class SavedStatesManager
     }
   }
 
-  public void importSavedStates(StringBuilder infoBuilder)
+  public void importSavedStates(PublishWorker worker)
   {
     noFilesCopied = 0;
     File saveFolder = new File(SAVES);
@@ -446,7 +447,7 @@ public class SavedStatesManager
           }
           if (!isValidSaveStatePath(sourcePath))
           {
-            infoBuilder.append("Skipping " + sourcePath + " (not a valid save state file)\n");
+            worker.publishMessage("Skipping " + sourcePath + " (not a valid save state file)");
             return;
           }
           Path destinationPath =
@@ -458,11 +459,11 @@ public class SavedStatesManager
           }
           if (!this.importOverwrite && destinationPath.toFile().exists())
           {
-            infoBuilder.append("Skipping " + sourcePath + " (already exists)\n");
+            worker.publishMessage("Skipping " + sourcePath + " (already exists)");
           }
           else
           {
-            infoBuilder.append("Copying " + sourcePath + "\n");
+            worker.publishMessage("Copying " + sourcePath);
             Files.copy(sourcePath, destinationPath, StandardCopyOption.REPLACE_EXISTING);
             if (!sourcePath.toFile().isDirectory())
             {
@@ -472,7 +473,7 @@ public class SavedStatesManager
         }
         catch (Exception e)
         {
-          infoBuilder.append("Could not copy from " + sourcePath.toString() + "\n");
+          worker.publishMessage("Could not copy from " + sourcePath.toString());
           ExceptionHandler.logException(e, "Could not copy from " + sourcePath.toString());
         }
       });

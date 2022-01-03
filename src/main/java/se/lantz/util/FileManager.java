@@ -45,6 +45,7 @@ import com.github.junrar.Archive;
 import com.github.junrar.rarfile.FileHeader;
 
 import se.lantz.db.DbConnector;
+import se.lantz.gui.exports.PublishWorker;
 import se.lantz.manager.SavedStatesManager;
 import se.lantz.model.InfoModel;
 import se.lantz.model.MainViewModel;
@@ -148,13 +149,13 @@ public class FileManager
     }
     return screenImage;
   }
-  
+
   public static BufferedImage getInfoSlotTextBox()
   {
     BufferedImage textBoxImage = null;
     try
-    {      
-       textBoxImage = ImageIO.read(FileManager.class.getResource("/se/lantz/InfoSlotTextBox.png"));
+    {
+      textBoxImage = ImageIO.read(FileManager.class.getResource("/se/lantz/InfoSlotTextBox.png"));
     }
     catch (IOException e)
     {
@@ -277,8 +278,8 @@ public class FileManager
   public static boolean shouldCompressFile(String filePath)
   {
     String lowerCasePath = filePath.toLowerCase();
-    return !(lowerCasePath.endsWith(".gz") || lowerCasePath.endsWith(".d81") || lowerCasePath.endsWith(".d82") || lowerCasePath.endsWith(".prg") ||
-      lowerCasePath.endsWith(".p00"));
+    return !(lowerCasePath.endsWith(".gz") || lowerCasePath.endsWith(".d81") || lowerCasePath.endsWith(".d82") ||
+      lowerCasePath.endsWith(".prg") || lowerCasePath.endsWith(".p00"));
   }
 
   public static void compressGzip(Path source, Path target) throws IOException
@@ -448,7 +449,7 @@ public class FileManager
     return newNameString;
   }
 
-  public void exportGameInfoFile(GameDetails gameDetails, File targetDir, StringBuilder infoBuilder, boolean fileLoader)
+  public void exportGameInfoFile(GameDetails gameDetails, File targetDir, PublishWorker worker, boolean fileLoader)
   {
     try
     {
@@ -456,13 +457,13 @@ public class FileManager
 
       if (fileLoader)
       {
-        infoBuilder.append("Creating cjm file for " + gameDetails.getTitle() + "\n");
+        worker.publishMessage("Creating cjm file for " + gameDetails.getTitle());
         filename =
           generateFileNameFromTitleForFileLoader(gameDetails.getTitle(), gameDetails.getDuplicateIndex()) + ".cjm";
       }
       else
       {
-        infoBuilder.append("Creating game info file for " + gameDetails.getTitle() + "\n");
+        worker.publishMessage("Creating game info file for " + gameDetails.getTitle());
         //Add -ms to comply with the maxi game tool.
         filename = generateFileNameFromTitle(gameDetails.getTitle(), gameDetails.getDuplicateIndex()) + "-ms.tsg";
       }
@@ -473,7 +474,7 @@ public class FileManager
     {
       String message = "Could not create file for: " + gameDetails.getTitle();
       logger.error(message, e);
-      infoBuilder.append(message);
+      worker.publishMessage(message);
     }
   }
 
@@ -644,7 +645,7 @@ public class FileManager
       {
         command.append("258 ");
       }
-      
+
       //Append REU
       if (systemModel.isREU512K())
       {
@@ -657,7 +658,7 @@ public class FileManager
       else if (systemModel.isREU16Mb())
       {
         command.append("-reu -reusize 16384 ");
-      }    
+      }
     }
     else
     {
@@ -1627,7 +1628,7 @@ public class FileManager
       ExceptionHandler.handleException(e, "Could not store game file");
     }
   }
-  
+
   public static String getPCUAEUSBPath(boolean savedStates)
   {
     File[] roots = File.listRoots();
@@ -1650,7 +1651,7 @@ public class FileManager
     if (savedStates)
     {
       gamesPath = deviceRoot.toPath().resolve(".THEC64SAVE");
-    }   
+    }
     return gamesPath.toString();
   }
 }

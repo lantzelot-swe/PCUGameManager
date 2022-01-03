@@ -4,15 +4,16 @@ import java.util.List;
 
 import javax.swing.SwingWorker;
 
+import se.lantz.gui.exports.PublishWorker;
 import se.lantz.util.ExceptionHandler;
 
-public abstract class AbstractImportWorker extends SwingWorker<Void, String>
+public abstract class AbstractImportWorker extends SwingWorker<Void, String> implements PublishWorker
 {
   volatile String progressValueString = "";
   volatile int progressMaximum = 0;
   volatile int progressValue = 0;
   ImportProgressDialog dialog;
-  
+
   public AbstractImportWorker(ImportProgressDialog dialog)
   {
     this.dialog = dialog;
@@ -38,7 +39,7 @@ public abstract class AbstractImportWorker extends SwingWorker<Void, String>
       }
     }
   }
-  
+
   @Override
   protected void done()
   {
@@ -51,5 +52,11 @@ public abstract class AbstractImportWorker extends SwingWorker<Void, String>
       ExceptionHandler.handleException(e, "Error during import");
     }
     dialog.finish();
+  }
+
+  @Override
+  public void publishMessage(String message)
+  {
+    publish(message);
   }
 }

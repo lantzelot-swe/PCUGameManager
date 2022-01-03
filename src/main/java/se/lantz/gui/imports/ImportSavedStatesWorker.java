@@ -5,10 +5,11 @@ import java.util.List;
 import javax.swing.SwingWorker;
 
 import se.lantz.gui.exports.ImportExportProgressDialog;
+import se.lantz.gui.exports.PublishWorker;
 import se.lantz.manager.SavedStatesManager;
 import se.lantz.util.ExceptionHandler;
 
-public class ImportSavedStatesWorker extends SwingWorker<Void, String>
+public class ImportSavedStatesWorker extends SwingWorker<Void, String> implements PublishWorker
 {
 
   private SavedStatesManager savedStatesManager;
@@ -31,9 +32,7 @@ public class ImportSavedStatesWorker extends SwingWorker<Void, String>
     {
       publish("Skipping already existing saved states in the saves folder.\n");
     }
-    StringBuilder infoBuilder = new StringBuilder();
-    savedStatesManager.importSavedStates(infoBuilder);
-    publish(infoBuilder.toString());
+    savedStatesManager.importSavedStates(this);
     publish("Copied " + savedStatesManager.getNumberOfFilesCopied() + " files.");
     publish("Done!");
     return null;
@@ -60,5 +59,11 @@ public class ImportSavedStatesWorker extends SwingWorker<Void, String>
       ExceptionHandler.handleException(e, "Error during import");
     }
     dialog.finish();
+  }
+
+  @Override
+  public void publishMessage(String message)
+  {
+    publish(message);
   }
 }

@@ -7,7 +7,7 @@ import javax.swing.SwingWorker;
 import se.lantz.manager.ExportManager;
 import se.lantz.util.ExceptionHandler;
 
-public class ExportWorker extends SwingWorker<Void, String>
+public class ExportWorker extends SwingWorker<Void, String> implements PublishWorker
 {
 
   private ExportManager exportManager;
@@ -25,23 +25,17 @@ public class ExportWorker extends SwingWorker<Void, String>
     if (exportManager.isDeleteBeforeExport())
     {
       publish("Deleting existing games before exporting...\n");
-      exportManager.deleteBeforeExport();
+      exportManager.deleteBeforeExport(this);
     }
     exportManager.createDirectoriesBeforeExport();
-    publish("Exporting from db...");
-    StringBuilder infoBuilder = new StringBuilder();
-    exportManager.readFromDb(infoBuilder);
-    publish(infoBuilder.toString());
-    publish("Creating game info files...");
-    infoBuilder = new StringBuilder();
-    exportManager.createGameInfoFiles(infoBuilder, false);
-    publish(infoBuilder.toString());
-    publish("Copying screenshots, covers and game files...");
-    infoBuilder = new StringBuilder();
-    exportManager.copyFilesForCarousel(infoBuilder);
-    publish(infoBuilder.toString());
+    publish("\nExporting from db...");
+    exportManager.readFromDb(this);
+    publish("\nCreating game info files...");
+    exportManager.createGameInfoFiles(this, false);
+    publish("\nCopying screenshots, covers and game files...");
+    exportManager.copyFilesForCarousel(this);
     exportManager.clearAfterImport();
-    publish("Done!");
+    publish("\nDone!");
     return null;
   }
 
@@ -66,5 +60,11 @@ public class ExportWorker extends SwingWorker<Void, String>
 			ExceptionHandler.handleException(e, "Error during export");
 		}
     dialog.finish();
+  }
+
+  @Override
+  public void publishMessage(String message)
+  {
+    publish(message);
   }
 }

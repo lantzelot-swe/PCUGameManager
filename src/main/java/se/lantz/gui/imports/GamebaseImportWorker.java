@@ -11,8 +11,10 @@ public class GamebaseImportWorker extends AbstractImportWorker
 {
   private ImportManager importManager;
   private final GamebaseImporter gbInporter;
-  
-  public GamebaseImportWorker(GamebaseImporter gamebaseImporter, ImportManager importManager, ImportProgressDialog dialog)
+
+  public GamebaseImportWorker(GamebaseImporter gamebaseImporter,
+                              ImportManager importManager,
+                              ImportProgressDialog dialog)
   {
     super(dialog);
     this.importManager = importManager;
@@ -23,10 +25,10 @@ public class GamebaseImportWorker extends AbstractImportWorker
   protected Void doInBackground() throws Exception
   {
     progressValueString = "Querying gamebase db...";
-    publish("Reading from gamebase db... this may take a while, be patient!");   
+    publish("Reading from gamebase db... this may take a while, be patient!");
     publish(gbInporter.importFromGamebase().toString());
     progressValueString = "Checking game files...";
-    
+
     List<List<GbGameInfo>> listChunks = gbInporter.getGbGameInfoChunks();
     progressMaximum = listChunks.size();
     progressValue = 0;
@@ -42,9 +44,9 @@ public class GamebaseImportWorker extends AbstractImportWorker
       }
       progressValue++;
       progressValueString = String.format("Checking game files (batch %s of %s)", progressValue, progressMaximum);
-      publish(gbInporter.checkGameFileForGbGames(gbInfoList).toString());    
+      publish(gbInporter.checkGameFileForGbGames(gbInfoList).toString());
     }
-    
+
     List<List<String>> dbRowReadChunks = importManager.getDbRowReadChunks();
     progressValueString = "Importing to db and copying files...";
     progressMaximum = dbRowReadChunks.size();
@@ -64,18 +66,20 @@ public class GamebaseImportWorker extends AbstractImportWorker
         }
         else
         {
-          publish("Import cancelled, " + (chunkCount * ImportManager.DB_ROW_CHUNK_SIZE) + " games where added to the db.");
+          publish("Import cancelled, " + (chunkCount * ImportManager.DB_ROW_CHUNK_SIZE) +
+            " games where added to the db.");
         }
         return null;
       }
       chunkCount++;
       progressValue++;
-      progressValueString = String.format("Importing to db and copying files (batch %s of %s)", progressValue, progressMaximum);
+      progressValueString =
+        String.format("Importing to db and copying files (batch %s of %s)", progressValue, progressMaximum);
       //Copy the list to avoid modifying it when reading several chunks
       ArrayList<String> copyList = new ArrayList<>();
       copyList.addAll(rowList);
       publish(importManager.insertRowsIntoDb(copyList).toString());
-      publish(importManager.copyFiles(true, copyList).toString());
+      importManager.copyFiles(true, copyList, this);
     }
     int numberOfGamesProcessed = importManager.clearAfterImport();
     publish("Processed " + numberOfGamesProcessed + " games.");

@@ -8,7 +8,7 @@ import se.lantz.manager.ImportManager;
 public class CarouselImportWorker extends AbstractImportWorker
 {
   private ImportManager importManager;
-  
+
   public CarouselImportWorker(ImportManager importManager, ImportProgressDialog dialog)
   {
     super(dialog);
@@ -19,14 +19,10 @@ public class CarouselImportWorker extends AbstractImportWorker
   protected Void doInBackground() throws Exception
   {
     progressValueString = "Reading game info files...";
-    publish("Reading game info files...");
-    StringBuilder infoBuilder = new StringBuilder();
-    importManager.readGameInfoFiles(infoBuilder);
-    publish(infoBuilder.toString());
-    infoBuilder = new StringBuilder();
-    importManager.convertIntoDbRows(infoBuilder);
-    publish(infoBuilder.toString());
-    publish("Importing to db...");
+    publish(progressValueString);
+    importManager.readGameInfoFiles(this);
+    importManager.convertIntoDbRows(this);
+    publish("\nImporting to db...");
     List<List<String>> dbRowReadChunks = importManager.getDbRowReadChunks();
     progressValueString = "Importing to db, copying covers, screens and game files...";
     progressMaximum = dbRowReadChunks.size();
@@ -41,11 +37,12 @@ public class CarouselImportWorker extends AbstractImportWorker
         progressValue = 1;
         if (chunkCount == 0)
         {
-          publish("Import cancelled, no games where added to the db.");
+          publish("\nImport cancelled, no games where added to the db.");
         }
         else
         {
-          publish("Import cancelled, " + (chunkCount * ImportManager.DB_ROW_CHUNK_SIZE) + " games where added to the db.");
+          publish("\nImport cancelled, " + (chunkCount * ImportManager.DB_ROW_CHUNK_SIZE) +
+            " games where added to the db.");
         }
         return null;
       }
@@ -55,7 +52,7 @@ public class CarouselImportWorker extends AbstractImportWorker
       ArrayList<String> copyList = new ArrayList<>();
       copyList.addAll(rowList);
       publish(importManager.insertRowsIntoDb(copyList).toString());
-      publish(importManager.copyFiles(false, copyList).toString());
+      importManager.copyFiles(false, copyList, this);
     }
     int numberOfGamesProcessed = importManager.clearAfterImport();
     publish("Processed " + numberOfGamesProcessed + " games.");

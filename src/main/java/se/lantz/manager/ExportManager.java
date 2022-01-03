@@ -14,6 +14,7 @@ import java.util.Map;
 
 import org.apache.commons.io.FilenameUtils;
 
+import se.lantz.gui.exports.PublishWorker;
 import se.lantz.model.MainViewModel;
 import se.lantz.model.data.GameDetails;
 import se.lantz.model.data.GameListData;
@@ -54,7 +55,7 @@ public class ExportManager
   {
     this.targetDir = targetDir;
   }
-  
+
   public void createDirectoriesBeforeExport()
   {
     try
@@ -66,8 +67,8 @@ public class ExportManager
       ExceptionHandler.handleException(e, "Could not create " + targetDir.toPath());
     }
   }
-  
-  public void deleteBeforeExport()
+
+  public void deleteBeforeExport(PublishWorker worker)
   {
     Path targetDirPath = this.targetDir.toPath();
     if (gameViewMode)
@@ -76,10 +77,11 @@ public class ExportManager
       try
       {
         if (Files.exists(targetDirPath))
-        {         
+        {
           File[] directories = targetDir.listFiles(File::isDirectory);
           for (File dir : directories)
           {
+            worker.publishMessage("Deleting " + dir.getName() + "...");
             //Delete entire folder
             Files.walk(dir.toPath()).sorted(Comparator.reverseOrder()).map(Path::toFile).forEach(File::delete);
           }
@@ -97,6 +99,7 @@ public class ExportManager
       {
         if (Files.exists(targetDirPath))
         {
+          worker.publishMessage("Deleting " + this.targetDir.getName() + "...");
           //Delete entire folder
           Files.walk(targetDirPath).sorted(Comparator.reverseOrder()).map(Path::toFile).forEach(File::delete);
         }
@@ -108,22 +111,22 @@ public class ExportManager
     }
   }
 
-  public void readFromDb(StringBuilder infoBuilder)
+  public void readFromDb(PublishWorker worker)
   {
     if (gameViewMode)
     {
       for (GameView gameView : gameViewList)
       {
-        gameDetailsForViewsMap.put(gameView, uiModel.readGameDetailsForGameView(infoBuilder, gameView));
+        gameDetailsForViewsMap.put(gameView, uiModel.readGameDetailsForGameView(worker, gameView));
       }
     }
     else
     {
-      gameDetailsList = uiModel.readGameDetailsForExport(infoBuilder, gamesList);
+      gameDetailsList = uiModel.readGameDetailsForExport(worker, gamesList);
     }
   }
 
-  public void createGameInfoFiles(StringBuilder infoBuilder, boolean fileLoader)
+  public void createGameInfoFiles(PublishWorker worker, boolean fileLoader)
   {
     if (gameViewMode)
     {
@@ -144,7 +147,7 @@ public class ExportManager
         }
         for (GameDetails gameDetails : gameDetailsForViewsMap.get(gameView))
         {
-          uiModel.exportGameInfoFile(gameDetails, targetPath.toFile(), infoBuilder, fileLoader);
+          uiModel.exportGameInfoFile(gameDetails, targetPath.toFile(), worker, fileLoader);
         }
       }
     }
@@ -152,7 +155,7 @@ public class ExportManager
     {
       for (GameDetails gameDetails : gameDetailsList)
       {
-        uiModel.exportGameInfoFile(gameDetails, targetDir, infoBuilder, fileLoader);
+        uiModel.exportGameInfoFile(gameDetails, targetDir, worker, fileLoader);
       }
     }
   }
@@ -161,29 +164,29 @@ public class ExportManager
   {
     return deleteBeforeExport;
   }
-  
+
   public void setDeleteBeforeExport(boolean delete)
   {
     this.deleteBeforeExport = delete;
   }
 
-  public void copyFilesForCarousel(StringBuilder infoBuilder)
+  public void copyFilesForCarousel(PublishWorker worker)
   {
     if (gameViewMode)
     {
       for (GameView gameView : gameViewList)
       {
         Path targetPath = targetDir.toPath().resolve(gameView.getName().replace(" ", "_"));
-        copyFilesForCarousel(infoBuilder, targetPath, gameDetailsForViewsMap.get(gameView));
+        copyFilesForCarousel(worker, targetPath, gameDetailsForViewsMap.get(gameView));
       }
     }
     else
     {
-      copyFilesForCarousel(infoBuilder, targetDir.toPath(), gameDetailsList);
+      copyFilesForCarousel(worker, targetDir.toPath(), gameDetailsList);
     }
   }
 
-  private void copyFilesForCarousel(StringBuilder infoBuilder, Path targetPath, List<GameDetails> gameDetailsList)
+  private void copyFilesForCarousel(PublishWorker worker, Path targetPath, List<GameDetails> gameDetailsList)
   {
     try
     {
@@ -196,7 +199,7 @@ public class ExportManager
     }
     catch (IOException e)
     {
-      infoBuilder.append("ERROR: Could not create directories for covers, screens and games, " + e.getMessage() + "\n");
+      worker.publishMessage("ERROR: Could not create directories for covers, screens and games, " + e.getMessage());
       ExceptionHandler.handleException(e, " Could not create directories for covers, screens and games");
       return;
     }
@@ -217,59 +220,51 @@ public class ExportManager
       {
         if (!gameDetails.getCover().isEmpty())
         {
-          infoBuilder.append("Copying cover from ");
-          infoBuilder.append(coverPath.toString());
-          infoBuilder.append("\n");
+          worker.publishMessage("Copying cover from " + coverPath.toString());
           Files.copy(coverPath, targetCoverPath, StandardCopyOption.REPLACE_EXISTING);
         }
         if (!gameDetails.getScreen1().isEmpty())
         {
-          infoBuilder.append("Copying screenshot from ");
-          infoBuilder.append(screens1Path.toString());
-          infoBuilder.append("\n");
+          worker.publishMessage("Copying screenshot from " + screens1Path.toString());
           Files.copy(screens1Path, targetScreen1Path, StandardCopyOption.REPLACE_EXISTING);
         }
         if (!gameDetails.getScreen2().isEmpty())
         {
-          infoBuilder.append("Copying screenshot from ");
-          infoBuilder.append(screens2Path.toString());
-          infoBuilder.append("\n");
+          worker.publishMessage("Copying screenshot from " + screens2Path.toString());
           Files.copy(screens2Path, targetScreen2Path, StandardCopyOption.REPLACE_EXISTING);
         }
         if (!gameDetails.getGame().isEmpty())
         {
-          infoBuilder.append("Copying game file from ");
-          infoBuilder.append(gamePath.toString());
-          infoBuilder.append("\n");
+          worker.publishMessage("Copying game file from " + gamePath.toString());
           Files.copy(gamePath, targetGamePath, StandardCopyOption.REPLACE_EXISTING);
         }
       }
       catch (IOException e)
       {
-        infoBuilder.append("ERROR: Could not copy files for " + gameDetails.getTitle() + ", " + e.getMessage() + "\n");
+        worker.publishMessage("ERROR: Could not copy files for " + gameDetails.getTitle() + ", " + e.getMessage());
         ExceptionHandler.handleException(e, "Could NOT copy files for: " + gameDetails.getTitle());
       }
     }
   }
 
-  public void copyGamesForFileLoader(StringBuilder infoBuilder)
+  public void copyGamesForFileLoader(PublishWorker worker)
   {
     if (gameViewMode)
     {
       for (GameView gameView : gameViewList)
       {
         Path targetPath = targetDir.toPath().resolve(gameView.getName());
-        copyGamesForFileLoader(infoBuilder, targetPath, gameDetailsForViewsMap.get(gameView));
+        copyGamesForFileLoader(worker, targetPath, gameDetailsForViewsMap.get(gameView));
       }
     }
     else
     {
-      copyGamesForFileLoader(infoBuilder, targetDir.toPath(), gameDetailsList);
+      copyGamesForFileLoader(worker, targetDir.toPath(), gameDetailsList);
     }
 
   }
 
-  private void copyGamesForFileLoader(StringBuilder infoBuilder, Path targetPath, List<GameDetails> gameDetailsList)
+  private void copyGamesForFileLoader(PublishWorker worker, Path targetPath, List<GameDetails> gameDetailsList)
   {
     try
     {
@@ -278,7 +273,7 @@ public class ExportManager
     }
     catch (IOException e)
     {
-      infoBuilder.append("ERROR: Could not create directory for games, " + e.getMessage() + "\n");
+      worker.publishMessage("ERROR: Could not create directory for games, " + e.getMessage());
       ExceptionHandler.handleException(e, " Could not create directory for games");
       return;
     }
@@ -310,11 +305,8 @@ public class ExportManager
       {
         if (!gameDetails.getGame().isEmpty())
         {
-          infoBuilder.append("Copying game file from ");
-          infoBuilder.append(gamePath.toString());
-          infoBuilder.append(" to ");
-          infoBuilder.append(targetGamePath);
-          infoBuilder.append("\n");
+          worker.publishMessage("Copying game file from " + gamePath.toString() + " to " + targetGamePath);
+
           if (zipped)
           {
             FileManager.decompressGzip(gamePath, targetGamePath);
@@ -327,7 +319,7 @@ public class ExportManager
       }
       catch (IOException e)
       {
-        infoBuilder.append("ERROR: Could not copy files for " + gameDetails.getTitle() + ", " + e.getMessage() + "\n");
+        worker.publishMessage("ERROR: Could not copy files for " + gameDetails.getTitle() + ", " + e.getMessage());
         ExceptionHandler.handleException(e, "Could NOT copy files for: " + gameDetails.getTitle());
       }
     }

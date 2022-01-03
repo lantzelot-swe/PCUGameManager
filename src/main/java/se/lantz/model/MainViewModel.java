@@ -10,7 +10,6 @@ import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 
 import javax.swing.DefaultComboBoxModel;
@@ -19,6 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import se.lantz.db.DbConnector;
+import se.lantz.gui.exports.PublishWorker;
 import se.lantz.manager.ImportManager;
 import se.lantz.manager.SavedStatesManager;
 import se.lantz.model.data.GameDetails;
@@ -293,26 +293,26 @@ public class MainViewModel extends AbstractModel
     dbConnector.cleanupAfterImport();
   }
 
-  public List<GameDetails> readGameDetailsForExport(StringBuilder infoBuilder, List<GameListData> gamesList)
+  public List<GameDetails> readGameDetailsForExport(PublishWorker worker, List<GameListData> gamesList)
   {
     List<GameDetails> returnList = new ArrayList<>();
     for (GameListData game : gamesList)
     {
-      infoBuilder.append("Fetching information for " + game.getTitle() + "\n");
+      worker.publishMessage("Fetching information for " + game.getTitle());
       returnList.add(dbConnector.getGameDetails(game.getGameId()));
     }
     return returnList;
   }
 
-  public List<GameDetails> readGameDetailsForGameView(StringBuilder infoBuilder, GameView gameView)
+  public List<GameDetails> readGameDetailsForGameView(PublishWorker worker, GameView gameView)
   {
     List<GameListData> gamesList = dbConnector.fetchGamesByView(gameView);
-    return readGameDetailsForExport(infoBuilder, gamesList);
+    return readGameDetailsForExport(worker, gamesList);
   }
 
-  public void exportGameInfoFile(GameDetails gameDetails, File targetDir, StringBuilder infoBuilder, boolean fileLoader)
+  public void exportGameInfoFile(GameDetails gameDetails, File targetDir, PublishWorker worker, boolean fileLoader)
   {
-    fileManager.exportGameInfoFile(gameDetails, targetDir, infoBuilder, fileLoader);
+    fileManager.exportGameInfoFile(gameDetails, targetDir, worker, fileLoader);
   }
 
   public InfoModel getInfoModel()
@@ -467,7 +467,7 @@ public class MainViewModel extends AbstractModel
   {
     this.requiredFieldsListener = requiredFieldsListener;
   }
-  
+
   public boolean isInfoSlotAvailableForCurrentView()
   {
     for (int i = 0; i < this.gameListModel.size(); i++)
@@ -929,9 +929,9 @@ public class MainViewModel extends AbstractModel
     int imgWidth = image.getWidth();
     int imgHeight = image.getHeight();
     g = image.createGraphics();
-    
+
     g.drawImage(infoSlotTextBox, imgWidth / 2 - infoSlotTextBox.getWidth() / 2, 55, null);
-    
+
     g.setFont(new Font("C64 Pro", 0, 0).deriveFont(10f));
 
     TextLayout textLayout = new TextLayout(title, g.getFont(), g.getFontRenderContext());

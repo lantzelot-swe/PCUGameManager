@@ -7,7 +7,7 @@ import javax.swing.SwingWorker;
 import se.lantz.manager.SavedStatesManager;
 import se.lantz.util.ExceptionHandler;
 
-public class ExportSavedStatesWorker extends SwingWorker<Void, String>
+public class ExportSavedStatesWorker extends SwingWorker<Void, String> implements PublishWorker
 {
 
   private SavedStatesManager savedStatesManager;
@@ -30,9 +30,7 @@ public class ExportSavedStatesWorker extends SwingWorker<Void, String>
     {
       publish("Skipping already existing saved states in the export folder...\n");
     }
-    StringBuilder infoBuilder = new StringBuilder();
-    savedStatesManager.exportSavedStates(infoBuilder);
-    publish(infoBuilder.toString());
+    savedStatesManager.exportSavedStates(this);
     publish("Copied " + savedStatesManager.getNumberOfFilesCopied() + " files.");
     publish("Done!");
     return null;
@@ -59,5 +57,11 @@ public class ExportSavedStatesWorker extends SwingWorker<Void, String>
 			ExceptionHandler.handleException(e, "Error during export");
 		}
     dialog.finish();
+  }
+
+  @Override
+  public void publishMessage(String message)
+  {
+    publish(message);
   }
 }

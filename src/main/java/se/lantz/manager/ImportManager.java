@@ -24,6 +24,7 @@ import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import se.lantz.gui.exports.PublishWorker;
 import se.lantz.model.MainViewModel;
 import se.lantz.util.ExceptionHandler;
 import se.lantz.util.FileManager;
@@ -70,7 +71,7 @@ public class ImportManager
   {
     this.addAsFavorite = favoriteValue;
   }
-  
+
   public void setViewTag(String viewTag)
   {
     this.viewTag = viewTag;
@@ -104,13 +105,13 @@ public class ImportManager
     }
   }
 
-  public void readGameInfoFiles(StringBuilder infoBuilder)
+  public void readGameInfoFiles(PublishWorker worker)
   {
     gameInfoFilesMap.clear();
 
     try (Stream<Path> filePathStream = Files.walk(srcParentFolder, 1))
     {
-      filePathStream.forEach(filePath -> readGameInfoFile(filePath, infoBuilder));
+      filePathStream.forEach(filePath -> readGameInfoFile(filePath, worker));
     }
     catch (IOException e)
     {
@@ -118,21 +119,19 @@ public class ImportManager
     }
   }
 
-  private void readGameInfoFile(Path filePath, StringBuilder infoBuilder)
+  private void readGameInfoFile(Path filePath, PublishWorker worker)
   {
     if (Files.isRegularFile(filePath) && getFileExtension(filePath).equalsIgnoreCase("tsg"))
     {
-      infoBuilder.append("Reading game info from ");
-      infoBuilder.append(filePath);
-      infoBuilder.append("\n");
-      List<String> result = readFileInList(filePath, infoBuilder);
+      worker.publishMessage("Reading game info from " + filePath);
+      List<String> result = readFileInList(filePath, worker);
       if (result.size() > 0)
       {
         gameInfoFilesMap.put(filePath, result);
       }
       else
       {
-        infoBuilder.append("Skipping file " + filePath.toString() + "\n");
+        worker.publishMessage("Skipping file " + filePath.toString());
       }
     }
   }
@@ -144,10 +143,10 @@ public class ImportManager
     return (dotIndex == -1) ? "" : fileName.substring(dotIndex + 1);
   }
 
-  public void convertIntoDbRows(StringBuilder infoBuilder)
+  public void convertIntoDbRows(PublishWorker worker)
   {
     // Construct a List of comma separated strings with all info correctly added.
-    gameInfoFilesMap.values().stream().forEach(list -> extractInfoIntoRowString(list, infoBuilder));
+    gameInfoFilesMap.values().stream().forEach(list -> extractInfoIntoRowString(list, worker));
   }
 
   public StringBuilder insertRowsIntoDb(List<String> rowList)
@@ -155,7 +154,7 @@ public class ImportManager
     return uiModel.importGameInfo(rowList, selectedOption, addAsFavorite, viewTag);
   }
 
-  private void extractInfoIntoRowString(List<String> fileLines, StringBuilder infoBuilder)
+  private void extractInfoIntoRowString(List<String> fileLines, PublishWorker worker)
   {
     String title = "";
     String year = "";
@@ -339,7 +338,7 @@ public class ImportManager
     }
     catch (Exception e)
     {
-      infoBuilder.append("ERROR: Could not read info file for \"" + title + "\"\n");
+      worker.publishMessage("ERROR: Could not read info file for \"" + title + "\"");
       logger.error("IMPORT: Could not read info file for " + title, e);
     }
   }
@@ -489,7 +488,7 @@ public class ImportManager
     return returnValue;
   }
 
-  private List<String> readFileInList(Path filePath, StringBuilder infoBuilder)
+  private List<String> readFileInList(Path filePath, PublishWorker worker)
   {
     List<String> lines = Collections.emptyList();
     try
@@ -498,7 +497,7 @@ public class ImportManager
     }
     catch (IOException e)
     {
-      infoBuilder.append("ERROR: Could not read file: filepath=" + filePath.toString() + ", " + e.getMessage() + "\n");
+      worker.publishMessage("ERROR: Could not read file: filepath=" + filePath.toString() + ", " + e.getMessage());
       ExceptionHandler.handleException(e, "Could not read file: filepath=" + filePath.toString());
     }
     return lines;
@@ -508,9 +507,10 @@ public class ImportManager
   {
     return getReadChunks(dbRowDataList, DB_ROW_CHUNK_SIZE);
   }
-  
+
   /**
    * Divides list into chunks with chunkSize size.
+   * 
    * @param <T> The type of objects in the list
    * @param list The list to divide
    * @param chunkSize The size of each chunk
@@ -520,21 +520,20 @@ public class ImportManager
   {
     final int listSize = list.size();
     List<List<T>> lists = new ArrayList<>();
-    for (int i = 0; i < listSize; i += chunkSize) {
-          lists.add(new ArrayList<T>(list.subList(i, Math.min(listSize, i + chunkSize))));
+    for (int i = 0; i < listSize; i += chunkSize)
+    {
+      lists.add(new ArrayList<T>(list.subList(i, Math.min(listSize, i + chunkSize))));
     }
     return lists;
   }
 
-  public StringBuilder copyFiles(boolean gamebaseImport, List<String> rowList)
+  public void copyFiles(boolean gamebaseImport, List<String> rowList, PublishWorker worker)
   {
-    StringBuilder infoBuilder = new StringBuilder();
     //Copy with the existing file names. At export convert to a name that works with the maxi tool if needed.
-    rowList.stream().forEach(dbRowData -> copyFiles(dbRowData, infoBuilder, gamebaseImport));
-    return infoBuilder;
+    rowList.stream().forEach(dbRowData -> copyFiles(dbRowData, worker, gamebaseImport));
   }
 
-  public void copyFiles(String dbRowData, StringBuilder infoBuilder, boolean gamebaseImport)
+  public void copyFiles(String dbRowData, PublishWorker worker, boolean gamebaseImport)
   {
     String coverName = "";
     String screen1Name = "";
@@ -560,7 +559,7 @@ public class ImportManager
     String advanced = splittedForPaths[16];
 
     try
-    {  
+    {
       logger.debug("RowData = {}", dbRowData);
 
       Path coverPath = srcCoversFolder.resolve(oldCoverName);
@@ -575,7 +574,7 @@ public class ImportManager
       Path gamePath = srcGamesFolder.resolve(oldGameName);
 
       Path targetGamePath = Paths.get("./games/" + gameName);
-      
+
       if (gamebaseImport)
       {
         if (!oldGameName.isEmpty())
@@ -587,11 +586,7 @@ public class ImportManager
       //Cover
       if (!oldCoverName.isEmpty())
       {
-        infoBuilder.append("Copying cover from ");
-        infoBuilder.append(coverPath.toString());
-        infoBuilder.append(" to ");
-        infoBuilder.append(targetCoverPath.toString());
-        infoBuilder.append("\n");
+        worker.publishMessage("Copying cover from " + coverPath.toString() + " to " + targetCoverPath.toString());
         try
         {
           Files.copy(coverPath, targetCoverPath, StandardCopyOption.REPLACE_EXISTING);
@@ -602,7 +597,7 @@ public class ImportManager
         }
         catch (Exception e)
         {
-          infoBuilder.append("ERROR: Could not copy cover file for " + gameName + ", " + e.getMessage() + "\n");
+          worker.publishMessage("ERROR: Could not copy cover file for " + gameName + ", " + e.getMessage());
           ExceptionHandler.logException(e, "Could not copy cover for " + gameName);
           useMissingCover(advanced, targetCoverPath);
         }
@@ -621,11 +616,8 @@ public class ImportManager
       {
         if (!oldScreen1Name.isEmpty())
         {
-          infoBuilder.append("Copying screenshot from ");
-          infoBuilder.append(screens1Path.toString());
-          infoBuilder.append(" to ");
-          infoBuilder.append(targetScreen1Path.toString());
-          infoBuilder.append("\n");
+          worker.publishMessage("Copying screenshot from " + screens1Path.toString() + " to " +
+            targetScreen1Path.toString());
           try
           {
             Files.copy(screens1Path, targetScreen1Path, StandardCopyOption.REPLACE_EXISTING);
@@ -636,18 +628,15 @@ public class ImportManager
           }
           catch (Exception e)
           {
-            infoBuilder.append("ERROR: Could not copy screenshot file for " + gameName + ", " + e.getMessage() + "\n");
+            worker.publishMessage("ERROR: Could not copy screenshot file for " + gameName + ", " + e.getMessage());
             ExceptionHandler.logException(e, "Could not copy screenshot for " + gameName);
             useMissingScreenshot(advanced, targetScreen1Path);
           }
         }
         if (!oldScreen2Name.isEmpty())
         {
-          infoBuilder.append("Copying screenshot from ");
-          infoBuilder.append(screens2Path.toString());
-          infoBuilder.append(" to ");
-          infoBuilder.append(targetScreen2Path.toString());
-          infoBuilder.append("\n");
+          worker.publishMessage("Copying screenshot from " + screens2Path.toString() + " to " +
+            targetScreen2Path.toString());
           try
           {
             Files.copy(screens2Path, targetScreen2Path, StandardCopyOption.REPLACE_EXISTING);
@@ -658,7 +647,7 @@ public class ImportManager
           }
           catch (Exception e)
           {
-            infoBuilder.append("ERROR: Could not copy screenshot file for " + gameName + ", " + e.getMessage() + "\n");
+            worker.publishMessage("ERROR: Could not copy screenshot file for " + gameName + ", " + e.getMessage());
             ExceptionHandler.logException(e, "Could not copy screenshot for " + gameName);
             useMissingScreenshot(advanced, targetScreen2Path);
           }
@@ -667,18 +656,14 @@ public class ImportManager
       //Game file
       if (!oldGameName.isEmpty())
       {
-        infoBuilder.append("Copying game file from ");
-        infoBuilder.append(gamePath.toString());
-        infoBuilder.append(" to ");
-        infoBuilder.append(targetGamePath.toString());
-        infoBuilder.append("\n");
+        worker.publishMessage("Copying game file from " + gamePath.toString() + " to " + targetGamePath.toString());
         try
         {
           Files.copy(gamePath, targetGamePath, StandardCopyOption.REPLACE_EXISTING);
         }
         catch (Exception e)
         {
-          infoBuilder.append("ERROR: Could not copy game file for " + gameName + ", " + e.getMessage() + "\n");
+          worker.publishMessage("ERROR: Could not copy game file for " + gameName + ", " + e.getMessage());
           ExceptionHandler.logException(e, "Could not copy game file for " + gameName);
           useMissingGameFile(advanced, targetGamePath);
         }
@@ -690,7 +675,7 @@ public class ImportManager
     }
     catch (Exception e)
     {
-      infoBuilder.append("ERROR: Could not copy files for " + gameName + ", " + e.getMessage() + "\n");
+      worker.publishMessage("ERROR: Could not copy files for " + gameName + ", " + e.getMessage());
       ExceptionHandler.handleException(e, "Could NOT copy files for: " + gameName);
     }
   }
