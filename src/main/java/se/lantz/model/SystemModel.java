@@ -319,7 +319,8 @@ public class SystemModel extends AbstractModel
     }
     if ((Boolean.compare(old, c64) != 0))
     {
-      notifyChange();
+      //Notify with explicit values to be able to react on this in ScreenshotsPanel.
+      notifyChange("c64", old, c64);
     }
   }
 
@@ -338,7 +339,8 @@ public class SystemModel extends AbstractModel
     }
     if ((Boolean.compare(old, vic) != 0))
     {
-      notifyChange();
+      //Notify with explicit values to be able to react on this in ScreenshotsPanel.
+      notifyChange("c64", !old, !vic);
     }
   }
 

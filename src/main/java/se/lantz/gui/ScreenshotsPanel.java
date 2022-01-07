@@ -12,6 +12,7 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 import java.beans.Beans;
+import java.beans.PropertyChangeEvent;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.FileSystems;
@@ -117,13 +118,15 @@ public class ScreenshotsPanel extends JPanel
     add(getGamePanel(), gbc_gamePanel);
     if (!Beans.isDesignTime())
     {
-      infomodel.addPropertyChangeListener((e) -> modelChanged());
+      infomodel.addPropertyChangeListener(e -> modelChanged());
       //React on changes to system, C64 or Vic-20
-      model.getSystemModel().addPropertyChangeListener((e) -> modelChanged());
+      model.getSystemModel().addPropertyChangeListener("c64", e -> systemChanged(e));
+      //React on when a new game is selected
+      model.addPropertyChangeListener("gameSelected", e -> resetWhenSavedOrNewGameSelected());
     }
   }
 
-  public void resetWhenSaved()
+  public void resetWhenSavedOrNewGameSelected()
   {
     currentCoverFile = "";
     currentScreen1File = "";
@@ -147,6 +150,16 @@ public class ScreenshotsPanel extends JPanel
     reloadScreens();
   }
 
+  private void systemChanged(PropertyChangeEvent e)
+  {
+    //Update cover info slot when the system type changes, but only for custom views and all games (id > -2)
+    if (infomodel.isInfoSlot() && model.getSelectedGameView().getGameViewId() > -2)
+    {
+      infomodel
+        .setCoverImage((boolean) e.getNewValue() ? FileManager.infoSlotC64Cover : FileManager.infoSlotVic20Cover);
+    }
+  }
+
   private String getGameFileName()
   {
     String returnValue = infomodel.getGamesFile();
@@ -159,7 +172,6 @@ public class ScreenshotsPanel extends JPanel
 
   private void reloadScreens()
   {
-    // Cover
     BufferedImage coverImage = infomodel.getCoverImage();
     if (coverImage != null)
     {
@@ -177,7 +189,7 @@ public class ScreenshotsPanel extends JPanel
       if (modelCoverFile.isEmpty())
       {
         currentCoverFile = "";
-        getCoverImageLabel().setIcon(getMissingCoverImageIcon());
+        getCoverImageLabel().setIcon(getDefaultCoverImageIcon());
       }
       else if (!modelCoverFile.equals(currentCoverFile))
       {
@@ -185,6 +197,7 @@ public class ScreenshotsPanel extends JPanel
         currentCoverFile = modelCoverFile;
       }
     }
+
     // Screen 1
     BufferedImage screen1Image = infomodel.getScreen1Image();
     if (screen1Image != null)
@@ -269,12 +282,12 @@ public class ScreenshotsPanel extends JPanel
       catch (IOException e)
       {
         logger.error("can't read file: " + filename, e);
-        getCoverImageLabel().setIcon(getMissingCoverImageIcon());
+        getCoverImageLabel().setIcon(getDefaultCoverImageIcon());
       }
     }
     else
     {
-      getCoverImageLabel().setIcon(getMissingCoverImageIcon());
+      getCoverImageLabel().setIcon(getDefaultCoverImageIcon());
     }
   }
 
@@ -313,7 +326,7 @@ public class ScreenshotsPanel extends JPanel
     return missingSceenshotIcon;
   }
 
-  private ImageIcon getMissingCoverImageIcon()
+  private ImageIcon getDefaultCoverImageIcon()
   {
     if (missingC64CoverIcon == null)
     {
@@ -767,12 +780,14 @@ public class ScreenshotsPanel extends JPanel
         {
           //Ask if text shall be added
           int value = JOptionPane.showConfirmDialog(getScreenshotPanel(),
-                                        "Do you want to add the gamelist view name to the screenshot?",
-                                        "Screenshot file",
-                                        JOptionPane.YES_NO_OPTION,
-                                        JOptionPane.INFORMATION_MESSAGE);
+                                                    "Do you want to add the gamelist view name to the screenshot?",
+                                                    "Screenshot file",
+                                                    JOptionPane.YES_NO_OPTION,
+                                                    JOptionPane.INFORMATION_MESSAGE);
           if (value == JOptionPane.YES_OPTION)
           {
+            //Make sure the image is of right size vefore adding text to it
+            returnImage = FileManager.scaleImageTo320x200x32bit(returnImage);
             model.writeGameViewTextOnScreen(returnImage, first ? Color.yellow : Color.red);
           }
         }
@@ -812,8 +827,18 @@ public class ScreenshotsPanel extends JPanel
     }
     fileChooser.setCurrentDirectory(new File(gameDir));
 
-    FileNameExtensionFilter vicefilter =
-      new FileNameExtensionFilter("Vice runnable files", "d64", "t64", "tap", "VSF", "VSZ", "GZ", "crt", "prg", "g64", "d81", "d82");
+    FileNameExtensionFilter vicefilter = new FileNameExtensionFilter("Vice runnable files",
+                                                                     "d64",
+                                                                     "t64",
+                                                                     "tap",
+                                                                     "VSF",
+                                                                     "VSZ",
+                                                                     "GZ",
+                                                                     "crt",
+                                                                     "prg",
+                                                                     "g64",
+                                                                     "d81",
+                                                                     "d82");
     fileChooser.addChoosableFileFilter(vicefilter);
     fileChooser.setFileFilter(vicefilter);
     int value = fileChooser.showOpenDialog(MainWindow.getInstance());
@@ -868,11 +893,13 @@ public class ScreenshotsPanel extends JPanel
       FileManager.getConfiguredProperties().put(SCREENS_DIR_PROPERTY, selectedFile.toPath().getParent().toString());
       if (first)
       {
-        infomodel.setScreen1Image(handleScreenFileDrop(new File[] { selectedFile }, screen1ImageLabel, edit1Button, true));
+        infomodel
+          .setScreen1Image(handleScreenFileDrop(new File[] { selectedFile }, screen1ImageLabel, edit1Button, true));
       }
       else
       {
-        infomodel.setScreen2Image(handleScreenFileDrop(new File[] { selectedFile }, screen2ImageLabel, edit2Button, false));
+        infomodel
+          .setScreen2Image(handleScreenFileDrop(new File[] { selectedFile }, screen2ImageLabel, edit2Button, false));
       }
     }
   }

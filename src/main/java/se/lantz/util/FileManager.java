@@ -54,6 +54,7 @@ import se.lantz.model.SavedStatesModel.SAVESTATE;
 import se.lantz.model.SystemModel;
 import se.lantz.model.data.GameDetails;
 import se.lantz.model.data.GameValidationDetails;
+import se.lantz.model.data.GameView;
 
 public class FileManager
 {
@@ -61,6 +62,9 @@ public class FileManager
   public static BufferedImage emptyVic20Cover;
   public static BufferedImage emptyC64Screenshot;
   public static BufferedImage emptyVic20Screenshot;
+
+  public static BufferedImage infoSlotC64Cover;
+  public static BufferedImage infoSlotVic20Cover;
 
   public static final String GAMES = "./games/";
   private static final String SCREENS = "./screens/";
@@ -90,6 +94,8 @@ public class FileManager
       emptyVic20Cover = ImageIO.read(FileManager.class.getResource("/se/lantz/CoverMissing-VIC20.png"));
       emptyC64Screenshot = ImageIO.read(FileManager.class.getResource("/se/lantz/MissingScreenshot-C64.png"));
       emptyVic20Screenshot = ImageIO.read(FileManager.class.getResource("/se/lantz/MissingScreenshot-VIC20.png"));
+      infoSlotC64Cover = ImageIO.read(FileManager.class.getResource("/se/lantz/InfoSlotC64Cover.png"));
+      infoSlotVic20Cover = ImageIO.read(FileManager.class.getResource("/se/lantz/InfoSlotVic20Cover.png"));
     }
     catch (IOException e)
     {
@@ -115,16 +121,52 @@ public class FileManager
     return FileManager.class.getResourceAsStream("/se/lantz/MissingGame-Vic20.vsf.gz");
   }
 
-  public static BufferedImage getInfoSlotCoverImage()
+  public static BufferedImage getInfoSlotCover(int gameViewId)
   {
     BufferedImage coverImage = null;
+    String coverName = "InfoSlotC64Cover.png";
+    switch (gameViewId)
+    {
+    case GameView.FAVORITES_ID:
+      coverName = "InfoSlotF1Cover.png";
+      break;
+    case GameView.FAVORITES_2_ID:
+      coverName = "InfoSlotF2Cover.png";
+      break;
+    case GameView.FAVORITES_3_ID:
+      coverName = "InfoSlotF3Cover.png";
+      break;
+    case GameView.FAVORITES_4_ID:
+      coverName = "InfoSlotF4Cover.png";
+      break;
+    case GameView.FAVORITES_5_ID:
+      coverName = "InfoSlotF5Cover.png";
+      break;
+    case GameView.FAVORITES_6_ID:
+      coverName = "InfoSlotF6Cover.png";
+      break;
+    case GameView.FAVORITES_7_ID:
+      coverName = "InfoSlotF7Cover.png";
+      break;
+    case GameView.FAVORITES_8_ID:
+      coverName = "InfoSlotF8Cover.png";
+      break;
+    case GameView.FAVORITES_9_ID:
+      coverName = "InfoSlotF9Cover.png";
+      break;
+    case GameView.FAVORITES_10_ID:
+      coverName = "InfoSlotF10Cover.png";
+      break;
+    default:
+      break;
+    }
     try
     {
-      coverImage = ImageIO.read(FileManager.class.getResource("/se/lantz/InfoSlotCover.png"));
+      coverImage = ImageIO.read(FileManager.class.getResource("/se/lantz/" + coverName));
     }
     catch (IOException e)
     {
-      ExceptionHandler.handleException(e, "Could not read cover image.");
+      ExceptionHandler.handleException(e, "Could not read info slot cover image.");
     }
     return coverImage;
   }

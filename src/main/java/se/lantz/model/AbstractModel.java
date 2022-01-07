@@ -22,6 +22,11 @@ public abstract class AbstractModel
   {
     propertyChangeSupport.addPropertyChangeListener(listener);
   }
+  
+  public void addPropertyChangeListener(String property, PropertyChangeListener listener)
+  {
+    propertyChangeSupport.addPropertyChangeListener(property, listener);
+  }
 
   public void removePropertyChangeListener(PropertyChangeListener listener)
   {
@@ -34,6 +39,24 @@ public abstract class AbstractModel
     {
       dataChanged = true;
       propertyChangeSupport.firePropertyChange("notify", null, "");
+    }
+  }
+  
+  protected void notifyChange(String property, boolean oldValue, boolean newValue)
+  {
+    if (!disable)
+    {
+      dataChanged = true;
+      propertyChangeSupport.firePropertyChange(property, oldValue, newValue);
+    }
+  }
+  
+  protected void notifyChange(String property, String oldValue, String newValue)
+  {
+    if (!disable)
+    {
+      dataChanged = true;
+      propertyChangeSupport.firePropertyChange(property, oldValue, newValue);
     }
   }
 

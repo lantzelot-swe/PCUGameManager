@@ -278,6 +278,8 @@ public class MainViewModel extends AbstractModel
       //Trigger a save directly when adding a info slot
       saveData();
     }
+    //Notify that a new game has been selected
+    notifyChange("gameSelected", null, "");
   }
 
   public StringBuilder importGameInfo(List<String> rowValues,
@@ -910,7 +912,7 @@ public class MainViewModel extends AbstractModel
 
     infoModel.resetOldFileNames();
     //Cover image
-    infoModel.setCoverImage(FileManager.getInfoSlotCoverImage());
+    infoModel.setCoverImage(FileManager.getInfoSlotCover(this.selectedGameView.getGameViewId()));
     //Screen images
     BufferedImage screenImage1 = FileManager.getInfoSlotScreenImage(true);
     writeGameViewTextOnScreen(screenImage1, Color.yellow);
@@ -920,7 +922,7 @@ public class MainViewModel extends AbstractModel
     writeGameViewTextOnScreen(screenImage2, Color.red);
     infoModel.setScreen2Image(screenImage2);
   }
-
+ 
   public void writeGameViewTextOnScreen(BufferedImage image, Color color)
   {
     String title = this.selectedGameView.getName().toUpperCase();

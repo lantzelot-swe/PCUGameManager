@@ -296,11 +296,11 @@ public class GameDetailsBackgroundPanel extends JPanel
         {
           public void actionPerformed(ActionEvent e)
           {
-            //Make sure any edits to time for saved states are commited.
+            //Make sure any edits to time for saved states are committed.
             savesBackgroundPanel.commitEdits();
             if (model.saveData())
             {
-              getInfoBackgroundPanel().getScreensPanel().resetWhenSaved();
+              getInfoBackgroundPanel().getScreensPanel().resetWhenSavedOrNewGameSelected();
             }
           }
         });
