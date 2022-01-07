@@ -35,3 +35,7 @@ pcuae-install/
 
 pcu.properties
 
+*.db
+.classpath
+.project
+*.mdb
