@@ -14,6 +14,7 @@ import javax.swing.UIManager;
 
 import se.lantz.gui.MainWindow;
 import se.lantz.gui.install.ManagerDownloadDialog;
+import se.lantz.model.PreferencesModel;
 import se.lantz.util.ExceptionHandler;
 import se.lantz.util.FileManager;
 import se.lantz.util.ManagerVersionChecker;
@@ -71,21 +72,29 @@ public class PCUAEManager
         e.printStackTrace();
       }
 
-      //Check for new versions at startup, but only when running stadalone, not during development.
+      
+      
+      //Check for new versions at startup, but only when running stand-alone, not during development.
       if (!FileManager.getPcuVersionFromManifest().isEmpty())
       {
-        ManagerVersionChecker.fetchLatestVersionFromGithub();
-        if (ManagerVersionChecker.isNewVersionAvailable())
+        PreferencesModel prefModel = new PreferencesModel();
+        
+        if (prefModel.isCheckManagerVersionAtStartup())
         {
-          ManagerDownloadDialog dialog = new ManagerDownloadDialog(MainWindow.getInstance());
-          dialog.pack();
-          dialog.setLocationRelativeTo(MainWindow.getInstance());
-          if (dialog.showDialog())
+          ManagerVersionChecker.fetchLatestVersionFromGithub();
+          if (ManagerVersionChecker.isNewVersionAvailable())
           {
-            ManagerVersionChecker.updateVersion();
+            ManagerDownloadDialog dialog = new ManagerDownloadDialog(MainWindow.getInstance());
+            dialog.pack();
+            dialog.setLocationRelativeTo(MainWindow.getInstance());
+            if (dialog.showDialog())
+            {
+              ManagerVersionChecker.updateVersion();
+              return;
+            }
           }
         }
-        else
+        if (prefModel.isCheckPCUAEVersionAtStartup())
         {
           //Check main PCUAE install file version
           mainWindow.checkForNewPCUAEVersionAtStartup();

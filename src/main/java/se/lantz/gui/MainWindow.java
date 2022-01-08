@@ -7,6 +7,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
+import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 
 import se.lantz.model.MainViewModel;
@@ -96,6 +97,18 @@ public final class MainWindow extends JFrame
       }
     }
     return menuBar;
+  }
+  
+  public void refreshFavoritesLists()
+  {
+    getJMenuBar().removeAll();
+    for (JMenu menu : menuManager.getMenues())
+    {
+      menuBar.add(menu);
+    }
+    getMainPanel().reloadCurrentGameView();
+    SwingUtilities.updateComponentTreeUI(this);
+    repaintAfterModifications();
   }
 
   public void reloadCurrentGameView()

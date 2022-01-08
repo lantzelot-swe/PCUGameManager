@@ -14,6 +14,7 @@ import javax.swing.SwingConstants;
 import se.lantz.manager.SavedStatesManager;
 import se.lantz.model.data.GameListData;
 import se.lantz.model.data.GameView;
+import se.lantz.util.FileManager;
 
 public class GameListDataRenderer extends DefaultListCellRenderer
 {
@@ -199,7 +200,11 @@ public class GameListDataRenderer extends DefaultListCellRenderer
     else if (view.getGameViewId() == GameView.FAVORITES_10_ID)
     {
       this.setFont(boldItalic);
-      this.setForeground(isSelected ? fav5ColorSelected : fav5Color);
+      this.setForeground(isSelected ? fav5ColorSelected : fav5Color);     
+    }
+    //Check if view is a favorite and the last one configured
+    if (view.getGameViewId() == -FileManager.getConfiguredNumberOfFavorites()-1)
+    {
       if (index > -1)
       {
         this.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Color.LIGHT_GRAY));

@@ -78,6 +78,8 @@ public class MainViewModel extends AbstractModel
 
   Scraper scraper = new MobyGamesScraper();
 
+  private int numberOfFavoritesViews = 10;
+
   public void setSavedStatesManager(SavedStatesManager savedStatesManager)
   {
     this.stateManager = savedStatesManager;
@@ -131,6 +133,7 @@ public class MainViewModel extends AbstractModel
 
   private void setupGameViews()
   {
+    numberOfFavoritesViews = FileManager.getConfiguredNumberOfFavorites();
     //Setup game views
     allGameView = new GameView(GameView.ALL_GAMES_ID);
 
@@ -143,53 +146,72 @@ public class MainViewModel extends AbstractModel
     favorites1View.setName("Favorites 1");
     favorites1View.setSqlQuery("WHERE Favorite = 1");
 
-    favorites2View = new GameView(GameView.FAVORITES_2_ID);
-    favorites2View.setName("Favorites 2");
-    favorites2View.setSqlQuery("WHERE Favorite = 2");
-
-    favorites3View = new GameView(GameView.FAVORITES_3_ID);
-    favorites3View.setName("Favorites 3");
-    favorites3View.setSqlQuery("WHERE Favorite = 3");
-
-    favorites4View = new GameView(GameView.FAVORITES_4_ID);
-    favorites4View.setName("Favorites 4");
-    favorites4View.setSqlQuery("WHERE Favorite = 4");
-
-    favorites5View = new GameView(GameView.FAVORITES_5_ID);
-    favorites5View.setName("Favorites 5");
-    favorites5View.setSqlQuery("WHERE Favorite = 5");
-
-    favorites6View = new GameView(GameView.FAVORITES_6_ID);
-    favorites6View.setName("Favorites 6");
-    favorites6View.setSqlQuery("WHERE Favorite = 6");
-
-    favorites7View = new GameView(GameView.FAVORITES_7_ID);
-    favorites7View.setName("Favorites 7");
-    favorites7View.setSqlQuery("WHERE Favorite = 7");
-
-    favorites8View = new GameView(GameView.FAVORITES_8_ID);
-    favorites8View.setName("Favorites 8");
-    favorites8View.setSqlQuery("WHERE Favorite = 8");
-
-    favorites9View = new GameView(GameView.FAVORITES_9_ID);
-    favorites9View.setName("Favorites 9");
-    favorites9View.setSqlQuery("WHERE Favorite = 9");
-
-    favorites10View = new GameView(GameView.FAVORITES_10_ID);
-    favorites10View.setName("Favorites 10");
-    favorites10View.setSqlQuery("WHERE Favorite = 10");
-
     gameViewModel.addElement(allGameView);
     gameViewModel.addElement(favorites1View);
-    gameViewModel.addElement(favorites2View);
-    gameViewModel.addElement(favorites3View);
-    gameViewModel.addElement(favorites4View);
-    gameViewModel.addElement(favorites5View);
-    gameViewModel.addElement(favorites6View);
-    gameViewModel.addElement(favorites7View);
-    gameViewModel.addElement(favorites8View);
-    gameViewModel.addElement(favorites9View);
-    gameViewModel.addElement(favorites10View);
+
+    if (numberOfFavoritesViews > 1)
+    {
+      favorites2View = new GameView(GameView.FAVORITES_2_ID);
+      favorites2View.setName("Favorites 2");
+      favorites2View.setSqlQuery("WHERE Favorite = 2");
+      gameViewModel.addElement(favorites2View);
+    }
+    if (numberOfFavoritesViews > 2)
+    {
+      favorites3View = new GameView(GameView.FAVORITES_3_ID);
+      favorites3View.setName("Favorites 3");
+      favorites3View.setSqlQuery("WHERE Favorite = 3");
+      gameViewModel.addElement(favorites3View);
+    }
+    if (numberOfFavoritesViews > 3)
+    {
+      favorites4View = new GameView(GameView.FAVORITES_4_ID);
+      favorites4View.setName("Favorites 4");
+      favorites4View.setSqlQuery("WHERE Favorite = 4");
+      gameViewModel.addElement(favorites4View);
+    }
+    if (numberOfFavoritesViews > 4)
+    {
+      favorites5View = new GameView(GameView.FAVORITES_5_ID);
+      favorites5View.setName("Favorites 5");
+      favorites5View.setSqlQuery("WHERE Favorite = 5");
+      gameViewModel.addElement(favorites5View);
+    }
+    if (numberOfFavoritesViews > 5)
+    {
+      favorites6View = new GameView(GameView.FAVORITES_6_ID);
+      favorites6View.setName("Favorites 6");
+      favorites6View.setSqlQuery("WHERE Favorite = 6");
+      gameViewModel.addElement(favorites6View);
+    }
+    if (numberOfFavoritesViews > 6)
+    {
+      favorites7View = new GameView(GameView.FAVORITES_7_ID);
+      favorites7View.setName("Favorites 7");
+      favorites7View.setSqlQuery("WHERE Favorite = 7");
+      gameViewModel.addElement(favorites7View);
+    }
+    if (numberOfFavoritesViews > 7)
+    {
+      favorites8View = new GameView(GameView.FAVORITES_8_ID);
+      favorites8View.setName("Favorites 8");
+      favorites8View.setSqlQuery("WHERE Favorite = 8");
+      gameViewModel.addElement(favorites8View);
+    }
+    if (numberOfFavoritesViews > 8)
+    {
+      favorites9View = new GameView(GameView.FAVORITES_9_ID);
+      favorites9View.setName("Favorites 9");
+      favorites9View.setSqlQuery("WHERE Favorite = 9");
+      gameViewModel.addElement(favorites9View);
+    }
+    if (numberOfFavoritesViews > 9)
+    {
+      favorites10View = new GameView(GameView.FAVORITES_10_ID);
+      favorites10View.setName("Favorites 10");
+      favorites10View.setSqlQuery("WHERE Favorite = 10");
+      gameViewModel.addElement(favorites10View);
+    }
 
     List<GameView> gameViewList = dbConnector.loadGameViews();
     Collections.sort(gameViewList);
@@ -352,88 +374,119 @@ public class MainViewModel extends AbstractModel
 
   public void setSelectedGameView(GameView gameView)
   {
-    this.selectedGameView = gameView;
-    if (gameView != null)
+    if (gameView == null)
     {
-      this.disableChangeNotification(true);
-      logger.debug("Fetching games for view {}...", gameView);
+      //USe all games view if null is passed here
+      gameView = allGameView;
+    }
+    this.selectedGameView = gameView;
 
-      long start = System.currentTimeMillis();
-      List<GameListData> gamesList = dbConnector.fetchGamesByView(gameView);
-      logger.debug("Fetched all games from db in " + (System.currentTimeMillis() - start) + " ms");
-      gameListModel.addAllGames(gamesList);
-      gameView.setGameCount(gamesList.size());
-      if (gameView.getGameViewId() == GameView.ALL_GAMES_ID)
+    this.disableChangeNotification(true);
+    logger.debug("Fetching games for view {}...", gameView);
+
+    long start = System.currentTimeMillis();
+    List<GameListData> gamesList = dbConnector.fetchGamesByView(gameView);
+    logger.debug("Fetched all games from db in " + (System.currentTimeMillis() - start) + " ms");
+    gameListModel.addAllGames(gamesList);
+    gameView.setGameCount(gamesList.size());
+    if (gameView.getGameViewId() == GameView.ALL_GAMES_ID)
+    {
+      this.allGamesCount = gamesList.size();
+      //Update favorites count
+      favorites1Count = 0;
+      favorites2Count = 0;
+      favorites3Count = 0;
+      favorites4Count = 0;
+      favorites5Count = 0;
+      favorites6Count = 0;
+      favorites7Count = 0;
+      favorites8Count = 0;
+      favorites9Count = 0;
+      favorites10Count = 0;
+      //Fetch all entries to be able to update counts with infoslots also
+      gamesList = dbConnector.fetchAllGamesForGameCount();
+      for (GameListData gameListData : gamesList)
       {
-        this.allGamesCount = gamesList.size();
-        //Update favorites count
-        favorites1Count = 0;
-        favorites2Count = 0;
-        favorites3Count = 0;
-        favorites4Count = 0;
-        favorites5Count = 0;
-        favorites6Count = 0;
-        favorites7Count = 0;
-        favorites8Count = 0;
-        favorites9Count = 0;
-        favorites10Count = 0;
-        //Fetch all entries to be able to update counts with infoslots also
-        gamesList = dbConnector.fetchAllGamesForGameCount();
-        for (GameListData gameListData : gamesList)
+        if (gameListData.isFavorite())
         {
-          if (gameListData.isFavorite())
+          switch (gameListData.getFavoriteNumber())
           {
-            switch (gameListData.getFavoriteNumber())
-            {
-            case 1:
-              favorites1Count++;
-              break;
-            case 2:
-              favorites2Count++;
-              break;
-            case 3:
-              favorites3Count++;
-              break;
-            case 4:
-              favorites4Count++;
-              break;
-            case 5:
-              favorites5Count++;
-              break;
-            case 6:
-              favorites6Count++;
-              break;
-            case 7:
-              favorites7Count++;
-              break;
-            case 8:
-              favorites8Count++;
-              break;
-            case 9:
-              favorites9Count++;
-              break;
-            case 10:
-              favorites10Count++;
-              break;
-            default:
-              break;
-            }
+          case 1:
+            favorites1Count++;
+            break;
+          case 2:
+            favorites2Count++;
+            break;
+          case 3:
+            favorites3Count++;
+            break;
+          case 4:
+            favorites4Count++;
+            break;
+          case 5:
+            favorites5Count++;
+            break;
+          case 6:
+            favorites6Count++;
+            break;
+          case 7:
+            favorites7Count++;
+            break;
+          case 8:
+            favorites8Count++;
+            break;
+          case 9:
+            favorites9Count++;
+            break;
+          case 10:
+            favorites10Count++;
+            break;
+          default:
+            break;
           }
         }
-        favorites1View.setGameCount(favorites1Count);
+      }
+      favorites1View.setGameCount(favorites1Count);
+      if (favorites2View != null)
+      {
         favorites2View.setGameCount(favorites2Count);
+      }
+      if (favorites3View != null)
+      {
         favorites3View.setGameCount(favorites3Count);
+      }
+      if (favorites4View != null)
+      {
         favorites4View.setGameCount(favorites4Count);
+      }
+      if (favorites5View != null)
+      {
         favorites5View.setGameCount(favorites5Count);
+      }
+      if (favorites6View != null)
+      {
         favorites6View.setGameCount(favorites6Count);
+      }
+      if (favorites7View != null)
+      {
         favorites7View.setGameCount(favorites7Count);
+      }
+      if (favorites8View != null)
+      {
         favorites8View.setGameCount(favorites8Count);
+      }
+      if (favorites9View != null)
+      {
         favorites9View.setGameCount(favorites9Count);
+      }
+      if (favorites10View != null)
+      {
         favorites10View.setGameCount(favorites10Count);
       }
-      this.disableChangeNotification(false);
-      logger.debug("...done.");
     }
+    this.disableChangeNotification(false);
+    logger.debug("...done.");
+
   }
 
   public int getAllGamesCount()
@@ -761,31 +814,67 @@ public class MainViewModel extends AbstractModel
       favorites1View.setGameCount(--favorites1Count);
       break;
     case 2:
-      favorites2View.setGameCount(--favorites2Count);
+      favorites2Count--;
+      if (favorites2View != null)
+      {
+        favorites2View.setGameCount(favorites2Count);
+      }
       break;
     case 3:
-      favorites3View.setGameCount(--favorites3Count);
+      favorites3Count--;
+      if (favorites3View != null)
+      {
+        favorites3View.setGameCount(favorites3Count);
+      }
       break;
     case 4:
-      favorites4View.setGameCount(--favorites4Count);
+      favorites4Count--;
+      if (favorites4View != null)
+      {
+        favorites4View.setGameCount(favorites4Count);
+      }
       break;
     case 5:
-      favorites5View.setGameCount(--favorites5Count);
+      favorites5Count--;
+      if (favorites5View != null)
+      {
+        favorites5View.setGameCount(favorites5Count);
+      }
       break;
     case 6:
-      favorites6View.setGameCount(--favorites6Count);
+      favorites6Count--;
+      if (favorites6View != null)
+      {
+        favorites6View.setGameCount(favorites6Count);
+      }
       break;
     case 7:
-      favorites7View.setGameCount(--favorites7Count);
+      favorites7Count--;
+      if (favorites7View != null)
+      {
+        favorites7View.setGameCount(favorites7Count);
+      }
       break;
     case 8:
-      favorites8View.setGameCount(--favorites8Count);
+      favorites8Count--;
+      if (favorites8View != null)
+      {
+        favorites8View.setGameCount(favorites8Count);
+      }
       break;
     case 9:
-      favorites9View.setGameCount(--favorites9Count);
+      favorites9Count--;
+      if (favorites9View != null)
+      {
+        favorites9View.setGameCount(favorites9Count);
+      }
       break;
     case 10:
-      favorites10View.setGameCount(--favorites10Count);
+      favorites10Count--;
+      if (favorites10View != null)
+      {
+        favorites10View.setGameCount(favorites10Count);
+      }
       break;
     default:
       break;
@@ -900,15 +989,24 @@ public class MainViewModel extends AbstractModel
         }
       }
     }
-    String description =
-      "For more Info on PCUAE look in The Help Menu. Main keys are CTRL + F1 for The Help Menu, CTRL + F3 for Carousel Version Changer, CTRL + F5 for Mode Changer, CTRL + F7 for PCUAE Option Menu, CTRL + SHIFT + F7 for Carousel Gamelist Changer.";
+    PreferencesModel prefModel = new PreferencesModel();
+
     gameDetails.setTitle(newTitle);
-    gameDetails.setDescription(description);
+    gameDetails.setComposer(prefModel.getComposer());
+    gameDetails.setAuthor(prefModel.getAuthor());
+    gameDetails.setGenre(prefModel.getGenre());
+    gameDetails.setYear(prefModel.getYear());
+
+    gameDetails.setDescription(prefModel.getDescription());
+    gameDetails.setDescriptionDe(prefModel.getDescriptionDe());
+    gameDetails.setDescriptionFr(prefModel.getDescriptionFr());
+    gameDetails.setDescriptionEs(prefModel.getDescriptionEs());
+    gameDetails.setDescriptionIt(prefModel.getDescriptionIt());
+
     gameDetails.setViewTag("GIS:" + this.selectedGameView.getGameViewId());
     gameDetails.setSystem("64,pal,driveicon,accuratedisk,sid6581,basic");
     gameDetails.setJoy1("J:1*:,,,,,,,,,,,,,,");
     gameDetails.setJoy2("J:2:,,,,,,,,,,,,,,");
-    gameDetails.setComposer("C64 SID Background Music");
 
     infoModel.resetOldFileNames();
     //Cover image
@@ -922,7 +1020,7 @@ public class MainViewModel extends AbstractModel
     writeGameViewTextOnScreen(screenImage2, Color.red);
     infoModel.setScreen2Image(screenImage2);
   }
- 
+
   public void writeGameViewTextOnScreen(BufferedImage image, Color color)
   {
     String title = this.selectedGameView.getName().toUpperCase();

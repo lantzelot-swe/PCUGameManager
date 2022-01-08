@@ -7,7 +7,7 @@ import java.util.Objects;
 
 import se.lantz.util.FileManager;
 
-public class InfoModel extends AbstractModel
+public class InfoModel extends AbstractModel implements CommonInfoModel
 {
   private String title = "";
   //Use this when saving cover/screen/game files: If the title has been changed the files shall be renamed.
@@ -216,7 +216,6 @@ public class InfoModel extends AbstractModel
     {
       notifyChange();
     }
-
   }
 
   public String getAuthor()

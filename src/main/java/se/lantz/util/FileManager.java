@@ -49,6 +49,7 @@ import se.lantz.gui.exports.PublishWorker;
 import se.lantz.manager.SavedStatesManager;
 import se.lantz.model.InfoModel;
 import se.lantz.model.MainViewModel;
+import se.lantz.model.PreferencesModel;
 import se.lantz.model.SavedStatesModel;
 import se.lantz.model.SavedStatesModel.SAVESTATE;
 import se.lantz.model.SystemModel;
@@ -76,6 +77,7 @@ public class FileManager
   private static final Logger logger = LoggerFactory.getLogger(FileManager.class);
 
   private static Properties fileProperties;
+  private static int currentNoOfFavorites = -1;
 
   private MainViewModel model;
   private InfoModel infoModel;
@@ -911,6 +913,8 @@ public class FileManager
   {
     if (fileProperties != null)
     {
+      //Reset to load again in getConfiguredNumberOfFavorites()
+      currentNoOfFavorites = -1;
       try (OutputStream output = new FileOutputStream("./pcu.properties"))
       {
         // save properties to project root folder
@@ -940,6 +944,16 @@ public class FileManager
       }
     }
     return fileProperties;
+  }
+  
+  public static int getConfiguredNumberOfFavorites()
+  {
+    //Only load once if not initialised. currentNoOfFavorites is reset when properties are stored.
+    if (currentNoOfFavorites == -1)
+    {
+      currentNoOfFavorites = Integer.parseInt(FileManager.getConfiguredProperties().getProperty(PreferencesModel.FAVORITESCOUNT, Integer.toString(10)));
+    }
+    return currentNoOfFavorites;
   }
 
   public static void backupDb(String targetFolderName)

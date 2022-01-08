@@ -40,6 +40,7 @@ import se.lantz.gui.imports.ImportProgressDialog;
 import se.lantz.gui.imports.ImportSavedStatesDialog;
 import se.lantz.gui.imports.ImportSavedStatesWorker;
 import se.lantz.gui.install.ManagerDownloadDialog;
+import se.lantz.gui.preferences.PreferencesDialog;
 import se.lantz.manager.BackupManager;
 import se.lantz.manager.ExportManager;
 import se.lantz.manager.ImportManager;
@@ -52,6 +53,7 @@ import se.lantz.manager.pcuae.PCUAEInstallManager;
 import se.lantz.manager.pcuae.RetroarchModeInstallManager;
 import se.lantz.manager.pcuae.ViceModeInstallManager;
 import se.lantz.model.MainViewModel;
+import se.lantz.model.PreferencesModel;
 import se.lantz.model.data.GameListData;
 import se.lantz.model.data.GameView;
 import se.lantz.util.ExceptionHandler;
@@ -72,6 +74,8 @@ public class MenuManager
   private JMenuItem addGameItem;
   private JMenuItem addInfoSlotItem;
   private JMenuItem deleteGameItem;
+  
+  private JMenuItem preferencesItem;
 
   private JMenuItem runGameItem;
   private JMenuItem importCarouselItem;
@@ -138,6 +142,7 @@ public class MenuManager
   private RetroarchModeInstallManager installRetroarchManager;
   private ViceModeInstallManager installViceManager;
   private MainWindow mainWindow;
+  private int currentFavoritesCount = 10;
 
   public MenuManager(final MainViewModel uiModel, MainWindow mainWindow)
   {
@@ -189,30 +194,10 @@ public class MenuManager
     fileMenu.addSeparator();
     fileMenu.add(getRefreshItem());
     fileMenu.addSeparator();
+    fileMenu.add(getPreferencesMenuItem());
+    fileMenu.addSeparator();
     fileMenu.add(getExitItem());
-    editMenu = new JMenu("Edit");
-    editMenu.setMnemonic('E');
-    editMenu.add(getToggleFavorite1Item());
-    editMenu.add(getToggleFavorite2Item());
-    editMenu.add(getToggleFavorite3Item());
-    editMenu.add(getToggleFavorite4Item());
-    editMenu.add(getToggleFavorite5Item());
-    editMenu.add(getToggleFavorite6Item());
-    editMenu.add(getToggleFavorite7Item());
-    editMenu.add(getToggleFavorite8Item());
-    editMenu.add(getToggleFavorite9Item());
-    editMenu.add(getToggleFavorite10Item());
-    editMenu.addSeparator();
-    editMenu.add(getClearFavorites1Item());
-    editMenu.add(getClearFavorites2Item());
-    editMenu.add(getClearFavorites3Item());
-    editMenu.add(getClearFavorites4Item());
-    editMenu.add(getClearFavorites5Item());
-    editMenu.add(getClearFavorites6Item());
-    editMenu.add(getClearFavorites7Item());
-    editMenu.add(getClearFavorites8Item());
-    editMenu.add(getClearFavorites9Item());
-    editMenu.add(getClearFavorites10Item());
+    setupEditMenu();
     toolsMenu = new JMenu("Tools");
     toolsMenu.setMnemonic('T');
     toolsMenu.add(getBackupDbItem());
@@ -243,6 +228,90 @@ public class MenuManager
     helpMenu.add(getCheckVersionItem());
     helpMenu.add(getAboutItem());
   }
+  
+  private JMenu setupEditMenu()
+  {
+    this.currentFavoritesCount = FileManager.getConfiguredNumberOfFavorites();
+    editMenu = new JMenu("Edit");
+    editMenu.setMnemonic('E');
+
+    editMenu.add(getToggleFavorite1Item());
+    if (currentFavoritesCount > 1)
+    {
+      editMenu.add(getToggleFavorite2Item());
+    }
+    if (currentFavoritesCount > 2)
+    {
+      editMenu.add(getToggleFavorite3Item());
+    }
+    if (currentFavoritesCount > 3)
+    {
+      editMenu.add(getToggleFavorite4Item());
+    }
+    if (currentFavoritesCount > 4)
+    {
+      editMenu.add(getToggleFavorite5Item());
+    }
+    if (currentFavoritesCount > 5)
+    {
+      editMenu.add(getToggleFavorite6Item());
+    }
+    if (currentFavoritesCount > 6)
+    {
+      editMenu.add(getToggleFavorite7Item());
+    }
+    if (currentFavoritesCount > 7)
+    {
+      editMenu.add(getToggleFavorite8Item());
+    }
+    if (currentFavoritesCount > 8)
+    {
+      editMenu.add(getToggleFavorite9Item());
+    }
+    if (currentFavoritesCount > 9)
+    {
+      editMenu.add(getToggleFavorite10Item());
+    }
+    editMenu.addSeparator();
+    editMenu.add(getClearFavorites1Item());
+    if (currentFavoritesCount > 1)
+    {
+      editMenu.add(getClearFavorites2Item());
+    }
+    if (currentFavoritesCount > 2)
+    {
+    editMenu.add(getClearFavorites3Item());
+    }
+    if (currentFavoritesCount > 3)
+    {
+    editMenu.add(getClearFavorites4Item());
+    }
+    if (currentFavoritesCount > 4)
+    {
+    editMenu.add(getClearFavorites5Item());
+    }
+    if (currentFavoritesCount > 5)
+    {
+    editMenu.add(getClearFavorites6Item());
+    }
+    if (currentFavoritesCount > 6)
+    {
+    editMenu.add(getClearFavorites7Item());
+    }
+    if (currentFavoritesCount > 7)
+    {
+    editMenu.add(getClearFavorites8Item());
+    }
+    if (currentFavoritesCount > 8)
+    {
+    editMenu.add(getClearFavorites9Item());
+    }
+    if (currentFavoritesCount > 9)
+    {
+      editMenu.add(getClearFavorites10Item());
+    }
+    return editMenu;
+  }
 
   public void intialize()
   {
@@ -251,11 +320,13 @@ public class MenuManager
       addGameItem.setEnabled(okToEnable);
       addInfoSlotItem.setEnabled(okToEnable);
       importMenu.setEnabled(okToEnable);
-      exportItem.setEnabled(okToEnable);
+      exportMenu.setEnabled(okToEnable);
       toolsMenu.setEnabled(okToEnable);
+      pcuaeMenu.setEnabled(okToEnable);
       editMenu.setEnabled(okToEnable);
       runGameItem.setEnabled(!uiModel.getInfoModel().getGamesFile().isEmpty());
       refreshItem.setEnabled(okToEnable);
+      preferencesItem.setEnabled(okToEnable);
     });
   }
 
@@ -301,6 +372,17 @@ public class MenuManager
 
     deleteGameItem.addActionListener(e -> mainWindow.getMainPanel().deleteCurrentGame());
     return deleteGameItem;
+  }
+  
+  JMenuItem getPreferencesMenuItem()
+  {
+    preferencesItem = new JMenuItem("Preferences...");
+    KeyStroke keyStrokeToPreferences = KeyStroke.getKeyStroke(KeyEvent.VK_P, InputEvent.CTRL_DOWN_MASK);
+    preferencesItem.setAccelerator(keyStrokeToPreferences);
+    preferencesItem.setMnemonic('P');
+
+    preferencesItem.addActionListener(e -> editPreferences());
+    return preferencesItem;
   }
 
   JMenuItem getDeleteGamesForViewMenuItem()
@@ -1014,6 +1096,24 @@ public class MenuManager
           dialog.setVisible(true);
         }
       }
+    }
+  }
+  
+  private void editPreferences()
+  {
+    PreferencesDialog prefDialog = new PreferencesDialog(this.mainWindow);
+    prefDialog.pack();
+    prefDialog.setLocationRelativeTo(MainWindow.getInstance());
+    if (prefDialog.showDialog())
+    {
+      prefDialog.savePreferences();
+      //Update favorites menu
+      setupEditMenu();
+      MainWindow.getInstance().refreshFavoritesLists();
+      //Refresh game views
+      uiModel.reloadGameViews();
+      //Set all games as selected
+      uiModel.setSelectedGameView(null);
     }
   }
 

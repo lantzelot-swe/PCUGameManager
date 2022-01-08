@@ -45,12 +45,12 @@ public class PCUAEProductDownloadDialog extends BaseDialog
       {
         if (startupCheck)
         {
-          message = "<html>PCUAE <a href='" + downloadUrl + "'>" + manager.getLatestVersion() +
-            "</a> is available.<p>Do you want to download this version?</html>";
+          message = "<html>PCUAE main setup <a href='" + downloadUrl + "'>" + manager.getLatestVersion() +
+            "</a> is available.<p>Do you want to download this version now?<p>You can install it to a USB drive later from the PCUAE menu.</html>";
         }
         else
         {
-          message = "<html>PCUAE <a href='" + downloadUrl + "'>" + manager.getLatestVersion() +
+          message = "<html>" + productText + " <a href='" + downloadUrl + "'>" + manager.getLatestVersion() +
             "</a> is available.<p>(Current install file: " + manager.getLatestInInstallFolder() +
             ").<br>Do you want to download and install the new version?</html>";
         }
