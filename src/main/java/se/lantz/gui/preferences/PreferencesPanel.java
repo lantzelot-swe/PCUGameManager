@@ -42,7 +42,7 @@ public class PreferencesPanel extends JPanel
     GridBagLayout gridBagLayout = new GridBagLayout();
     setLayout(gridBagLayout);
     GridBagConstraints gbc_startupPanel = new GridBagConstraints();
-    gbc_startupPanel.insets = new Insets(5, 5, 5, 0);
+    gbc_startupPanel.insets = new Insets(5, 5, 5, 5);
     gbc_startupPanel.weightx = 1.0;
     gbc_startupPanel.anchor = GridBagConstraints.NORTHWEST;
     gbc_startupPanel.fill = GridBagConstraints.BOTH;
@@ -52,7 +52,7 @@ public class PreferencesPanel extends JPanel
     GridBagConstraints gbc_favoritesPanel = new GridBagConstraints();
     gbc_favoritesPanel.anchor = GridBagConstraints.NORTHWEST;
     gbc_favoritesPanel.weightx = 1.0;
-    gbc_favoritesPanel.insets = new Insets(0, 0, 5, 0);
+    gbc_favoritesPanel.insets = new Insets(5, 5, 5, 5);
     gbc_favoritesPanel.fill = GridBagConstraints.BOTH;
     gbc_favoritesPanel.gridx = 0;
     gbc_favoritesPanel.gridy = 1;
@@ -61,7 +61,7 @@ public class PreferencesPanel extends JPanel
     gbc_infoSlotPanel.weightx = 1.0;
     gbc_infoSlotPanel.weighty = 1.0;
     gbc_infoSlotPanel.anchor = GridBagConstraints.NORTHWEST;
-    gbc_infoSlotPanel.insets = new Insets(5, 5, 0, 0);
+    gbc_infoSlotPanel.insets = new Insets(5, 5, 0, 5);
     gbc_infoSlotPanel.fill = GridBagConstraints.BOTH;
     gbc_infoSlotPanel.gridx = 0;
     gbc_infoSlotPanel.gridy = 2;
