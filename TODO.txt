@@ -1,2 +1,7 @@
-- Search function, how does that work in gamebase?
+TODO after version 2.3.0:
 
+- Add a tool for re-setting the joystick configurations to default (keeping the primary option)
+
+- Add joystick config to preferences
+
+- Add a tool to replace all infoslots screenshots with a thumb from the corresponding folder on a detected USB stick.
