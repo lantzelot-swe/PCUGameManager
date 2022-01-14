@@ -7,30 +7,30 @@ import se.lantz.gui.BaseDialog;
 
 public class PreferencesDialog extends BaseDialog
 {
-  private PreferencesPanel panel;
+  private PreferencesTabPanel panel;
 
   public PreferencesDialog(Frame owner)
   {
     super(owner);
     setTitle("PCUAE Manager preferences");
-    addContent(getPreferencesPanel());
+    addContent(getPreferencesTabPanel());
     getOkButton().setText("Save");
     getOkButton().setPreferredSize(null);
-    this.setPreferredSize(new Dimension(372, 570));
+    this.setPreferredSize(new Dimension(366, 550));
     this.setResizable(false);
   }
 
-  private PreferencesPanel getPreferencesPanel()
+  private PreferencesTabPanel getPreferencesTabPanel()
   {
     if (panel == null)
     {
-      panel = new PreferencesPanel();
+      panel = new PreferencesTabPanel();
     }
     return panel;
   }
 
   public void savePreferences()
   {
-    getPreferencesPanel().savePreferences();
+    getPreferencesTabPanel().savePreferences();
   }
 }

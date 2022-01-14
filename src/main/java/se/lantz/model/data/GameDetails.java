@@ -1,6 +1,7 @@
 package se.lantz.model.data;
 
 import se.lantz.model.JoystickModel;
+import se.lantz.util.FileManager;
 
 /**
  * The data structure representing a specific game.
@@ -33,8 +34,11 @@ public class GameDetails
 
   public GameDetails()
   {
-    setJoy1("J:1:" + JoystickModel.DEFAULT_CONFIG);
-    setJoy2("J:2*:" + JoystickModel.DEFAULT_CONFIG);
+    String configuredJoystick = FileManager.getConfiguredJoystickConfig();
+    String joy1 = configuredJoystick.replace("J:2*:", "J:1:");
+    joy1 = joy1.replace("J:2:", "J:1*:");
+    setJoy1(joy1);
+    setJoy2(configuredJoystick);
   }
 
   public String getTitle()

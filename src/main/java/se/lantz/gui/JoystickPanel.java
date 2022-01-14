@@ -154,10 +154,6 @@ public class JoystickPanel extends JPanel
     if (primaryJoyCheckBox == null)
     {
       String text = "Use port " + portnumber + " as Primary joystick";
-      if (portnumber == 2)
-      {
-        text = text + " (Default setting)";
-      }
       primaryJoyCheckBox = new JCheckBox(text);
       primaryJoyCheckBox.addItemListener((e) -> model.setPrimary(primaryJoyCheckBox.isSelected()));
     }
@@ -332,7 +328,7 @@ public class JoystickPanel extends JPanel
     return configPanel;
   }
 
-  private JCheckBox getMouseCheckBox()
+  public JCheckBox getMouseCheckBox()
   {
     if (mouseCheckBox == null)
     {

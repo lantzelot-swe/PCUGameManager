@@ -48,6 +48,7 @@ import se.lantz.db.DbConnector;
 import se.lantz.gui.exports.PublishWorker;
 import se.lantz.manager.SavedStatesManager;
 import se.lantz.model.InfoModel;
+import se.lantz.model.JoystickModel;
 import se.lantz.model.MainViewModel;
 import se.lantz.model.PreferencesModel;
 import se.lantz.model.SavedStatesModel;
@@ -78,6 +79,7 @@ public class FileManager
 
   private static Properties fileProperties;
   private static int currentNoOfFavorites = -1;
+  private static String currentJoystickConfig = "";
 
   private MainViewModel model;
   private InfoModel infoModel;
@@ -915,6 +917,7 @@ public class FileManager
     {
       //Reset to load again in getConfiguredNumberOfFavorites()
       currentNoOfFavorites = -1;
+      currentJoystickConfig = "";
       try (OutputStream output = new FileOutputStream("./pcu.properties"))
       {
         // save properties to project root folder
@@ -954,6 +957,15 @@ public class FileManager
       currentNoOfFavorites = Integer.parseInt(FileManager.getConfiguredProperties().getProperty(PreferencesModel.FAVORITESCOUNT, Integer.toString(10)));
     }
     return currentNoOfFavorites;
+  }
+  
+  public static String getConfiguredJoystickConfig()
+  {
+    if (currentJoystickConfig.isEmpty())
+    {
+      currentJoystickConfig = FileManager.getConfiguredProperties().getProperty(PreferencesModel.JOYSTICK, "J:2*:" + JoystickModel.DEFAULT_CONFIG);
+    }
+    return currentJoystickConfig;
   }
 
   public static void backupDb(String targetFolderName)

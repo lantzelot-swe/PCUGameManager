@@ -50,7 +50,6 @@ public class InfoSlotPreferencesPanel extends JPanel
   public InfoSlotPreferencesPanel(PreferencesModel model)
   {
     this.model = model;
-    this.setPreferredSize(new Dimension(335, 310));
     GridBagLayout gridBagLayout = new GridBagLayout();
     gridBagLayout.columnWeights = new double[] { 1.0, 0.0 };
     gridBagLayout.columnWidths = new int[] { 0, 0 };

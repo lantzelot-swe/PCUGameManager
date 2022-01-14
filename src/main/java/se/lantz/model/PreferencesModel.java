@@ -19,6 +19,7 @@ public class PreferencesModel extends AbstractModel implements CommonInfoModel
   public static final String DESCRIPTION_ES = "infoSlotdescriptionEs";
   public static final String DESCRIPTION_IT = "infoSlotdescriptionIt";
   public static final String FAVORITESCOUNT = "favoritesCount";
+  public static final String JOYSTICK = "joystick";
   
   
   private boolean checkPCUAEVersionAtStartup = true;
@@ -34,6 +35,8 @@ public class PreferencesModel extends AbstractModel implements CommonInfoModel
   private String author = "";
   private String composer = "C64 SID Background Music";
   private int favoritesCount = 10;
+  
+  private String joystickConfig = "J:2*:" + JoystickModel.DEFAULT_CONFIG;
 
   public PreferencesModel()
   {
@@ -50,6 +53,7 @@ public class PreferencesModel extends AbstractModel implements CommonInfoModel
     setDescriptionIt(configuredProperties.getProperty(DESCRIPTION_IT, descriptionIt));
     setYear(Integer.parseInt(configuredProperties.getProperty(YEAR, Integer.toString(year))));
     setFavoritesCount(Integer.parseInt(configuredProperties.getProperty(FAVORITESCOUNT, Integer.toString(favoritesCount))));
+    setJoystickConfig(configuredProperties.getProperty(JOYSTICK, joystickConfig));
   }
 
   public boolean isCheckPCUAEVersionAtStartup()
@@ -253,6 +257,21 @@ public class PreferencesModel extends AbstractModel implements CommonInfoModel
     }
   }
 
+  public String getJoystickConfig()
+  {
+    return joystickConfig;
+  }
+
+  public void setJoystickConfig(String joystickConfig)
+  {
+    String old = getJoystickConfig();
+    this.joystickConfig = joystickConfig;
+    if (!Objects.equals(old, joystickConfig))
+    {
+      notifyChange();
+    }
+  }
+
   public void savePreferences()
   {
     Properties configuredProperties = FileManager.getConfiguredProperties();
@@ -269,6 +288,7 @@ public class PreferencesModel extends AbstractModel implements CommonInfoModel
     configuredProperties.put(DESCRIPTION_IT, descriptionIt);
     configuredProperties.put(YEAR, Integer.toString(year));
     configuredProperties.put(FAVORITESCOUNT, Integer.toString(favoritesCount));
+    configuredProperties.put(JOYSTICK, joystickConfig);
     FileManager.storeProperties();
   }
 }
