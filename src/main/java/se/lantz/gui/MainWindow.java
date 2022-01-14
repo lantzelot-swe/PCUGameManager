@@ -99,14 +99,16 @@ public final class MainWindow extends JFrame
     return menuBar;
   }
   
-  public void refreshFavoritesLists()
+  public void refreshAfterPreferencesSave()
   {
     getJMenuBar().removeAll();
     for (JMenu menu : menuManager.getMenues())
     {
       menuBar.add(menu);
     }
+    
     getMainPanel().reloadCurrentGameView();
+    getMainPanel().updateSavedStatesTabTitle();
     SwingUtilities.updateComponentTreeUI(this);
     repaintAfterModifications();
   }

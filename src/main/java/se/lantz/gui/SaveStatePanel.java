@@ -311,7 +311,7 @@ public class SaveStatePanel extends JPanel
     BufferedImage image = null;
     if (!filename.isEmpty())
     {
-      String fileName = model.getInfoModel().getGamesFile();
+      String fileName = SavedStatesManager.getGameFolderName(model.getInfoModel().getGamesFile());
       logger.debug(fileName.toString());
 
       Path saveFolderPath = new File("./saves/" + fileName).toPath();
@@ -856,5 +856,10 @@ public class SaveStatePanel extends JPanel
         });
     }
     return deleteButton;
+  }
+  
+  void resetCurrentGameReference()
+  {
+    this.currentGameFile = "";
   }
 }

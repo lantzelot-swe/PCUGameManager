@@ -7,6 +7,9 @@ import se.lantz.util.FileManager;
 
 public class PreferencesModel extends AbstractModel implements CommonInfoModel
 {
+  public static final String CAROUSEL_132 = "1.3.2";
+  public static final String CAROUSEL_152 = "1.5.2";
+  
   public static final String PCUAE_VERSION_CHECK = "checkForPCUAEVersion";
   public static final String MANGER_VERSION_CHECK = "checkForManagerVersion";
   public static final String GENRE = "infoSlotGenre";
@@ -20,12 +23,13 @@ public class PreferencesModel extends AbstractModel implements CommonInfoModel
   public static final String DESCRIPTION_IT = "infoSlotdescriptionIt";
   public static final String FAVORITESCOUNT = "favoritesCount";
   public static final String JOYSTICK = "joystick";
-  
-  
+  public static final String SAVED_STATES_CAROUSEL = "savedStatesCarousel";
+
   private boolean checkPCUAEVersionAtStartup = true;
   private boolean checkManagerVersionAtStartup = true;
-  
-  private String description = "For more Info on PCUAE look in The Help Menu. Main keys are CTRL + F1 for The Help Menu, CTRL + F3 for Carousel Version Changer, CTRL + F5 for Mode Changer, CTRL + F7 for PCUAE Option Menu, CTRL + SHIFT + F7 for Carousel Gamelist Changer.";
+
+  private String description =
+    "For more Info on PCUAE look in The Help Menu. Main keys are CTRL + F1 for The Help Menu, CTRL + F3 for Carousel Version Changer, CTRL + F5 for Mode Changer, CTRL + F7 for PCUAE Option Menu, CTRL + SHIFT + F7 for Carousel Gamelist Changer.";
   private String descriptionDe = "";
   private String descriptionFr = "";
   private String descriptionEs = "";
@@ -35,13 +39,15 @@ public class PreferencesModel extends AbstractModel implements CommonInfoModel
   private String author = "";
   private String composer = "C64 SID Background Music";
   private int favoritesCount = 10;
-  
+
   private String joystickConfig = "J:2*:" + JoystickModel.DEFAULT_CONFIG;
+  private String savedStatesCarouselVersion = CAROUSEL_152;
 
   public PreferencesModel()
   {
     Properties configuredProperties = FileManager.getConfiguredProperties();
-    setCheckManagerVersionAtStartup(Boolean.parseBoolean(configuredProperties.getProperty(MANGER_VERSION_CHECK, "true")));
+    setCheckManagerVersionAtStartup(Boolean
+      .parseBoolean(configuredProperties.getProperty(MANGER_VERSION_CHECK, "true")));
     setCheckPCUAEVersionAtStartup(Boolean.parseBoolean(configuredProperties.getProperty(PCUAE_VERSION_CHECK, "true")));
     setGenre(configuredProperties.getProperty(GENRE, genre));
     setAuthor(configuredProperties.getProperty(AUTHOR, author));
@@ -52,8 +58,10 @@ public class PreferencesModel extends AbstractModel implements CommonInfoModel
     setDescriptionEs(configuredProperties.getProperty(DESCRIPTION_ES, descriptionEs));
     setDescriptionIt(configuredProperties.getProperty(DESCRIPTION_IT, descriptionIt));
     setYear(Integer.parseInt(configuredProperties.getProperty(YEAR, Integer.toString(year))));
-    setFavoritesCount(Integer.parseInt(configuredProperties.getProperty(FAVORITESCOUNT, Integer.toString(favoritesCount))));
+    setFavoritesCount(Integer
+      .parseInt(configuredProperties.getProperty(FAVORITESCOUNT, Integer.toString(favoritesCount))));
     setJoystickConfig(configuredProperties.getProperty(JOYSTICK, joystickConfig));
+    setSavedStatesCarouselVersion(configuredProperties.getProperty(SAVED_STATES_CAROUSEL, CAROUSEL_152));
   }
 
   public boolean isCheckPCUAEVersionAtStartup()
@@ -104,15 +112,14 @@ public class PreferencesModel extends AbstractModel implements CommonInfoModel
       notifyChange();
     }
   }
-  
-  
+
   public String getDescriptionDe()
   {
     return descriptionDe;
   }
 
   public void setDescriptionDe(String descriptionDe)
-  {   
+  {
     String old = getDescriptionDe();
     //Replace all double spaces, tabs and newlines
     this.descriptionDe = descriptionDe.replaceAll("\\s\\s+", " ");
@@ -272,12 +279,27 @@ public class PreferencesModel extends AbstractModel implements CommonInfoModel
     }
   }
 
+  public String getSavedStatesCarouselVersion()
+  {
+    return savedStatesCarouselVersion;
+  }
+
+  public void setSavedStatesCarouselVersion(String savedStatesCarouselVersion)
+  {
+    String old = getSavedStatesCarouselVersion();
+    this.savedStatesCarouselVersion = savedStatesCarouselVersion;
+    if (!Objects.equals(old, savedStatesCarouselVersion))
+    {
+      notifyChange();
+    }
+  }
+
   public void savePreferences()
   {
     Properties configuredProperties = FileManager.getConfiguredProperties();
     configuredProperties.put(MANGER_VERSION_CHECK, Boolean.toString(checkManagerVersionAtStartup));
     configuredProperties.put(PCUAE_VERSION_CHECK, Boolean.toString(checkPCUAEVersionAtStartup));
-    
+
     configuredProperties.put(GENRE, genre);
     configuredProperties.put(AUTHOR, author);
     configuredProperties.put(COMPOSER, composer);
@@ -289,6 +311,7 @@ public class PreferencesModel extends AbstractModel implements CommonInfoModel
     configuredProperties.put(YEAR, Integer.toString(year));
     configuredProperties.put(FAVORITESCOUNT, Integer.toString(favoritesCount));
     configuredProperties.put(JOYSTICK, joystickConfig);
+    configuredProperties.put(SAVED_STATES_CAROUSEL, savedStatesCarouselVersion);
     FileManager.storeProperties();
   }
 }

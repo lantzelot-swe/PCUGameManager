@@ -31,15 +31,18 @@ public class MiscPanel extends JPanel
   private JPanel favoritesPanel;
   private JLabel numberOfFavoritesLabel;
   private JSpinner favoritesSpinner;
+  private SaveStatePrefPanel saveStatePrefPanel;
 
   public MiscPanel(PreferencesModel model)
   {
     this.model = model;
 
     GridBagLayout gridBagLayout = new GridBagLayout();
+    gridBagLayout.rowWeights = new double[]{0.0, 0.0, 1.0};
+    gridBagLayout.columnWeights = new double[]{1.0};
     setLayout(gridBagLayout);
     GridBagConstraints gbc_startupPanel = new GridBagConstraints();
-    gbc_startupPanel.insets = new Insets(5, 5, 5, 5);
+    gbc_startupPanel.insets = new Insets(5, 5, 5, 3);
     gbc_startupPanel.weightx = 1.0;
     gbc_startupPanel.anchor = GridBagConstraints.NORTHWEST;
     gbc_startupPanel.fill = GridBagConstraints.BOTH;
@@ -47,14 +50,21 @@ public class MiscPanel extends JPanel
     gbc_startupPanel.gridy = 0;
     add(getStartupPanel(), gbc_startupPanel);
     GridBagConstraints gbc_favoritesPanel = new GridBagConstraints();
-    gbc_favoritesPanel.weighty = 1.0;
     gbc_favoritesPanel.anchor = GridBagConstraints.NORTHWEST;
     gbc_favoritesPanel.weightx = 1.0;
-    gbc_favoritesPanel.insets = new Insets(5, 5, 5, 5);
+    gbc_favoritesPanel.insets = new Insets(5, 5, 5, 3);
     gbc_favoritesPanel.fill = GridBagConstraints.HORIZONTAL;
     gbc_favoritesPanel.gridx = 0;
     gbc_favoritesPanel.gridy = 1;
     add(getFavoritesPanel(), gbc_favoritesPanel);
+    GridBagConstraints gbc_saveStatePrefPanel = new GridBagConstraints();
+    gbc_saveStatePrefPanel.insets = new Insets(5, 5, 5, 3);
+    gbc_saveStatePrefPanel.weighty = 1.0;
+    gbc_saveStatePrefPanel.anchor = GridBagConstraints.NORTHWEST;
+    gbc_saveStatePrefPanel.fill = GridBagConstraints.HORIZONTAL;
+    gbc_saveStatePrefPanel.gridx = 0;
+    gbc_saveStatePrefPanel.gridy = 2;
+    add(getSaveStatePrefPanel(), gbc_saveStatePrefPanel);
     if (!Beans.isDesignTime())
     {
       model.addPropertyChangeListener(e -> modelChanged());
@@ -194,5 +204,13 @@ public class MiscPanel extends JPanel
       });
     }
     return favoritesSpinner;
+  }
+  private SaveStatePrefPanel getSaveStatePrefPanel() {
+    if (saveStatePrefPanel == null) {
+    	saveStatePrefPanel = new SaveStatePrefPanel(this.model);
+    	saveStatePrefPanel
+      .setBorder(new TitledBorder(null, "Saved states preferences", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+    }
+    return saveStatePrefPanel;
   }
 }

@@ -260,4 +260,9 @@ public class MainPanel extends JPanel
   {
     getListPanel().reloadCurrentGameView();
   }
+  
+  public void updateSavedStatesTabTitle()
+  {
+    getGameDetailsBackgroundPanel().updateSavedStatesTabTitle();
+  }
 }

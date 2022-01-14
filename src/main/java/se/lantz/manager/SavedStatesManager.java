@@ -26,6 +26,7 @@ import org.slf4j.LoggerFactory;
 
 import se.lantz.gui.exports.PublishWorker;
 import se.lantz.model.MainViewModel;
+import se.lantz.model.PreferencesModel;
 import se.lantz.model.SavedStatesModel;
 import se.lantz.model.SavedStatesModel.SAVESTATE;
 import se.lantz.util.ExceptionHandler;
@@ -102,15 +103,15 @@ public class SavedStatesManager
     //If the game has been renamed, make sure to rename the saves folder also
     String oldFileName = model.getInfoModel().getOldGamesFile();
     String newFileName = model.getInfoModel().getGamesFile();
-    File oldSaveFolder = new File(SAVES + oldFileName);
+    File oldSaveFolder = new File(SAVES + getGameFolderName(oldFileName));
     if (!oldFileName.equals(newFileName) && oldSaveFolder.exists())
     {
       //Rename old folder to new name
-      oldSaveFolder.renameTo(new File(SAVES + model.getInfoModel().getGamesFile()));
+      oldSaveFolder.renameTo(new File(SAVES + getGameFolderName(model.getInfoModel().getGamesFile())));
     }
 
     String fileName = model.getInfoModel().getGamesFile();
-    Path saveFolder = new File(SAVES + fileName).toPath();
+    Path saveFolder = new File(SAVES + getGameFolderName(fileName)).toPath();
     int numberofSaves = 0;
     //Check which ones are available
     Path mta0Path = saveFolder.resolve(MTA0);
@@ -161,7 +162,7 @@ public class SavedStatesManager
   {
     savedStatesModel.resetProperties();
     //Read from state directory, update model
-    String fileName = model.getInfoModel().getGamesFile();
+    String fileName = getGameFolderName(model.getInfoModel().getGamesFile());
     if (!fileName.isEmpty())
     {
       //Check if folder is available
@@ -330,7 +331,7 @@ public class SavedStatesManager
 
   private void deleteSavedState(SAVESTATE state)
   {
-    String fileName = model.getInfoModel().getGamesFile();
+    String fileName = getGameFolderName(model.getInfoModel().getGamesFile());
     Path saveFolder = new File(SAVES + fileName).toPath();
     try
     {
@@ -554,7 +555,8 @@ public class SavedStatesManager
 
   public int getNumberOfSavedStatesForGame(String gameFileName)
   {
-    return savedStatesMap.get(gameFileName) != null ? savedStatesMap.get(gameFileName) : 0;
+    String fileName = getGameFolderName(gameFileName);
+    return savedStatesMap.get(fileName) != null ? savedStatesMap.get(fileName) : 0;
   }
 
   public void checkEnablementOfPalNtscMenuItem(boolean check)
@@ -568,7 +570,7 @@ public class SavedStatesManager
       if (!fileName.isEmpty() && fileName.contains(".vsf"))
       {
         //Check if folder is available
-        Path saveFolder = new File(SAVES + fileName).toPath();
+        Path saveFolder = new File(SAVES + getGameFolderName(fileName)).toPath();
         if (Files.exists(saveFolder))
         {
           //Check which ones are available
@@ -587,7 +589,7 @@ public class SavedStatesManager
   {
     String gamesFile = model.getInfoModel().getGamesFile();
     Path gameFilePath = new File(FileManager.GAMES + gamesFile).toPath();
-    Path firstSavedStatePath = new File(SAVES + gamesFile).toPath().resolve(VSZ0);
+    Path firstSavedStatePath = new File(SAVES + getGameFolderName(gamesFile)).toPath().resolve(VSZ0);
 
     Path tempFilePath = new File(FileManager.GAMES + "temp.gz").toPath();
     try
@@ -612,5 +614,25 @@ public class SavedStatesManager
       ExceptionHandler.handleException(e, "Could not swap game file and first saved state.");
     }
     return false;
+  }
+  
+  public static  String getGameFolderName(String fileName)
+  {
+    String returnValue = "";
+    switch (FileManager.getConfiguredSavedStatesCarouselVersion())
+    {
+      case PreferencesModel.CAROUSEL_132:
+        returnValue = fileName;
+        break;
+      case PreferencesModel.CAROUSEL_152:
+        if (fileName.indexOf(".") > -1)
+        {
+          returnValue = fileName.substring(0, fileName.indexOf("."));
+        }
+        break;
+      default:
+        break;
+    }
+    return returnValue;
   }
 }

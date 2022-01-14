@@ -44,6 +44,7 @@ import se.lantz.manager.ScraperManager;
 import se.lantz.model.MainViewModel;
 import se.lantz.model.data.GameListData;
 import se.lantz.model.data.ScraperFields;
+import se.lantz.util.FileManager;
 
 public class GameDetailsBackgroundPanel extends JPanel
 {
@@ -188,6 +189,7 @@ public class GameDetailsBackgroundPanel extends JPanel
       systemSavesTabbedPane = new JTabbedPane();
       systemSavesTabbedPane.addTab("System Settings", getSystemPanel());
       systemSavesTabbedPane.addTab("Saved states", getSavesBackgroundPanel());
+      updateSavedStatesTabTitle();
     }
     return systemSavesTabbedPane;
   }
@@ -499,5 +501,12 @@ public class GameDetailsBackgroundPanel extends JPanel
     {
       return false;
     }
+  }
+  
+  public void updateSavedStatesTabTitle()
+  {
+    String carouselVersion = FileManager.getConfiguredSavedStatesCarouselVersion();
+    getSystemSavesTabbedPane().setTitleAt(1, "Saved States (Carousel " + carouselVersion + ")");
+    getSavesBackgroundPanel().resetCurrentGameReference();
   }
 }

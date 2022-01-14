@@ -1109,7 +1109,7 @@ public class MenuManager
       prefDialog.savePreferences();
       //Update favorites menu
       setupEditMenu();
-      MainWindow.getInstance().refreshFavoritesLists();
+      MainWindow.getInstance().refreshAfterPreferencesSave();
       //Refresh game views
       uiModel.reloadGameViews();
       //Set all games as selected

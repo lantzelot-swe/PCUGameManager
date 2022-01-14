@@ -80,4 +80,12 @@ public class SaveStateBackgroundPanel extends JPanel
     getSaveStatePanel3().commitEdits();
     getSaveStatePanel4().commitEdits();
   }
+  
+  void resetCurrentGameReference()
+  {
+    getSaveStatePanel1().resetCurrentGameReference();
+    getSaveStatePanel2().resetCurrentGameReference();
+    getSaveStatePanel3().resetCurrentGameReference();
+    getSaveStatePanel4().resetCurrentGameReference();
+  }
 }

@@ -80,6 +80,7 @@ public class FileManager
   private static Properties fileProperties;
   private static int currentNoOfFavorites = -1;
   private static String currentJoystickConfig = "";
+  private static String currentSavedStatesCarouselVersion = "";
 
   private MainViewModel model;
   private InfoModel infoModel;
@@ -625,7 +626,7 @@ public class FileManager
       }
       else
       {
-        gamePathString = SavedStatesManager.SAVES + infoModel.getGamesFile() + "/" + savedStatesModel.getState1File();
+        gamePathString = SavedStatesManager.SAVES + SavedStatesManager.getGameFolderName(infoModel.getGamesFile()) + "/" + savedStatesModel.getState1File();
       }
     }
       break;
@@ -638,7 +639,7 @@ public class FileManager
       }
       else
       {
-        gamePathString = SavedStatesManager.SAVES + infoModel.getGamesFile() + "/" + savedStatesModel.getState2File();
+        gamePathString = SavedStatesManager.SAVES + SavedStatesManager.getGameFolderName(infoModel.getGamesFile()) + "/" + savedStatesModel.getState2File();
       }
       break;
     case Save2:
@@ -650,7 +651,7 @@ public class FileManager
       }
       else
       {
-        gamePathString = SavedStatesManager.SAVES + infoModel.getGamesFile() + "/" + savedStatesModel.getState3File();
+        gamePathString = SavedStatesManager.SAVES + SavedStatesManager.getGameFolderName(infoModel.getGamesFile()) + "/" + savedStatesModel.getState3File();
       }
       break;
     case Save3:
@@ -662,7 +663,7 @@ public class FileManager
       }
       else
       {
-        gamePathString = SavedStatesManager.SAVES + infoModel.getGamesFile() + "/" + savedStatesModel.getState4File();
+        gamePathString = SavedStatesManager.SAVES + SavedStatesManager.getGameFolderName(infoModel.getGamesFile()) + "/" + savedStatesModel.getState4File();
       }
       break;
     default:
@@ -918,6 +919,7 @@ public class FileManager
       //Reset to load again in getConfiguredNumberOfFavorites()
       currentNoOfFavorites = -1;
       currentJoystickConfig = "";
+      currentSavedStatesCarouselVersion = "";
       try (OutputStream output = new FileOutputStream("./pcu.properties"))
       {
         // save properties to project root folder
@@ -948,24 +950,36 @@ public class FileManager
     }
     return fileProperties;
   }
-  
+
   public static int getConfiguredNumberOfFavorites()
   {
     //Only load once if not initialised. currentNoOfFavorites is reset when properties are stored.
     if (currentNoOfFavorites == -1)
     {
-      currentNoOfFavorites = Integer.parseInt(FileManager.getConfiguredProperties().getProperty(PreferencesModel.FAVORITESCOUNT, Integer.toString(10)));
+      currentNoOfFavorites = Integer.parseInt(FileManager.getConfiguredProperties()
+        .getProperty(PreferencesModel.FAVORITESCOUNT, Integer.toString(10)));
     }
     return currentNoOfFavorites;
   }
-  
+
   public static String getConfiguredJoystickConfig()
   {
     if (currentJoystickConfig.isEmpty())
     {
-      currentJoystickConfig = FileManager.getConfiguredProperties().getProperty(PreferencesModel.JOYSTICK, "J:2*:" + JoystickModel.DEFAULT_CONFIG);
+      currentJoystickConfig = FileManager.getConfiguredProperties().getProperty(PreferencesModel.JOYSTICK,
+                                                                                "J:2*:" + JoystickModel.DEFAULT_CONFIG);
     }
     return currentJoystickConfig;
+  }
+
+  public static String getConfiguredSavedStatesCarouselVersion()
+  {
+    if (currentSavedStatesCarouselVersion.isEmpty())
+    {
+      currentSavedStatesCarouselVersion = FileManager.getConfiguredProperties()
+        .getProperty(PreferencesModel.SAVED_STATES_CAROUSEL, PreferencesModel.CAROUSEL_152);
+    }
+    return currentSavedStatesCarouselVersion;
   }
 
   public static void backupDb(String targetFolderName)
