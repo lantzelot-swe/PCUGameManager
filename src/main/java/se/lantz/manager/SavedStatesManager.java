@@ -13,17 +13,21 @@ import java.nio.file.StandardCopyOption;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.imageio.ImageIO;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import se.lantz.gui.MainWindow;
 import se.lantz.gui.exports.PublishWorker;
 import se.lantz.model.MainViewModel;
 import se.lantz.model.PreferencesModel;
@@ -615,24 +619,139 @@ public class SavedStatesManager
     }
     return false;
   }
-  
-  public static  String getGameFolderName(String fileName)
+
+  public static String getGameFolderName(String fileName)
   {
     String returnValue = "";
     switch (FileManager.getConfiguredSavedStatesCarouselVersion())
     {
-      case PreferencesModel.CAROUSEL_132:
-        returnValue = fileName;
-        break;
-      case PreferencesModel.CAROUSEL_152:
-        if (fileName.indexOf(".") > -1)
-        {
-          returnValue = fileName.substring(0, fileName.indexOf("."));
-        }
-        break;
-      default:
-        break;
+    case PreferencesModel.CAROUSEL_132:
+      returnValue = fileName;
+      break;
+    case PreferencesModel.CAROUSEL_152:
+      if (fileName.indexOf(".") > -1)
+      {
+        returnValue = fileName.substring(0, fileName.indexOf("."));
+      }
+      break;
+    default:
+      break;
     }
     return returnValue;
+  }
+
+  public void convertToCarousel152Version()
+  {
+    File saveFolder = new File(SAVES);
+    try (Stream<Path> stream = Files.walk(saveFolder.toPath().toAbsolutePath(), 1))
+    {
+      stream.forEachOrdered(sourcePath -> {
+        try
+        {
+          //Ignore first folder
+          if (sourcePath.equals(saveFolder.toPath().toAbsolutePath()))
+          {
+            return;
+          }
+
+          File originalDir = sourcePath.toFile();
+          String newName = originalDir.getName();
+          if (newName.indexOf(".") > -1)
+          {
+            newName = newName.substring(0, newName.indexOf("."));
+          }
+          File newDir = new File(originalDir.getParent() + "\\" + newName);
+          if (!newName.equals(originalDir.getName()) && !newDir.exists())
+          {
+            //TODO: what if same name exists already, merge or just ignore?
+            originalDir.renameTo(newDir);
+          }
+        }
+        catch (Exception e)
+        {
+          ExceptionHandler.logException(e, "Could not convert available saved states for " + sourcePath.toString());
+        }
+      });
+    }
+    catch (IOException e1)
+    {
+      ExceptionHandler.handleException(e1, "Could not convert saved states");
+    }
+    //Collect all that has 1.5.2 version already
+    try (Stream<Path> stream = Files.walk(saveFolder.toPath().toAbsolutePath(), 1))
+    {
+      List<Path> existingSaveFolders = stream.filter(sourcePath -> {
+        File originalDir = sourcePath.toFile();
+        String newName = originalDir.getName();
+        if (newName.indexOf(".") > -1)
+        {
+          newName = newName.substring(0, newName.indexOf("."));
+          File newDir = new File(originalDir.getParent() + "\\" + newName);
+
+          return newDir.exists();
+        }
+        return false;
+      }).collect(Collectors.toList());
+
+      if (!existingSaveFolders.isEmpty())
+      {
+        int result = JOptionPane
+          .showConfirmDialog(MainWindow.getInstance(),
+                             String
+                               .format("There are %s games where a 1.5.2 version of the saved states already exists, do you want to overwrite them with the 1.3.2 version?",
+                                       existingSaveFolders.size()),
+                             "Exisiting saved states",
+                             JOptionPane.YES_NO_OPTION);
+        if (result == JOptionPane.YES_OPTION)
+        {
+          existingSaveFolders.stream().forEach(sourcePath -> {
+            File originalDir = sourcePath.toFile();
+            String newName = originalDir.getName().substring(0, originalDir.getName().indexOf("."));
+            File newDir = new File(originalDir.getParent() + "\\" + newName);
+            try
+            {
+              FileUtils.deleteDirectory(newDir);
+              originalDir.renameTo(newDir);
+            }
+            catch (IOException e)
+            {
+              ExceptionHandler.handleException(e, "Could not delete and replace dir");
+            }
+          });
+        }
+      }
+    }
+    catch (IOException e1)
+    {
+      ExceptionHandler.handleException(e1, "Could not convert saved states");
+    }
+  }
+
+  public int checkFor132SavedStates()
+  {
+    File saveFolder = new File(SAVES);
+    long returnValue = 0;
+    try (Stream<Path> stream = Files.walk(saveFolder.toPath().toAbsolutePath(), 1))
+    {
+      returnValue = stream.filter(sourcePath -> {
+        //Ignore first folder
+        if (sourcePath.equals(saveFolder.toPath().toAbsolutePath()))
+        {
+          return false;
+        }
+        File originalDir = sourcePath.toFile();
+        String newName = originalDir.getName();
+        if (newName.indexOf(".") > -1)
+        {
+          return true;
+        }
+        return false;
+      }).count();
+    }
+    catch (IOException e1)
+    {
+      ExceptionHandler.handleException(e1, "Could not check saved states using carousel 1.3.2 format");
+    }
+    return (int) returnValue;
   }
 }

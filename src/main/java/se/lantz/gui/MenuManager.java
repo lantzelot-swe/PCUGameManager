@@ -53,7 +53,6 @@ import se.lantz.manager.pcuae.PCUAEInstallManager;
 import se.lantz.manager.pcuae.RetroarchModeInstallManager;
 import se.lantz.manager.pcuae.ViceModeInstallManager;
 import se.lantz.model.MainViewModel;
-import se.lantz.model.PreferencesModel;
 import se.lantz.model.data.GameListData;
 import se.lantz.model.data.GameView;
 import se.lantz.util.ExceptionHandler;
@@ -74,7 +73,7 @@ public class MenuManager
   private JMenuItem addGameItem;
   private JMenuItem addInfoSlotItem;
   private JMenuItem deleteGameItem;
-  
+
   private JMenuItem preferencesItem;
 
   private JMenuItem runGameItem;
@@ -114,6 +113,7 @@ public class MenuManager
 
   private JMenuItem validateDbItem;
   private JMenuItem palNtscFixItem;
+  private JMenuItem convertSavedStatesItem;
 
   private JMenuItem installPCUAEItem;
   private JMenuItem installAmigaModeItem;
@@ -209,6 +209,8 @@ public class MenuManager
     toolsMenu.add(getValidateDbItem());
     toolsMenu.addSeparator();
     toolsMenu.add(getPalNtscFixMenuItem());
+    toolsMenu.addSeparator();
+    toolsMenu.add(getConvertSavedStatesItem());
 
     pcuaeMenu = new JMenu("PCUAE");
     pcuaeMenu.add(getInstallPCUAEItem());
@@ -228,7 +230,7 @@ public class MenuManager
     helpMenu.add(getCheckVersionItem());
     helpMenu.add(getAboutItem());
   }
-  
+
   private JMenu setupEditMenu()
   {
     this.currentFavoritesCount = FileManager.getConfiguredNumberOfFavorites();
@@ -280,31 +282,31 @@ public class MenuManager
     }
     if (currentFavoritesCount > 2)
     {
-    editMenu.add(getClearFavorites3Item());
+      editMenu.add(getClearFavorites3Item());
     }
     if (currentFavoritesCount > 3)
     {
-    editMenu.add(getClearFavorites4Item());
+      editMenu.add(getClearFavorites4Item());
     }
     if (currentFavoritesCount > 4)
     {
-    editMenu.add(getClearFavorites5Item());
+      editMenu.add(getClearFavorites5Item());
     }
     if (currentFavoritesCount > 5)
     {
-    editMenu.add(getClearFavorites6Item());
+      editMenu.add(getClearFavorites6Item());
     }
     if (currentFavoritesCount > 6)
     {
-    editMenu.add(getClearFavorites7Item());
+      editMenu.add(getClearFavorites7Item());
     }
     if (currentFavoritesCount > 7)
     {
-    editMenu.add(getClearFavorites8Item());
+      editMenu.add(getClearFavorites8Item());
     }
     if (currentFavoritesCount > 8)
     {
-    editMenu.add(getClearFavorites9Item());
+      editMenu.add(getClearFavorites9Item());
     }
     if (currentFavoritesCount > 9)
     {
@@ -373,7 +375,7 @@ public class MenuManager
     deleteGameItem.addActionListener(e -> mainWindow.getMainPanel().deleteCurrentGame());
     return deleteGameItem;
   }
-  
+
   JMenuItem getPreferencesMenuItem()
   {
     preferencesItem = new JMenuItem("Preferences...");
@@ -803,6 +805,17 @@ public class MenuManager
     return palNtscFixItem;
   }
 
+  private JMenuItem getConvertSavedStatesItem()
+  {
+    if (convertSavedStatesItem == null)
+    {
+      convertSavedStatesItem = new JMenuItem("Convert Saved states...");
+      convertSavedStatesItem.setMnemonic('c');
+      convertSavedStatesItem.addActionListener(e -> convertSavedStates());
+    }
+    return convertSavedStatesItem;
+  }
+
   private JMenuItem getInstallPCUAEItem()
   {
     if (installPCUAEItem == null)
@@ -890,7 +903,7 @@ public class MenuManager
     });
     return helpItem;
   }
-  
+
   private JMenuItem getPcuaeWikiItem()
   {
     pcuaeWikiItem = new JMenuItem("PCUAE wiki");
@@ -1098,7 +1111,7 @@ public class MenuManager
       }
     }
   }
-  
+
   private void editPreferences()
   {
     PreferencesDialog prefDialog = new PreferencesDialog(this.mainWindow);
@@ -1232,6 +1245,41 @@ public class MenuManager
     }
   }
 
+  private void convertSavedStates()
+  {
+    //First check how many old saves there is, then ask if they shall be converted.
+    int numberOf132Games = savedStatesManager.checkFor132SavedStates();
+
+    if (numberOf132Games == 0)
+    {
+      JOptionPane.showMessageDialog(MainWindow.getInstance().getMainPanel(),
+                                    "No saved states uses the old Carousel version 1.3.2 format. All is up to date.",
+                                    "Convert saved states to Carousel 1.5.2 format",
+                                    JOptionPane.INFORMATION_MESSAGE);
+    }
+    else
+    {
+      String message = String
+        .format("<html>There are %s games saved with the old format used by the Carousel version 1.3.2 and earlier.<br>Do you want to convert them to the new format so that they can be used by the Carousel version 1.5.2 and later?</html>",
+                Integer.valueOf(numberOf132Games));
+      int option = JOptionPane.showConfirmDialog(MainWindow.getInstance().getMainPanel(),
+                                                 message,
+                                                 "Convert saved states to Carousel 1.5.2 format",
+                                                 JOptionPane.YES_NO_OPTION,
+                                                 JOptionPane.QUESTION_MESSAGE);
+      if (option == JOptionPane.YES_OPTION)
+      {
+        savedStatesManager.convertToCarousel152Version();
+        //Refresh after converting
+        MainWindow.getInstance().refreshAfterPreferencesSave();
+        //Refresh game views
+        uiModel.reloadGameViews();
+        //Set all games as selected
+        uiModel.setSelectedGameView(null);
+      }
+    }
+  }
+
   private void installPCUAE()
   {
     installPCUAEManager.installPCUAE();
@@ -1326,7 +1374,7 @@ public class MenuManager
                                     JOptionPane.INFORMATION_MESSAGE);
     }
   }
-  
+
   void checkForNewPCUAEVersionAtStartup()
   {
     installPCUAEManager.checkForNewVersionAtStartup();

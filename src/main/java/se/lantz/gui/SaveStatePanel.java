@@ -114,14 +114,14 @@ public class SaveStatePanel extends JPanel
     add(getGameButton(), gbc_snapshotButton);
     GridBagConstraints gbc_timeLabel = new GridBagConstraints();
     gbc_timeLabel.anchor = GridBagConstraints.NORTHWEST;
-    gbc_timeLabel.insets = new Insets(5, 5, 5, 0);
+    gbc_timeLabel.insets = new Insets(5, 5, 0, 0);
     gbc_timeLabel.gridx = 4;
     gbc_timeLabel.gridy = 0;
     add(getTimeLabel(), gbc_timeLabel);
     GridBagConstraints gbc_snapshotLabel = new GridBagConstraints();
     gbc_snapshotLabel.gridwidth = 2;
     gbc_snapshotLabel.weightx = 1.0;
-    gbc_snapshotLabel.insets = new Insets(5, 0, 5, 5);
+    gbc_snapshotLabel.insets = new Insets(5, 0, 0, 5);
     gbc_snapshotLabel.anchor = GridBagConstraints.NORTHWEST;
     gbc_snapshotLabel.gridx = 1;
     gbc_snapshotLabel.gridy = 0;
