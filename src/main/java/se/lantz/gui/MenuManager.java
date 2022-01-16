@@ -114,6 +114,7 @@ public class MenuManager
   private JMenuItem validateDbItem;
   private JMenuItem palNtscFixItem;
   private JMenuItem convertSavedStatesItem;
+  private JMenuItem resetJoystickConfigItem;
 
   private JMenuItem installPCUAEItem;
   private JMenuItem installAmigaModeItem;
@@ -202,16 +203,15 @@ public class MenuManager
     toolsMenu.setMnemonic('T');
     toolsMenu.add(getBackupDbItem());
     toolsMenu.add(getRestoreDbItem());
+    toolsMenu.add(getValidateDbItem());
     toolsMenu.addSeparator();
     toolsMenu.add(getDeleteAllGamesItem());
     toolsMenu.add(getDeleteGamesForViewMenuItem());
     toolsMenu.addSeparator();
-    toolsMenu.add(getValidateDbItem());
+    toolsMenu.add(getConvertSavedStatesItem());
+    toolsMenu.add(getResetJoystickConfigItem());
     toolsMenu.addSeparator();
     toolsMenu.add(getPalNtscFixMenuItem());
-    toolsMenu.addSeparator();
-    toolsMenu.add(getConvertSavedStatesItem());
-
     pcuaeMenu = new JMenu("PCUAE");
     pcuaeMenu.add(getInstallPCUAEItem());
     pcuaeModeMenu = new JMenu("Mode Packs");
@@ -356,7 +356,7 @@ public class MenuManager
 
   JMenuItem getAddInfoSlotMenuItem()
   {
-    addInfoSlotItem = new JMenuItem("Add info slot for current view");
+    addInfoSlotItem = new JMenuItem("Add info slot for current gamelist view");
     KeyStroke keyStrokeToAddGame = KeyStroke.getKeyStroke(KeyEvent.VK_I, InputEvent.CTRL_DOWN_MASK);
     addInfoSlotItem.setAccelerator(keyStrokeToAddGame);
     addInfoSlotItem.setMnemonic('I');
@@ -814,6 +814,17 @@ public class MenuManager
       convertSavedStatesItem.addActionListener(e -> convertSavedStates());
     }
     return convertSavedStatesItem;
+  }
+
+  private JMenuItem getResetJoystickConfigItem()
+  {
+    if (resetJoystickConfigItem == null)
+    {
+      resetJoystickConfigItem = new JMenuItem("Reset joystick configs for current gamelist view");
+      resetJoystickConfigItem.setMnemonic('j');
+      resetJoystickConfigItem.addActionListener(e -> resetJoystickConfigs());
+    }
+    return resetJoystickConfigItem;
   }
 
   private JMenuItem getInstallPCUAEItem()
@@ -1277,6 +1288,25 @@ public class MenuManager
         //Set all games as selected
         uiModel.setSelectedGameView(null);
       }
+    }
+  }
+
+  private void resetJoystickConfigs()
+  {
+    String message = "Do you want to reset the joystick configurations for all games in the current gamelist view?\n" +
+      "Only the mappings are reset to the default (defined in preferences), primary joystick is preserved.\n" +
+      "The second joystick is also reset with the default mappings.";
+
+    int option = JOptionPane.showConfirmDialog(MainWindow.getInstance().getMainPanel(),
+                                               message,
+                                               "Reset joystick configurations",
+                                               JOptionPane.YES_NO_OPTION,
+                                               JOptionPane.QUESTION_MESSAGE);
+    if (option == JOptionPane.YES_OPTION)
+    {
+      uiModel.resetJoystickConfigsForCurrentView();
+      JOptionPane.showMessageDialog(MainWindow.getInstance().getMainPanel(), "Joystick configurations updated.", "Reset joystick configurations", JOptionPane.INFORMATION_MESSAGE);
+      MainWindow.getInstance().reloadCurrentGameView();
     }
   }
 

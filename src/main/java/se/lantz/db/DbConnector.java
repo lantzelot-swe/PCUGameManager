@@ -1198,4 +1198,68 @@ public class DbConnector
     }
     return fixedGames;
   }
+  
+  public void resetJoystickConfigsForView(GameView view)
+  {
+    String joyConfig = FileManager.getConfiguredJoystickConfig();
+    //Get only the mappings
+    joyConfig = joyConfig.substring(joyConfig.lastIndexOf(":")+1);
+    
+    String joy1Default = "J:1*:" + joyConfig;
+    String joy1NotDefault = "J:1:" + joyConfig;
+    String joy2Default = "J:2*:" + joyConfig;
+    String joy2NotDefault = "J:2:" + joyConfig;
+    
+    StringBuilder joy1sqlBuilder = new StringBuilder();
+    StringBuilder joy2sqlBuilder = new StringBuilder();
+    
+    //Joy1Default
+    joy1sqlBuilder.append("UPDATE gameinfo SET joy1config = '");
+    joy1sqlBuilder.append(joy1Default);
+    joy1sqlBuilder.append("', joy2config = '");
+    joy1sqlBuilder.append(joy2NotDefault);
+    joy1sqlBuilder.append("' ");
+    if (!view.getSqlQuery().isEmpty())
+    {
+      joy1sqlBuilder.append(view.getSqlQuery());
+      joy1sqlBuilder.append(" AND ");
+    }
+    else
+    {
+      joy1sqlBuilder.append("WHERE ");
+    }
+    joy1sqlBuilder.append("joy1Config LIKE '%*%'");   
+    logger.debug("Generated SQL for joy1 default:\n{}", joy1sqlBuilder.toString());
+    
+    //Joy2Default
+    joy2sqlBuilder.append("UPDATE gameinfo SET joy1config = '");
+    joy2sqlBuilder.append(joy1NotDefault);
+    joy2sqlBuilder.append("', joy2config = '");
+    joy2sqlBuilder.append(joy2Default);
+    joy2sqlBuilder.append("' ");
+    if (!view.getSqlQuery().isEmpty())
+    {
+      joy2sqlBuilder.append(view.getSqlQuery());
+      joy2sqlBuilder.append(" AND ");
+    }
+    else
+    {
+      joy2sqlBuilder.append("WHERE ");
+    }
+    joy2sqlBuilder.append("joy2Config LIKE '%*%'"); 
+    logger.debug("Generated SQL for joy2 default:\n{}", joy2sqlBuilder.toString());
+    
+    try (Connection conn = this.connect(); PreparedStatement joy1tmt = conn.prepareStatement(joy1sqlBuilder.toString());
+      PreparedStatement joy2tmt = conn.prepareStatement(joy2sqlBuilder.toString()))
+    {
+      int value = joy1tmt.executeUpdate();
+      logger.debug("Executed successfully, value = {}", value);
+      value = joy2tmt.executeUpdate();
+      logger.debug("Executed successfully, value = {}", value);
+    }
+    catch (SQLException e)
+    {
+      ExceptionHandler.handleException(e, "Could not update joystick configurations");
+    }
+  }
 }

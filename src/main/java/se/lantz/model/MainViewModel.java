@@ -971,6 +971,11 @@ public class MainViewModel extends AbstractModel
   {
     stateManager.checkEnablementOfPalNtscMenuItem(check);
   }
+  
+  public void resetJoystickConfigsForCurrentView()
+  {
+    dbConnector.resetJoystickConfigsForView(getSelectedGameView());
+  }
 
   private void generateInfoSlot(GameDetails gameDetails)
   {
