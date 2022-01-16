@@ -26,7 +26,8 @@ public class GamebaseImportWorker extends AbstractImportWorker
   {
     progressValueString = "Querying gamebase db...";
     publish("Reading from gamebase db... this may take a while, be patient!");
-    publish(gbInporter.importFromGamebase().toString());
+    
+    gbInporter.importFromGamebase(this);
     progressValueString = "Checking game files...";
 
     List<List<GbGameInfo>> listChunks = gbInporter.getGbGameInfoChunks();
@@ -44,14 +45,14 @@ public class GamebaseImportWorker extends AbstractImportWorker
       }
       progressValue++;
       progressValueString = String.format("Checking game files (batch %s of %s)", progressValue, progressMaximum);
-      publish(gbInporter.checkGameFileForGbGames(gbInfoList).toString());
+      gbInporter.checkGameFileForGbGames(gbInfoList, this);
     }
 
     List<List<String>> dbRowReadChunks = importManager.getDbRowReadChunks();
     progressValueString = "Importing to db and copying files...";
     progressMaximum = dbRowReadChunks.size();
     progressValue = 0;
-    publish("Importing to db, copying covers, screens and game files...");
+    publish("\nImporting to db, copying covers, screens and game files...");
     int chunkCount = 0;
     for (List<String> rowList : dbRowReadChunks)
     {

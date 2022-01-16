@@ -18,6 +18,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import se.lantz.gui.exports.PublishWorker;
 import se.lantz.manager.ImportManager;
 import se.lantz.scraper.GamebaseScraper;
 import se.lantz.util.ExceptionHandler;
@@ -142,10 +143,9 @@ public class GamebaseImporter
     return false;
   }
 
-  public StringBuilder importFromGamebase()
+  public void importFromGamebase(PublishWorker worker)
   {
     gbGameInfoList.clear();
-    StringBuilder builder = new StringBuilder();
     //Use the folder where the gamebase mdb file is located in the import manager
     importManager.setSelectedFoldersForGamebase(gbGamesPath, gbScreensPath, gbExtrasPath.resolve("covers"));
 
@@ -180,22 +180,21 @@ public class GamebaseImporter
       int gameCount = 0;
       while (result.next())
       {
-        if (createGbGameInfo(result, statement, builder))
+        if (createGbGameInfo(result, statement, worker))
         {
           gameCount++;
         }
       }
-      builder.append("Read " + gameCount + " games from the gamebase db.\n");
+      worker.publishMessage("\nRead " + gameCount + " games from the gamebase db.\n");
     }
     catch (SQLException ex)
     {
-      builder.append("ERROR: Query failed : " + ex.toString() + "\n");
+      worker.publishMessage("ERROR: Query failed : " + ex.toString());
       ExceptionHandler.handleException(ex, "Query failed");
     }
-    return builder;
   }
 
-  private boolean createGbGameInfo(ResultSet result, Statement statement, StringBuilder builder)
+  private boolean createGbGameInfo(ResultSet result, Statement statement, PublishWorker worker)
   {
     String title = "";
     try
@@ -216,13 +215,14 @@ public class GamebaseImporter
       String vic20Description = "";
       boolean vic20Cart = false;
 
+      worker.publishMessage("Creating game info for " + title + "...");
       //Game file
       if (isC64)
       {
         //GB64 includes game files for all games, no additional extras available.
         if (gamefile.isEmpty() && !includeEntriesWithMissingGameFile)
         {
-          builder.append("Ignoring " + title + " (No game file available)\n");
+          worker.publishMessage("Ignoring " + title + " (No game file available)");
           return false;
         }
 
@@ -264,7 +264,7 @@ public class GamebaseImporter
 
           if (gamefile.isEmpty() && !includeEntriesWithMissingGameFile)
           {
-            builder.append("Ignoring " + title + " (No game file available)\n");
+            worker.publishMessage("Ignoring " + title + " (No game file available)");
             return false;
           }
         }
@@ -329,7 +329,7 @@ public class GamebaseImporter
     }
     catch (Exception e)
     {
-      builder.append("ERROR: Could not fetch all info for " + title + ":\n" + e.toString() + "\n");
+      worker.publishMessage("ERROR: Could not fetch all info for " + title + ":\n" + e.toString());
       ExceptionHandler.handleException(e, "Could not fetch all info for " + title);
     }
     return false;
@@ -424,13 +424,13 @@ public class GamebaseImporter
     return importManager.getReadChunks(gbGameInfoList, CHUNK_SIZE);
   }
 
-  public StringBuilder checkGameFileForGbGames(List<GbGameInfo> gbGameList)
+  public void checkGameFileForGbGames(List<GbGameInfo> gbGameList, PublishWorker worker)
   {
-    StringBuilder builder = new StringBuilder();
     for (GbGameInfo gbGameInfo : gbGameList)
     {
       try
       {
+        worker.publishMessage("Checking game file for " + gbGameInfo.getTitle()  + "...");
         String gameFile = getFileToInclude(gbGamesPath, gbGameInfo.getGamefile(), gbGameInfo.isVic20Cart());
         importManager.addFromGamebaseImporter(gbGameInfo.getTitle(),
                                               gbGameInfo.getYear(),
@@ -449,13 +449,12 @@ public class GamebaseImporter
       }
       catch (Exception e)
       {
-        builder.append("Ignoring " + gbGameInfo.getTitle() +
-          ", Could not check game file (file is corrupt?). Game is not imported.\n");
+        worker.publishMessage("Ignoring " + gbGameInfo.getTitle() +
+          ", Could not check game file (file is corrupt?). Game is not imported.");
         ExceptionHandler
           .logException(e, "Could not check game file for " + gbGameInfo.getTitle() + ", game is not imported");
       }
     }
-    return builder;
   }
 
   private String constructAdvancedString(int palOrNtsc, int trueDriveEmu, String gemus)
