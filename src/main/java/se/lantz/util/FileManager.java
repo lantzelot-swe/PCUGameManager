@@ -177,7 +177,50 @@ public class FileManager
     return coverImage;
   }
 
-  public static BufferedImage getInfoSlotScreenImage(boolean first)
+  public static BufferedImage getInfoSlotScreenImage(boolean first, String gameviewName)
+  {
+    //Check for USB and check if an existing games folder is available, pick from thumbs...
+    BufferedImage screenImage = null;
+    
+    String usbPath = getPCUAEUSBPath(false);
+    if (!usbPath.isEmpty())
+    {
+      //Read from USB thumbs
+      Path gamelistThumbsPath = Paths.get(usbPath, gameviewName.replace(" ", "_"), "thumbs");
+      File thumbsDir = gamelistThumbsPath.toFile();
+      if (thumbsDir.exists() && thumbsDir.listFiles().length > 0)
+      {
+        try
+        {
+          if (first || thumbsDir.listFiles().length == 1)
+          {
+            screenImage = ImageIO.read(gamelistThumbsPath.resolve("thumbs-1.png").toFile());
+          }
+          else
+          {
+            screenImage = ImageIO.read(gamelistThumbsPath.resolve("thumbs-2.png").toFile());
+          }         
+        }
+        catch (IOException e)
+        {
+          ExceptionHandler.handleException(e, "Could not read info slot screen image from USB.");
+          screenImage = getDefaultInfoSlotImage(first);
+        }
+      }
+      else
+      {
+        screenImage = getDefaultInfoSlotImage(first);
+      }
+    }
+    else
+    {
+      //Use default screens     
+      screenImage = getDefaultInfoSlotImage(first);   
+    }
+    return screenImage;
+  }
+  
+  private static BufferedImage getDefaultInfoSlotImage(boolean first)
   {
     BufferedImage screenImage = null;
     try

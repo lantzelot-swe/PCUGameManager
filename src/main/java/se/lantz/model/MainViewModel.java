@@ -1017,11 +1017,11 @@ public class MainViewModel extends AbstractModel
     //Cover image
     infoModel.setCoverImage(FileManager.getInfoSlotCover(this.selectedGameView.getGameViewId()));
     //Screen images
-    BufferedImage screenImage1 = FileManager.getInfoSlotScreenImage(true);
+    BufferedImage screenImage1 = FileManager.getInfoSlotScreenImage(true, this.selectedGameView.getName());
     writeGameViewTextOnScreen(screenImage1, Color.yellow);
     infoModel.setScreen1Image(screenImage1);
 
-    BufferedImage screenImage2 = FileManager.getInfoSlotScreenImage(false);
+    BufferedImage screenImage2 = FileManager.getInfoSlotScreenImage(false, this.selectedGameView.getName());
     writeGameViewTextOnScreen(screenImage2, Color.red);
     infoModel.setScreen2Image(screenImage2);
   }
