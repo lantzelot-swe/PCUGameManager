@@ -4,17 +4,17 @@ import java.awt.Dimension;
 
 import se.lantz.gui.BaseDialog;
 import se.lantz.gui.MainWindow;
-import se.lantz.manager.pcuae.BaseInstallManger;
+import se.lantz.manager.pcuae.BaseInstallManager;
 
 public class PCUAEProductDownloadDialog extends BaseDialog
 {
   private ManagerDownloadPanel panel;
   private boolean firstDownload;
   private String productText;
-  private BaseInstallManger manager;
+  private BaseInstallManager manager;
   private boolean startupCheck;
 
-  public PCUAEProductDownloadDialog(final boolean firstDownload, final BaseInstallManger manager, String productName, final boolean startupCheck)
+  public PCUAEProductDownloadDialog(final boolean firstDownload, final BaseInstallManager manager, String productName, final boolean startupCheck)
   {
     super(MainWindow.getInstance());
     this.firstDownload = firstDownload;

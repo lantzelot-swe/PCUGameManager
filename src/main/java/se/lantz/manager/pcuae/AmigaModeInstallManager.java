@@ -4,7 +4,7 @@ import javax.swing.JOptionPane;
 
 import se.lantz.gui.MainWindow;
 
-public class AmigaModeInstallManager extends BaseInstallManger
+public class AmigaModeInstallManager extends BaseInstallManager
 {
   private static final String PRODUCT_NAME = "Amiga mode";
 
@@ -17,7 +17,7 @@ public class AmigaModeInstallManager extends BaseInstallManger
     readVersionFromInstallFolder(AMIGA_MODE_INSTALL_NAME);
     if (isNewVersionAvailable(AMIGA_MODE_INSTALL_NAME))
     {
-      askAndStartDownload(PRODUCT_NAME);
+      askAndStartDownload(PRODUCT_NAME, AMIGA_MODE_INSTALL_NAME);
     }
     else
     {

@@ -81,6 +81,7 @@ public class FileManager
   private static int currentNoOfFavorites = -1;
   private static String currentJoystickConfig = "";
   private static String currentSavedStatesCarouselVersion = "";
+  private static String deleteInstallFiles = "";
 
   private MainViewModel model;
   private InfoModel infoModel;
@@ -920,6 +921,7 @@ public class FileManager
       currentNoOfFavorites = -1;
       currentJoystickConfig = "";
       currentSavedStatesCarouselVersion = "";
+      deleteInstallFiles = "";
       try (OutputStream output = new FileOutputStream("./pcu.properties"))
       {
         // save properties to project root folder
@@ -980,6 +982,16 @@ public class FileManager
         .getProperty(PreferencesModel.SAVED_STATES_CAROUSEL, PreferencesModel.CAROUSEL_152);
     }
     return currentSavedStatesCarouselVersion;
+  }
+  
+  public static boolean isConfiguredDeleteOldInstallfilesAfterDownload()
+  {
+    if (deleteInstallFiles.isEmpty())
+    {
+      deleteInstallFiles = FileManager.getConfiguredProperties()
+        .getProperty(PreferencesModel.DELETE_OLD_INSTALL_FILES, "false");
+    }
+    return Boolean.parseBoolean(deleteInstallFiles);
   }
 
   public static void backupDb(String targetFolderName)

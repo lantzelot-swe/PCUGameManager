@@ -35,9 +35,10 @@ import se.lantz.gui.MainWindow;
 import se.lantz.gui.download.DownloadDialog;
 import se.lantz.gui.install.PCUAEProductDownloadDialog;
 import se.lantz.util.ExceptionHandler;
+import se.lantz.util.FileManager;
 import se.lantz.util.ManagerVersionChecker;
 
-public abstract class BaseInstallManger implements AWTEventListener
+public abstract class BaseInstallManager implements AWTEventListener
 {
   public static final String INSTALL_FOLDER = "./pcuae-install/";
 
@@ -57,7 +58,7 @@ public abstract class BaseInstallManger implements AWTEventListener
 
   protected volatile boolean downloadIterrupted = false;
 
-  public BaseInstallManger()
+  public BaseInstallManager()
   {
     Toolkit.getDefaultToolkit().addAWTEventListener(this,
                                                     AWTEvent.KEY_EVENT_MASK | AWTEvent.MOUSE_EVENT_MASK |
@@ -109,24 +110,7 @@ public abstract class BaseInstallManger implements AWTEventListener
   protected void readVersionFromInstallFolder(String installFileName)
   {
     latestInInstallFolder = "";
-    FilenameFilter filter = new FilenameFilter()
-      {
-        @Override
-        public boolean accept(File f, String name)
-        {
-          if (PCUAE_INSTALL_NAME.equals(installFileName))
-          {
-            //Check so that no other is part of the name
-           return !(name.contains(AMIGA_MODE_INSTALL_NAME) || name.contains(ATARI_MODE_INSTALL_NAME) ||
-              name.contains(LINUX_MODE_INSTALL_NAME) || name.contains(RETROARCH_MODE_INSTALL_NAME) ||
-              name.contains(VICE_MODE_INSTALL_NAME)) && name.endsWith(".exe");
-          }
-          else
-          {
-            return name.contains(installFileName) && name.endsWith(".exe");
-          }
-        }
-      };
+    FilenameFilter filter = getFileNameFilter(installFileName);
     File installFolder = new File(INSTALL_FOLDER);
     File[] availableFiles = installFolder.listFiles(filter);
     //Check the timestamp and take the last modified as the current one
@@ -145,6 +129,43 @@ public abstract class BaseInstallManger implements AWTEventListener
     {
       latestInInstallFolder = latestFile.getName();
     }
+  }
+
+  protected void deleteOldInstallFiles(String installFileName)
+  {
+    FilenameFilter filter = getFileNameFilter(installFileName);
+    File installFolder = new File(INSTALL_FOLDER);
+    File[] availableFiles = installFolder.listFiles(filter);
+    for (File file : availableFiles)
+    {
+      if (!file.getName().equals(latestInInstallFolder))
+      {
+        file.delete();
+      }
+    }
+  }
+  
+  private FilenameFilter getFileNameFilter(String installFileName)
+  {
+    FilenameFilter filter = new FilenameFilter()
+    {
+      @Override
+      public boolean accept(File f, String name)
+      {
+        if (PCUAE_INSTALL_NAME.equals(installFileName))
+        {
+          //Check so that no other is part of the name
+          return !(name.contains(AMIGA_MODE_INSTALL_NAME) || name.contains(ATARI_MODE_INSTALL_NAME) ||
+            name.contains(LINUX_MODE_INSTALL_NAME) || name.contains(RETROARCH_MODE_INSTALL_NAME) ||
+            name.contains(VICE_MODE_INSTALL_NAME)) && name.endsWith(".exe");
+        }
+        else
+        {
+          return name.contains(installFileName) && name.endsWith(".exe");
+        }
+      }
+    };
+    return filter;
   }
 
   public GithubAssetInformation fetchLatestVersionFromGithub(String assetsName)
@@ -390,25 +411,24 @@ public abstract class BaseInstallManger implements AWTEventListener
   {
     return gitHubReleaseInformation.getDownloadUrl();
   }
-  
+
   public String getReleaseTagUrl()
   {
     return gitHubReleaseInformation.getReleaseTagUrl();
   }
-  
-  protected void askAndStartDownloadAtStartup(String productName)
+
+  protected void askAndStartDownloadAtStartup(String productName, String installName)
   {
-    PCUAEProductDownloadDialog dialog =
-      new PCUAEProductDownloadDialog(false, this, productName, true);
+    PCUAEProductDownloadDialog dialog = new PCUAEProductDownloadDialog(false, this, productName, true);
     dialog.pack();
     dialog.setLocationRelativeTo(MainWindow.getInstance());
     if (dialog.showDialog())
     {
-      downloadLatestVersion(productName);
+      downloadLatestVersion(productName, installName);
     }
   }
 
-  protected void askAndStartDownload(String productName)
+  protected void askAndStartDownload(String productName, String installName)
   {
     PCUAEProductDownloadDialog dialog =
       new PCUAEProductDownloadDialog(latestInInstallFolder.isEmpty(), this, productName, false);
@@ -416,7 +436,7 @@ public abstract class BaseInstallManger implements AWTEventListener
     dialog.setLocationRelativeTo(MainWindow.getInstance());
     if (dialog.showDialog())
     {
-      downloadLatestVersion(productName);
+      downloadLatestVersion(productName, installName);
     }
     else if (!latestInInstallFolder.isEmpty())
     {
@@ -424,7 +444,7 @@ public abstract class BaseInstallManger implements AWTEventListener
     }
   }
 
-  protected void downloadLatestVersion(String productName)
+  protected void downloadLatestVersion(String productName, String installName)
   {
     DownloadDialog progressDialog =
       new DownloadDialog("Downloading " + productName + " version " + gitHubReleaseInformation.getLatestVersion());
@@ -434,6 +454,13 @@ public abstract class BaseInstallManger implements AWTEventListener
     if (progressDialog.showDialog())
     {
       latestInInstallFolder = gitHubReleaseInformation.getInstallFile();
+      
+      if (FileManager.isConfiguredDeleteOldInstallfilesAfterDownload())
+      {
+        deleteOldInstallFiles(installName);
+      }
+      
+      
       int value = JOptionPane.showConfirmDialog(MainWindow.getInstance(),
                                                 "Download completed, do you want to install " + productName + " " +
                                                   gitHubReleaseInformation.getLatestVersion() + " now?",

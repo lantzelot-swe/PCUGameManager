@@ -4,7 +4,7 @@ import javax.swing.JOptionPane;
 
 import se.lantz.gui.MainWindow;
 
-public class AtariModeInstallManager extends BaseInstallManger
+public class AtariModeInstallManager extends BaseInstallManager
 {
   private static final String PRODUCT_NAME = "Atari mode";
 
@@ -17,7 +17,7 @@ public class AtariModeInstallManager extends BaseInstallManger
     readVersionFromInstallFolder(ATARI_MODE_INSTALL_NAME);
     if (isNewVersionAvailable(ATARI_MODE_INSTALL_NAME))
     {
-      askAndStartDownload(PRODUCT_NAME);
+      askAndStartDownload(PRODUCT_NAME, ATARI_MODE_INSTALL_NAME);
     }
     else
     {

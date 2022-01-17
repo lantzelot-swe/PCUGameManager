@@ -4,8 +4,9 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 
 import se.lantz.gui.MainWindow;
+import se.lantz.util.FileManager;
 
-public class PCUAEInstallManager extends BaseInstallManger
+public class PCUAEInstallManager extends BaseInstallManager
 {
   private static final String PRODUCT_NAME = "PCUAE";
 
@@ -21,7 +22,7 @@ public class PCUAEInstallManager extends BaseInstallManger
     readVersionFromInstallFolder(PCUAE_INSTALL_NAME);
     if (isNewVersionAvailable(PCUAE_INSTALL_NAME))
     {
-      askAndStartDownloadAtStartup(PRODUCT_NAME);
+      askAndStartDownloadAtStartup(PRODUCT_NAME, PCUAE_INSTALL_NAME);
     }
   }
 
@@ -30,7 +31,7 @@ public class PCUAEInstallManager extends BaseInstallManger
     readVersionFromInstallFolder(PCUAE_INSTALL_NAME);
     if (isNewVersionAvailable(PCUAE_INSTALL_NAME))
     {
-      askAndStartDownload(PRODUCT_NAME);
+      askAndStartDownload(PRODUCT_NAME, PCUAE_INSTALL_NAME);
     }
     else
     {

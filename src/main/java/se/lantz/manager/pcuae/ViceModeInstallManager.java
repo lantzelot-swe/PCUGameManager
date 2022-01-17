@@ -4,7 +4,7 @@ import javax.swing.JOptionPane;
 
 import se.lantz.gui.MainWindow;
 
-public class ViceModeInstallManager extends BaseInstallManger
+public class ViceModeInstallManager extends BaseInstallManager
 {
   private static final String PRODUCT_NAME = "Vice mode";
 
@@ -17,7 +17,7 @@ public class ViceModeInstallManager extends BaseInstallManger
     readVersionFromInstallFolder(VICE_MODE_INSTALL_NAME);
     if (isNewVersionAvailable(VICE_MODE_INSTALL_NAME))
     {
-      askAndStartDownload(PRODUCT_NAME);
+      askAndStartDownload(PRODUCT_NAME, VICE_MODE_INSTALL_NAME);
     }
     else
     {

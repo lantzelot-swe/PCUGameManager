@@ -4,7 +4,7 @@ import javax.swing.JOptionPane;
 
 import se.lantz.gui.MainWindow;
 
-public class RetroarchModeInstallManager extends BaseInstallManger
+public class RetroarchModeInstallManager extends BaseInstallManager
 {
   private static final String PRODUCT_NAME = "Retroarch mode";
 
@@ -17,7 +17,7 @@ public class RetroarchModeInstallManager extends BaseInstallManger
     readVersionFromInstallFolder(RETROARCH_MODE_INSTALL_NAME);
     if (isNewVersionAvailable(RETROARCH_MODE_INSTALL_NAME))
     {
-      askAndStartDownload(PRODUCT_NAME);
+      askAndStartDownload(PRODUCT_NAME, RETROARCH_MODE_INSTALL_NAME);
     }
     else
     {

@@ -4,7 +4,7 @@ import javax.swing.JOptionPane;
 
 import se.lantz.gui.MainWindow;
 
-public class LinuxModeInstallManager extends BaseInstallManger
+public class LinuxModeInstallManager extends BaseInstallManager
 {
   private static final String PRODUCT_NAME = "Linux mode";
 
@@ -17,7 +17,7 @@ public class LinuxModeInstallManager extends BaseInstallManger
     readVersionFromInstallFolder(LINUX_MODE_INSTALL_NAME);
     if (isNewVersionAvailable(LINUX_MODE_INSTALL_NAME))
     {
-      askAndStartDownload(PRODUCT_NAME);
+      askAndStartDownload(PRODUCT_NAME, LINUX_MODE_INSTALL_NAME);
     }
     else
     {
