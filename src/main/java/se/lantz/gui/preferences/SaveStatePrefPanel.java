@@ -64,7 +64,7 @@ public class SaveStatePrefPanel extends JPanel
     {
       String info = "<html>Different versions of the Carousel adds the saved states in different folders. " +
         "You have to choose which version of the Carousel you want the manager to read the saved states for. " +
-        "Only saved states for one carousel version at a time is shown for the games in the game list views.</html>";
+        "Only saved states for one carousel version at a time is shown for the games in the gamelist views.</html>";
       infoLabel = new JLabel(info);
     }
     return infoLabel;
