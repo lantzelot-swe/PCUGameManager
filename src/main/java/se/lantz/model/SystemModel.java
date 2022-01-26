@@ -2,6 +2,8 @@ package se.lantz.model;
 
 import java.util.ArrayList;
 
+import se.lantz.util.ExceptionHandler;
+
 public class SystemModel extends AbstractModel
 {
   private static final String C64 = "64";
@@ -291,7 +293,8 @@ public class SystemModel extends AbstractModel
       }
       else
       {
-        throw new IllegalArgumentException("Does not recognize " + flag);
+        //Ignore any invalid flags
+        ExceptionHandler.logException(new IllegalArgumentException("Does not recognize " + flag), "");
       }
     }
     
