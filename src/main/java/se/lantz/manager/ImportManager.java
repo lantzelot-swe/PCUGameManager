@@ -493,7 +493,7 @@ public class ImportManager
     List<String> lines = Collections.emptyList();
     try
     {
-      lines = Files.readAllLines(filePath, StandardCharsets.ISO_8859_1);
+      lines = Files.readAllLines(filePath, StandardCharsets.UTF_8);
     }
     catch (IOException e)
     {
