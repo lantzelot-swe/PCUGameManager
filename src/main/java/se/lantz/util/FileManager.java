@@ -38,6 +38,7 @@ import javax.imageio.ImageIO;
 import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -91,6 +92,9 @@ public class FileManager
 
   private static List<String> validFileEndingList =
     Arrays.asList("d64", "t64", "prg", "p00", "d81", "d82", "d71", "x64", "g64", "tap", "crt", "vsf");
+  
+  private static List<String> validDiskFilesEndingList =
+    Arrays.asList("d64", "d81", "d82", "d71", "x64", "g64");
 
   static
   {
@@ -646,12 +650,12 @@ public class FileManager
     {
       gamePathString = GAMES + infoModel.getGamesFile();
     }
-    runVice(true, gamePathString);
+    runVice(true, gamePathString, "");
   }
 
   public void runViceWithoutGame()
   {
-    runVice(false, "");
+    runVice(false, "", "");
   }
 
   public void runSnapshotInVice(SAVESTATE saveState)
@@ -713,10 +717,16 @@ public class FileManager
     default:
       break;
     }
-    runVice(true, gamePathString);
+    String attachDiskPath = "";
+    if (isValidDiskFileEnding(infoModel.getGamesFile()))
+    {
+      attachDiskPath = GAMES + infoModel.getGamesFile();
+    }
+    
+    runVice(true, gamePathString, attachDiskPath);
   }
 
-  private void runVice(boolean appendGame, String gamePath)
+  private void runVice(boolean appendGame, String gamePath, String attachDiskPath)
   {
     StringBuilder command = new StringBuilder();
     if (systemModel.isC64())
@@ -836,12 +846,20 @@ public class FileManager
         command.append("-joydev2 1");
       }
     }
+    //Attach disk if valid file ending of game file
+    if (!attachDiskPath.isEmpty())
+    {
+      command.append(" -8 \"");
+      command.append(attachDiskPath);
+      command.append("\"");
+    }
 
     //Used for saved snapshots, must be at the end of the commands
     if (appendGame && gamePath.contains(".vsz"))
     {
-      command.append(" ");
+      command.append(" \"");
       command.append(gamePath);
+      command.append("\"");
     }
 
     //Launch Vice
@@ -1644,6 +1662,15 @@ public class FileManager
   private static boolean isValidFileEnding(String fileName)
   {
     return validFileEndingList.stream().anyMatch(ending -> fileName.endsWith(ending));
+  }
+  
+  private static boolean isValidDiskFileEnding(String fileName)
+  {
+    if (fileName.isEmpty())
+    {
+      return false;
+    }
+    return validDiskFilesEndingList.stream().anyMatch(ending -> StringUtils.containsIgnoreCase(fileName, "." + ending));
   }
 
   public static List<String> convertAllScreenshotsTo32Bit() throws IOException
