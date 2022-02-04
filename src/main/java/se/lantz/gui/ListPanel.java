@@ -129,7 +129,8 @@ public class ListPanel extends JPanel
             JMenuItem addItem = new JMenuItem("Add gamelist view...");
             addItem.addActionListener(e -> gameViewManager.openViewEditDialog(new GameView(0)));
             menu.add(addItem);
-            if (((GameView) getListViewComboBox().getSelectedItem()).getGameViewId() > 0)
+            int gameListViewId = ((GameView) getListViewComboBox().getSelectedItem()).getGameViewId();
+            if (gameListViewId > 0)
             {
               JMenuItem editItem = new JMenuItem("Edit gamelist view...");
               editItem.addActionListener(e -> gameViewManager
@@ -139,6 +140,12 @@ public class ListPanel extends JPanel
               deleteItem
                 .addActionListener(e -> gameViewManager.deleteView((GameView) getListViewComboBox().getSelectedItem()));
               menu.add(deleteItem);
+            }
+            else if (gameListViewId < -1)
+            {
+              JMenuItem renameItem = new JMenuItem("Rename gamelist view...");
+              renameItem.addActionListener(e -> gameViewManager.renameFavoritesView((GameView) getListViewComboBox().getSelectedItem()));
+              menu.add(renameItem);
             }
 
             menu.show(listViewEditButton, 15, 15);

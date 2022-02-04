@@ -92,9 +92,8 @@ public class FileManager
 
   private static List<String> validFileEndingList =
     Arrays.asList("d64", "t64", "prg", "p00", "d81", "d82", "d71", "x64", "g64", "tap", "crt", "vsf");
-  
-  private static List<String> validDiskFilesEndingList =
-    Arrays.asList("d64", "d81", "d82", "d71", "x64", "g64");
+
+  private static List<String> validDiskFilesEndingList = Arrays.asList("d64", "d81", "d82", "d71", "x64", "g64");
 
   static
   {
@@ -131,41 +130,71 @@ public class FileManager
     return FileManager.class.getResourceAsStream("/se/lantz/MissingGame-Vic20.vsf.gz");
   }
 
-  public static BufferedImage getInfoSlotCover(int gameViewId)
+  public static BufferedImage getInfoSlotCover(int gameViewId, String gameViewName)
   {
     BufferedImage coverImage = null;
     String coverName = "InfoSlotC64Cover.png";
     switch (gameViewId)
     {
     case GameView.FAVORITES_ID:
-      coverName = "InfoSlotF1Cover.png";
+      if (gameViewName.equalsIgnoreCase("Favorites 1"))
+      {
+        coverName = "InfoSlotF1Cover.png";
+      }
       break;
     case GameView.FAVORITES_2_ID:
-      coverName = "InfoSlotF2Cover.png";
+      if (gameViewName.equalsIgnoreCase("Favorites 2"))
+      {
+        coverName = "InfoSlotF2Cover.png";
+      }
       break;
     case GameView.FAVORITES_3_ID:
-      coverName = "InfoSlotF3Cover.png";
+      if (gameViewName.equalsIgnoreCase("Favorites 3"))
+      {
+        coverName = "InfoSlotF3Cover.png";
+      }
       break;
     case GameView.FAVORITES_4_ID:
-      coverName = "InfoSlotF4Cover.png";
+      if (gameViewName.equalsIgnoreCase("Favorites 4"))
+      {
+        coverName = "InfoSlotF4Cover.png";
+      }
       break;
     case GameView.FAVORITES_5_ID:
-      coverName = "InfoSlotF5Cover.png";
+      if (gameViewName.equalsIgnoreCase("Favorites 5"))
+      {
+        coverName = "InfoSlotF5Cover.png";
+      }
       break;
     case GameView.FAVORITES_6_ID:
-      coverName = "InfoSlotF6Cover.png";
+      if (gameViewName.equalsIgnoreCase("Favorites 6"))
+      {
+        coverName = "InfoSlotF6Cover.png";
+      }
       break;
     case GameView.FAVORITES_7_ID:
-      coverName = "InfoSlotF7Cover.png";
+      if (gameViewName.equalsIgnoreCase("Favorites 7"))
+      {
+        coverName = "InfoSlotF7Cover.png";
+      }
       break;
     case GameView.FAVORITES_8_ID:
-      coverName = "InfoSlotF8Cover.png";
+      if (gameViewName.equalsIgnoreCase("Favorites 8"))
+      {
+        coverName = "InfoSlotF8Cover.png";
+      }
       break;
     case GameView.FAVORITES_9_ID:
-      coverName = "InfoSlotF9Cover.png";
+      if (gameViewName.equalsIgnoreCase("Favorites 9"))
+      {
+        coverName = "InfoSlotF9Cover.png";
+      }
       break;
     case GameView.FAVORITES_10_ID:
-      coverName = "InfoSlotF10Cover.png";
+      if (gameViewName.equalsIgnoreCase("Favorites 10"))
+      {
+        coverName = "InfoSlotF10Cover.png";
+      }
       break;
     default:
       break;
@@ -185,7 +214,7 @@ public class FileManager
   {
     //Check for USB and check if an existing games folder is available, pick from thumbs...
     BufferedImage screenImage = null;
-    
+
     String usbPath = getPCUAEUSBPath(false);
     if (!usbPath.isEmpty())
     {
@@ -203,7 +232,7 @@ public class FileManager
           else
           {
             screenImage = ImageIO.read(gamelistThumbsPath.resolve("thumbs-2.png").toFile());
-          }         
+          }
         }
         catch (IOException e)
         {
@@ -219,11 +248,11 @@ public class FileManager
     else
     {
       //Use default screens     
-      screenImage = getDefaultInfoSlotImage(first);   
+      screenImage = getDefaultInfoSlotImage(first);
     }
     return screenImage;
   }
-  
+
   private static BufferedImage getDefaultInfoSlotImage(boolean first)
   {
     BufferedImage screenImage = null;
@@ -674,7 +703,8 @@ public class FileManager
       }
       else
       {
-        gamePathString = SavedStatesManager.SAVES + SavedStatesManager.getGameFolderName(infoModel.getGamesFile()) + "/" + savedStatesModel.getState1File();
+        gamePathString = SavedStatesManager.SAVES + SavedStatesManager.getGameFolderName(infoModel.getGamesFile()) +
+          "/" + savedStatesModel.getState1File();
       }
     }
       break;
@@ -687,7 +717,8 @@ public class FileManager
       }
       else
       {
-        gamePathString = SavedStatesManager.SAVES + SavedStatesManager.getGameFolderName(infoModel.getGamesFile()) + "/" + savedStatesModel.getState2File();
+        gamePathString = SavedStatesManager.SAVES + SavedStatesManager.getGameFolderName(infoModel.getGamesFile()) +
+          "/" + savedStatesModel.getState2File();
       }
       break;
     case Save2:
@@ -699,7 +730,8 @@ public class FileManager
       }
       else
       {
-        gamePathString = SavedStatesManager.SAVES + SavedStatesManager.getGameFolderName(infoModel.getGamesFile()) + "/" + savedStatesModel.getState3File();
+        gamePathString = SavedStatesManager.SAVES + SavedStatesManager.getGameFolderName(infoModel.getGamesFile()) +
+          "/" + savedStatesModel.getState3File();
       }
       break;
     case Save3:
@@ -711,7 +743,8 @@ public class FileManager
       }
       else
       {
-        gamePathString = SavedStatesManager.SAVES + SavedStatesManager.getGameFolderName(infoModel.getGamesFile()) + "/" + savedStatesModel.getState4File();
+        gamePathString = SavedStatesManager.SAVES + SavedStatesManager.getGameFolderName(infoModel.getGamesFile()) +
+          "/" + savedStatesModel.getState4File();
       }
       break;
     default:
@@ -722,7 +755,7 @@ public class FileManager
     {
       attachDiskPath = GAMES + infoModel.getGamesFile();
     }
-    
+
     runVice(true, gamePathString, attachDiskPath);
   }
 
@@ -1044,13 +1077,19 @@ public class FileManager
     }
     return currentSavedStatesCarouselVersion;
   }
-  
+
+  public static String getConfiguredFavGameViewName(int favNumber)
+  {
+    return FileManager.getConfiguredProperties().getProperty(GameView.FAV_GAMEVIEW_NAME_PREF_KEY + favNumber,
+                                                             "Favorites " + favNumber);
+  }
+
   public static boolean isConfiguredDeleteOldInstallfilesAfterDownload()
   {
     if (deleteInstallFiles.isEmpty())
     {
-      deleteInstallFiles = FileManager.getConfiguredProperties()
-        .getProperty(PreferencesModel.DELETE_OLD_INSTALL_FILES, "false");
+      deleteInstallFiles =
+        FileManager.getConfiguredProperties().getProperty(PreferencesModel.DELETE_OLD_INSTALL_FILES, "false");
     }
     return Boolean.parseBoolean(deleteInstallFiles);
   }
@@ -1663,7 +1702,7 @@ public class FileManager
   {
     return validFileEndingList.stream().anyMatch(ending -> fileName.endsWith(ending));
   }
-  
+
   private static boolean isValidDiskFileEnding(String fileName)
   {
     if (fileName.isEmpty())

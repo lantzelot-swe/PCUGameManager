@@ -143,7 +143,7 @@ public class MainViewModel extends AbstractModel
 
     //Add favorites views
     favorites1View = new GameView(GameView.FAVORITES_ID);
-    favorites1View.setName("Favorites 1");
+    favorites1View.setName(FileManager.getConfiguredFavGameViewName(1));
     favorites1View.setSqlQuery("WHERE Favorite = 1");
 
     gameViewModel.addElement(allGameView);
@@ -152,63 +152,63 @@ public class MainViewModel extends AbstractModel
     if (numberOfFavoritesViews > 1)
     {
       favorites2View = new GameView(GameView.FAVORITES_2_ID);
-      favorites2View.setName("Favorites 2");
+      favorites2View.setName(FileManager.getConfiguredFavGameViewName(2));
       favorites2View.setSqlQuery("WHERE Favorite = 2");
       gameViewModel.addElement(favorites2View);
     }
     if (numberOfFavoritesViews > 2)
     {
       favorites3View = new GameView(GameView.FAVORITES_3_ID);
-      favorites3View.setName("Favorites 3");
+      favorites3View.setName(FileManager.getConfiguredFavGameViewName(3));
       favorites3View.setSqlQuery("WHERE Favorite = 3");
       gameViewModel.addElement(favorites3View);
     }
     if (numberOfFavoritesViews > 3)
     {
       favorites4View = new GameView(GameView.FAVORITES_4_ID);
-      favorites4View.setName("Favorites 4");
+      favorites4View.setName(FileManager.getConfiguredFavGameViewName(4));
       favorites4View.setSqlQuery("WHERE Favorite = 4");
       gameViewModel.addElement(favorites4View);
     }
     if (numberOfFavoritesViews > 4)
     {
       favorites5View = new GameView(GameView.FAVORITES_5_ID);
-      favorites5View.setName("Favorites 5");
+      favorites5View.setName(FileManager.getConfiguredFavGameViewName(5));
       favorites5View.setSqlQuery("WHERE Favorite = 5");
       gameViewModel.addElement(favorites5View);
     }
     if (numberOfFavoritesViews > 5)
     {
       favorites6View = new GameView(GameView.FAVORITES_6_ID);
-      favorites6View.setName("Favorites 6");
+      favorites6View.setName(FileManager.getConfiguredFavGameViewName(6));
       favorites6View.setSqlQuery("WHERE Favorite = 6");
       gameViewModel.addElement(favorites6View);
     }
     if (numberOfFavoritesViews > 6)
     {
       favorites7View = new GameView(GameView.FAVORITES_7_ID);
-      favorites7View.setName("Favorites 7");
+      favorites7View.setName(FileManager.getConfiguredFavGameViewName(7));
       favorites7View.setSqlQuery("WHERE Favorite = 7");
       gameViewModel.addElement(favorites7View);
     }
     if (numberOfFavoritesViews > 7)
     {
       favorites8View = new GameView(GameView.FAVORITES_8_ID);
-      favorites8View.setName("Favorites 8");
+      favorites8View.setName(FileManager.getConfiguredFavGameViewName(8));
       favorites8View.setSqlQuery("WHERE Favorite = 8");
       gameViewModel.addElement(favorites8View);
     }
     if (numberOfFavoritesViews > 8)
     {
       favorites9View = new GameView(GameView.FAVORITES_9_ID);
-      favorites9View.setName("Favorites 9");
+      favorites9View.setName(FileManager.getConfiguredFavGameViewName(9));
       favorites9View.setSqlQuery("WHERE Favorite = 9");
       gameViewModel.addElement(favorites9View);
     }
     if (numberOfFavoritesViews > 9)
     {
       favorites10View = new GameView(GameView.FAVORITES_10_ID);
-      favorites10View.setName("Favorites 10");
+      favorites10View.setName(FileManager.getConfiguredFavGameViewName(10));
       favorites10View.setSqlQuery("WHERE Favorite = 10");
       gameViewModel.addElement(favorites10View);
     }
@@ -1015,7 +1015,7 @@ public class MainViewModel extends AbstractModel
 
     infoModel.resetOldFileNames();
     //Cover image
-    infoModel.setCoverImage(FileManager.getInfoSlotCover(this.selectedGameView.getGameViewId()));
+    infoModel.setCoverImage(FileManager.getInfoSlotCover(this.selectedGameView.getGameViewId(), this.selectedGameView.getName()));
     //Screen images
     BufferedImage screenImage1 = FileManager.getInfoSlotScreenImage(true, this.selectedGameView.getName());
     writeGameViewTextOnScreen(screenImage1, Color.yellow);

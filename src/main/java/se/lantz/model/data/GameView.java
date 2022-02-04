@@ -10,6 +10,7 @@ import se.lantz.util.DbConstants;
 
 public class GameView implements Comparable
 {
+  public static final String FAV_GAMEVIEW_NAME_PREF_KEY = "GameViewFavoritesName_";
   public static final int ALL_GAMES_ID = -1;
   public static final int FAVORITES_ID = -2;
   public static final int FAVORITES_2_ID = -3;
@@ -33,6 +34,7 @@ public class GameView implements Comparable
   public GameView(int gameViewId)
   {
     this.gameViewId = gameViewId;
+    
   }
 
   public String getName()
@@ -270,6 +272,15 @@ public class GameView implements Comparable
   public void setGameCount(int count)
   {
     this.gameCount = count;
+  }
+  
+  public String getFavNamePreferencesKey()
+  {
+    if (gameViewId < -1)
+    {
+      return FAV_GAMEVIEW_NAME_PREF_KEY + -(gameViewId + 1);
+    }
+    return "";
   }
 
   @Override

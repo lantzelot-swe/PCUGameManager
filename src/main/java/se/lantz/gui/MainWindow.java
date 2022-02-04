@@ -99,9 +99,10 @@ public final class MainWindow extends JFrame
     return menuBar;
   }
   
-  public void refreshAfterPreferencesSave()
+  public void refreshMenuAndUI()
   {
     getJMenuBar().removeAll();
+    menuManager.setupEditMenu();
     for (JMenu menu : menuManager.getMenues())
     {
       menuBar.add(menu);

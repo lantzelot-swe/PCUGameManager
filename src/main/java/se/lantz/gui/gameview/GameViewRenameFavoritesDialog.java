@@ -9,31 +9,21 @@ import javax.swing.JPanel;
 import se.lantz.gui.BaseDialog;
 import se.lantz.model.data.GameView;
 
-public class GameViewEditDialog extends BaseDialog
+public class GameViewRenameFavoritesDialog extends BaseDialog
 {
 
-  private FilterPanel filterPanel;
   private ViewNamePanel namePanel;
 
-  public GameViewEditDialog(Frame owner, GameView gameView)
+  public GameViewRenameFavoritesDialog(Frame owner, GameView gameView)
   {
     super(owner);
     JPanel content = new JPanel();
     content.setLayout(new BorderLayout());
-    content.add(getViewNamePanel(gameView), BorderLayout.NORTH);
-    content.add(getFilterPanel(gameView), BorderLayout.CENTER);
-    setPreferredSize(new Dimension(400, 600));
+    content.add(getViewNamePanel(gameView), BorderLayout.CENTER);
+    setPreferredSize(new Dimension(400, 130));
     this.setResizable(false);
     addContent(content);
-  }
-
-  private FilterPanel getFilterPanel(GameView gameView)
-  {
-    if (filterPanel == null)
-    {
-      filterPanel = new FilterPanel(gameView);
-    }
-    return filterPanel;
+    setTitle("Rename favorites view");
   }
 
   private ViewNamePanel getViewNamePanel(GameView gameView)
@@ -48,7 +38,6 @@ public class GameViewEditDialog extends BaseDialog
   public void updateGameViewAfterClosing()
   {
     namePanel.updateGameView();
-    filterPanel.updateGameView();
   }
 
   @Override

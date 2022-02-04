@@ -20,6 +20,7 @@ import se.lantz.gamebase.GamebaseOptions;
 import se.lantz.gui.SelectDirPanel;
 import se.lantz.gui.SelectDirPanel.Mode;
 import se.lantz.manager.ImportManager;
+import se.lantz.util.FileManager;
 
 public class ImportOptionsPanel extends JPanel
 {
@@ -147,41 +148,7 @@ public class ImportOptionsPanel extends JPanel
     int returnValue = 0;
     if (getFavoriteCheckBox().isSelected())
     {
-      switch (getFavoriteComboBox().getSelectedItem().toString())
-      {
-      case "Favorite 1":
-        returnValue = 1;
-        break;
-      case "Favorite 2":
-        returnValue = 2;
-        break;
-      case "Favorite 3":
-        returnValue = 3;
-        break;
-      case "Favorite 4":
-        returnValue = 4;
-        break;
-      case "Favorite 5":
-        returnValue = 5;
-        break;
-      case "Favorite 6":
-        returnValue = 6;
-        break;
-      case "Favorite 7":
-        returnValue = 7;
-        break;
-      case "Favorite 8":
-        returnValue = 8;
-        break;
-      case "Favorite 9":
-        returnValue = 9;
-        break;
-      case "Favorite 10":
-        returnValue = 10;
-        break;
-      default:
-        break;
-      }
+      returnValue = getFavoriteComboBox().getSelectedIndex()+1;
     }
     return returnValue;
   }
@@ -324,16 +291,16 @@ public class ImportOptionsPanel extends JPanel
     {
       favoriteComboBox = new JComboBox<String>();
       DefaultComboBoxModel<String> favoriteComboModel = new DefaultComboBoxModel<>();
-      favoriteComboModel.addElement("Favorite 1");
-      favoriteComboModel.addElement("Favorite 2");
-      favoriteComboModel.addElement("Favorite 3");
-      favoriteComboModel.addElement("Favorite 4");
-      favoriteComboModel.addElement("Favorite 5");
-      favoriteComboModel.addElement("Favorite 6");
-      favoriteComboModel.addElement("Favorite 7");
-      favoriteComboModel.addElement("Favorite 8");
-      favoriteComboModel.addElement("Favorite 9");
-      favoriteComboModel.addElement("Favorite 10");
+      favoriteComboModel.addElement(FileManager.getConfiguredFavGameViewName(1));
+      favoriteComboModel.addElement(FileManager.getConfiguredFavGameViewName(2));
+      favoriteComboModel.addElement(FileManager.getConfiguredFavGameViewName(3));
+      favoriteComboModel.addElement(FileManager.getConfiguredFavGameViewName(4));
+      favoriteComboModel.addElement(FileManager.getConfiguredFavGameViewName(5));
+      favoriteComboModel.addElement(FileManager.getConfiguredFavGameViewName(6));
+      favoriteComboModel.addElement(FileManager.getConfiguredFavGameViewName(7));
+      favoriteComboModel.addElement(FileManager.getConfiguredFavGameViewName(8));
+      favoriteComboModel.addElement(FileManager.getConfiguredFavGameViewName(9));
+      favoriteComboModel.addElement(FileManager.getConfiguredFavGameViewName(10));
       favoriteComboBox.setModel(favoriteComboModel);
       favoriteComboBox.setEnabled(false);
     }

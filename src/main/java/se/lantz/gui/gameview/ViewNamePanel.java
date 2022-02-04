@@ -52,7 +52,7 @@ public class ViewNamePanel extends JPanel
     }
     return nameLabel;
   }
-  private JTextField getTextField() {
+  protected JTextField getTextField() {
     if (textField == null) {
     	textField = new JTextField();
     	textField.setColumns(10);

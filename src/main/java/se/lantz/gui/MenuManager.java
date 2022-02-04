@@ -231,7 +231,7 @@ public class MenuManager
     helpMenu.add(getAboutItem());
   }
 
-  private JMenu setupEditMenu()
+  public JMenu setupEditMenu()
   {
     this.currentFavoritesCount = FileManager.getConfiguredNumberOfFavorites();
     editMenu = new JMenu("Edit");
@@ -511,7 +511,7 @@ public class MenuManager
 
   private JMenuItem getToggleFavorite1Item()
   {
-    toggleFavorite1Item = new JMenuItem("Add/remove from favorites 1");
+    toggleFavorite1Item = new JMenuItem("Add/remove from " + FileManager.getConfiguredFavGameViewName(1));
     KeyStroke keyStrokeToToggleFav = KeyStroke.getKeyStroke(KeyEvent.VK_F1, InputEvent.CTRL_DOWN_MASK);
     toggleFavorite1Item.setAccelerator(keyStrokeToToggleFav);
     toggleFavorite1Item.addActionListener(e -> {
@@ -524,7 +524,7 @@ public class MenuManager
 
   private JMenuItem getToggleFavorite2Item()
   {
-    toggleFavorite2Item = new JMenuItem("Add/remove from favorites 2");
+    toggleFavorite2Item = new JMenuItem("Add/remove from " + FileManager.getConfiguredFavGameViewName(2));
     KeyStroke keyStrokeToToggleFav = KeyStroke.getKeyStroke(KeyEvent.VK_F2, InputEvent.CTRL_DOWN_MASK);
     toggleFavorite2Item.setAccelerator(keyStrokeToToggleFav);
     toggleFavorite2Item.addActionListener(e -> {
@@ -537,7 +537,7 @@ public class MenuManager
 
   private JMenuItem getToggleFavorite3Item()
   {
-    toggleFavorite3Item = new JMenuItem("Add/remove from favorites 3");
+    toggleFavorite3Item = new JMenuItem("Add/remove from " + FileManager.getConfiguredFavGameViewName(3));
     KeyStroke keyStrokeToToggleFav = KeyStroke.getKeyStroke(KeyEvent.VK_F3, InputEvent.CTRL_DOWN_MASK);
     toggleFavorite3Item.setAccelerator(keyStrokeToToggleFav);
     toggleFavorite3Item.addActionListener(e -> {
@@ -550,7 +550,7 @@ public class MenuManager
 
   private JMenuItem getToggleFavorite4Item()
   {
-    toggleFavorite4Item = new JMenuItem("Add/remove from favorites 4");
+    toggleFavorite4Item = new JMenuItem("Add/remove from " + FileManager.getConfiguredFavGameViewName(4));
     KeyStroke keyStrokeToToggleFav = KeyStroke.getKeyStroke(KeyEvent.VK_F4, InputEvent.CTRL_DOWN_MASK);
     toggleFavorite4Item.setAccelerator(keyStrokeToToggleFav);
     toggleFavorite4Item.addActionListener(e -> {
@@ -563,7 +563,7 @@ public class MenuManager
 
   private JMenuItem getToggleFavorite5Item()
   {
-    toggleFavorite5Item = new JMenuItem("Add/remove from favorites 5");
+    toggleFavorite5Item = new JMenuItem("Add/remove from " + FileManager.getConfiguredFavGameViewName(5));
     KeyStroke keyStrokeToToggleFav = KeyStroke.getKeyStroke(KeyEvent.VK_F5, InputEvent.CTRL_DOWN_MASK);
     toggleFavorite5Item.setAccelerator(keyStrokeToToggleFav);
     toggleFavorite5Item.addActionListener(e -> {
@@ -576,7 +576,7 @@ public class MenuManager
 
   private JMenuItem getToggleFavorite6Item()
   {
-    toggleFavorite6Item = new JMenuItem("Add/remove from favorites 6");
+    toggleFavorite6Item = new JMenuItem("Add/remove from " + FileManager.getConfiguredFavGameViewName(6));
     KeyStroke keyStrokeToToggleFav = KeyStroke.getKeyStroke(KeyEvent.VK_F6, InputEvent.CTRL_DOWN_MASK);
     toggleFavorite6Item.setAccelerator(keyStrokeToToggleFav);
     toggleFavorite6Item.addActionListener(e -> {
@@ -589,7 +589,7 @@ public class MenuManager
 
   private JMenuItem getToggleFavorite7Item()
   {
-    toggleFavorite7Item = new JMenuItem("Add/remove from favorites 7");
+    toggleFavorite7Item = new JMenuItem("Add/remove from " + FileManager.getConfiguredFavGameViewName(7));
     KeyStroke keyStrokeToToggleFav = KeyStroke.getKeyStroke(KeyEvent.VK_F7, InputEvent.CTRL_DOWN_MASK);
     toggleFavorite7Item.setAccelerator(keyStrokeToToggleFav);
     toggleFavorite7Item.addActionListener(e -> {
@@ -602,7 +602,7 @@ public class MenuManager
 
   private JMenuItem getToggleFavorite8Item()
   {
-    toggleFavorite8Item = new JMenuItem("Add/remove from favorites 8");
+    toggleFavorite8Item = new JMenuItem("Add/remove from " + FileManager.getConfiguredFavGameViewName(8));
     KeyStroke keyStrokeToToggleFav = KeyStroke.getKeyStroke(KeyEvent.VK_F8, InputEvent.CTRL_DOWN_MASK);
     toggleFavorite8Item.setAccelerator(keyStrokeToToggleFav);
     toggleFavorite8Item.addActionListener(e -> {
@@ -615,7 +615,7 @@ public class MenuManager
 
   private JMenuItem getToggleFavorite9Item()
   {
-    toggleFavorite9Item = new JMenuItem("Add/remove from favorites 9");
+    toggleFavorite9Item = new JMenuItem("Add/remove from " + FileManager.getConfiguredFavGameViewName(9));
     KeyStroke keyStrokeToToggleFav = KeyStroke.getKeyStroke(KeyEvent.VK_F9, InputEvent.CTRL_DOWN_MASK);
     toggleFavorite9Item.setAccelerator(keyStrokeToToggleFav);
     toggleFavorite9Item.addActionListener(e -> {
@@ -628,7 +628,7 @@ public class MenuManager
 
   private JMenuItem getToggleFavorite10Item()
   {
-    toggleFavorite10Item = new JMenuItem("Add/remove from favorites 10");
+    toggleFavorite10Item = new JMenuItem("Add/remove from " + FileManager.getConfiguredFavGameViewName(10));
     KeyStroke keyStrokeToToggleFav = KeyStroke.getKeyStroke(KeyEvent.VK_F10, InputEvent.CTRL_DOWN_MASK);
     toggleFavorite10Item.setAccelerator(keyStrokeToToggleFav);
     toggleFavorite10Item.addActionListener(e -> {
@@ -641,7 +641,7 @@ public class MenuManager
 
   private JMenuItem getClearFavorites1Item()
   {
-    clearFavorites1Item = new JMenuItem("Clear favorites 1");
+    clearFavorites1Item = new JMenuItem("Clear " + FileManager.getConfiguredFavGameViewName(1));
     KeyStroke keyStrokeToClearFav =
       KeyStroke.getKeyStroke(KeyEvent.VK_F1, InputEvent.CTRL_DOWN_MASK + InputEvent.SHIFT_DOWN_MASK);
     clearFavorites1Item.setAccelerator(keyStrokeToClearFav);
@@ -653,7 +653,7 @@ public class MenuManager
 
   private JMenuItem getClearFavorites2Item()
   {
-    clearFavorites2Item = new JMenuItem("Clear favorites 2");
+    clearFavorites2Item = new JMenuItem("Clear " + FileManager.getConfiguredFavGameViewName(2));
     KeyStroke keyStrokeToClearFav =
       KeyStroke.getKeyStroke(KeyEvent.VK_F2, InputEvent.CTRL_DOWN_MASK + InputEvent.SHIFT_DOWN_MASK);
     clearFavorites2Item.setAccelerator(keyStrokeToClearFav);
@@ -665,7 +665,7 @@ public class MenuManager
 
   private JMenuItem getClearFavorites3Item()
   {
-    clearFavorites3Item = new JMenuItem("Clear favorites 3");
+    clearFavorites3Item = new JMenuItem("Clear " + FileManager.getConfiguredFavGameViewName(3));
     KeyStroke keyStrokeToClearFav =
       KeyStroke.getKeyStroke(KeyEvent.VK_F3, InputEvent.CTRL_DOWN_MASK + InputEvent.SHIFT_DOWN_MASK);
     clearFavorites3Item.setAccelerator(keyStrokeToClearFav);
@@ -677,7 +677,7 @@ public class MenuManager
 
   private JMenuItem getClearFavorites4Item()
   {
-    clearFavorites4Item = new JMenuItem("Clear favorites 4");
+    clearFavorites4Item = new JMenuItem("Clear " + FileManager.getConfiguredFavGameViewName(4));
     KeyStroke keyStrokeToClearFav =
       KeyStroke.getKeyStroke(KeyEvent.VK_F4, InputEvent.CTRL_DOWN_MASK + InputEvent.SHIFT_DOWN_MASK);
     clearFavorites4Item.setAccelerator(keyStrokeToClearFav);
@@ -689,7 +689,7 @@ public class MenuManager
 
   private JMenuItem getClearFavorites5Item()
   {
-    clearFavorites5Item = new JMenuItem("Clear favorites 5");
+    clearFavorites5Item = new JMenuItem("Clear " + FileManager.getConfiguredFavGameViewName(5));
     KeyStroke keyStrokeToClearFav =
       KeyStroke.getKeyStroke(KeyEvent.VK_F5, InputEvent.CTRL_DOWN_MASK + InputEvent.SHIFT_DOWN_MASK);
     clearFavorites5Item.setAccelerator(keyStrokeToClearFav);
@@ -701,7 +701,7 @@ public class MenuManager
 
   private JMenuItem getClearFavorites6Item()
   {
-    clearFavorites6Item = new JMenuItem("Clear favorites 6");
+    clearFavorites6Item = new JMenuItem("Clear " + FileManager.getConfiguredFavGameViewName(6));
     KeyStroke keyStrokeToClearFav =
       KeyStroke.getKeyStroke(KeyEvent.VK_F6, InputEvent.CTRL_DOWN_MASK + InputEvent.SHIFT_DOWN_MASK);
     clearFavorites6Item.setAccelerator(keyStrokeToClearFav);
@@ -713,7 +713,7 @@ public class MenuManager
 
   private JMenuItem getClearFavorites7Item()
   {
-    clearFavorites7Item = new JMenuItem("Clear favorites 7");
+    clearFavorites7Item = new JMenuItem("Clear " + FileManager.getConfiguredFavGameViewName(7));
     KeyStroke keyStrokeToClearFav =
       KeyStroke.getKeyStroke(KeyEvent.VK_F7, InputEvent.CTRL_DOWN_MASK + InputEvent.SHIFT_DOWN_MASK);
     clearFavorites7Item.setAccelerator(keyStrokeToClearFav);
@@ -725,7 +725,7 @@ public class MenuManager
 
   private JMenuItem getClearFavorites8Item()
   {
-    clearFavorites8Item = new JMenuItem("Clear favorites 8");
+    clearFavorites8Item = new JMenuItem("Clear " + FileManager.getConfiguredFavGameViewName(8));
     KeyStroke keyStrokeToClearFav =
       KeyStroke.getKeyStroke(KeyEvent.VK_F8, InputEvent.CTRL_DOWN_MASK + InputEvent.SHIFT_DOWN_MASK);
     clearFavorites8Item.setAccelerator(keyStrokeToClearFav);
@@ -737,7 +737,7 @@ public class MenuManager
 
   private JMenuItem getClearFavorites9Item()
   {
-    clearFavorites9Item = new JMenuItem("Clear favorites 9");
+    clearFavorites9Item = new JMenuItem("Clear " + FileManager.getConfiguredFavGameViewName(9));
     KeyStroke keyStrokeToClearFav =
       KeyStroke.getKeyStroke(KeyEvent.VK_F9, InputEvent.CTRL_DOWN_MASK + InputEvent.SHIFT_DOWN_MASK);
     clearFavorites9Item.setAccelerator(keyStrokeToClearFav);
@@ -749,7 +749,7 @@ public class MenuManager
 
   private JMenuItem getClearFavorites10Item()
   {
-    clearFavorites10Item = new JMenuItem("Clear favorites 10");
+    clearFavorites10Item = new JMenuItem("Clear " + FileManager.getConfiguredFavGameViewName(10));
     KeyStroke keyStrokeToClearFav =
       KeyStroke.getKeyStroke(KeyEvent.VK_F10, InputEvent.CTRL_DOWN_MASK + InputEvent.SHIFT_DOWN_MASK);
     clearFavorites10Item.setAccelerator(keyStrokeToClearFav);
@@ -1132,8 +1132,7 @@ public class MenuManager
     {
       prefDialog.savePreferences();
       //Update favorites menu
-      setupEditMenu();
-      MainWindow.getInstance().refreshAfterPreferencesSave();
+      MainWindow.getInstance().refreshMenuAndUI();
       //Refresh game views
       uiModel.reloadGameViews();
       //Set all games as selected
@@ -1282,7 +1281,7 @@ public class MenuManager
       {
         savedStatesManager.convertToCarousel152Version();
         //Refresh after converting
-        MainWindow.getInstance().refreshAfterPreferencesSave();
+        MainWindow.getInstance().refreshMenuAndUI();
         //Refresh game views
         uiModel.reloadGameViews();
         //Set all games as selected
