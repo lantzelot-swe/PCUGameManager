@@ -274,6 +274,11 @@ public class GameView implements Comparable
     this.gameCount = count;
   }
   
+  public int getGameCount()
+  {
+    return this.gameCount;
+  }
+  
   public String getFavNamePreferencesKey()
   {
     if (gameViewId < -1)

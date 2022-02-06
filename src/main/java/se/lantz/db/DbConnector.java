@@ -13,6 +13,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -826,6 +828,54 @@ public class DbConnector
     return returnValue;
   }
 
+  public List<String> getScreenShotNames(List<String> gameIds)
+  {
+    //Returns 32 screenshot file names used for creating info slot screens.
+    List<String> returnList = new ArrayList<>();
+    Random screenIndexRandom = new Random();
+    String gameIdsString = gameIds.stream().collect(Collectors.joining(","));
+
+    String sql = "SELECT Screen1File, Screen2File FROM gameinfo WHERE rowid IN (" + gameIdsString + ");";
+    logger.debug("Generated SELECT String:\n{}", sql);
+
+    try (Connection conn = this.connect(); PreparedStatement pstmt = conn.prepareStatement(sql))
+    {
+      ResultSet rs = pstmt.executeQuery();
+      while (rs.next())
+      {
+        if (gameIds.size() < 32)
+        {
+          //Add both screens
+          returnList.add(rs.getString(DbConstants.SCREEN1));
+          returnList.add(rs.getString(DbConstants.SCREEN2));
+        }
+        else
+        {
+          //Randomize which screen to pick
+          if (screenIndexRandom.nextInt(2) == 0)
+          {
+            returnList.add(rs.getString(DbConstants.SCREEN1));
+          }
+          else
+          {
+            returnList.add(rs.getString(DbConstants.SCREEN2));
+          }
+        }
+      }
+      logger.debug("SELECT Executed successfully");
+      if (returnList.size() > 32)
+      {
+        Collections.shuffle(returnList);
+        returnList = returnList.subList(0, 31);
+      }
+    }
+    catch (SQLException e)
+    {
+      ExceptionHandler.handleException(e, "Could not fetch game details.");
+    }
+    return returnList;
+  }
+
   public int getGameDuplicateIndexToUse(String title, String gameId)
   {
     //This is only called when the title changes for an existing game or when adding a new game 
@@ -1198,21 +1248,21 @@ public class DbConnector
     }
     return fixedGames;
   }
-  
+
   public void resetJoystickConfigsForView(GameView view)
   {
     String joyConfig = FileManager.getConfiguredJoystickConfig();
     //Get only the mappings
-    joyConfig = joyConfig.substring(joyConfig.lastIndexOf(":")+1);
-    
+    joyConfig = joyConfig.substring(joyConfig.lastIndexOf(":") + 1);
+
     String joy1Default = "J:1*:" + joyConfig;
     String joy1NotDefault = "J:1:" + joyConfig;
     String joy2Default = "J:2*:" + joyConfig;
     String joy2NotDefault = "J:2:" + joyConfig;
-    
+
     StringBuilder joy1sqlBuilder = new StringBuilder();
     StringBuilder joy2sqlBuilder = new StringBuilder();
-    
+
     //Joy1Default
     joy1sqlBuilder.append("UPDATE gameinfo SET joy1config = '");
     joy1sqlBuilder.append(joy1Default);
@@ -1228,9 +1278,9 @@ public class DbConnector
     {
       joy1sqlBuilder.append("WHERE ");
     }
-    joy1sqlBuilder.append("joy1Config LIKE '%*%'");   
+    joy1sqlBuilder.append("joy1Config LIKE '%*%'");
     logger.debug("Generated SQL for joy1 default:\n{}", joy1sqlBuilder.toString());
-    
+
     //Joy2Default
     joy2sqlBuilder.append("UPDATE gameinfo SET joy1config = '");
     joy2sqlBuilder.append(joy1NotDefault);
@@ -1246,9 +1296,9 @@ public class DbConnector
     {
       joy2sqlBuilder.append("WHERE ");
     }
-    joy2sqlBuilder.append("joy2Config LIKE '%*%'"); 
+    joy2sqlBuilder.append("joy2Config LIKE '%*%'");
     logger.debug("Generated SQL for joy2 default:\n{}", joy2sqlBuilder.toString());
-    
+
     try (Connection conn = this.connect(); PreparedStatement joy1tmt = conn.prepareStatement(joy1sqlBuilder.toString());
       PreparedStatement joy2tmt = conn.prepareStatement(joy2sqlBuilder.toString()))
     {

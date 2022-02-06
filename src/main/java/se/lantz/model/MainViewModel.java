@@ -971,7 +971,7 @@ public class MainViewModel extends AbstractModel
   {
     stateManager.checkEnablementOfPalNtscMenuItem(check);
   }
-  
+
   public void resetJoystickConfigsForCurrentView()
   {
     dbConnector.resetJoystickConfigsForView(getSelectedGameView());
@@ -1015,15 +1015,45 @@ public class MainViewModel extends AbstractModel
 
     infoModel.resetOldFileNames();
     //Cover image
-    infoModel.setCoverImage(FileManager.getInfoSlotCover(this.selectedGameView.getGameViewId(), this.selectedGameView.getName()));
+    infoModel.setCoverImage(FileManager.getInfoSlotCover(this.selectedGameView.getGameViewId(),
+                                                         this.selectedGameView.getName()));
     //Screen images
-    BufferedImage screenImage1 = FileManager.getInfoSlotScreenImage(true, this.selectedGameView.getName());
-    writeGameViewTextOnScreen(screenImage1, Color.yellow);
-    infoModel.setScreen1Image(screenImage1);
+    List<String> screenShotFileNames = new ArrayList<>();
+    if (this.selectedGameView.getGameCount() > 15)
+    {
+      ArrayList<Integer> indexList = new ArrayList<Integer>();
+      for (int i = 0; i < selectedGameView.getGameCount(); i++)
+      {
+        indexList.add(i);
+      }
 
-    BufferedImage screenImage2 = FileManager.getInfoSlotScreenImage(false, this.selectedGameView.getName());
-    writeGameViewTextOnScreen(screenImage2, Color.red);
-    infoModel.setScreen2Image(screenImage2);
+      Collections.shuffle(indexList);
+
+      List<String> gameIdList = new ArrayList<>();
+      int index = 0;
+      while (gameIdList.size() < 32 && index < indexList.size())
+      {
+        GameListData randomGame = this.gameListModel.get(indexList.get(index));
+        if (!randomGame.isInfoSlot())
+        {
+          gameIdList.add(randomGame.getGameId());
+        }
+        index++;
+      }
+      //Only read from db if there are more than 15 games in the current view
+      if (gameIdList.size() > 15)
+      {
+        //Get a screenshot names for the game from db
+        screenShotFileNames = this.dbConnector.getScreenShotNames(gameIdList);
+        Collections.shuffle(screenShotFileNames);
+      }
+    }
+
+    BufferedImage[] images = FileManager.getInfoSlotScreenImage(this.selectedGameView, screenShotFileNames);
+    writeGameViewTextOnScreen(images[0], Color.yellow);
+    infoModel.setScreen1Image(images[0]);
+    writeGameViewTextOnScreen(images[1], Color.red);
+    infoModel.setScreen2Image(images[1]);
   }
 
   public void writeGameViewTextOnScreen(BufferedImage image, Color color)

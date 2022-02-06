@@ -210,7 +210,7 @@ public class FileManager
     return coverImage;
   }
 
-  public static BufferedImage getInfoSlotScreenImage(boolean first, String gameviewName)
+  private static BufferedImage getInfoSlotScreenImage(boolean first, String gameviewName)
   {
     //Check for USB and check if an existing games folder is available, pick from thumbs...
     BufferedImage screenImage = null;
@@ -251,6 +251,73 @@ public class FileManager
       screenImage = getDefaultInfoSlotImage(first);
     }
     return screenImage;
+  }
+
+  public static BufferedImage[] getInfoSlotScreenImage(GameView gameview, List<String> screenShotFileNames)
+  {
+    BufferedImage[] images = new BufferedImage[2];
+    //Check number of games in current view
+    if (screenShotFileNames.size() > 0)
+    {
+      List<BufferedImage> screenImages = new ArrayList<>();
+      for (String fileName : screenShotFileNames)
+      {
+        try
+        {
+          BufferedImage image = ImageIO.read(new File(SCREENS + fileName));
+          //Scale the image to 80x50
+          screenImages.add(scaleImageTo80x50(image));
+        }
+        catch (IOException e)
+        {
+          ExceptionHandler.handleException(e, "Could not read image for info slot screenshot.");
+        }
+      }
+      //Construct the new image
+      BufferedImage combinedImage1 = new BufferedImage(320, 200, BufferedImage.TYPE_INT_ARGB);
+      Graphics g1 = combinedImage1.getGraphics();
+      BufferedImage combinedImage2 = new BufferedImage(320, 200, BufferedImage.TYPE_INT_ARGB);
+      Graphics g2 = combinedImage2.getGraphics();
+      int yPos = 0;
+      int xPos = 0;
+
+      for (int i = 0; i < screenImages.size(); i++)
+      {
+        if (i == 16)
+        {
+          xPos = 0;
+          yPos = 0;
+        }
+        if (i < 16)
+        {
+          drawInfoSlotCombinedImage(g1, screenImages.get(i), xPos, yPos);
+        }
+        else
+        {
+          drawInfoSlotCombinedImage(g2, screenImages.get(i), xPos, yPos);
+        }
+        //Recalculate position
+        xPos++;
+        if (xPos > 3)
+        {
+          xPos = 0;
+          yPos++;
+        }
+      }
+      images[0] = combinedImage1;
+      images[1] = combinedImage2;
+    }
+    else
+    {
+      images[0] = getInfoSlotScreenImage(true, gameview.getName());
+      images[1] = getInfoSlotScreenImage(true, gameview.getName());
+    }
+    return images;
+  }
+
+  private static void drawInfoSlotCombinedImage(Graphics g, BufferedImage image, int xPos, int yPos)
+  {
+    g.drawImage(image, 0 + xPos * 80, 0 + yPos * 50, null);
   }
 
   private static BufferedImage getDefaultInfoSlotImage(boolean first)
@@ -1495,6 +1562,26 @@ public class FileManager
     Graphics g = copyOfImage.createGraphics();
     g.drawImage(newImage, 0, 0, null);
     return newImage;
+  }
+
+  private static BufferedImage scaleImageTo80x50(BufferedImage originalImage)
+  {
+    BufferedImage returnImage = originalImage;
+    if (returnImage.getType() != BufferedImage.TYPE_INT_ARGB)
+    {
+      //Convert to 32 bit
+      BufferedImage copyOfImage =
+        new BufferedImage(returnImage.getWidth(null), returnImage.getHeight(null), BufferedImage.TYPE_INT_ARGB);
+      Graphics g = copyOfImage.createGraphics();
+      g.drawImage(returnImage, 0, 0, null);
+      returnImage = copyOfImage;
+    }
+    Image newImage = returnImage.getScaledInstance(80, 50, Image.SCALE_SMOOTH);
+    BufferedImage copyOfImage =
+      new BufferedImage(newImage.getWidth(null), newImage.getHeight(null), BufferedImage.TYPE_INT_ARGB);
+    Graphics g = copyOfImage.createGraphics();
+    g.drawImage(newImage, 0, 0, null);
+    return copyOfImage;
   }
 
   /**
