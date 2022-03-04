@@ -83,6 +83,7 @@ public class FileManager
   private static String currentJoystickConfig = "";
   private static String currentSavedStatesCarouselVersion = "";
   private static String deleteInstallFiles = "";
+  private static String cropScreenshots = "";
 
   private MainViewModel model;
   private InfoModel infoModel;
@@ -1083,6 +1084,7 @@ public class FileManager
       currentJoystickConfig = "";
       currentSavedStatesCarouselVersion = "";
       deleteInstallFiles = "";
+      cropScreenshots = "";
       try (OutputStream output = new FileOutputStream("./pcu.properties"))
       {
         // save properties to project root folder
@@ -1159,6 +1161,15 @@ public class FileManager
         FileManager.getConfiguredProperties().getProperty(PreferencesModel.DELETE_OLD_INSTALL_FILES, "false");
     }
     return Boolean.parseBoolean(deleteInstallFiles);
+  }
+  
+  public static boolean isCropScreenshots()
+  {
+    if (cropScreenshots.isEmpty())
+    {
+      cropScreenshots = FileManager.getConfiguredProperties().getProperty(PreferencesModel.CROP_SCREENSHOTS, "false");
+    }
+    return Boolean.parseBoolean(cropScreenshots);
   }
 
   public static void backupDb(String targetFolderName)
@@ -1543,13 +1554,18 @@ public class FileManager
   public static BufferedImage cropImageTo320x200(BufferedImage originalImage)
   {
     // Crop to right size for C64: Remove the border to fit nicely in the carousel.
-    BufferedImage newImage = originalImage
-      .getSubimage((originalImage.getWidth() - 320) / 2, ((originalImage.getHeight() - 200) / 2) - 1, 320, 200);
-    BufferedImage copyOfImage =
-      new BufferedImage(newImage.getWidth(), newImage.getHeight(), BufferedImage.TYPE_INT_ARGB);
-    Graphics g = copyOfImage.createGraphics();
-    g.drawImage(newImage, 0, 0, null);
-    return newImage;
+    //Do nothing if image is too small
+    if (originalImage.getWidth() > 320 && originalImage.getHeight() > 200)
+    {
+      BufferedImage newImage = originalImage
+        .getSubimage((originalImage.getWidth() - 320) / 2, ((originalImage.getHeight() - 200) / 2) - 1, 320, 200);
+      BufferedImage copyOfImage =
+        new BufferedImage(newImage.getWidth(), newImage.getHeight(), BufferedImage.TYPE_INT_ARGB);
+      Graphics g = copyOfImage.createGraphics();
+      g.drawImage(newImage, 0, 0, null);
+      return newImage;
+    }
+    return originalImage;
   }
 
   private static BufferedImage cropImageTo448x280(BufferedImage originalImage)

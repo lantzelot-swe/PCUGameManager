@@ -786,12 +786,20 @@ public class ScreenshotsPanel extends JPanel
                                                     JOptionPane.INFORMATION_MESSAGE);
           if (value == JOptionPane.YES_OPTION)
           {
-            //Make sure the image is of right size vefore adding text to it
+            //Make sure the image is of right size before adding text to it
             returnImage = FileManager.scaleImageTo320x200x32bit(returnImage);
             model.writeGameViewTextOnScreen(returnImage, first ? Color.yellow : Color.red);
           }
         }
-        setEditButtonVisibility(returnImage, editButton);
+        if (FileManager.isCropScreenshots())
+        {
+          editButton.setVisible(false);
+          returnImage = FileManager.cropImageTo320x200(returnImage);
+        }
+        else
+        {
+          setEditButtonVisibility(returnImage, editButton);      
+        }
         imageLabel.setIcon(new ImageIcon(FileManager.scaleImageTo320x200x32bit(returnImage)));
       }
       catch (IOException e)

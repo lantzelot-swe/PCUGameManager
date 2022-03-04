@@ -14,6 +14,7 @@ import se.lantz.scraper.C64comScraper;
 import se.lantz.scraper.GamebaseScraper;
 import se.lantz.scraper.MobyGamesScraper;
 import se.lantz.scraper.Scraper;
+import se.lantz.util.FileManager;
 
 public class ScraperManager
 {
@@ -144,8 +145,16 @@ public class ScraperManager
 
   public void updateModelWithScreenshotImages(BufferedImage screen1, BufferedImage screen2)
   {
-    infoModel.setScreen1Image(screen1);
-    infoModel.setScreen2Image(screen2);
+    if (FileManager.isCropScreenshots())
+    {
+      infoModel.setScreen1Image(FileManager.cropImageTo320x200(screen1));
+      infoModel.setScreen2Image(FileManager.cropImageTo320x200(screen2));
+    }
+    else
+    {
+      infoModel.setScreen1Image(screen1);
+      infoModel.setScreen2Image(screen2);
+    }
   }
   
   public void updateModelWithCoverImage(BufferedImage cover)

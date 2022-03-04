@@ -13,6 +13,7 @@ public class PreferencesModel extends AbstractModel implements CommonInfoModel
   public static final String PCUAE_VERSION_CHECK = "checkForPCUAEVersion";
   public static final String MANGER_VERSION_CHECK = "checkForManagerVersion";
   public static final String DELETE_OLD_INSTALL_FILES = "deleteOldInstallFiles";
+  public static final String CROP_SCREENSHOTS = "cropScreenshotsWhenAdded";
   public static final String GENRE = "infoSlotGenre";
   public static final String AUTHOR = "infoSlotAuthor";
   public static final String YEAR = "infoSlotYear";
@@ -29,6 +30,7 @@ public class PreferencesModel extends AbstractModel implements CommonInfoModel
   private boolean checkPCUAEVersionAtStartup = true;
   private boolean checkManagerVersionAtStartup = true;
   private boolean deleteOldInstallfilesAfterDownload = false;
+  private boolean cropScreenshots = false;
 
   private String description =
     "For more Info on PCUAE look in The Help Menu. Main keys are CTRL + F1 for The Help Menu, CTRL + F3 for Carousel Version Changer, CTRL + F5 for Mode Changer, CTRL + F7 for PCUAE Option Menu, CTRL + SHIFT + F7 for Carousel Gamelist Changer.";
@@ -65,6 +67,7 @@ public class PreferencesModel extends AbstractModel implements CommonInfoModel
     setJoystickConfig(configuredProperties.getProperty(JOYSTICK, joystickConfig));
     setSavedStatesCarouselVersion(configuredProperties.getProperty(SAVED_STATES_CAROUSEL, CAROUSEL_152));
     setDeleteOldInstallfilesAfterDownload(Boolean.parseBoolean(configuredProperties.getProperty(DELETE_OLD_INSTALL_FILES, "false")));
+    setCropScreenshots(Boolean.parseBoolean(configuredProperties.getProperty(CROP_SCREENSHOTS, "false")));
   }
 
   public boolean isCheckPCUAEVersionAtStartup()
@@ -312,6 +315,21 @@ public class PreferencesModel extends AbstractModel implements CommonInfoModel
     }
   }
 
+  public boolean isCropScreenshots()
+  {
+    return cropScreenshots;
+  }
+
+  public void setCropScreenshots(boolean cropScreenshots)
+  {
+    boolean old = isCropScreenshots();
+    this.cropScreenshots = cropScreenshots;
+    if ((Boolean.compare(old, cropScreenshots) != 0))
+    {
+      notifyChange();
+    }
+  }
+
   public void savePreferences()
   {
     Properties configuredProperties = FileManager.getConfiguredProperties();
@@ -331,6 +349,7 @@ public class PreferencesModel extends AbstractModel implements CommonInfoModel
     configuredProperties.put(JOYSTICK, joystickConfig);
     configuredProperties.put(SAVED_STATES_CAROUSEL, savedStatesCarouselVersion);
     configuredProperties.put(DELETE_OLD_INSTALL_FILES, Boolean.toString(deleteOldInstallfilesAfterDownload));
+    configuredProperties.put(CROP_SCREENSHOTS, Boolean.toString(cropScreenshots));
     FileManager.storeProperties();
   }
 }

@@ -35,12 +35,16 @@ public class MiscPanel extends JPanel
   private SaveStatePrefPanel saveStatePrefPanel;
   private JPanel installPanel;
   private JCheckBox deleteOldInstallsCheckBox;
+  private JPanel screenshotsPanel;
+  private JCheckBox cropScreenCheckBox;
 
   public MiscPanel(PreferencesModel model)
   {
     this.model = model;
 
     GridBagLayout gridBagLayout = new GridBagLayout();
+    gridBagLayout.rowWeights = new double[] { 0.0, 0.0, 0.0, 0.0, 1.0 };
+    gridBagLayout.columnWeights = new double[] { 1.0 };
     setLayout(gridBagLayout);
     GridBagConstraints gbc_startupPanel = new GridBagConstraints();
     gbc_startupPanel.insets = new Insets(5, 5, 5, 3);
@@ -52,7 +56,7 @@ public class MiscPanel extends JPanel
     add(getStartupPanel(), gbc_startupPanel);
     GridBagConstraints gbc_installPanel = new GridBagConstraints();
     gbc_installPanel.weightx = 1.0;
-    gbc_installPanel.insets = new Insets(5, 5, 5, 5);
+    gbc_installPanel.insets = new Insets(5, 5, 5, 0);
     gbc_installPanel.fill = GridBagConstraints.HORIZONTAL;
     gbc_installPanel.gridx = 0;
     gbc_installPanel.gridy = 1;
@@ -65,13 +69,20 @@ public class MiscPanel extends JPanel
     gbc_favoritesPanel.gridx = 0;
     gbc_favoritesPanel.gridy = 2;
     add(getFavoritesPanel(), gbc_favoritesPanel);
+    GridBagConstraints gbc_screenshotsPanel = new GridBagConstraints();
+    gbc_screenshotsPanel.weightx = 1.0;
+    gbc_screenshotsPanel.insets = new Insets(0, 0, 5, 0);
+    gbc_screenshotsPanel.fill = GridBagConstraints.BOTH;
+    gbc_screenshotsPanel.gridx = 0;
+    gbc_screenshotsPanel.gridy = 3;
+    add(getScreenshotsPanel(), gbc_screenshotsPanel);
     GridBagConstraints gbc_saveStatePrefPanel = new GridBagConstraints();
     gbc_saveStatePrefPanel.insets = new Insets(5, 5, 0, 3);
     gbc_saveStatePrefPanel.weighty = 1.0;
     gbc_saveStatePrefPanel.anchor = GridBagConstraints.NORTHWEST;
     gbc_saveStatePrefPanel.fill = GridBagConstraints.HORIZONTAL;
     gbc_saveStatePrefPanel.gridx = 0;
-    gbc_saveStatePrefPanel.gridy = 3;
+    gbc_saveStatePrefPanel.gridy = 4;
     add(getSaveStatePrefPanel(), gbc_saveStatePrefPanel);
     if (!Beans.isDesignTime())
     {
@@ -90,7 +101,7 @@ public class MiscPanel extends JPanel
                                               new EtchedBorder(EtchedBorder.LOWERED,
                                                                new Color(255, 255, 255),
                                                                new Color(160, 160, 160)),
-                                              "Startup preferences",
+                                              "Startup",
                                               TitledBorder.LEADING,
                                               TitledBorder.TOP,
                                               null,
@@ -147,6 +158,7 @@ public class MiscPanel extends JPanel
       getFavoritesSpinner().setValue(model.getFavoritesCount());
     }
     getDeleteOldInstallsCheckBox().setSelected(model.isDeleteOldInstallfilesAfterDownload());
+    getCropScreenCheckBox().setSelected(model.isCropScreenshots());
   }
 
   private JPanel getFavoritesPanel()
@@ -154,8 +166,15 @@ public class MiscPanel extends JPanel
     if (favoritesPanel == null)
     {
       favoritesPanel = new JPanel();
-      favoritesPanel
-        .setBorder(new TitledBorder(null, "Favorites preferences", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+      favoritesPanel.setBorder(new TitledBorder(
+                                                new EtchedBorder(EtchedBorder.LOWERED,
+                                                                 new Color(255, 255, 255),
+                                                                 new Color(160, 160, 160)),
+                                                "Favorites",
+                                                TitledBorder.LEADING,
+                                                TitledBorder.TOP,
+                                                null,
+                                                new Color(0, 0, 0)));
       GridBagLayout gbl_favoritesPanel = new GridBagLayout();
       favoritesPanel.setLayout(gbl_favoritesPanel);
       GridBagConstraints gbc_numberOfFavoritesLabel = new GridBagConstraints();
@@ -220,12 +239,8 @@ public class MiscPanel extends JPanel
     if (saveStatePrefPanel == null)
     {
       saveStatePrefPanel = new SaveStatePrefPanel(this.model);
-      saveStatePrefPanel.setBorder(new TitledBorder(null,
-                                                    "Saved states preferences",
-                                                    TitledBorder.LEADING,
-                                                    TitledBorder.TOP,
-                                                    null,
-                                                    null));
+      saveStatePrefPanel
+        .setBorder(new TitledBorder(null, "Saved states", TitledBorder.LEADING, TitledBorder.TOP, null, null));
     }
     return saveStatePrefPanel;
   }
@@ -239,7 +254,7 @@ public class MiscPanel extends JPanel
                                               new EtchedBorder(EtchedBorder.LOWERED,
                                                                new Color(255, 255, 255),
                                                                new Color(160, 160, 160)),
-                                              "PCUAE Install preferences",
+                                              "PCUAE Install",
                                               TitledBorder.LEADING,
                                               TitledBorder.TOP,
                                               null,
@@ -269,5 +284,36 @@ public class MiscPanel extends JPanel
         .addItemListener((e) -> model.setDeleteOldInstallfilesAfterDownload(deleteOldInstallsCheckBox.isSelected()));
     }
     return deleteOldInstallsCheckBox;
+  }
+
+  private JPanel getScreenshotsPanel()
+  {
+    if (screenshotsPanel == null)
+    {
+      screenshotsPanel = new JPanel();
+      screenshotsPanel
+        .setBorder(new TitledBorder(null, "Screenshots", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+      GridBagLayout gbl_screenshotsPanel = new GridBagLayout();
+      gbl_screenshotsPanel.columnWidths = new int[]{0, 0};
+      gbl_screenshotsPanel.rowHeights = new int[]{0, 0};
+      gbl_screenshotsPanel.columnWeights = new double[]{0.0, Double.MIN_VALUE};
+      gbl_screenshotsPanel.rowWeights = new double[]{0.0, Double.MIN_VALUE};
+      screenshotsPanel.setLayout(gbl_screenshotsPanel);
+      GridBagConstraints gbc_cropScreenCheckBox = new GridBagConstraints();
+      gbc_cropScreenCheckBox.insets = new Insets(5, 0, 5, 5);
+      gbc_cropScreenCheckBox.gridx = 0;
+      gbc_cropScreenCheckBox.gridy = 0;
+      screenshotsPanel.add(getCropScreenCheckBox(), gbc_cropScreenCheckBox);
+    }
+    return screenshotsPanel;
+  }
+  private JCheckBox getCropScreenCheckBox() {
+    if (cropScreenCheckBox == null) {
+    	cropScreenCheckBox = new JCheckBox("Automatically crop screenshots to 320x200 pixels when added.");
+    	cropScreenCheckBox.setVerticalTextPosition(SwingConstants.TOP);
+    	cropScreenCheckBox
+        .addItemListener((e) -> model.setCropScreenshots(cropScreenCheckBox.isSelected()));
+    }
+    return cropScreenCheckBox;
   }
 }
