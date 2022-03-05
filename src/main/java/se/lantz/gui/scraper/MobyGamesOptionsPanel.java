@@ -8,6 +8,8 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.io.IOException;
@@ -136,6 +138,19 @@ public class MobyGamesOptionsPanel extends JPanel
     if (urlTextField == null)
     {
       urlTextField = new JTextField();
+      urlTextField.addFocusListener(new FocusListener() {
+
+        @Override
+        public void focusGained(FocusEvent e) {
+          urlTextField.select(0, urlTextField.getText().length());
+        }
+
+        @Override
+        public void focusLost(FocusEvent e) {
+          urlTextField.select(0, 0);
+        }
+        });
+
       urlTextField.setText("https://www.mobygames.com/game/");
       urlTextField.addKeyListener(new KeyAdapter()
       {

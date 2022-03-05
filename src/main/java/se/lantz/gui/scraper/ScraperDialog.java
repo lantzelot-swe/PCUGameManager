@@ -12,6 +12,7 @@ import java.awt.event.ActionListener;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 
 import se.lantz.gui.BaseDialog;
 import se.lantz.manager.ScraperManager;
@@ -106,7 +107,7 @@ public class ScraperDialog extends BaseDialog
     getMobyGamesPanel().preSelectFields();
     getC64comPanel().preSelectFields();
     getGb64comPanel().preSelectFields();
-    getMobyGamesPanel().getUrlTextField().requestFocusInWindow();
+    SwingUtilities.invokeLater(() -> getMobyGamesPanel().getUrlTextField().requestFocusInWindow());
     this.getRootPane().setDefaultButton(getMobyGamesPanel().getConnectButton());
 
     return super.showDialog();
