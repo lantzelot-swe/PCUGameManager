@@ -9,6 +9,8 @@ import se.lantz.util.FileManager;
 
 public class InfoModel extends AbstractModel implements CommonInfoModel
 {
+  //This is an approximate value of what fits on one row in the carousel on theC64/theVic20
+  public static int MAX_TITLE_LENGTH = 163;
   private String title = "";
   //Use this when saving cover/screen/game files: If the title has been changed the files shall be renamed.
   private String titleInDb = "";

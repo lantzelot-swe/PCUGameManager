@@ -15,6 +15,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -33,7 +34,8 @@ public class DescriptionPanel extends JPanel
   {
     en, de, fr, es, it
   }
-
+  private ImageIcon warningIcon = new ImageIcon(getClass().getResource("/se/lantz/warning-icon.png"));
+  
   private JTextArea descriptionTextArea;
   private JScrollPane descriptionScrollPane;
   private JLabel charCountLabel;
@@ -221,7 +223,7 @@ public class DescriptionPanel extends JPanel
   {
     if (length > 512)
     {
-      getCharCountLabel().setIcon(UIManager.getIcon("OptionPane.warningIcon"));
+      getCharCountLabel().setIcon(warningIcon);
     }
     else
     {

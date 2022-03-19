@@ -9,9 +9,11 @@ import javax.swing.BorderFactory;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.ImageIcon;
 import javax.swing.JList;
+import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 
 import se.lantz.manager.SavedStatesManager;
+import se.lantz.model.InfoModel;
 import se.lantz.model.data.GameListData;
 import se.lantz.model.data.GameView;
 import se.lantz.util.FileManager;
@@ -37,6 +39,8 @@ public class GameListDataRenderer extends DefaultListCellRenderer
   private ImageIcon saves2Icon = new ImageIcon(this.getClass().getResource("/se/lantz/16x16SaveIcon-2.png"));
   private ImageIcon saves3Icon = new ImageIcon(this.getClass().getResource("/se/lantz/16x16SaveIcon-3.png"));
   private ImageIcon saves4Icon = new ImageIcon(this.getClass().getResource("/se/lantz/16x16SaveIcon-4.png"));
+  
+  private ImageIcon warningIcon = new ImageIcon(getClass().getResource("/se/lantz/warning-icon.png"));
 
   private final Font bold;
   private final Font boldItalic;
@@ -62,7 +66,7 @@ public class GameListDataRenderer extends DefaultListCellRenderer
       super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
     if (value instanceof GameListData)
     {
-      handleGameListData(value, isSelected);
+      handleGameListData(value, isSelected, list);
     }
     else
     {
@@ -71,7 +75,7 @@ public class GameListDataRenderer extends DefaultListCellRenderer
     return listCellRendererComponent;
   }
 
-  private void handleGameListData(Object value, boolean isSelected)
+  private void handleGameListData(Object value, boolean isSelected, JList list)
   {
     GameListData listData = (GameListData) value;
     if (listData.isFavorite())
@@ -120,26 +124,34 @@ public class GameListDataRenderer extends DefaultListCellRenderer
       }
     }
     //Decide which icon to use
-    int numberOfSavedStates = savedStatesManager.getNumberOfSavedStatesForGame(listData.getGameFileName());
-    if (numberOfSavedStates == 1)
+    int titleLength = list.getGraphics().getFontMetrics().stringWidth(listData.getTitle());
+    if (titleLength > InfoModel.MAX_TITLE_LENGTH)
     {
-      this.setIcon(saves1Icon);
-    }
-    else if (numberOfSavedStates == 2)
-    {
-      this.setIcon(saves2Icon);
-    }
-    else if (numberOfSavedStates == 3)
-    {
-      this.setIcon(saves3Icon);
-    }
-    else if (numberOfSavedStates == 4)
-    {
-      this.setIcon(saves4Icon);
+      this.setIcon(warningIcon);
     }
     else
-    {
-      this.setIcon(null);
+    { 
+      int numberOfSavedStates = savedStatesManager.getNumberOfSavedStatesForGame(listData.getGameFileName());
+      if (numberOfSavedStates == 1)
+      {
+        this.setIcon(saves1Icon);
+      }
+      else if (numberOfSavedStates == 2)
+      {
+        this.setIcon(saves2Icon);
+      }
+      else if (numberOfSavedStates == 3)
+      {
+        this.setIcon(saves3Icon);
+      }
+      else if (numberOfSavedStates == 4)
+      {
+        this.setIcon(saves4Icon);
+      }
+      else
+      {
+        this.setIcon(null);
+      }
     }
   }
 

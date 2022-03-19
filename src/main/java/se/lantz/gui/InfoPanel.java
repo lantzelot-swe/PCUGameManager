@@ -1,7 +1,7 @@
 package se.lantz.gui;
 
+import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -12,19 +12,19 @@ import java.awt.event.KeyEvent;
 import java.beans.Beans;
 import java.util.Calendar;
 
-import javax.swing.Action;
+import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
 import javax.swing.JSpinner;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
-import javax.swing.KeyStroke;
 import javax.swing.SpinnerModel;
 import javax.swing.SpinnerNumberModel;
+import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
-import javax.swing.text.DefaultEditorKit;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 
 import se.lantz.model.InfoModel;
 import se.lantz.util.CustomUndoPlainDocument;
@@ -32,6 +32,8 @@ import se.lantz.util.TextComponentSupport;
 
 public class InfoPanel extends JPanel
 {
+  private ImageIcon warningIcon = new ImageIcon(getClass().getResource("/se/lantz/warning-icon14x14.png"));
+  JLabel titleLabel;
   private JTextField titleField;
   private JTextField authorField;
   private JTextField composerField;
@@ -59,7 +61,8 @@ public class InfoPanel extends JPanel
     gridBagLayout.columnWidths = new int[] { 0, 0 };
     setLayout(gridBagLayout);
 
-    JLabel titleLabel = new JLabel("Game title");
+    titleLabel = new JLabel("Game title");
+    titleLabel.setHorizontalTextPosition(SwingConstants.LEFT);
     GridBagConstraints gbc_titleLabel = new GridBagConstraints();
     gbc_titleLabel.anchor = GridBagConstraints.WEST;
     gbc_titleLabel.gridwidth = 2;
@@ -250,8 +253,37 @@ public class InfoPanel extends JPanel
             model.setTitle(textField.getText());
           }
         });
+
+      titleField.getDocument().addDocumentListener(new DocumentListener()
+        {
+          public void changedUpdate(DocumentEvent e)
+          {
+            updateWarningForTitleLength();
+          }
+
+          public void removeUpdate(DocumentEvent e)
+          {
+            updateWarningForTitleLength();
+          }
+
+          public void insertUpdate(DocumentEvent e)
+          {
+            updateWarningForTitleLength();
+          }
+        });
+
     }
     return titleField;
+  }
+
+  private void updateWarningForTitleLength()
+  {
+    int length = titleField.getGraphics().getFontMetrics().stringWidth(titleField.getText());
+    titleLabel.setIcon(length > InfoModel.MAX_TITLE_LENGTH ? warningIcon : null);
+    titleLabel.setToolTipText(length > InfoModel.MAX_TITLE_LENGTH
+      ? "The title is too long, it will be wrapped in the carousel."
+      : null);
+    titleField.setForeground(length > InfoModel.MAX_TITLE_LENGTH ? Color.RED : Color.BLACK);
   }
 
   private JSpinner getYearField()
@@ -303,13 +335,13 @@ public class InfoPanel extends JPanel
     {
       authorField = new JTextField();
       authorField.setDocument(new CustomUndoPlainDocument()
-      {
-        @Override
-        public void updateModel()
         {
-          model.setAuthor(authorField.getText());
-        }
-      });
+          @Override
+          public void updateModel()
+          {
+            model.setAuthor(authorField.getText());
+          }
+        });
       authorField.addKeyListener(new KeyAdapter()
         {
           @Override
@@ -329,13 +361,13 @@ public class InfoPanel extends JPanel
     {
       composerField = new JTextField();
       composerField.setDocument(new CustomUndoPlainDocument()
-      {
-        @Override
-        public void updateModel()
         {
-          model.setComposer(composerField.getText());
-        }
-      });
+          @Override
+          public void updateModel()
+          {
+            model.setComposer(composerField.getText());
+          }
+        });
       composerField.addKeyListener(new KeyAdapter()
         {
           @Override
