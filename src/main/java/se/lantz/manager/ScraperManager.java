@@ -148,12 +148,18 @@ public class ScraperManager
     if (FileManager.isCropScreenshots())
     {
       infoModel.setScreen1Image(FileManager.cropImageTo320x200(screen1));
-      infoModel.setScreen2Image(FileManager.cropImageTo320x200(screen2));
+      if (screen2 != null)
+      {
+        infoModel.setScreen2Image(FileManager.cropImageTo320x200(screen2));
+      }
     }
     else
     {
       infoModel.setScreen1Image(screen1);
-      infoModel.setScreen2Image(screen2);
+      if (screen2 != null)
+      {
+        infoModel.setScreen2Image(screen2);
+      }
     }
   }
   
