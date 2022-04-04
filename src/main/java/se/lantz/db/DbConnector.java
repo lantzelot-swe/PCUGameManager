@@ -888,7 +888,8 @@ public class DbConnector
     sqlBuilder.append(fileName);
     sqlBuilder.append("-cover*\' OR CoverFile GLOB \'");
     sqlBuilder.append(fileName);
-    sqlBuilder.append("[0-9][0-9]-cover*\';");
+    //Use only 0-5 here to filter out games where title may end with a year, e.g 97. 59 duplicates should be enough...
+    sqlBuilder.append("[0-5][0-9]-cover*\';");
     String sql = sqlBuilder.toString();
     logger.debug("Checking if game is in db already: {}", sql);
     int returnIndex = 0;
