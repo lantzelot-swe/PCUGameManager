@@ -619,7 +619,7 @@ public class FileManager
   public static String generateFileNameFromTitleForFileLoader(String title, int duplicateIndex)
   {
     List<Character> forbiddenCharsList =
-      ":,'�!+*<>()/[]?|".chars().mapToObj(item -> (char) item).collect(Collectors.toList());
+      ":,'�!+*<>/[]?|".chars().mapToObj(item -> (char) item).collect(Collectors.toList());
 
     List<Character> newName = title.chars().mapToObj(item -> (char) item)
       .filter(character -> !forbiddenCharsList.contains(character)).collect(Collectors.toList());
@@ -642,6 +642,11 @@ public class FileManager
 
       if (fileLoader)
       {
+        if (gameDetails.getGame().isEmpty())
+        {
+          //Do nothing
+          return;
+        }
         worker.publishMessage("Creating cjm file for " + gameDetails.getTitle());
         filename =
           generateFileNameFromTitleForFileLoader(gameDetails.getTitle(), gameDetails.getDuplicateIndex()) + ".cjm";
