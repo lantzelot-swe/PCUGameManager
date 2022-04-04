@@ -602,13 +602,6 @@ public class FileManager
         .map(Character::toUpperCase).collect(Collectors.toList());
     String newNameString = newName.stream().map(String::valueOf).collect(Collectors.joining());
 
-    //The maxi game tool seems to truncate to a maximum length of 23 characters. Let's do the same here.
-    if (newNameString.length() > 23)
-    {
-      newNameString = newNameString.substring(0, 23);
-      logger.debug("FileName: truncating to : {}", title);
-    }
-
     //Just add the duplicate index if there are several games with the same name
     if (duplicateIndex > 0 && duplicateIndex < 10)
     {
