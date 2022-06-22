@@ -80,7 +80,7 @@ public class SelectDirPanel extends JPanel
     switch (mode)
     {
     case CAROUSEL_IMPORT:
-      configuredDir = getUsbFilePath(false);
+      configuredDir = getUsbFilePath(false, false);
       if (configuredDir.isEmpty())
       {
         configuredDir = FileManager.getConfiguredProperties().getProperty(IMPORT_DIR_PROPERTY);
@@ -99,7 +99,7 @@ public class SelectDirPanel extends JPanel
       }
       break;
     case CAROUSEL_EXPORT:
-      configuredDir = getUsbFilePath(false);
+      configuredDir = getUsbFilePath(false, false);
       if (configuredDir.isEmpty())
       {
         configuredDir = FileManager.getConfiguredProperties().getProperty(CAROUSEL_EXPORT_DIR_PROPERTY);
@@ -110,7 +110,7 @@ public class SelectDirPanel extends JPanel
       }
       break;
     case FILELOADER_EXPORT:
-      configuredDir = getUsbFilePath(false);
+      configuredDir = getUsbFilePath(false, true);
       if (configuredDir.isEmpty())
       {
         configuredDir = FileManager.getConfiguredProperties().getProperty(FILELOADER_EXPORT_DIR_PROPERTY);
@@ -121,7 +121,7 @@ public class SelectDirPanel extends JPanel
       }
       break;
     case SAVEDSTATES_IMPORT:
-      configuredDir = getUsbFilePath(true);
+      configuredDir = getUsbFilePath(true, false);
       if (configuredDir.isEmpty())
       {
         configuredDir = FileManager.getConfiguredProperties().getProperty(SAVEDSTATES_IMPORT_DIR_PROPERTY);
@@ -132,7 +132,7 @@ public class SelectDirPanel extends JPanel
       }
       break;
     case SAVEDSTATES_EXPORT:
-      configuredDir = getUsbFilePath(true);
+      configuredDir = getUsbFilePath(true, false);
       if (configuredDir.isEmpty())
       {
         configuredDir = FileManager.getConfiguredProperties().getProperty(SAVEDSTATES_EXPORT_DIR_PROPERTY);
@@ -156,9 +156,9 @@ public class SelectDirPanel extends JPanel
     add(getUsbInfoLabel(), gbc_usbInfoLabel);
   }
   
-  private String getUsbFilePath(boolean saveState)
+  private String getUsbFilePath(boolean saveState, boolean fileLoader)
   {
-    String usbDir = FileManager.getPCUAEUSBPath(saveState);
+    String usbDir = FileManager.getPCUAEUSBPath(saveState, fileLoader);
     if (!usbDir.isEmpty())
     {
       getUsbInfoLabel().setText("PCUAE USB detected (" + usbDir.substring(0, usbDir.indexOf("\\")) + ")");

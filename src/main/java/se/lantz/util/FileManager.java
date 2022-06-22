@@ -216,7 +216,7 @@ public class FileManager
     //Check for USB and check if an existing games folder is available, pick from thumbs...
     BufferedImage screenImage = null;
 
-    String usbPath = getPCUAEUSBPath(false);
+    String usbPath = getPCUAEUSBPath(false, false);
     if (!usbPath.isEmpty())
     {
       //Read from USB thumbs
@@ -1952,7 +1952,7 @@ public class FileManager
     }
   }
 
-  public static String getPCUAEUSBPath(boolean savedStates)
+  public static String getPCUAEUSBPath(boolean savedStates, boolean fileLoader)
   {
     File[] roots = File.listRoots();
     File deviceRoot = null;
@@ -1970,10 +1970,29 @@ public class FileManager
     {
       return "";
     }
-    Path gamesPath = deviceRoot.toPath().resolve("Carousel_Games/Games");
+    
+    Path gamesPath;
     if (savedStates)
     {
       gamesPath = deviceRoot.toPath().resolve(".THEC64SAVE");
+    }
+    else if (fileLoader)
+    {
+      gamesPath = deviceRoot.toPath().resolve("File Loader Games");
+    }
+    else
+    {
+      //Check if a PCUAE folder exists (for PCUAE 2.0.0 and later)
+      Path pcuaePath = deviceRoot.toPath().resolve("PCUAE");
+      
+      if (pcuaePath.toFile().exists())
+      {
+        gamesPath = deviceRoot.toPath().resolve("PCUAE/Carousel_Games/Games");     
+      }
+      else
+      {
+        gamesPath = deviceRoot.toPath().resolve("Carousel_Games/Games");
+      }
     }
     return gamesPath.toString();
   }
