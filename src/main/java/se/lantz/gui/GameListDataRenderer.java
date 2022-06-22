@@ -131,7 +131,7 @@ public class GameListDataRenderer extends DefaultListCellRenderer
     }
     else
     { 
-      int numberOfSavedStates = savedStatesManager.getNumberOfSavedStatesForGame(listData.getGameFileName());
+      int numberOfSavedStates = savedStatesManager.getNumberOfSavedStatesForGame(listData.getGameFileName(), listData.getTitle());
       if (numberOfSavedStates == 1)
       {
         this.setIcon(saves1Icon);

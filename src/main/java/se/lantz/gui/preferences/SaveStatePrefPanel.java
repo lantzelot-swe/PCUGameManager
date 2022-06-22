@@ -21,6 +21,7 @@ public class SaveStatePrefPanel extends JPanel
   private JRadioButton v152RadioButton;
   private final ButtonGroup buttonGroup = new ButtonGroup();
   private PreferencesModel model;
+  private JRadioButton fileLoaderRadioButton;
 
   public SaveStatePrefPanel(PreferencesModel model)
   {
@@ -43,13 +44,21 @@ public class SaveStatePrefPanel extends JPanel
     gbc_v132RadioButton.gridy = 1;
     add(getV132RadioButton(), gbc_v132RadioButton);
     GridBagConstraints gbc_v152RadioButton = new GridBagConstraints();
-    gbc_v152RadioButton.weighty = 1.0;
-    gbc_v152RadioButton.insets = new Insets(0, 40, 10, 0);
+    gbc_v152RadioButton.weighty = 0.0;
+    gbc_v152RadioButton.insets = new Insets(0, 40, 0, 0);
     gbc_v152RadioButton.anchor = GridBagConstraints.NORTHWEST;
     gbc_v152RadioButton.weightx = 1.0;
     gbc_v152RadioButton.gridx = 0;
     gbc_v152RadioButton.gridy = 2;
     add(getV152RadioButton(), gbc_v152RadioButton);
+    GridBagConstraints gbc_fileLoaderRadioButton = new GridBagConstraints();
+    gbc_fileLoaderRadioButton.insets = new Insets(0, 40, 10, 0);
+    gbc_fileLoaderRadioButton.anchor = GridBagConstraints.NORTHWEST;
+    gbc_fileLoaderRadioButton.gridx = 0;
+    gbc_fileLoaderRadioButton.gridy = 3;
+    gbc_fileLoaderRadioButton.weightx = 1.0;
+    gbc_fileLoaderRadioButton.weighty = 1.0;
+    add(getFileLoaderRadioButton(), gbc_fileLoaderRadioButton);
     if (!Beans.isDesignTime())
     {
       model.addPropertyChangeListener(e -> modelChanged());
@@ -63,8 +72,8 @@ public class SaveStatePrefPanel extends JPanel
     if (infoLabel == null)
     {
       String info = "<html>Different versions of the Carousel adds the saved states in different folders. " +
-        "You have to choose which version of the Carousel you want the manager to read the saved states for. " +
-        "Only saved states for one carousel version at a time is shown for the games in the gamelist views.</html>";
+        "You have to choose which version of the Carousel (or the File Loader) you want the manager to read the saved states for. " +
+        "Only saved states for one option at a time is shown for the games in the gamelist views. Saved states for the File loader is located in a folder mathching the game title.</html>";
       infoLabel = new JLabel(info);
     }
     return infoLabel;
@@ -111,8 +120,30 @@ public class SaveStatePrefPanel extends JPanel
     return v152RadioButton;
   }
 
+  private JRadioButton getFileLoaderRadioButton()
+  {
+    if (fileLoaderRadioButton == null)
+    {
+      fileLoaderRadioButton = new JRadioButton("File Loader");
+      buttonGroup.add(fileLoaderRadioButton);
+      fileLoaderRadioButton.addItemListener(new ItemListener()
+        {
+          public void itemStateChanged(ItemEvent e)
+          {
+            if (fileLoaderRadioButton.isSelected())
+            {
+              model.setSavedStatesCarouselVersion(PreferencesModel.FILE_LOADER);
+            }
+          }
+        });
+    }
+    return fileLoaderRadioButton;
+  }
+
   private void modelChanged()
   {
     getV132RadioButton().setSelected(model.getSavedStatesCarouselVersion().equals(PreferencesModel.CAROUSEL_132));
+    getV152RadioButton().setSelected(model.getSavedStatesCarouselVersion().equals(PreferencesModel.CAROUSEL_152));
+    getFileLoaderRadioButton().setSelected(model.getSavedStatesCarouselVersion().equals(PreferencesModel.FILE_LOADER));
   }
 }

@@ -9,6 +9,7 @@ import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.PathMatcher;
+import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -33,6 +34,7 @@ import se.lantz.model.MainViewModel;
 import se.lantz.model.PreferencesModel;
 import se.lantz.model.SavedStatesModel;
 import se.lantz.model.SavedStatesModel.SAVESTATE;
+import se.lantz.model.data.GameValidationDetails;
 import se.lantz.util.ExceptionHandler;
 import se.lantz.util.FileManager;
 
@@ -107,15 +109,16 @@ public class SavedStatesManager
     //If the game has been renamed, make sure to rename the saves folder also
     String oldFileName = model.getInfoModel().getOldGamesFile();
     String newFileName = model.getInfoModel().getGamesFile();
-    File oldSaveFolder = new File(SAVES + getGameFolderName(oldFileName));
+    File oldSaveFolder = new File(SAVES + getGameFolderName(oldFileName, model.getInfoModel().getTitle()));
     if (!oldFileName.equals(newFileName) && oldSaveFolder.exists())
     {
       //Rename old folder to new name
-      oldSaveFolder.renameTo(new File(SAVES + getGameFolderName(model.getInfoModel().getGamesFile())));
+      oldSaveFolder.renameTo(new File(SAVES +
+        getGameFolderName(model.getInfoModel().getGamesFile(), model.getInfoModel().getTitle())));
     }
 
     String fileName = model.getInfoModel().getGamesFile();
-    Path saveFolder = new File(SAVES + getGameFolderName(fileName)).toPath();
+    Path saveFolder = new File(SAVES + getGameFolderName(fileName, model.getInfoModel().getTitle())).toPath();
     int numberofSaves = 0;
     //Check which ones are available
     Path mta0Path = saveFolder.resolve(MTA0);
@@ -166,9 +169,10 @@ public class SavedStatesManager
   {
     savedStatesModel.resetProperties();
     //Read from state directory, update model
-    String fileName = getGameFolderName(model.getInfoModel().getGamesFile());
+    String fileName = getGameFolderName(model.getInfoModel().getGamesFile(), model.getInfoModel().getTitle());
     if (!fileName.isEmpty())
     {
+      fileName = fileName.trim();
       //Check if folder is available
       Path saveFolder = new File(SAVES + fileName).toPath();
       if (Files.exists(saveFolder))
@@ -335,7 +339,7 @@ public class SavedStatesManager
 
   private void deleteSavedState(SAVESTATE state)
   {
-    String fileName = getGameFolderName(model.getInfoModel().getGamesFile());
+    String fileName = getGameFolderName(model.getInfoModel().getGamesFile(), model.getInfoModel().getTitle());
     Path saveFolder = new File(SAVES + fileName).toPath();
     try
     {
@@ -557,10 +561,18 @@ public class SavedStatesManager
     }
   }
 
-  public int getNumberOfSavedStatesForGame(String gameFileName)
+  public int getNumberOfSavedStatesForGame(String gameFileName, String title)
   {
-    String fileName = getGameFolderName(gameFileName);
-    return savedStatesMap.get(fileName) != null ? savedStatesMap.get(fileName) : 0;
+    String fileName = getGameFolderName(gameFileName, title);
+    if (savedStatesMap.get(fileName) == null)
+    {
+      //Check with only uppercase also
+      return savedStatesMap.get(fileName.toUpperCase()) != null ? savedStatesMap.get(fileName.toUpperCase()) : 0;
+    }
+    else
+    {
+      return savedStatesMap.get(fileName);
+    }
   }
 
   public void checkEnablementOfPalNtscMenuItem(boolean check)
@@ -574,7 +586,7 @@ public class SavedStatesManager
       if (!fileName.isEmpty() && fileName.contains(".vsf"))
       {
         //Check if folder is available
-        Path saveFolder = new File(SAVES + getGameFolderName(fileName)).toPath();
+        Path saveFolder = new File(SAVES + getGameFolderName(fileName, model.getInfoModel().getTitle())).toPath();
         if (Files.exists(saveFolder))
         {
           //Check which ones are available
@@ -593,7 +605,8 @@ public class SavedStatesManager
   {
     String gamesFile = model.getInfoModel().getGamesFile();
     Path gameFilePath = new File(FileManager.GAMES + gamesFile).toPath();
-    Path firstSavedStatePath = new File(SAVES + getGameFolderName(gamesFile)).toPath().resolve(VSZ0);
+    Path firstSavedStatePath =
+      new File(SAVES + getGameFolderName(gamesFile, model.getInfoModel().getTitle())).toPath().resolve(VSZ0);
 
     Path tempFilePath = new File(FileManager.GAMES + "temp.gz").toPath();
     try
@@ -620,7 +633,7 @@ public class SavedStatesManager
     return false;
   }
 
-  public static String getGameFolderName(String fileName)
+  public static String getGameFolderName(String fileName, String gameTitle)
   {
     String returnValue = "";
     switch (FileManager.getConfiguredSavedStatesCarouselVersion())
@@ -632,6 +645,12 @@ public class SavedStatesManager
       if (fileName.indexOf(".") > -1)
       {
         returnValue = fileName.substring(0, fileName.indexOf("."));
+      }
+      break;
+    case PreferencesModel.FILE_LOADER:
+      if (fileName.length() > 0)
+      {
+        returnValue = FileManager.generateSavedStatesFolderNameForFileLoader(gameTitle, 0);
       }
       break;
     default:
@@ -727,6 +746,82 @@ public class SavedStatesManager
     }
   }
 
+  public void copyFromCarouselToFileLoader()
+  {
+    //1. look through all folders and try to find a game in the db that matches the file name.
+    //2. for all that matches, get the title and copy the existing folder to a folder named as the title 
+    File saveFolder = new File(SAVES);
+    try (Stream<Path> stream = Files.walk(saveFolder.toPath().toAbsolutePath(), 1))
+    {
+      List<GameValidationDetails> allGamesDetailsList = this.model.getDbConnector().fetchAllGamesForDbValdation();
+
+      List<Path> filteredPathList = getMatchingCarousel152FoldersThatCanBeCopied(stream, allGamesDetailsList);
+      //Copy for all 
+      filteredPathList.stream().forEachOrdered(sourcePath -> {
+        try
+        {
+          File originalDir = sourcePath.toFile();
+          String fileName = originalDir.getName();
+
+          GameValidationDetails gameDetails = allGamesDetailsList.stream()
+            .filter(game -> fileName.equals(get152VersionFileName(game.getGame()))).findAny().orElse(null);
+
+          if (gameDetails != null)
+          {
+            File newDir = new File(originalDir.getParent() + "\\" +
+              FileManager.generateSavedStatesFolderNameForFileLoader(gameDetails.getTitle(), 0));
+            copyDirectory(sourcePath.toString(), newDir.toPath().toString());
+          }
+        }
+        catch (Exception e)
+        {
+          ExceptionHandler.logException(e, "Could not copy available saved states for " + sourcePath.toString());
+        }
+      });
+    }
+    catch (IOException e1)
+    {
+      ExceptionHandler.handleException(e1, "Could not copy saved states");
+    }
+  }
+
+  private void copyDirectory(String sourceDirectoryLocation, String destinationDirectoryLocation) throws IOException
+  {
+    Files.walk(Paths.get(sourceDirectoryLocation)).forEach(source -> {
+      Path destination =
+        Paths.get(destinationDirectoryLocation, source.toString().substring(sourceDirectoryLocation.length()));
+      try
+      {
+        Files.copy(source, destination, StandardCopyOption.REPLACE_EXISTING);
+      }
+      catch (IOException e)
+      {
+        ExceptionHandler.logException(e, "Could not copy available saved states from " + sourceDirectoryLocation);
+      }
+    });
+  }
+
+  private boolean is152VersionFolderName(Path folderPath)
+  {
+    String folderName = folderPath.toFile().getName();
+    String newName = folderName;
+    if (folderName.indexOf(".") > -1)
+    {
+      newName = folderName.substring(0, folderName.indexOf("."));
+    }
+    return newName.equalsIgnoreCase(folderName);
+  }
+
+  private String get152VersionFileName(String fileName)
+  {
+    String newName = fileName;
+    if (fileName.indexOf(".") > -1)
+    {
+      newName = fileName.substring(0, fileName.indexOf("."));
+    }
+    return newName;
+  }
+
   public int checkFor132SavedStates()
   {
     File saveFolder = new File(SAVES);
@@ -753,5 +848,42 @@ public class SavedStatesManager
       ExceptionHandler.handleException(e1, "Could not check saved states using carousel 1.3.2 format");
     }
     return (int) returnValue;
+  }
+
+  public int checkForSavedStatesToCopyToFileLoader()
+  {
+    //1. look through all folders and try to find a game in the db that matches the file name.
+    //2. for all that matches, get the title and check so that no folder exists already 
+    File saveFolder = new File(SAVES);
+    try (Stream<Path> stream = Files.walk(saveFolder.toPath().toAbsolutePath(), 1))
+    {
+      List<GameValidationDetails> allGamesDetailsList = this.model.getDbConnector().fetchAllGamesForDbValdation();
+      List<Path> filteredPathList = getMatchingCarousel152FoldersThatCanBeCopied(stream, allGamesDetailsList);
+      return filteredPathList.size();
+    }
+    catch (IOException e1)
+    {
+      ExceptionHandler.handleException(e1, "Could not check saved states for File Loader");
+    }
+    return 0;
+  }
+
+  private List<Path> getMatchingCarousel152FoldersThatCanBeCopied(Stream<Path> stream,
+                                                                  List<GameValidationDetails> allGamesDetailsList)
+  {
+    List<Path> filteredPathList = stream.filter(sourcePath -> is152VersionFolderName(sourcePath)).filter(sourcePath -> {
+      File originalDir = sourcePath.toFile();
+      String fileName = originalDir.getName();
+      GameValidationDetails gameDetails = allGamesDetailsList.stream()
+        .filter(game -> fileName.equals(get152VersionFileName(game.getGame()))).findAny().orElse(null);
+      if (gameDetails != null)
+      {
+        File newDir = new File(originalDir.getParent() + "\\" +
+          FileManager.generateSavedStatesFolderNameForFileLoader(gameDetails.getTitle(), 0));
+        return !newDir.exists();
+      }
+      return false;
+    }).collect(Collectors.toList());
+    return filteredPathList;
   }
 }

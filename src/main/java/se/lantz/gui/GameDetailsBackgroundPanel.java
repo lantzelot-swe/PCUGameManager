@@ -42,6 +42,7 @@ import se.lantz.gui.translation.TranslationProgressDialog;
 import se.lantz.gui.translation.TranslationWorker;
 import se.lantz.manager.ScraperManager;
 import se.lantz.model.MainViewModel;
+import se.lantz.model.PreferencesModel;
 import se.lantz.model.data.GameListData;
 import se.lantz.model.data.ScraperFields;
 import se.lantz.util.FileManager;
@@ -506,7 +507,12 @@ public class GameDetailsBackgroundPanel extends JPanel
   public void updateSavedStatesTabTitle()
   {
     String carouselVersion = FileManager.getConfiguredSavedStatesCarouselVersion();
-    getSystemSavesTabbedPane().setTitleAt(1, "Saved States (Carousel " + carouselVersion + ")");
+    String title = "Saved States (Carousel " + carouselVersion + ")";
+    if (carouselVersion.equals(PreferencesModel.FILE_LOADER))
+    {
+      title = "Saved States (File Loader)";
+    }
+    getSystemSavesTabbedPane().setTitleAt(1, title);
     getSavesBackgroundPanel().resetCurrentGameReference();
   }
 }

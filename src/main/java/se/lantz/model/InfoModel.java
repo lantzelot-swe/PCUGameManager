@@ -63,7 +63,8 @@ public class InfoModel extends AbstractModel implements CommonInfoModel
   public void setTitle(String title)
   {
     String old = getTitle();
-    this.title = title;
+    //Remove all " since that messes with the SQL
+    this.title = title.replace("\"", "").trim();
     if (!Objects.equals(old, title))
     {
       notifyChange();
@@ -213,7 +214,8 @@ public class InfoModel extends AbstractModel implements CommonInfoModel
   public void setComposer(String composer)
   {
     String old = getComposer();
-    this.composer = composer;
+    //Remove all " since that messes with the SQL
+    this.composer = composer.replace("\"", "").trim();
     if (!Objects.equals(old, composer))
     {
       notifyChange();
@@ -228,7 +230,8 @@ public class InfoModel extends AbstractModel implements CommonInfoModel
   public void setAuthor(String author)
   {
     String old = getAuthor();
-    this.author = author;
+    //Remove all " since that messes with the SQL
+    this.author = author.replace("\"", "").trim();
     if (!Objects.equals(old, author))
     {
       notifyChange();

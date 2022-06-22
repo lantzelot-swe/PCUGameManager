@@ -114,6 +114,7 @@ public class MenuManager
   private JMenuItem validateDbItem;
   private JMenuItem palNtscFixItem;
   private JMenuItem convertSavedStatesItem;
+  private JMenuItem copySavedStatesItem;
   private JMenuItem resetJoystickConfigItem;
 
   private JMenuItem installPCUAEItem;
@@ -209,6 +210,7 @@ public class MenuManager
     toolsMenu.add(getDeleteGamesForViewMenuItem());
     toolsMenu.addSeparator();
     toolsMenu.add(getConvertSavedStatesItem());
+    toolsMenu.add(getCopySavedStatesToFileLoaderItem());
     toolsMenu.add(getResetJoystickConfigItem());
     toolsMenu.addSeparator();
     toolsMenu.add(getPalNtscFixMenuItem());
@@ -815,6 +817,18 @@ public class MenuManager
     }
     return convertSavedStatesItem;
   }
+  
+  private JMenuItem getCopySavedStatesToFileLoaderItem()
+  {
+    
+    if (copySavedStatesItem == null)
+    {
+      copySavedStatesItem = new JMenuItem("Copy Saved states to File Loader...");
+      copySavedStatesItem.setMnemonic('f');
+      copySavedStatesItem.addActionListener(e -> copySavedStatesFromCarouselToFileLoader());
+    }
+    return copySavedStatesItem;
+  }
 
   private JMenuItem getResetJoystickConfigItem()
   {
@@ -1288,6 +1302,52 @@ public class MenuManager
         uiModel.setSelectedGameView(null);
       }
     }
+  }
+  
+  private void copySavedStatesFromCarouselToFileLoader()
+  {
+    
+    JOptionPane.showMessageDialog(MainWindow.getInstance().getMainPanel(),
+                                  "<html>A Carousel saves the saved states for a game in a folder named after the game file name.<br>When exporting games to File Loader the " +
+                                  "file name will be based on the title for the game, so the carousel saved states<br>will not be available for exported games.<p><p>With this " +
+                                  "function you can copy existing saved states for the games in the carousel to a new folder that the File loader will find. <br>It will check all " +
+                                  "imported saved states and match them towards available games in the manager and create a new folder in the saves directory.<br>You can then export the saved states to your USB stick to use them in the File Loader. <p><p>Press OK to check for saved states that can be copied.</html>",
+                                  "Copy saved states to File Loader",
+                                  JOptionPane.INFORMATION_MESSAGE);
+    
+    
+    int numberOfSavesNotAvailableForFileLoader = savedStatesManager.checkForSavedStatesToCopyToFileLoader();
+    
+    if (numberOfSavesNotAvailableForFileLoader == 0)
+    {
+      JOptionPane.showMessageDialog(MainWindow.getInstance().getMainPanel(),
+                                    "No carousel saved states exists that are not available for File Loader. All is up to date.",
+                                    "Copy saved states to File Loader",
+                                    JOptionPane.INFORMATION_MESSAGE);
+    }
+    else
+    {
+      String message = String
+        .format("<html>There are %s games that have saved states used by the Carousel version 1.5.2 or later.<br>Do you want to copy them to the File Loader format so that they are accessible from the File Loader?</html>",
+                Integer.valueOf(numberOfSavesNotAvailableForFileLoader));
+      int option = JOptionPane.showConfirmDialog(MainWindow.getInstance().getMainPanel(),
+                                                 message,
+                                                 "Copy saved states to File Loader",
+                                                 JOptionPane.YES_NO_OPTION,
+                                                 JOptionPane.QUESTION_MESSAGE);
+      if (option == JOptionPane.YES_OPTION)
+      {
+        savedStatesManager.copyFromCarouselToFileLoader();
+        //Refresh after converting
+        MainWindow.getInstance().refreshMenuAndUI();
+        //Refresh game views
+        uiModel.reloadGameViews();
+        //Set all games as selected
+        uiModel.setSelectedGameView(null);
+      }
+    }
+    
+    
   }
 
   private void resetJoystickConfigs()

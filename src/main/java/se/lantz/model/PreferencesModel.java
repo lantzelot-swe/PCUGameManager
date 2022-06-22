@@ -9,6 +9,7 @@ public class PreferencesModel extends AbstractModel implements CommonInfoModel
 {
   public static final String CAROUSEL_132 = "1.3.2";
   public static final String CAROUSEL_152 = "1.5.2";
+  public static final String FILE_LOADER = "fl";
   
   public static final String PCUAE_VERSION_CHECK = "checkForPCUAEVersion";
   public static final String MANGER_VERSION_CHECK = "checkForManagerVersion";

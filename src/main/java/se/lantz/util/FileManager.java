@@ -619,7 +619,7 @@ public class FileManager
   public static String generateFileNameFromTitleForFileLoader(String title, int duplicateIndex)
   {
     List<Character> forbiddenCharsList =
-      ":,'�!+*<>/[]?|".chars().mapToObj(item -> (char) item).collect(Collectors.toList());
+      ":,'�!+*<>/[]?|\"".chars().mapToObj(item -> (char) item).collect(Collectors.toList());
 
     List<Character> newName = title.chars().mapToObj(item -> (char) item)
       .filter(character -> !forbiddenCharsList.contains(character)).collect(Collectors.toList());
@@ -629,9 +629,28 @@ public class FileManager
       //Just add the duplicate index if there are several games with the same name
       newNameString = newNameString + "_" + duplicateIndex;
     }
+    newNameString = newNameString.trim();
 
     logger.debug("Game title: \"{}\" ---- New fileName: \"{}\"", title, newNameString);
     return newNameString;
+  }
+  
+  public static String generateSavedStatesFolderNameForFileLoader(String title, int duplicateIndex)
+  {
+    String name = generateFileNameFromTitleForFileLoader(title, duplicateIndex);
+    //Special handling of titles where dots occur, e.g. G.A.C.C.R.R. or H.E.R.O.
+    int dotCount = (int)name.chars().filter(ch -> ch == '.').count();
+    if (dotCount > 4)
+    {
+      //Strip string to only include 4 dots, seems to be a limit there
+      int endIndex = StringUtils.ordinalIndexOf(name, ".", 5);
+      name = name.substring(0, endIndex);
+    }
+    if (name.endsWith("."))
+    {
+      name = name.substring(0, name.lastIndexOf("."));
+    }
+    return name;
   }
 
   public void exportGameInfoFile(GameDetails gameDetails, File targetDir, PublishWorker worker, boolean fileLoader)
@@ -769,7 +788,7 @@ public class FileManager
       }
       else
       {
-        gamePathString = SavedStatesManager.SAVES + SavedStatesManager.getGameFolderName(infoModel.getGamesFile()) +
+        gamePathString = SavedStatesManager.SAVES + SavedStatesManager.getGameFolderName(infoModel.getGamesFile(), infoModel.getTitle()) +
           "/" + savedStatesModel.getState1File();
       }
     }
@@ -783,7 +802,7 @@ public class FileManager
       }
       else
       {
-        gamePathString = SavedStatesManager.SAVES + SavedStatesManager.getGameFolderName(infoModel.getGamesFile()) +
+        gamePathString = SavedStatesManager.SAVES + SavedStatesManager.getGameFolderName(infoModel.getGamesFile(), infoModel.getTitle()) +
           "/" + savedStatesModel.getState2File();
       }
       break;
@@ -796,7 +815,7 @@ public class FileManager
       }
       else
       {
-        gamePathString = SavedStatesManager.SAVES + SavedStatesManager.getGameFolderName(infoModel.getGamesFile()) +
+        gamePathString = SavedStatesManager.SAVES + SavedStatesManager.getGameFolderName(infoModel.getGamesFile(), infoModel.getTitle()) +
           "/" + savedStatesModel.getState3File();
       }
       break;
@@ -809,7 +828,7 @@ public class FileManager
       }
       else
       {
-        gamePathString = SavedStatesManager.SAVES + SavedStatesManager.getGameFolderName(infoModel.getGamesFile()) +
+        gamePathString = SavedStatesManager.SAVES + SavedStatesManager.getGameFolderName(infoModel.getGamesFile(), infoModel.getTitle()) +
           "/" + savedStatesModel.getState4File();
       }
       break;
