@@ -208,7 +208,15 @@ public class ManagerVersionChecker
     {
       return 0;
     }
-    return Integer.parseInt(numbers);
+    
+    int number = Integer.parseInt(numbers);
+    if (number < 1000)
+    {
+      //Major releases increase the first digit and may not add any "build" number
+      //add a zero.
+      number = number * 10;
+    }
+    return number;
   }
 
   public static String getLatestVersion()
