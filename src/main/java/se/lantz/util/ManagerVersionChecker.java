@@ -42,13 +42,14 @@ public class ManagerVersionChecker
   private static String managerMainInstallFile;
   private static String latestReleaseDescription = "";
   private static boolean downloadIterrupted = false;
-  
+
   private static ExecutorService singleThreadExecutor = Executors.newSingleThreadExecutor();
+
   private ManagerVersionChecker()
   {
     //Empty
   }
-  
+
   public static void fetchLatestVersionFromGithub()
   {
     try
@@ -65,14 +66,15 @@ public class ManagerVersionChecker
       }
       scanner.close();
       con.disconnect();
-     
+
       JsonReader reader = new JsonReader(new StringReader(builder.toString()));
       reader.setLenient(true);
       JsonElement root = new JsonParser().parse(reader);
       JsonObject jsonObject = root.getAsJsonObject();
       latestVersion = jsonObject.get("tag_name").getAsString();
       tagloadUrl = jsonObject.get("html_url").getAsString();
-      downloadUrl = jsonObject.get("assets").getAsJsonArray().get(0).getAsJsonObject().get("browser_download_url").getAsString();
+      downloadUrl =
+        jsonObject.get("assets").getAsJsonArray().get(0).getAsJsonObject().get("browser_download_url").getAsString();
       latestReleaseDescription = jsonObject.get("body").getAsString();
       managerMainInstallFile = downloadUrl.substring(downloadUrl.lastIndexOf("/") + 1);
     }
@@ -81,11 +83,11 @@ public class ManagerVersionChecker
       ExceptionHandler.handleException(ex, "Could not check version");
     }
   }
-  
+
   public static void updateVersion()
-  {  
+  {
     DownloadDialog progressDialog = new DownloadDialog("Downloading version " + latestVersion);
-    singleThreadExecutor.execute(() -> startDownload(progressDialog));  
+    singleThreadExecutor.execute(() -> startDownload(progressDialog));
     progressDialog.pack();
     progressDialog.setLocationRelativeTo(MainWindow.getInstance());
     if (progressDialog.showDialog())
@@ -103,7 +105,7 @@ public class ManagerVersionChecker
       }
       //Launch new JRE that will copy over the existing file
       String command = ".\\jre\\bin\\java -cp temp\\updater.jar se.lantz.updater.ManagerUpdater";
-      
+
       try
       {
         Runtime.getRuntime().exec(command);
@@ -131,8 +133,7 @@ public class ManagerVersionChecker
       });
     }
   }
-  
-  
+
   public static void startDownload(final DownloadDialog downloadDialog)
   {
     downloadIterrupted = false;
@@ -143,7 +144,7 @@ public class ManagerVersionChecker
     {
       url = new URL(downloadUrl);
       Files.createDirectories(new File(TEMP_FOLDER).toPath());
-      
+
       HttpURLConnection httpConnection = (HttpURLConnection) (url.openConnection());
       long completeFileSize = httpConnection.getContentLength();
       BufferedInputStream in = new BufferedInputStream(httpConnection.getInputStream());
@@ -181,42 +182,38 @@ public class ManagerVersionChecker
       downloadDialog.closeWhenComplete();
     }
   }
-  
+
   public static boolean isNewVersionAvailable()
   {
     logger.debug("Manifest version=" + FileManager.getPcuVersionFromManifest());
-    //Ignore versions starting with 1, the comparison does not work well with that.
-    //Once 2.x is available it will be calculated correctly
-    if (latestVersion.startsWith("1"))
-    {
-      return false;
-    }
-    return getIntVersion(FileManager.getPcuVersionFromManifest()) < getIntVersion(latestVersion);
+    return isNewer(FileManager.getPcuVersionFromManifest(), latestVersion);
   }
-  
-  public static int getIntVersion(String versionString)
+
+  public static boolean isNewer(String existingVersionString, String latestVersionString)
   {
-    //Regular expression to match digits in a string
+    //Regular expression to match digits in a string. Each group returns the digit in the current position.
+    //1 and 10 is handled properly.
     String regex = "\\d+";
     Pattern pattern = Pattern.compile(regex);
-    Matcher matcher = pattern.matcher(versionString);
-    String numbers = "";
-    while(matcher.find()) {
-       numbers = numbers + matcher.group();
-    }
-    if (numbers.isEmpty())
+    Matcher existingMatcher = pattern.matcher(existingVersionString);
+    Matcher latestMatcher = pattern.matcher(latestVersionString);
+    String currentExistingNumber = "";
+    String currentLatestNumber = "";
+    while (existingMatcher.find())
     {
-      return 0;
+      currentExistingNumber = existingMatcher.group();
+      currentLatestNumber = latestMatcher.find() ? latestMatcher.group() : "0";
+      if (Integer.parseInt(currentLatestNumber) > Integer.parseInt(currentExistingNumber))
+      {
+        return true;
+      }
     }
-    
-    int number = Integer.parseInt(numbers);
-    if (number < 1000)
+    //There is an additional digit in the latest version string, consider it newer
+    if (latestMatcher.find())
     {
-      //Major releases increase the first digit and may not add any "build" number
-      //add a zero.
-      number = number * 10;
+      return true;
     }
-    return number;
+    return false;
   }
 
   public static String getLatestVersion()
@@ -228,7 +225,7 @@ public class ManagerVersionChecker
   {
     return tagloadUrl;
   }
-  
+
   public static String getLatestReleaseDescription()
   {
     return latestReleaseDescription;

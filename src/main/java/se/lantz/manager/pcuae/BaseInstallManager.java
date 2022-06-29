@@ -144,27 +144,27 @@ public abstract class BaseInstallManager implements AWTEventListener
       }
     }
   }
-  
+
   private FilenameFilter getFileNameFilter(String installFileName)
   {
     FilenameFilter filter = new FilenameFilter()
-    {
-      @Override
-      public boolean accept(File f, String name)
       {
-        if (PCUAE_INSTALL_NAME.equals(installFileName))
+        @Override
+        public boolean accept(File f, String name)
         {
-          //Check so that no other is part of the name
-          return !(name.contains(AMIGA_MODE_INSTALL_NAME) || name.contains(ATARI_MODE_INSTALL_NAME) ||
-            name.contains(LINUX_MODE_INSTALL_NAME) || name.contains(RETROARCH_MODE_INSTALL_NAME) ||
-            name.contains(VICE_MODE_INSTALL_NAME)) && name.endsWith(".exe");
+          if (PCUAE_INSTALL_NAME.equals(installFileName))
+          {
+            //Check so that no other is part of the name
+            return !(name.contains(AMIGA_MODE_INSTALL_NAME) || name.contains(ATARI_MODE_INSTALL_NAME) ||
+              name.contains(LINUX_MODE_INSTALL_NAME) || name.contains(RETROARCH_MODE_INSTALL_NAME) ||
+              name.contains(VICE_MODE_INSTALL_NAME)) && name.endsWith(".exe");
+          }
+          else
+          {
+            return name.contains(installFileName) && name.endsWith(".exe");
+          }
         }
-        else
-        {
-          return name.contains(installFileName) && name.endsWith(".exe");
-        }
-      }
-    };
+      };
     return filter;
   }
 
@@ -393,8 +393,7 @@ public abstract class BaseInstallManager implements AWTEventListener
   protected boolean isNewVersionAvailable(String installName)
   {
     gitHubReleaseInformation = fetchLatestVersionFromGithub(installName);
-    return ManagerVersionChecker.getIntVersion(latestInInstallFolder) < ManagerVersionChecker
-      .getIntVersion(gitHubReleaseInformation.getInstallFile());
+    return ManagerVersionChecker.isNewer(latestInInstallFolder, gitHubReleaseInformation.getInstallFile());
   }
 
   public String getLatestInInstallFolder()
@@ -454,13 +453,12 @@ public abstract class BaseInstallManager implements AWTEventListener
     if (progressDialog.showDialog())
     {
       latestInInstallFolder = gitHubReleaseInformation.getInstallFile();
-      
+
       if (FileManager.isConfiguredDeleteOldInstallfilesAfterDownload())
       {
         deleteOldInstallFiles(installName);
       }
-      
-      
+
       int value = JOptionPane.showConfirmDialog(MainWindow.getInstance(),
                                                 "Download completed, do you want to install " + productName + " " +
                                                   gitHubReleaseInformation.getLatestVersion() + " now?",
