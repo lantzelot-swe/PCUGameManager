@@ -118,7 +118,9 @@ public class SavedStatesManager
     }
 
     String fileName = model.getInfoModel().getGamesFile();
-    Path saveFolder = new File(SAVES + getGameFolderName(fileName, model.getInfoModel().getTitle())).toPath();
+    String gameFolderName = getGameFolderName(fileName, model.getInfoModel().getTitle());
+    
+    Path saveFolder = new File(SAVES + gameFolderName).toPath();
     int numberofSaves = 0;
     //Check which ones are available
     Path mta0Path = saveFolder.resolve(MTA0);
@@ -162,7 +164,7 @@ public class SavedStatesManager
       numberofSaves++;
     }
     //Update current map also
-    savedStatesMap.put(fileName, numberofSaves);
+    savedStatesMap.put(gameFolderName.toUpperCase(), numberofSaves);
   }
 
   public void readSavedStates()
@@ -547,7 +549,7 @@ public class SavedStatesManager
             savesAvailable++;
           }
           //Add to map
-          savedStatesMap.put(sourcePath.toFile().getName(), savesAvailable);
+          savedStatesMap.put(sourcePath.toFile().getName().toUpperCase(), savesAvailable);
         }
         catch (Exception e)
         {
@@ -563,16 +565,8 @@ public class SavedStatesManager
 
   public int getNumberOfSavedStatesForGame(String gameFileName, String title)
   {
-    String fileName = getGameFolderName(gameFileName, title);
-    if (savedStatesMap.get(fileName) == null)
-    {
-      //Check with only uppercase also
-      return savedStatesMap.get(fileName.toUpperCase()) != null ? savedStatesMap.get(fileName.toUpperCase()) : 0;
-    }
-    else
-    {
-      return savedStatesMap.get(fileName);
-    }
+    String fileName = getGameFolderName(gameFileName, title).toUpperCase();
+    return savedStatesMap.get(fileName) == null ? 0 : savedStatesMap.get(fileName);
   }
 
   public void checkEnablementOfPalNtscMenuItem(boolean check)
