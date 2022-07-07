@@ -1,5 +1,5 @@
 # PCUAE Manager
-PCUAE Manager (Project Carousel Usb Anniversary Edition) is an application for managing installation of the PCUAE software and managing games and games information used by the carousel for TheC64, The Vic20 and TheC64 Mini.
+PCUAE Manager (Project Carousel Usb Anniversary Edition) is an application for managing installation of the [PCUAE software] (https://github.com/CommodoreOS/PCUAE) and managing games and games information used by the carousel for TheC64, The Vic20 and TheC64 Mini.
 
 To run the PCUAE Manager you first need a "full version" that includes a JRE, you can get it from [here](https://drive.google.com/drive/folders/1_F1MGrP5Z5qMEiOOWTkTEkUwVA_A1c42?usp=sharing).
 
