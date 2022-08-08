@@ -218,6 +218,11 @@ public class ListPanel extends JPanel
   {
     return getList().getSelectedIndices().length == 1;
   }
+  
+  boolean isNoGameSelected()
+  {
+    return getList().getSelectedIndices().length == 0;
+  }
 
   int getSelectedIndexInList()
   {
@@ -635,6 +640,23 @@ public class ListPanel extends JPanel
           uiModel.toggleFavorite10(glData);
         }
       }
+      mainPanel.repaintAfterModifications();
+    }
+  }
+  
+  public void setViewTag(String viewTag)
+  {
+    if (!uiModel.isDataChanged())
+    {
+      for (GameListData glData : list.getSelectedValuesList())
+      {
+        if (!glData.isInfoSlot())
+        {
+          uiModel.setViewTag(glData, viewTag);
+        }
+      }
+      //Trigger a reload of current game view
+      uiModel.reloadCurrentGameView();
       mainPanel.repaintAfterModifications();
     }
   }

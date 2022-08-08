@@ -1194,6 +1194,20 @@ public class DbConnector
       ExceptionHandler.handleException(e, "Could not clear favorite values in db.");
     }
   }
+  
+  public void setViewTag(String gameId, String viewTag)
+  {
+    String sql = "UPDATE gameinfo SET Viewtag = '" + viewTag + "' WHERE rowId = " + gameId + ";";
+    try (Connection conn = this.connect(); PreparedStatement favoritestmt = conn.prepareStatement(sql))
+    {
+      int value = favoritestmt.executeUpdate();
+      logger.debug("Executed successfully, value = {}", value);
+    }
+    catch (SQLException e)
+    {
+      ExceptionHandler.handleException(e, "Could not update Viewtag value in db.");
+    }
+  }
 
   public void cleanupAfterImport()
   {

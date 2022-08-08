@@ -106,6 +106,8 @@ public class MenuManager
   private JMenuItem clearFavorites9Item;
   private JMenuItem clearFavorites10Item;
 
+  private JMenuItem editViewTagItem;
+
   private JMenuItem backupDbItem;
   private JMenuItem restoreDbItem;
   private JMenuItem deleteAllGamesItem;
@@ -314,6 +316,8 @@ public class MenuManager
     {
       editMenu.add(getClearFavorites10Item());
     }
+    editMenu.addSeparator();
+    editMenu.add(getEditViewTagItem());
     return editMenu;
   }
 
@@ -761,6 +765,30 @@ public class MenuManager
     return clearFavorites10Item;
   }
 
+  private JMenuItem getEditViewTagItem()
+  {
+    editViewTagItem = new JMenuItem("Edit view tag...");
+    KeyStroke keyStrokeToToggleFav = KeyStroke.getKeyStroke(KeyEvent.VK_T, InputEvent.CTRL_DOWN_MASK);
+    editViewTagItem.setAccelerator(keyStrokeToToggleFav);
+    editViewTagItem.addActionListener(e -> {
+      if (!mainWindow.getMainPanel().isNoGameSelected())
+      {
+        String initialValue = mainWindow.getMainPanel().isSingleGameSelected() ? uiModel.getInfoModel().getViewTag() : "";
+        String message = mainWindow.getMainPanel().isSingleGameSelected()
+          ? "Enter the view tag to set for " + uiModel.getInfoModel().getTitle()
+          : "Enter the view tag to set for the selected games";
+        String viewTag = JOptionPane.showInputDialog(MainWindow.getInstance(), message, initialValue);
+        if (viewTag != null)
+        {
+          mainWindow.setWaitCursor(true);
+          mainWindow.getMainPanel().setViewTag(viewTag);
+          mainWindow.setWaitCursor(false);
+        }
+      }
+    });
+    return editViewTagItem;
+  }
+
   private JMenuItem getBackupDbItem()
   {
     backupDbItem = new JMenuItem("Backup database");
@@ -817,10 +845,10 @@ public class MenuManager
     }
     return convertSavedStatesItem;
   }
-  
+
   private JMenuItem getCopySavedStatesToFileLoaderItem()
   {
-    
+
     if (copySavedStatesItem == null)
     {
       copySavedStatesItem = new JMenuItem("Copy Saved states to File Loader...");
@@ -1303,27 +1331,28 @@ public class MenuManager
       }
     }
   }
-  
+
   private void copySavedStatesFromCarouselToFileLoader()
   {
-    
-    JOptionPane.showMessageDialog(MainWindow.getInstance().getMainPanel(),
-                                  "<html>A Carousel saves the saved states for a game in a folder named after the game file name.<br>When exporting games to File Loader the " +
-                                  "file name will be based on the title for the game, so the carousel saved states<br>will not be available for exported games.<p><p>With this " +
-                                  "function you can copy existing saved states for the games in the carousel to a new folder that the File loader will find. <br>It will check all " +
-                                  "imported saved states and match them towards available games in the manager and create a new folder in the saves directory.<br>You can then export the saved states to your USB stick to use them in the File Loader. <p><p>Press OK to check for saved states that can be copied.</html>",
-                                  "Copy saved states to File Loader",
-                                  JOptionPane.INFORMATION_MESSAGE);
-    
-    
+
+    JOptionPane
+      .showMessageDialog(MainWindow.getInstance().getMainPanel(),
+                         "<html>A Carousel saves the saved states for a game in a folder named after the game file name.<br>When exporting games to File Loader the " +
+                           "file name will be based on the title for the game, so the carousel saved states<br>will not be available for exported games.<p><p>With this " +
+                           "function you can copy existing saved states for the games in the carousel to a new folder that the File loader will find. <br>It will check all " +
+                           "imported saved states and match them towards available games in the manager and create a new folder in the saves directory.<br>You can then export the saved states to your USB stick to use them in the File Loader. <p><p>Press OK to check for saved states that can be copied.</html>",
+                         "Copy saved states to File Loader",
+                         JOptionPane.INFORMATION_MESSAGE);
+
     int numberOfSavesNotAvailableForFileLoader = savedStatesManager.checkForSavedStatesToCopyToFileLoader();
-    
+
     if (numberOfSavesNotAvailableForFileLoader == 0)
     {
-      JOptionPane.showMessageDialog(MainWindow.getInstance().getMainPanel(),
-                                    "No carousel saved states exists that are not available for File Loader. All is up to date.",
-                                    "Copy saved states to File Loader",
-                                    JOptionPane.INFORMATION_MESSAGE);
+      JOptionPane
+        .showMessageDialog(MainWindow.getInstance().getMainPanel(),
+                           "No carousel saved states exists that are not available for File Loader. All is up to date.",
+                           "Copy saved states to File Loader",
+                           JOptionPane.INFORMATION_MESSAGE);
     }
     else
     {
@@ -1346,8 +1375,7 @@ public class MenuManager
         uiModel.setSelectedGameView(null);
       }
     }
-    
-    
+
   }
 
   private void resetJoystickConfigs()
@@ -1364,7 +1392,10 @@ public class MenuManager
     if (option == JOptionPane.YES_OPTION)
     {
       uiModel.resetJoystickConfigsForCurrentView();
-      JOptionPane.showMessageDialog(MainWindow.getInstance().getMainPanel(), "Joystick configurations updated.", "Reset joystick configurations", JOptionPane.INFORMATION_MESSAGE);
+      JOptionPane.showMessageDialog(MainWindow.getInstance().getMainPanel(),
+                                    "Joystick configurations updated.",
+                                    "Reset joystick configurations",
+                                    JOptionPane.INFORMATION_MESSAGE);
       MainWindow.getInstance().reloadCurrentGameView();
     }
   }

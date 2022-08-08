@@ -930,6 +930,15 @@ public class MainViewModel extends AbstractModel
   {
     favorites10Count = toggleFavorite(data, 10, favorites10Count, favorites10View);
   }
+  
+  public void setViewTag(GameListData data, String viewTag)
+  {
+    if (data != null && !data.getGameId().isEmpty())
+    {
+      dbConnector.setViewTag(data.getGameId(), viewTag);
+      gameListModel.notifyChange();
+    }
+  }
 
   private int toggleFavorite(GameListData data, int favoritesNumber, int favoritesCount, GameView favoritesView)
   {
