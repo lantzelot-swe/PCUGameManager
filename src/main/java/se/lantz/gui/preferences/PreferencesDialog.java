@@ -16,7 +16,7 @@ public class PreferencesDialog extends BaseDialog
     addContent(getPreferencesTabPanel());
     getOkButton().setText("Save");
     getOkButton().setPreferredSize(null);
-    this.setPreferredSize(new Dimension(366, 630));
+    this.setPreferredSize(new Dimension(368, 570));
     this.setResizable(false);
   }
 

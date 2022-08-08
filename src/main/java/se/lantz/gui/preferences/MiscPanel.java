@@ -4,19 +4,11 @@ import java.awt.Color;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.awt.event.FocusAdapter;
-import java.awt.event.FocusEvent;
 import java.beans.Beans;
 
 import javax.swing.JCheckBox;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JSpinner;
-import javax.swing.JTextField;
-import javax.swing.SpinnerModel;
-import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingConstants;
-import javax.swing.SwingUtilities;
 import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
 
@@ -29,9 +21,6 @@ public class MiscPanel extends JPanel
   private JCheckBox pcuaeVersionCheckBox;
 
   private PreferencesModel model;
-  private JPanel favoritesPanel;
-  private JLabel numberOfFavoritesLabel;
-  private JSpinner favoritesSpinner;
   private SaveStatePrefPanel saveStatePrefPanel;
   private JPanel installPanel;
   private JCheckBox deleteOldInstallsCheckBox;
@@ -56,22 +45,14 @@ public class MiscPanel extends JPanel
     add(getStartupPanel(), gbc_startupPanel);
     GridBagConstraints gbc_installPanel = new GridBagConstraints();
     gbc_installPanel.weightx = 1.0;
-    gbc_installPanel.insets = new Insets(5, 5, 5, 0);
+    gbc_installPanel.insets = new Insets(5, 5, 5, 3);
     gbc_installPanel.fill = GridBagConstraints.HORIZONTAL;
     gbc_installPanel.gridx = 0;
     gbc_installPanel.gridy = 1;
     add(getInstallPanel(), gbc_installPanel);
-    GridBagConstraints gbc_favoritesPanel = new GridBagConstraints();
-    gbc_favoritesPanel.anchor = GridBagConstraints.NORTHWEST;
-    gbc_favoritesPanel.weightx = 1.0;
-    gbc_favoritesPanel.insets = new Insets(5, 5, 5, 3);
-    gbc_favoritesPanel.fill = GridBagConstraints.HORIZONTAL;
-    gbc_favoritesPanel.gridx = 0;
-    gbc_favoritesPanel.gridy = 2;
-    add(getFavoritesPanel(), gbc_favoritesPanel);
     GridBagConstraints gbc_screenshotsPanel = new GridBagConstraints();
     gbc_screenshotsPanel.weightx = 1.0;
-    gbc_screenshotsPanel.insets = new Insets(0, 0, 5, 0);
+    gbc_screenshotsPanel.insets = new Insets(5, 5, 5, 3);
     gbc_screenshotsPanel.fill = GridBagConstraints.BOTH;
     gbc_screenshotsPanel.gridx = 0;
     gbc_screenshotsPanel.gridy = 3;
@@ -153,85 +134,8 @@ public class MiscPanel extends JPanel
   {
     getManagerVersionCheckBox().setSelected(model.isCheckManagerVersionAtStartup());
     getPcuaeVersionCheckBox().setSelected(model.isCheckPCUAEVersionAtStartup());
-    if (!getFavoritesSpinner().hasFocus() && !getFavoritesSpinner().getValue().equals(model.getFavoritesCount()))
-    {
-      getFavoritesSpinner().setValue(model.getFavoritesCount());
-    }
     getDeleteOldInstallsCheckBox().setSelected(model.isDeleteOldInstallfilesAfterDownload());
     getCropScreenCheckBox().setSelected(model.isCropScreenshots());
-  }
-
-  private JPanel getFavoritesPanel()
-  {
-    if (favoritesPanel == null)
-    {
-      favoritesPanel = new JPanel();
-      favoritesPanel.setBorder(new TitledBorder(
-                                                new EtchedBorder(EtchedBorder.LOWERED,
-                                                                 new Color(255, 255, 255),
-                                                                 new Color(160, 160, 160)),
-                                                "Favorites",
-                                                TitledBorder.LEADING,
-                                                TitledBorder.TOP,
-                                                null,
-                                                new Color(0, 0, 0)));
-      GridBagLayout gbl_favoritesPanel = new GridBagLayout();
-      favoritesPanel.setLayout(gbl_favoritesPanel);
-      GridBagConstraints gbc_numberOfFavoritesLabel = new GridBagConstraints();
-      gbc_numberOfFavoritesLabel.insets = new Insets(5, 5, 5, 5);
-      gbc_numberOfFavoritesLabel.gridx = 0;
-      gbc_numberOfFavoritesLabel.gridy = 0;
-      favoritesPanel.add(getNumberOfFavoritesLabel(), gbc_numberOfFavoritesLabel);
-      GridBagConstraints gbc_favoritesSpinner = new GridBagConstraints();
-      gbc_favoritesSpinner.anchor = GridBagConstraints.WEST;
-      gbc_favoritesSpinner.weightx = 1.0;
-      gbc_favoritesSpinner.insets = new Insets(5, 5, 5, 0);
-      gbc_favoritesSpinner.gridx = 1;
-      gbc_favoritesSpinner.gridy = 0;
-      favoritesPanel.add(getFavoritesSpinner(), gbc_favoritesSpinner);
-    }
-    return favoritesPanel;
-  }
-
-  private JLabel getNumberOfFavoritesLabel()
-  {
-    if (numberOfFavoritesLabel == null)
-    {
-      numberOfFavoritesLabel = new JLabel("Number of favorites lists");
-    }
-    return numberOfFavoritesLabel;
-  }
-
-  private JSpinner getFavoritesSpinner()
-  {
-    if (favoritesSpinner == null)
-    {
-      SpinnerModel spinnerModel = new SpinnerNumberModel(10, // initial value
-                                                         1, // min
-                                                         10, // max
-                                                         1);
-      favoritesSpinner = new JSpinner(spinnerModel);
-      JSpinner.NumberEditor numberEditor = new JSpinner.NumberEditor(favoritesSpinner, "####");
-      favoritesSpinner.setEditor(numberEditor);
-      // Select all when gaining focus
-      numberEditor.getTextField().addFocusListener(new FocusAdapter()
-        {
-          @Override
-          public void focusGained(final FocusEvent e)
-          {
-            SwingUtilities.invokeLater(() -> {
-              JTextField tf = (JTextField) e.getSource();
-              tf.selectAll();
-            });
-          }
-        });
-
-      favoritesSpinner.addChangeListener(e -> {
-        JSpinner textField = (JSpinner) e.getSource();
-        model.setFavoritesCount(Integer.parseInt(textField.getValue().toString()));
-      });
-    }
-    return favoritesSpinner;
   }
 
   private SaveStatePrefPanel getSaveStatePrefPanel()
@@ -294,10 +198,10 @@ public class MiscPanel extends JPanel
       screenshotsPanel
         .setBorder(new TitledBorder(null, "Screenshots", TitledBorder.LEADING, TitledBorder.TOP, null, null));
       GridBagLayout gbl_screenshotsPanel = new GridBagLayout();
-      gbl_screenshotsPanel.columnWidths = new int[]{0, 0};
-      gbl_screenshotsPanel.rowHeights = new int[]{0, 0};
-      gbl_screenshotsPanel.columnWeights = new double[]{0.0, Double.MIN_VALUE};
-      gbl_screenshotsPanel.rowWeights = new double[]{0.0, Double.MIN_VALUE};
+      gbl_screenshotsPanel.columnWidths = new int[] { 0, 0 };
+      gbl_screenshotsPanel.rowHeights = new int[] { 0, 0 };
+      gbl_screenshotsPanel.columnWeights = new double[] { 0.0, Double.MIN_VALUE };
+      gbl_screenshotsPanel.rowWeights = new double[] { 0.0, Double.MIN_VALUE };
       screenshotsPanel.setLayout(gbl_screenshotsPanel);
       GridBagConstraints gbc_cropScreenCheckBox = new GridBagConstraints();
       gbc_cropScreenCheckBox.insets = new Insets(5, 0, 5, 5);
@@ -307,12 +211,14 @@ public class MiscPanel extends JPanel
     }
     return screenshotsPanel;
   }
-  private JCheckBox getCropScreenCheckBox() {
-    if (cropScreenCheckBox == null) {
-    	cropScreenCheckBox = new JCheckBox("Automatically crop screenshots to 320x200 pixels when added.");
-    	cropScreenCheckBox.setVerticalTextPosition(SwingConstants.TOP);
-    	cropScreenCheckBox
-        .addItemListener((e) -> model.setCropScreenshots(cropScreenCheckBox.isSelected()));
+
+  private JCheckBox getCropScreenCheckBox()
+  {
+    if (cropScreenCheckBox == null)
+    {
+      cropScreenCheckBox = new JCheckBox("Automatically crop screenshots to 320x200 pixels when added.");
+      cropScreenCheckBox.setVerticalTextPosition(SwingConstants.TOP);
+      cropScreenCheckBox.addItemListener((e) -> model.setCropScreenshots(cropScreenCheckBox.isSelected()));
     }
     return cropScreenCheckBox;
   }

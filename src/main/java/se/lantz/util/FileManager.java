@@ -1166,8 +1166,13 @@ public class FileManager
 
   public static String getConfiguredFavGameViewName(int favNumber)
   {
-    return FileManager.getConfiguredProperties().getProperty(GameView.FAV_GAMEVIEW_NAME_PREF_KEY + favNumber,
-                                                             "Favorites " + favNumber);
+    String deafultName = "Favorites " + favNumber;
+    String configuredName = FileManager.getConfiguredProperties().getProperty(GameView.FAV_GAMEVIEW_NAME_PREF_KEY + favNumber);
+    if (configuredName == null || configuredName.isEmpty())
+    {
+      return deafultName;
+    }
+    return configuredName;
   }
 
   public static boolean isConfiguredDeleteOldInstallfilesAfterDownload()

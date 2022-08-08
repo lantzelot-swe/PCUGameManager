@@ -10,7 +10,7 @@ public class PreferencesModel extends AbstractModel implements CommonInfoModel
   public static final String CAROUSEL_132 = "1.3.2";
   public static final String CAROUSEL_152 = "1.5.2";
   public static final String FILE_LOADER = "fl";
-  
+
   public static final String PCUAE_VERSION_CHECK = "checkForPCUAEVersion";
   public static final String MANGER_VERSION_CHECK = "checkForManagerVersion";
   public static final String DELETE_OLD_INSTALL_FILES = "deleteOldInstallFiles";
@@ -27,6 +27,17 @@ public class PreferencesModel extends AbstractModel implements CommonInfoModel
   public static final String FAVORITESCOUNT = "favoritesCount";
   public static final String JOYSTICK = "joystick";
   public static final String SAVED_STATES_CAROUSEL = "savedStatesCarousel";
+
+  public static final String FAVORITES_1_ALIAS = "GameViewFavoritesName_1";
+  public static final String FAVORITES_2_ALIAS = "GameViewFavoritesName_2";
+  public static final String FAVORITES_3_ALIAS = "GameViewFavoritesName_3";
+  public static final String FAVORITES_4_ALIAS = "GameViewFavoritesName_4";
+  public static final String FAVORITES_5_ALIAS = "GameViewFavoritesName_5";
+  public static final String FAVORITES_6_ALIAS = "GameViewFavoritesName_6";
+  public static final String FAVORITES_7_ALIAS = "GameViewFavoritesName_7";
+  public static final String FAVORITES_8_ALIAS = "GameViewFavoritesName_8";
+  public static final String FAVORITES_9_ALIAS = "GameViewFavoritesName_9";
+  public static final String FAVORITES_10_ALIAS = "GameViewFavoritesName_10";
 
   private boolean checkPCUAEVersionAtStartup = true;
   private boolean checkManagerVersionAtStartup = true;
@@ -48,6 +59,17 @@ public class PreferencesModel extends AbstractModel implements CommonInfoModel
   private String joystickConfig = "J:2*:" + JoystickModel.DEFAULT_CONFIG;
   private String savedStatesCarouselVersion = CAROUSEL_152;
 
+  private String fav1Alias = "";
+  private String fav2Alias = "";
+  private String fav3Alias = "";
+  private String fav4Alias = "";
+  private String fav5Alias = "";
+  private String fav6Alias = "";
+  private String fav7Alias = "";
+  private String fav8Alias = "";
+  private String fav9Alias = "";
+  private String fav10Alias = "";
+
   public PreferencesModel()
   {
     Properties configuredProperties = FileManager.getConfiguredProperties();
@@ -67,8 +89,20 @@ public class PreferencesModel extends AbstractModel implements CommonInfoModel
       .parseInt(configuredProperties.getProperty(FAVORITESCOUNT, Integer.toString(favoritesCount))));
     setJoystickConfig(configuredProperties.getProperty(JOYSTICK, joystickConfig));
     setSavedStatesCarouselVersion(configuredProperties.getProperty(SAVED_STATES_CAROUSEL, CAROUSEL_152));
-    setDeleteOldInstallfilesAfterDownload(Boolean.parseBoolean(configuredProperties.getProperty(DELETE_OLD_INSTALL_FILES, "false")));
+    setDeleteOldInstallfilesAfterDownload(Boolean
+      .parseBoolean(configuredProperties.getProperty(DELETE_OLD_INSTALL_FILES, "false")));
     setCropScreenshots(Boolean.parseBoolean(configuredProperties.getProperty(CROP_SCREENSHOTS, "false")));
+
+    setFav1Alias(configuredProperties.getProperty(FAVORITES_1_ALIAS, fav1Alias));
+    setFav2Alias(configuredProperties.getProperty(FAVORITES_2_ALIAS, fav2Alias));
+    setFav3Alias(configuredProperties.getProperty(FAVORITES_3_ALIAS, fav3Alias));
+    setFav4Alias(configuredProperties.getProperty(FAVORITES_4_ALIAS, fav4Alias));
+    setFav5Alias(configuredProperties.getProperty(FAVORITES_5_ALIAS, fav5Alias));
+    setFav6Alias(configuredProperties.getProperty(FAVORITES_6_ALIAS, fav6Alias));
+    setFav7Alias(configuredProperties.getProperty(FAVORITES_7_ALIAS, fav7Alias));
+    setFav8Alias(configuredProperties.getProperty(FAVORITES_8_ALIAS, fav8Alias));
+    setFav9Alias(configuredProperties.getProperty(FAVORITES_9_ALIAS, fav9Alias));
+    setFav10Alias(configuredProperties.getProperty(FAVORITES_10_ALIAS, fav10Alias));
   }
 
   public boolean isCheckPCUAEVersionAtStartup()
@@ -256,6 +290,156 @@ public class PreferencesModel extends AbstractModel implements CommonInfoModel
     }
   }
 
+  public String getFav1Alias()
+  {
+    return fav1Alias;
+  }
+
+  public void setFav1Alias(String alias)
+  {
+    String old = getFav1Alias();
+    this.fav1Alias = alias;
+    if (!Objects.equals(old, fav1Alias))
+    {
+      notifyChange();
+    }
+  }
+
+  public String getFav2Alias()
+  {
+    return fav2Alias;
+  }
+
+  public void setFav2Alias(String alias)
+  {
+    String old = getFav2Alias();
+    this.fav2Alias = alias;
+    if (!Objects.equals(old, fav2Alias))
+    {
+      notifyChange();
+    }
+  }
+
+  public String getFav3Alias()
+  {
+    return fav3Alias;
+  }
+
+  public void setFav3Alias(String alias)
+  {
+    String old = getFav3Alias();
+    this.fav3Alias = alias;
+    if (!Objects.equals(old, fav3Alias))
+    {
+      notifyChange();
+    }
+  }
+
+  public String getFav4Alias()
+  {
+    return fav4Alias;
+  }
+
+  public void setFav4Alias(String alias)
+  {
+    String old = getFav4Alias();
+    this.fav4Alias = alias;
+    if (!Objects.equals(old, fav4Alias))
+    {
+      notifyChange();
+    }
+  }
+
+  public String getFav5Alias()
+  {
+    return fav5Alias;
+  }
+
+  public void setFav5Alias(String alias)
+  {
+    String old = getFav5Alias();
+    this.fav5Alias = alias;
+    if (!Objects.equals(old, fav5Alias))
+    {
+      notifyChange();
+    }
+  }
+
+  public String getFav6Alias()
+  {
+    return fav6Alias;
+  }
+
+  public void setFav6Alias(String alias)
+  {
+    String old = getFav6Alias();
+    this.fav6Alias = alias;
+    if (!Objects.equals(old, fav6Alias))
+    {
+      notifyChange();
+    }
+  }
+
+  public String getFav7Alias()
+  {
+    return fav7Alias;
+  }
+
+  public void setFav7Alias(String alias)
+  {
+    String old = getFav7Alias();
+    this.fav7Alias = alias;
+    if (!Objects.equals(old, fav7Alias))
+    {
+      notifyChange();
+    }
+  }
+
+  public String getFav8Alias()
+  {
+    return fav8Alias;
+  }
+
+  public void setFav8Alias(String alias)
+  {
+    String old = getFav8Alias();
+    this.fav8Alias = alias;
+    if (!Objects.equals(old, fav8Alias))
+    {
+      notifyChange();
+    }
+  }
+
+  public String getFav9Alias()
+  {
+    return fav9Alias;
+  }
+
+  public void setFav9Alias(String alias)
+  {
+    String old = getFav9Alias();
+    this.fav9Alias = alias;
+    if (!Objects.equals(old, fav9Alias))
+    {
+      notifyChange();
+    }
+  }
+
+  public String getFav10Alias()
+  {
+    return fav10Alias;
+  }
+
+  public void setFav10Alias(String alias)
+  {
+    String old = getFav10Alias();
+    this.fav10Alias = alias;
+    if (!Objects.equals(old, fav10Alias))
+    {
+      notifyChange();
+    }
+  }
+
   public int getFavoritesCount()
   {
     return favoritesCount;
@@ -307,7 +491,7 @@ public class PreferencesModel extends AbstractModel implements CommonInfoModel
   }
 
   public void setDeleteOldInstallfilesAfterDownload(boolean deleteOldInstallfilesAfterDownload)
-  {   
+  {
     boolean old = isDeleteOldInstallfilesAfterDownload();
     this.deleteOldInstallfilesAfterDownload = deleteOldInstallfilesAfterDownload;
     if ((Boolean.compare(old, deleteOldInstallfilesAfterDownload) != 0))
@@ -351,6 +535,16 @@ public class PreferencesModel extends AbstractModel implements CommonInfoModel
     configuredProperties.put(SAVED_STATES_CAROUSEL, savedStatesCarouselVersion);
     configuredProperties.put(DELETE_OLD_INSTALL_FILES, Boolean.toString(deleteOldInstallfilesAfterDownload));
     configuredProperties.put(CROP_SCREENSHOTS, Boolean.toString(cropScreenshots));
+    configuredProperties.put(FAVORITES_1_ALIAS, fav1Alias);
+    configuredProperties.put(FAVORITES_2_ALIAS, fav2Alias);
+    configuredProperties.put(FAVORITES_3_ALIAS, fav3Alias);
+    configuredProperties.put(FAVORITES_4_ALIAS, fav4Alias);
+    configuredProperties.put(FAVORITES_5_ALIAS, fav5Alias);
+    configuredProperties.put(FAVORITES_6_ALIAS, fav6Alias);
+    configuredProperties.put(FAVORITES_7_ALIAS, fav7Alias);
+    configuredProperties.put(FAVORITES_8_ALIAS, fav8Alias);
+    configuredProperties.put(FAVORITES_9_ALIAS, fav9Alias);
+    configuredProperties.put(FAVORITES_10_ALIAS, fav10Alias);
     FileManager.storeProperties();
   }
 }

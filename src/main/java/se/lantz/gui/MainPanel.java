@@ -242,6 +242,21 @@ public class MainPanel extends JPanel
   {
     getListPanel().toggleFavorite10();
   }
+  
+  public void setViewTag(String viewTag)
+  {
+    getListPanel().setViewTag(viewTag);
+  }
+  
+  public boolean isSingleGameSelected()
+  {
+    return getListPanel().isSingleGameSelected();
+  }
+  
+  public boolean isNoGameSelected()
+  {
+    return getListPanel().isNoGameSelected();
+  }
 
   public void runCurrentGame()
   {

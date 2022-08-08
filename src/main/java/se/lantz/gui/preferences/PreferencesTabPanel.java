@@ -18,6 +18,7 @@ public class PreferencesTabPanel extends JPanel
   private PreferencesModel model;
   private JTabbedPane tabbedPane;
   private MiscPanel miscPanel;
+  private FavoritesPanel favPanel;
   private InfoSlotPreferencesPanel infoSlotPreferencesPanel;
   private JPanel infoSlotBackgroundPanel;
   private JPanel joystickBackgroundPanel;
@@ -42,6 +43,7 @@ public class PreferencesTabPanel extends JPanel
     {
       tabbedPane = new JTabbedPane(JTabbedPane.TOP);
       tabbedPane.addTab("Misc.", null, getMiscPanel(), null);
+      tabbedPane.addTab("Favorites", null, getFavPanel(), null);
       tabbedPane.addTab("Joystick", null, getJoystickBackgroundPanel(), null);
       tabbedPane.addTab("Infoslot", null, getInfoSlotBackgroundPanel(), null);
     }
@@ -69,6 +71,7 @@ public class PreferencesTabPanel extends JPanel
   public void savePreferences()
   {
     model.setJoystickConfig(joyModel.getConfigString());
+    getFavPanel().savePreferences();
     model.savePreferences();
   }
 
@@ -90,6 +93,16 @@ public class PreferencesTabPanel extends JPanel
       infoSlotBackgroundPanel.add(getInfoSlotPreferencesPanel(), gbc_panel);
     }
     return infoSlotBackgroundPanel;
+  }
+
+  private FavoritesPanel getFavPanel()
+  {
+    if (favPanel == null)
+    {
+      favPanel = new FavoritesPanel(model);
+
+    }
+    return favPanel;
   }
 
   private JPanel getJoystickBackgroundPanel()
