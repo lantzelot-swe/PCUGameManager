@@ -23,7 +23,7 @@ public class AliasPanel extends JPanel
     GridBagConstraints gbc_favLabel = new GridBagConstraints();
     gbc_favLabel.weighty = 1.0;
     gbc_favLabel.anchor = GridBagConstraints.NORTHWEST;
-    gbc_favLabel.insets = new Insets(7, 5, 0, 5);
+    gbc_favLabel.insets = new Insets(7, 10, 0, 5);
     gbc_favLabel.gridx = 0;
     gbc_favLabel.gridy = 0;
     add(getFavLabel(), gbc_favLabel);
@@ -31,7 +31,7 @@ public class AliasPanel extends JPanel
     gbc_textField.anchor = GridBagConstraints.NORTHEAST;
     gbc_textField.weighty = 1.0;
     gbc_textField.weightx = 1.0;
-    gbc_textField.insets = new Insets(5, 5, 0, 60);
+    gbc_textField.insets = new Insets(5, 5, 0, 10);
     gbc_textField.gridx = 1;
     gbc_textField.gridy = 0;
     add(getTextField(), gbc_textField);
@@ -41,7 +41,7 @@ public class AliasPanel extends JPanel
   {
     if (favLabel == null)
     {
-      favLabel = new JLabel("Favorites_" + number + ":");
+      favLabel = new JLabel("Favorites " + number + ":");
     }
     return favLabel;
   }
@@ -51,7 +51,7 @@ public class AliasPanel extends JPanel
     if (textField == null)
     {
       textField = new JTextField();
-      textField.setPreferredSize(new Dimension(200, 20));
+      textField.setPreferredSize(new Dimension(250, 20));
     }
     return textField;
   }

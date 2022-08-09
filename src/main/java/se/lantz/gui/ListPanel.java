@@ -648,6 +648,7 @@ public class ListPanel extends JPanel
   {
     if (!uiModel.isDataChanged())
     {
+      int[] selectedIndices = list.getSelectionModel().getSelectedIndices();
       for (GameListData glData : list.getSelectedValuesList())
       {
         if (!glData.isInfoSlot())
@@ -657,6 +658,7 @@ public class ListPanel extends JPanel
       }
       //Trigger a reload of current game view
       uiModel.reloadCurrentGameView();
+      list.setSelectedIndices(selectedIndices);
       mainPanel.repaintAfterModifications();
     }
   }

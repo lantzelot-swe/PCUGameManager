@@ -120,7 +120,7 @@ public class FavoritesPanel extends JPanel
   {
     if (numberOfFavoritesLabel == null)
     {
-      numberOfFavoritesLabel = new JLabel("Number of favorites lists");
+      numberOfFavoritesLabel = new JLabel("Number of favorites lists shown in the UI");
     }
     return numberOfFavoritesLabel;
   }
@@ -171,7 +171,7 @@ public class FavoritesPanel extends JPanel
       aliasPanel.setLayout(gbl_aliasPanel);
       GridBagConstraints gbc_aliasInfoLabel = new GridBagConstraints();
       gbc_aliasInfoLabel.anchor = GridBagConstraints.WEST;
-      gbc_aliasInfoLabel.insets = new Insets(5, 5, 5, 0);
+      gbc_aliasInfoLabel.insets = new Insets(5, 10, 5, 0);
       gbc_aliasInfoLabel.gridx = 0;
       gbc_aliasInfoLabel.gridy = 0;
       aliasPanel.add(getAliasInfoLabel(), gbc_aliasInfoLabel);
@@ -357,6 +357,7 @@ public class FavoritesPanel extends JPanel
 
   public void savePreferences()
   {
+    model.disableChangeNotification(true);
     model.setFav1Alias(getAliasPanel_1().getTextField().getText());
     model.setFav2Alias(getAliasPanel_2().getTextField().getText());
     model.setFav3Alias(getAliasPanel_3().getTextField().getText());
@@ -367,5 +368,6 @@ public class FavoritesPanel extends JPanel
     model.setFav8Alias(getAliasPanel_8().getTextField().getText());
     model.setFav9Alias(getAliasPanel_9().getTextField().getText());
     model.setFav10Alias(getAliasPanel_10().getTextField().getText());
+    model.disableChangeNotification(false);
   }
 }
