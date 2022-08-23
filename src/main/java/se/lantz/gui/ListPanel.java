@@ -144,7 +144,8 @@ public class ListPanel extends JPanel
             else if (gameListViewId < -1)
             {
               JMenuItem renameItem = new JMenuItem("Rename gamelist view...");
-              renameItem.addActionListener(e -> gameViewManager.renameFavoritesView((GameView) getListViewComboBox().getSelectedItem()));
+              renameItem.addActionListener(e -> gameViewManager
+                .renameFavoritesView((GameView) getListViewComboBox().getSelectedItem()));
               menu.add(renameItem);
             }
 
@@ -218,7 +219,7 @@ public class ListPanel extends JPanel
   {
     return getList().getSelectedIndices().length == 1;
   }
-  
+
   boolean isNoGameSelected()
   {
     return getList().getSelectedIndices().length == 0;
@@ -439,6 +440,7 @@ public class ListPanel extends JPanel
       list.addListSelectionListener(e -> {
         if (!e.getValueIsAdjusting() || pageButtonPressed)
         {
+          updateViewInfoLabel();
           if (!delayDetailsUpdate && !uiModel.isDisableChangeNotifcation())
           {
             updateSelectedGame();
@@ -455,7 +457,13 @@ public class ListPanel extends JPanel
 
   public void updateViewInfoLabel()
   {
-    getViewInfoLabel().setText(uiModel.getGameListModel().getSize() + " of " + uiModel.getAllGamesCount());
+    String text = uiModel.getGameListModel().getSize() + " of " + uiModel.getAllGamesCount();
+    int selectedGames = list.getSelectedIndices().length;
+    if (selectedGames > 1)
+    {
+      text = text + " (" + selectedGames + ")";
+    }
+    getViewInfoLabel().setText(text);
   }
 
   private void updateSelectedGame()
@@ -643,7 +651,7 @@ public class ListPanel extends JPanel
       mainPanel.repaintAfterModifications();
     }
   }
-  
+
   public void setViewTag(String viewTag)
   {
     if (!uiModel.isDataChanged())
