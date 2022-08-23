@@ -966,7 +966,7 @@ public class MenuManager
     pcuaeWikiItem.addActionListener(e -> {
       try
       {
-        Desktop.getDesktop().browse(new URI("https://projectcarouselusb.online/help-2"));
+        Desktop.getDesktop().browse(new URI("https://github.com/CommodoreOS/PCUAE/wiki"));
       }
       catch (IOException | URISyntaxException ex)
       {
