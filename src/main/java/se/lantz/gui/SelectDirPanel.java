@@ -10,9 +10,14 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.LinkOption;
 import java.nio.file.Path;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -27,6 +32,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import se.lantz.util.ExceptionHandler;
 import se.lantz.util.FileManager;
 import javax.swing.JLabel;
 
@@ -401,50 +407,74 @@ public class SelectDirPanel extends JPanel
 
   private boolean checkSelectedFolder(Path folder)
   {
-
     logger.debug("Selected folder: {}", folder);
-
-    //Assume a games subfolder is available
-    Path srcParentFolder = folder.resolve("games");
-    Path srcCoversFolder = srcParentFolder.resolve("covers");
-    Path srcGamesFolder = srcParentFolder.resolve("games");
-    Path srcScreensFolder = srcParentFolder.resolve("screens");
-
-    logger.debug("parent folder: {}", srcParentFolder);
-    logger.debug("covers folder: {}", srcCoversFolder);
-    logger.debug("games folder: {}", srcGamesFolder);
-    logger.debug("screens folder: {}", srcScreensFolder);
-
-    // Verify that subfolders are available
-    if (Files.exists(srcParentFolder, LinkOption.NOFOLLOW_LINKS) &&
-      Files.exists(srcCoversFolder, LinkOption.NOFOLLOW_LINKS) &&
-      Files.exists(srcGamesFolder, LinkOption.NOFOLLOW_LINKS) &&
-      Files.exists(srcScreensFolder, LinkOption.NOFOLLOW_LINKS))
+    if (isCarouselFolder(folder))
     {
-      logger.debug("A valid directory!");
-
       return true;
     }
     else
     {
-      //Check if there is no games subfolder, but valid structure
-      srcCoversFolder = folder.resolve("covers");
-      srcGamesFolder = folder.resolve("games");
-      srcScreensFolder = folder.resolve("screens");
-      if (Files.exists(srcCoversFolder, LinkOption.NOFOLLOW_LINKS) &&
-        Files.exists(srcGamesFolder, LinkOption.NOFOLLOW_LINKS) &&
-        Files.exists(srcScreensFolder, LinkOption.NOFOLLOW_LINKS))
+      List<Path> foundCarousels = Collections.EMPTY_LIST;
+      try (Stream<Path> filePathStream = Files.walk(folder, 1))
       {
-        logger.debug("A valid directory!");
-
-        return true;
+        foundCarousels = filePathStream.filter(Files::isDirectory).filter(dir -> isCarouselFolder(dir)).collect(Collectors.toList());
       }
-      else
+      catch (IOException e)
       {
-        logger.debug("An ivalid directory!");
-        return false;
+        ExceptionHandler.handleException(e, "Could not read gameInfo files");
       }
+      return foundCarousels.size() > 0;
     }
+
+//    //Assume a games subfolder is available
+//    Path srcParentFolder = folder.resolve("games");
+//    Path srcCoversFolder = srcParentFolder.resolve("covers");
+//    Path srcGamesFolder = srcParentFolder.resolve("games");
+//    Path srcScreensFolder = srcParentFolder.resolve("screens");
+//
+//    logger.debug("parent folder: {}", srcParentFolder);
+//    logger.debug("covers folder: {}", srcCoversFolder);
+//    logger.debug("games folder: {}", srcGamesFolder);
+//    logger.debug("screens folder: {}", srcScreensFolder);
+//
+//    // Verify that subfolders are available
+//    if (Files.exists(srcParentFolder, LinkOption.NOFOLLOW_LINKS) &&
+//      Files.exists(srcCoversFolder, LinkOption.NOFOLLOW_LINKS) &&
+//      Files.exists(srcGamesFolder, LinkOption.NOFOLLOW_LINKS) &&
+//      Files.exists(srcScreensFolder, LinkOption.NOFOLLOW_LINKS))
+//    {
+//      logger.debug("A valid directory!");
+//
+//      return true;
+//    }
+//    else
+//    {
+//      //Check if there is no games subfolder, but valid structure
+//      srcCoversFolder = folder.resolve("covers");
+//      srcGamesFolder = folder.resolve("games");
+//      srcScreensFolder = folder.resolve("screens");
+//      if (Files.exists(srcCoversFolder, LinkOption.NOFOLLOW_LINKS) &&
+//        Files.exists(srcGamesFolder, LinkOption.NOFOLLOW_LINKS) &&
+//        Files.exists(srcScreensFolder, LinkOption.NOFOLLOW_LINKS))
+//      {
+//        logger.debug("A valid directory!");
+//
+//        return true;
+//      }
+//      else
+//      {
+//        logger.debug("An ivalid directory!");
+//        return false;
+//      }
+//    }
+  }
+  
+  
+  private boolean isCarouselFolder(Path folder)
+  {
+   return Files.exists(folder.resolve("covers"), LinkOption.NOFOLLOW_LINKS) &&
+     Files.exists(folder.resolve("screens"), LinkOption.NOFOLLOW_LINKS) &&
+     Files.exists(folder.resolve("games"), LinkOption.NOFOLLOW_LINKS); 
   }
 
   public void registerGBFileSelectedActionListener(ActionListener listener)

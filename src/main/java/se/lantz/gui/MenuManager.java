@@ -1009,10 +1009,11 @@ public class MenuManager
     optionsDialog.setLocationRelativeTo(this.mainWindow);
     if (optionsDialog.showDialog())
     {
-      importManager.setSelectedFolderForCarousel(optionsDialog.getImportDirectory());
+      importManager.setSelectedFolderForCarousels(optionsDialog.getImportDirectory());
       importManager.setSelectedOption(optionsDialog.getSelectedOption());
       importManager.setAddAsFavorite(optionsDialog.getMarkAsFavorite());
       importManager.setViewTag(optionsDialog.getViewTag());
+      importManager.setCreateGameViews(optionsDialog.isCreateGameViews());
       ImportProgressDialog dialog = new ImportProgressDialog(this.mainWindow);
       CarouselImportWorker worker = new CarouselImportWorker(importManager, dialog);
       worker.execute();

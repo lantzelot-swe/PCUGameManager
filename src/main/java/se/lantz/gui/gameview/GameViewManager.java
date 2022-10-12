@@ -73,7 +73,7 @@ public class GameViewManager
   private boolean okToSave(GameView gameView)
   {
     String title = "Invalid name";
-    //Check name towards all other available gameviews, no duplicates. Also minmum two characters
+    //Check name towards all other available gameviews, no duplicates. Also minimum two characters
     if (gameView.getName().length() < 2)
     {     
       JOptionPane.showMessageDialog(MainWindow.getInstance(), "The gamelist view name is too short, give it a different name.", title, JOptionPane.ERROR_MESSAGE);

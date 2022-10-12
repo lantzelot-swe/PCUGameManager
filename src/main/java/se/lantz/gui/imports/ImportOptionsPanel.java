@@ -21,6 +21,8 @@ import se.lantz.gui.SelectDirPanel;
 import se.lantz.gui.SelectDirPanel.Mode;
 import se.lantz.manager.ImportManager;
 import se.lantz.util.FileManager;
+import java.awt.event.ItemListener;
+import java.awt.event.ItemEvent;
 
 public class ImportOptionsPanel extends JPanel
 {
@@ -39,6 +41,7 @@ public class ImportOptionsPanel extends JPanel
   private JComboBox<String> favoriteComboBox;
   private JCheckBox viewTagCheckBox;
   private JTextField viewTagTextField;
+  private JCheckBox createViewCheckBox;
 
   public ImportOptionsPanel()
   {
@@ -92,6 +95,10 @@ public class ImportOptionsPanel extends JPanel
     gbc_selectDirLabel.gridx = 0;
     gbc_selectDirLabel.gridy = 0;
     add(getSelectDirLabel(), gbc_selectDirLabel);
+    if (isCarouselImport)
+    {
+      setStateForCreateViewCheckBox();
+    }
   }
 
   private JLabel getInfoLabel()
@@ -201,7 +208,7 @@ public class ImportOptionsPanel extends JPanel
     if (selectDirLabel == null)
     {
       String text =
-        isCarouselImport ? "Select a directory containing a game carousel:" : "Select a gamebase database file (.mdb):";
+        isCarouselImport ? "Select a directory containing one or several game carousels:" : "Select a gamebase database file (.mdb):";
       selectDirLabel = new JLabel(text);
     }
     return selectDirLabel;
@@ -234,7 +241,7 @@ public class ImportOptionsPanel extends JPanel
       gbc_skipRadioButton.gridwidth = 2;
       gbc_skipRadioButton.anchor = GridBagConstraints.WEST;
       gbc_skipRadioButton.weightx = 1.0;
-      gbc_skipRadioButton.insets = new Insets(0, 5, 0, 0);
+      gbc_skipRadioButton.insets = new Insets(0, 5, 5, 0);
       gbc_skipRadioButton.gridx = 0;
       gbc_skipRadioButton.gridy = 0;
       selectionPanel.add(getSkipRadioButton(), gbc_skipRadioButton);
@@ -242,39 +249,50 @@ public class ImportOptionsPanel extends JPanel
       gbc_overwriteRadioButton.gridwidth = 2;
       gbc_overwriteRadioButton.anchor = GridBagConstraints.WEST;
       gbc_overwriteRadioButton.weightx = 1.0;
-      gbc_overwriteRadioButton.insets = new Insets(0, 5, 0, 0);
+      gbc_overwriteRadioButton.insets = new Insets(0, 5, 5, 0);
       gbc_overwriteRadioButton.gridx = 0;
       gbc_overwriteRadioButton.gridy = 1;
       selectionPanel.add(getOverwriteRadioButton(), gbc_overwriteRadioButton);
       GridBagConstraints gbc_addRadioButton = new GridBagConstraints();
+      gbc_addRadioButton.weighty = 1.0;
       gbc_addRadioButton.gridwidth = 2;
-      gbc_addRadioButton.anchor = GridBagConstraints.WEST;
+      gbc_addRadioButton.anchor = GridBagConstraints.NORTHWEST;
       gbc_addRadioButton.insets = new Insets(0, 5, 10, 0);
       gbc_addRadioButton.gridx = 0;
       gbc_addRadioButton.gridy = 2;
       selectionPanel.add(getAddRadioButton(), gbc_addRadioButton);
+      if (isCarouselImport)
+      {
+        GridBagConstraints gbc_createViewCheckBox = new GridBagConstraints();
+        gbc_createViewCheckBox.anchor = GridBagConstraints.WEST;
+        gbc_createViewCheckBox.gridwidth = 2;
+        gbc_createViewCheckBox.insets = new Insets(5, 5, 5, 5);
+        gbc_createViewCheckBox.gridx = 0;
+        gbc_createViewCheckBox.gridy = 3;
+        selectionPanel.add(getCreateViewCheckBox(), gbc_createViewCheckBox);
+      }
       GridBagConstraints gbc_favoriteCheckBox = new GridBagConstraints();
-      gbc_favoriteCheckBox.weighty = 1.0;
-      gbc_favoriteCheckBox.anchor = GridBagConstraints.NORTHWEST;
-      gbc_favoriteCheckBox.insets = new Insets(5, 5, 5, 5);
+      gbc_favoriteCheckBox.anchor = GridBagConstraints.WEST;
+      gbc_favoriteCheckBox.insets = new Insets(0, 5, 5, 5);
       gbc_favoriteCheckBox.gridx = 0;
-      gbc_favoriteCheckBox.gridy = 3;
+      gbc_favoriteCheckBox.gridy = 4;
       selectionPanel.add(getFavoriteCheckBox(), gbc_favoriteCheckBox);
       GridBagConstraints gbc_favoriteComboBox = new GridBagConstraints();
+      gbc_favoriteComboBox.insets = new Insets(0, 0, 5, 0);
       gbc_favoriteComboBox.fill = GridBagConstraints.HORIZONTAL;
       gbc_favoriteComboBox.gridx = 1;
-      gbc_favoriteComboBox.gridy = 3;
+      gbc_favoriteComboBox.gridy = 4;
       selectionPanel.add(getFavoriteComboBox(), gbc_favoriteComboBox);
       GridBagConstraints gbc_viewTagCheckBox = new GridBagConstraints();
       gbc_viewTagCheckBox.anchor = GridBagConstraints.NORTHWEST;
-      gbc_viewTagCheckBox.insets = new Insets(5, 5, 5, 5);
+      gbc_viewTagCheckBox.insets = new Insets(0, 5, 0, 5);
       gbc_viewTagCheckBox.gridx = 0;
-      gbc_viewTagCheckBox.gridy = 4;
+      gbc_viewTagCheckBox.gridy = 5;
       selectionPanel.add(getViewTagCheckBox(), gbc_viewTagCheckBox);
       GridBagConstraints gbc_viewTagTextField = new GridBagConstraints();
       gbc_viewTagTextField.fill = GridBagConstraints.HORIZONTAL;
       gbc_viewTagTextField.gridx = 1;
-      gbc_viewTagTextField.gridy = 4;
+      gbc_viewTagTextField.gridy = 5;
       selectionPanel.add(getViewTagTextField(), gbc_viewTagTextField);
     }
     return selectionPanel;
@@ -337,5 +355,36 @@ public class ImportOptionsPanel extends JPanel
   public String getViewTag()
   {
     return viewTagCheckBox.isSelected() ? viewTagTextField.getText() : "";
+  }
+  private JCheckBox getCreateViewCheckBox() {
+    if (createViewCheckBox == null) {
+    	createViewCheckBox = new JCheckBox("Create a new gameview for each imported folder");
+    	createViewCheckBox.setSelected(true);
+    	createViewCheckBox.addActionListener(new ActionListener() {
+    	  public void actionPerformed(ActionEvent e) {
+    	    setStateForCreateViewCheckBox();
+    	  }
+    	});
+    }
+    return createViewCheckBox;
+  }
+  
+  private void setStateForCreateViewCheckBox()
+  {
+    boolean gameViewSelected = getCreateViewCheckBox().isSelected();
+    getViewTagCheckBox().setEnabled(!gameViewSelected);
+    getFavoriteCheckBox().setEnabled(!gameViewSelected);
+    getFavoriteComboBox().setEnabled(!gameViewSelected);
+    if (gameViewSelected)
+    {
+      getViewTagCheckBox().setSelected(false);
+      
+    }
+    getViewTagTextField().setEnabled(getViewTagCheckBox().isSelected() && !gameViewSelected);
+  }
+  
+  public boolean isCreateGameViews()
+  {
+    return getCreateViewCheckBox().isSelected();
   }
 }

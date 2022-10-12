@@ -21,7 +21,7 @@ public class ImportOptionsDialog extends BaseDialog
     if (isCarouselImport)
     {
       setTitle("Import carousel folder");
-      this.setPreferredSize(new Dimension(450, 365));
+      this.setPreferredSize(new Dimension(450, 385));
     }
     else
     {
@@ -66,7 +66,12 @@ public class ImportOptionsDialog extends BaseDialog
   {
     return getImportOptionsPanel().getSelectedGbOptions();
   }
-
+  
+  public boolean isCreateGameViews()
+  {
+    return getImportOptionsPanel().isCreateGameViews();
+  }
+    
   public boolean showDialog(GamebaseImporter importer)
   {
     getImportOptionsPanel().getGbOptionsPanel().setGamebaseImporter(importer);

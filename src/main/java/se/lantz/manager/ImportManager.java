@@ -16,6 +16,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.imageio.ImageIO;
@@ -26,6 +27,9 @@ import org.slf4j.LoggerFactory;
 
 import se.lantz.gui.exports.PublishWorker;
 import se.lantz.model.MainViewModel;
+import se.lantz.model.data.GameView;
+import se.lantz.model.data.ViewFilter;
+import se.lantz.util.DbConstants;
 import se.lantz.util.ExceptionHandler;
 import se.lantz.util.FileManager;
 
@@ -56,6 +60,8 @@ public class ImportManager
   private Options selectedOption;
   private int addAsFavorite = -1;
   private String viewTag;
+  private boolean createGameViews = false;
+  private List<Path> foundCarouselsPaths = new ArrayList<Path>();
 
   public ImportManager(MainViewModel uiModel)
   {
@@ -76,12 +82,50 @@ public class ImportManager
   {
     this.viewTag = viewTag;
   }
+  
+  public void setCreateGameViews(boolean createGameViews)
+  {
+    this.createGameViews = createGameViews;
+  }
 
   public void setSelectedFoldersForGamebase(Path gamesFolder, Path screensPath, Path coversPath)
   {
     srcGamesFolder = gamesFolder;
     srcScreensFolder = screensPath;
     srcCoversFolder = coversPath;
+  }
+  
+  public void setSelectedFolderForCarousels(Path folder)
+  {
+    foundCarouselsPaths.clear();
+    if (isCarouselFolder(folder))
+    {
+      foundCarouselsPaths.add(folder);
+    }
+    else
+    {
+      //Check one level only
+      try (Stream<Path> filePathStream = Files.walk(folder, 1))
+      {
+        foundCarouselsPaths = filePathStream.filter(Files::isDirectory).filter(dir -> isCarouselFolder(dir)).collect(Collectors.toList());
+      }
+      catch (IOException e)
+      {
+        ExceptionHandler.handleException(e, "Could not read gameInfo files");
+      }
+    }
+  }
+  
+  private boolean isCarouselFolder(Path folder)
+  {
+   return Files.exists(folder.resolve("covers"), LinkOption.NOFOLLOW_LINKS) &&
+     Files.exists(folder.resolve("screens"), LinkOption.NOFOLLOW_LINKS) &&
+     Files.exists(folder.resolve("games"), LinkOption.NOFOLLOW_LINKS); 
+  }
+  
+  public List<Path> getFoundCarouselsPaths()
+  {
+    return this.foundCarouselsPaths;
   }
 
   public void setSelectedFolderForCarousel(Path folder)
@@ -102,6 +146,25 @@ public class ImportManager
       srcCoversFolder = folder.resolve("covers");
       srcGamesFolder = folder.resolve("games");
       srcScreensFolder = folder.resolve("screens");
+    }
+  }
+  
+  public void createGameViewForCarousel(Path path, PublishWorker worker)
+  {
+    if (this.createGameViews)
+    {     
+      String dirName = path.toFile().getName();
+      //If dirname is one of favorites_1 to 10 , mark as favorites instead?
+      //Tag all games with dirName TODO: Check for duplicates, just add an index if duplicate exist?
+      
+      this.setViewTag(dirName);
+      worker.publishMessage("\nCreating game view: " + dirName);
+     
+      ViewFilter filter = new ViewFilter(DbConstants.VIEW_TAG, ViewFilter.EQUALS_TEXT, dirName, true);
+      GameView newView = new GameView(0);
+      newView.setViewFilters(Arrays.asList(filter));
+      newView.setName(dirName);
+      uiModel.saveGameView(newView);
     }
   }
 
@@ -720,6 +783,14 @@ public class ImportManager
     {
       ExceptionHandler.handleException(e, "Could not store game file");
     }
+  }
+  
+  public int clearAfterCarouselImport()
+  {
+    int size = dbRowDataList.size();
+    dbRowDataList.clear();
+    gameInfoFilesMap.clear();
+    return size;
   }
 
   public int clearAfterImport()
