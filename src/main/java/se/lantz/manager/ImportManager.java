@@ -88,6 +88,13 @@ public class ImportManager
   public void setCreateGameViews(boolean createGameViews)
   {
     this.createGameViews = createGameViews;
+    if (createGameViews)
+    {
+      //Set the right options for creating game views
+      setSelectedOption(Options.ADD);
+      setAddAsFavorite(-1);
+      setViewTag(null);
+    }
   }
 
   public void setSelectedFoldersForGamebase(Path gamesFolder, Path screensPath, Path coversPath)
@@ -158,10 +165,10 @@ public class ImportManager
     {
       String dirName = path.toFile().getName();
       //If dirname is one of favorites_1 to 10 , mark as favorites instead.
-      //Tag all games with dirName Check for duplicates, just add an index if duplicate exist.
+      //Tag all games with dirName. Check for duplicates, just add an index if duplicate exist.
       int favoritesViewId = getFavoritesViewBasedOnDirName(dirName);
      
-      if (favoritesViewId != 0)
+      if (favoritesViewId < 0)
       {
          worker.publishMessage("\nAdding to favorites");
          setAddAsFavorite(Math.abs(favoritesViewId)-1);
@@ -214,7 +221,8 @@ public class ImportManager
     for (int i = 0; i < uiModel.getGameViewModel().getSize(); i++)
     {
       GameView currentView = uiModel.getGameViewModel().getElementAt(i);
-      availableNames.add(currentView.getName());
+      //Match with "_" since the dirs looks like that
+      availableNames.add(currentView.getName().replaceAll(" ","_"));
     }
     int index = 1;
     while (availableNames.contains(newName))

@@ -1013,6 +1013,7 @@ public class MenuManager
       importManager.setSelectedOption(optionsDialog.getSelectedOption());
       importManager.setAddAsFavorite(optionsDialog.getMarkAsFavorite());
       importManager.setViewTag(optionsDialog.getViewTag());
+      //This will reset the other options if selected
       importManager.setCreateGameViews(optionsDialog.isCreateGameViews());
       ImportProgressDialog dialog = new ImportProgressDialog(this.mainWindow);
       CarouselImportWorker worker = new CarouselImportWorker(importManager, dialog);
@@ -1039,6 +1040,7 @@ public class MenuManager
         importManager.setSelectedOption(optionsDialog.getSelectedOption());
         importManager.setAddAsFavorite(optionsDialog.getMarkAsFavorite());
         importManager.setViewTag(optionsDialog.getViewTag());
+        importManager.setCreateGameViews(false);
         ImportProgressDialog dialog = new ImportProgressDialog(this.mainWindow);
         GamebaseImportWorker worker = new GamebaseImportWorker(gamebaseImporter, importManager, dialog);
         worker.execute();
