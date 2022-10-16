@@ -307,9 +307,10 @@ public class MainViewModel extends AbstractModel
   public StringBuilder importGameInfo(List<String> rowValues,
                                       ImportManager.Options option,
                                       int addAsFavorite,
-                                      String viewTag)
+                                      String viewTag,
+                                      int gameViewId)
   {
-    return dbConnector.importRowsInGameInfoTable(rowValues, option, addAsFavorite, viewTag);
+    return dbConnector.importRowsInGameInfoTable(rowValues, option, addAsFavorite, viewTag, gameViewId);
   }
 
   public void cleanupAfterImport()

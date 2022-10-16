@@ -20,11 +20,13 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.imageio.ImageIO;
+import javax.swing.JOptionPane;
 
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import se.lantz.gui.MainWindow;
 import se.lantz.gui.exports.PublishWorker;
 import se.lantz.model.MainViewModel;
 import se.lantz.model.data.GameView;
@@ -149,23 +151,83 @@ public class ImportManager
     }
   }
   
-  public void createGameViewForCarousel(Path path, PublishWorker worker)
+  public int createGameViewForCarousel(Path path, PublishWorker worker)
   {
+    int gameViewId = 0;
     if (this.createGameViews)
-    {     
+    {
       String dirName = path.toFile().getName();
-      //If dirname is one of favorites_1 to 10 , mark as favorites instead?
-      //Tag all games with dirName TODO: Check for duplicates, just add an index if duplicate exist?
-      
-      this.setViewTag(dirName);
-      worker.publishMessage("\nCreating game view: " + dirName);
+      //If dirname is one of favorites_1 to 10 , mark as favorites instead.
+      //Tag all games with dirName Check for duplicates, just add an index if duplicate exist.
+      int favoritesViewId = getFavoritesViewBasedOnDirName(dirName);
      
-      ViewFilter filter = new ViewFilter(DbConstants.VIEW_TAG, ViewFilter.EQUALS_TEXT, dirName, true);
-      GameView newView = new GameView(0);
-      newView.setViewFilters(Arrays.asList(filter));
-      newView.setName(dirName);
-      uiModel.saveGameView(newView);
+      if (favoritesViewId != 0)
+      {
+         worker.publishMessage("\nAdding to favorites");
+         setAddAsFavorite(Math.abs(favoritesViewId)-1);
+         gameViewId = favoritesViewId;
+      }
+      else
+      {
+        String newViewName = getNewGameViewName(dirName);
+        
+        this.setViewTag(newViewName);
+        worker.publishMessage("\nCreating game view: " + newViewName);
+       
+        ViewFilter filter = new ViewFilter(DbConstants.VIEW_TAG, ViewFilter.EQUALS_TEXT, newViewName, true);
+        GameView newView = new GameView(0);
+        newView.setViewFilters(Arrays.asList(filter));
+        newView.setName(newViewName.replaceAll("_", " "));
+        uiModel.saveGameView(newView);
+        gameViewId = newView.getGameViewId();
+      }
     }
+    return gameViewId;
+  }
+  
+  private int getFavoritesViewBasedOnDirName(String dirName)
+  {
+    GameView favoritesGameView = null;
+    for (int i = 0; i < uiModel.getGameViewModel().getSize(); i++)
+    {
+      GameView currentView = uiModel.getGameViewModel().getElementAt(i);
+      if (currentView.getGameViewId() < -1 && 
+          currentView.getName().equalsIgnoreCase(dirName) ||
+          currentView.getName().equalsIgnoreCase(dirName.replaceAll("_", " ")))
+      {
+        favoritesGameView = uiModel.getGameViewModel().getElementAt(i);
+        break;
+      }
+    }
+    
+    if (favoritesGameView != null)
+    {
+      return favoritesGameView.getGameViewId();
+    }
+    return 0; 
+  }
+  
+  private String getNewGameViewName(String dirName)
+  {
+    String newName = dirName;
+    List<String> availableNames = new ArrayList<>();
+    for (int i = 0; i < uiModel.getGameViewModel().getSize(); i++)
+    {
+      GameView currentView = uiModel.getGameViewModel().getElementAt(i);
+      availableNames.add(currentView.getName());
+    }
+    int index = 1;
+    while (availableNames.contains(newName))
+    {
+      if (index > 1)
+      {
+        //Remove last added "_1" etc if available.
+        newName = newName.replaceAll("_[0-9]+$", "");
+      }
+      newName = newName + "_" + index;
+      index++;
+    }
+    return newName;
   }
 
   public void readGameInfoFiles(PublishWorker worker)
@@ -212,9 +274,9 @@ public class ImportManager
     gameInfoFilesMap.values().stream().forEach(list -> extractInfoIntoRowString(list, worker));
   }
 
-  public StringBuilder insertRowsIntoDb(List<String> rowList)
+  public StringBuilder insertRowsIntoDb(List<String> rowList, int gameViewId)
   {
-    return uiModel.importGameInfo(rowList, selectedOption, addAsFavorite, viewTag);
+    return uiModel.importGameInfo(rowList, selectedOption, addAsFavorite, viewTag, gameViewId);
   }
 
   private void extractInfoIntoRowString(List<String> fileLines, PublishWorker worker)
@@ -787,6 +849,11 @@ public class ImportManager
   
   public int clearAfterCarouselImport()
   {
+    if (this.createGameViews)
+    {
+      setViewTag(null);
+      setAddAsFavorite(-1);
+    }
     int size = dbRowDataList.size();
     dbRowDataList.clear();
     gameInfoFilesMap.clear();

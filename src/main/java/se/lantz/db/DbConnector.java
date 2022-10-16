@@ -461,19 +461,20 @@ public class DbConnector
   public StringBuilder importRowsInGameInfoTable(List<String> rowValues,
                                                  ImportManager.Options option,
                                                  int addAsFavorite,
-                                                 String viewTag)
+                                                 String viewTag,
+                                                 int gameViewId)
   {
     StringBuilder returnBuilder = new StringBuilder();
     switch (option)
     {
     case SKIP:
-      skipExistingAndInsertMissingIntoGameInfoTable(rowValues, returnBuilder, addAsFavorite, viewTag);
+      skipExistingAndInsertMissingIntoGameInfoTable(rowValues, returnBuilder, addAsFavorite, viewTag, gameViewId);
       break;
     case OVERWRITE:
-      overwriteExistingAndInsertMissingIntoGameInfoTable(rowValues, returnBuilder, addAsFavorite, viewTag);
+      overwriteExistingAndInsertMissingIntoGameInfoTable(rowValues, returnBuilder, addAsFavorite, viewTag, gameViewId);
       break;
     case ADD:
-      insertAllIntoGameInfoTable(rowValues, returnBuilder, addAsFavorite, viewTag);
+      insertAllIntoGameInfoTable(rowValues, returnBuilder, addAsFavorite, viewTag, gameViewId);
       break;
     default:
       break;
@@ -484,7 +485,8 @@ public class DbConnector
   private void overwriteExistingAndInsertMissingIntoGameInfoTable(List<String> rowValues,
                                                                   StringBuilder infoBuilder,
                                                                   int addAsFavorite,
-                                                                  String viewTag)
+                                                                  String viewTag,
+                                                                  int gameViewId)
   {
     List<String> existingRowValues = new ArrayList<>();
     List<String> newRowValues = new ArrayList<>();
@@ -536,7 +538,7 @@ public class DbConnector
 
     if (newRowValues.size() > 0)
     {
-      insertAllIntoGameInfoTable(newRowValues, infoBuilder, addAsFavorite, viewTag);
+      insertAllIntoGameInfoTable(newRowValues, infoBuilder, addAsFavorite, viewTag, gameViewId);
     }
     else
     {
@@ -547,7 +549,8 @@ public class DbConnector
   private void skipExistingAndInsertMissingIntoGameInfoTable(List<String> rowValues,
                                                              StringBuilder infoBuilder,
                                                              int addAsFavorite,
-                                                             String viewTag)
+                                                             String viewTag,
+                                                             int gameViewId)
   {
     List<String> newRowValues = new ArrayList<>();
     //Check which are already available and sort them out of rowValues
@@ -602,7 +605,7 @@ public class DbConnector
     infoBuilder.append(" games.\n");
     if (newRowValues.size() > 0)
     {
-      insertAllIntoGameInfoTable(newRowValues, infoBuilder, addAsFavorite, viewTag);
+      insertAllIntoGameInfoTable(newRowValues, infoBuilder, addAsFavorite, viewTag, gameViewId);
     }
     else
     {
@@ -616,7 +619,8 @@ public class DbConnector
   private void insertAllIntoGameInfoTable(List<String> rowValues,
                                           StringBuilder infoBuilder,
                                           int addAsFavorite,
-                                          String viewTag)
+                                          String viewTag,
+                                          int gameViewId)
   {
     infoBuilder.append("Adding ");
     infoBuilder.append(rowValues.size());
@@ -654,8 +658,13 @@ public class DbConnector
         st.append(",0");
       }
       st.append(",");
-
-      if (oldGameName.isEmpty() && !getSystemInfo(rowData).contains("basic"))
+      
+      if (getSystemInfo(rowData).contains("basic") && gameViewId != 0)
+      {
+        //An infoslot, append GIS:
+        st.append("\"GIS:" + gameViewId +  "\",");
+      }
+      else if (oldGameName.isEmpty() && !getSystemInfo(rowData).contains("basic"))
       {
         st.append("\"missing");
         if (!viewTag.isEmpty())

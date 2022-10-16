@@ -79,7 +79,7 @@ public class GamebaseImportWorker extends AbstractImportWorker
       //Copy the list to avoid modifying it when reading several chunks
       ArrayList<String> copyList = new ArrayList<>();
       copyList.addAll(rowList);
-      publish(importManager.insertRowsIntoDb(copyList).toString());
+      publish(importManager.insertRowsIntoDb(copyList, 0).toString());
       importManager.copyFiles(true, copyList, this);
     }
     int numberOfGamesProcessed = importManager.clearAfterImport();
