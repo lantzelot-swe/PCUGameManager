@@ -33,13 +33,13 @@ public class CarouselImportWorker extends AbstractImportWorker
       List<List<String>> dbRowReadChunks = importManager.getDbRowReadChunks();
       progressValueString = "Importing to db, copying covers, screens and game files...";
       progressMaximum = dbRowReadChunks.size();
-      
+
       int gameViewId = 0;
       if (progressMaximum > 0)
       {
         gameViewId = importManager.createGameViewForCarousel(currentPath, this);
       }
-      
+
       int chunkCount = 0;
       for (List<String> rowList : importManager.getDbRowReadChunks())
       {
@@ -61,16 +61,18 @@ public class CarouselImportWorker extends AbstractImportWorker
         }
         chunkCount++;
         progressValue++;
-                
+
         //Copy the list to avoid modifying it when reading several chunks
         ArrayList<String> copyList = new ArrayList<>();
         copyList.addAll(rowList);
         publish(importManager.insertRowsIntoDb(copyList, gameViewId).toString());
         importManager.copyFiles(false, copyList, this);
       }
+      //Create game view if view tag is defined
+      importManager.createGameViewForViewTag(this);
       numberOfGamesProcessed = numberOfGamesProcessed + importManager.clearAfterCarouselImport();
     }
-    
+
     publish("Processed " + numberOfGamesProcessed + " games.");
     progressValueString = "Finished!";
     progressValue++;

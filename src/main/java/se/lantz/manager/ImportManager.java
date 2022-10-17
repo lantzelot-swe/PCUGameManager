@@ -84,7 +84,7 @@ public class ImportManager
   {
     this.viewTag = viewTag;
   }
-  
+
   public void setCreateGameViews(boolean createGameViews)
   {
     this.createGameViews = createGameViews;
@@ -103,7 +103,7 @@ public class ImportManager
     srcScreensFolder = screensPath;
     srcCoversFolder = coversPath;
   }
-  
+
   public void setSelectedFolderForCarousels(Path folder)
   {
     foundCarouselsPaths.clear();
@@ -116,7 +116,8 @@ public class ImportManager
       //Check one level only
       try (Stream<Path> filePathStream = Files.walk(folder, 1))
       {
-        foundCarouselsPaths = filePathStream.filter(Files::isDirectory).filter(dir -> isCarouselFolder(dir)).collect(Collectors.toList());
+        foundCarouselsPaths =
+          filePathStream.filter(Files::isDirectory).filter(dir -> isCarouselFolder(dir)).collect(Collectors.toList());
       }
       catch (IOException e)
       {
@@ -124,14 +125,14 @@ public class ImportManager
       }
     }
   }
-  
+
   private boolean isCarouselFolder(Path folder)
   {
-   return Files.exists(folder.resolve("covers"), LinkOption.NOFOLLOW_LINKS) &&
-     Files.exists(folder.resolve("screens"), LinkOption.NOFOLLOW_LINKS) &&
-     Files.exists(folder.resolve("games"), LinkOption.NOFOLLOW_LINKS); 
+    return Files.exists(folder.resolve("covers"), LinkOption.NOFOLLOW_LINKS) &&
+      Files.exists(folder.resolve("screens"), LinkOption.NOFOLLOW_LINKS) &&
+      Files.exists(folder.resolve("games"), LinkOption.NOFOLLOW_LINKS);
   }
-  
+
   public List<Path> getFoundCarouselsPaths()
   {
     return this.foundCarouselsPaths;
@@ -157,7 +158,7 @@ public class ImportManager
       srcScreensFolder = folder.resolve("screens");
     }
   }
-  
+
   public int createGameViewForCarousel(Path path, PublishWorker worker)
   {
     int gameViewId = 0;
@@ -167,20 +168,20 @@ public class ImportManager
       //If dirname is one of favorites_1 to 10 , mark as favorites instead.
       //Tag all games with dirName. Check for duplicates, just add an index if duplicate exist.
       int favoritesViewId = getFavoritesViewBasedOnDirName(dirName);
-     
+
       if (favoritesViewId < 0)
       {
-         worker.publishMessage("\nAdding to favorites");
-         setAddAsFavorite(Math.abs(favoritesViewId)-1);
-         gameViewId = favoritesViewId;
+        worker.publishMessage("\nAdding to favorites");
+        setAddAsFavorite(Math.abs(favoritesViewId) - 1);
+        gameViewId = favoritesViewId;
       }
       else
       {
         String newViewName = getNewGameViewName(dirName);
-        
+
         this.setViewTag(newViewName);
         worker.publishMessage("\nCreating game view: " + newViewName);
-       
+
         ViewFilter filter = new ViewFilter(DbConstants.VIEW_TAG, ViewFilter.EQUALS_TEXT, newViewName, true);
         GameView newView = new GameView(0);
         newView.setViewFilters(Arrays.asList(filter));
@@ -191,29 +192,28 @@ public class ImportManager
     }
     return gameViewId;
   }
-  
+
   private int getFavoritesViewBasedOnDirName(String dirName)
   {
     GameView favoritesGameView = null;
     for (int i = 0; i < uiModel.getGameViewModel().getSize(); i++)
     {
       GameView currentView = uiModel.getGameViewModel().getElementAt(i);
-      if (currentView.getGameViewId() < -1 && 
-          currentView.getName().equalsIgnoreCase(dirName) ||
-          currentView.getName().equalsIgnoreCase(dirName.replaceAll("_", " ")))
+      if (currentView.getGameViewId() < -1 && currentView.getName().equalsIgnoreCase(dirName) ||
+        currentView.getName().equalsIgnoreCase(dirName.replaceAll("_", " ")))
       {
         favoritesGameView = uiModel.getGameViewModel().getElementAt(i);
         break;
       }
     }
-    
+
     if (favoritesGameView != null)
     {
       return favoritesGameView.getGameViewId();
     }
-    return 0; 
+    return 0;
   }
-  
+
   private String getNewGameViewName(String dirName)
   {
     String newName = dirName;
@@ -222,7 +222,7 @@ public class ImportManager
     {
       GameView currentView = uiModel.getGameViewModel().getElementAt(i);
       //Match with "_" since the dirs looks like that
-      availableNames.add(currentView.getName().replaceAll(" ","_"));
+      availableNames.add(currentView.getName().replaceAll(" ", "_"));
     }
     int index = 1;
     while (availableNames.contains(newName))
@@ -236,6 +236,23 @@ public class ImportManager
       index++;
     }
     return newName;
+  }
+
+  public void createGameViewForViewTag(PublishWorker worker)
+  {
+    if (!this.createGameViews && this.viewTag != null && !this.viewTag.isEmpty())
+    {
+      String newViewName = this.viewTag;
+
+      this.setViewTag(newViewName);
+      worker.publishMessage("\nCreating game view for view tag: " + newViewName);
+
+      ViewFilter filter = new ViewFilter(DbConstants.VIEW_TAG, ViewFilter.EQUALS_TEXT, newViewName, true);
+      GameView newView = new GameView(0);
+      newView.setViewFilters(Arrays.asList(filter));
+      newView.setName(newViewName.replaceAll("_", " "));
+      uiModel.saveGameView(newView);
+    }
   }
 
   public void readGameInfoFiles(PublishWorker worker)
@@ -854,7 +871,7 @@ public class ImportManager
       ExceptionHandler.handleException(e, "Could not store game file");
     }
   }
-  
+
   public int clearAfterCarouselImport()
   {
     if (this.createGameViews)

@@ -26,7 +26,7 @@ public class GamebaseImportWorker extends AbstractImportWorker
   {
     progressValueString = "Querying gamebase db...";
     publish("Reading from gamebase db... this may take a while, be patient!");
-    
+
     gbInporter.importFromGamebase(this);
     progressValueString = "Checking game files...";
 
@@ -82,6 +82,8 @@ public class GamebaseImportWorker extends AbstractImportWorker
       publish(importManager.insertRowsIntoDb(copyList, 0).toString());
       importManager.copyFiles(true, copyList, this);
     }
+    //Create game view if view tag is defined
+    importManager.createGameViewForViewTag(this);
     int numberOfGamesProcessed = importManager.clearAfterImport();
     publish("Processed " + numberOfGamesProcessed + " games.");
     progressValueString = "Finished!";

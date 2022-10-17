@@ -43,6 +43,7 @@ public class ImportOptionsPanel extends JPanel
   private JRadioButton createGameViewButton;
   private JRadioButton noGameviewRadioButton;
   private final ButtonGroup gameViewGroup = new ButtonGroup();
+  private JLabel viewTagInfoLabel;
 
   public ImportOptionsPanel()
   {
@@ -250,7 +251,7 @@ public class ImportOptionsPanel extends JPanel
       gbc_skipRadioButton.gridwidth = 2;
       gbc_skipRadioButton.anchor = GridBagConstraints.WEST;
       gbc_skipRadioButton.weightx = 1.0;
-      gbc_skipRadioButton.insets = new Insets(0, 5, 5, 0);
+      gbc_skipRadioButton.insets = new Insets(0, 5, 0, 0);
       gbc_skipRadioButton.gridx = 0;
       gbc_skipRadioButton.gridy = 0;
       selectionPanel.add(getSkipRadioButton(), gbc_skipRadioButton);
@@ -258,7 +259,7 @@ public class ImportOptionsPanel extends JPanel
       gbc_overwriteRadioButton.gridwidth = 2;
       gbc_overwriteRadioButton.anchor = GridBagConstraints.WEST;
       gbc_overwriteRadioButton.weightx = 1.0;
-      gbc_overwriteRadioButton.insets = new Insets(0, 5, 5, 0);
+      gbc_overwriteRadioButton.insets = new Insets(0, 5, 0, 0);
       gbc_overwriteRadioButton.gridx = 0;
       gbc_overwriteRadioButton.gridy = 1;
       selectionPanel.add(getOverwriteRadioButton(), gbc_overwriteRadioButton);
@@ -270,28 +271,35 @@ public class ImportOptionsPanel extends JPanel
       gbc_addRadioButton.gridx = 0;
       gbc_addRadioButton.gridy = 2;
       selectionPanel.add(getAddRadioButton(), gbc_addRadioButton);
+      GridBagConstraints gbc_viewTagInfoLabel = new GridBagConstraints();
+      gbc_viewTagInfoLabel.gridwidth = 2;
+      gbc_viewTagInfoLabel.fill = GridBagConstraints.HORIZONTAL;
+      gbc_viewTagInfoLabel.insets = new Insets(0, 5, 5, 5);
+      gbc_viewTagInfoLabel.gridx = 0;
+      gbc_viewTagInfoLabel.gridy = 5;
+      selectionPanel.add(getViewTagInfoLabel(), gbc_viewTagInfoLabel);
       GridBagConstraints gbc_favoriteCheckBox = new GridBagConstraints();
       gbc_favoriteCheckBox.anchor = GridBagConstraints.WEST;
       gbc_favoriteCheckBox.insets = new Insets(0, 5, 5, 5);
       gbc_favoriteCheckBox.gridx = 0;
-      gbc_favoriteCheckBox.gridy = 4;
+      gbc_favoriteCheckBox.gridy = 3;
       selectionPanel.add(getFavoriteCheckBox(), gbc_favoriteCheckBox);
       GridBagConstraints gbc_favoriteComboBox = new GridBagConstraints();
       gbc_favoriteComboBox.insets = new Insets(0, 0, 5, 0);
       gbc_favoriteComboBox.fill = GridBagConstraints.HORIZONTAL;
       gbc_favoriteComboBox.gridx = 1;
-      gbc_favoriteComboBox.gridy = 4;
+      gbc_favoriteComboBox.gridy = 3;
       selectionPanel.add(getFavoriteComboBox(), gbc_favoriteComboBox);
       GridBagConstraints gbc_viewTagCheckBox = new GridBagConstraints();
       gbc_viewTagCheckBox.anchor = GridBagConstraints.NORTHWEST;
       gbc_viewTagCheckBox.insets = new Insets(0, 5, 0, 5);
       gbc_viewTagCheckBox.gridx = 0;
-      gbc_viewTagCheckBox.gridy = 5;
+      gbc_viewTagCheckBox.gridy = 4;
       selectionPanel.add(getViewTagCheckBox(), gbc_viewTagCheckBox);
       GridBagConstraints gbc_viewTagTextField = new GridBagConstraints();
       gbc_viewTagTextField.fill = GridBagConstraints.HORIZONTAL;
       gbc_viewTagTextField.gridx = 1;
-      gbc_viewTagTextField.gridy = 5;
+      gbc_viewTagTextField.gridy = 4;
       selectionPanel.add(getViewTagTextField(), gbc_viewTagTextField);
     }
     return selectionPanel;
@@ -334,6 +342,7 @@ public class ImportOptionsPanel extends JPanel
           public void actionPerformed(ActionEvent e)
           {
             getViewTagTextField().setEnabled(viewTagCheckBox.isSelected());
+            getViewTagInfoLabel().setText(viewTagCheckBox.isSelected() ? "(A new game view for the view tag is created)" : " ");
           }
         });
     }
@@ -361,7 +370,7 @@ public class ImportOptionsPanel extends JPanel
     boolean gameViewSelected = getCreateGameViewButton().isSelected();
     getViewTagCheckBox().setEnabled(!gameViewSelected);
     getFavoriteCheckBox().setEnabled(!gameViewSelected);
-    
+    getViewTagInfoLabel().setEnabled(!gameViewSelected);
     getAddRadioButton().setEnabled(!gameViewSelected);
     getOverwriteRadioButton().setEnabled(!gameViewSelected);
     getSkipRadioButton().setEnabled(!gameViewSelected);
@@ -387,7 +396,7 @@ public class ImportOptionsPanel extends JPanel
     	GridBagConstraints gbc_createGameViewButton = new GridBagConstraints();
     	gbc_createGameViewButton.fill = GridBagConstraints.HORIZONTAL;
     	gbc_createGameViewButton.anchor = GridBagConstraints.WEST;
-    	gbc_createGameViewButton.insets = new Insets(0, 0, 5, 0);
+    	gbc_createGameViewButton.insets = new Insets(0, 0, 0, 0);
     	gbc_createGameViewButton.gridx = 0;
     	gbc_createGameViewButton.gridy = 0;
     	radioButtonPanel.add(getCreateGameViewButton(), gbc_createGameViewButton);
@@ -424,5 +433,11 @@ public class ImportOptionsPanel extends JPanel
       });
     }
     return noGameviewRadioButton;
+  }
+  private JLabel getViewTagInfoLabel() {
+    if (viewTagInfoLabel == null) {
+    	viewTagInfoLabel = new JLabel(" ");
+    }
+    return viewTagInfoLabel;
   }
 }
