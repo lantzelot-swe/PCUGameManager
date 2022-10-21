@@ -20,6 +20,7 @@ import javax.swing.UIManager;
 import javax.swing.event.HyperlinkEvent;
 
 import se.lantz.gamebase.GamebaseImporter;
+import se.lantz.gui.DeleteDialog.TYPE_OF_DELETE;
 import se.lantz.gui.dbbackup.BackupProgressDialog;
 import se.lantz.gui.dbbackup.BackupWorker;
 import se.lantz.gui.dbrestore.RestoreDbDialog;
@@ -112,6 +113,7 @@ public class MenuManager
   private JMenuItem restoreDbItem;
   private JMenuItem deleteAllGamesItem;
   private JMenuItem deleteGamesForViewItem;
+  private JMenuItem deleteAllGameViewsItem;
 
   private JMenuItem validateDbItem;
   private JMenuItem palNtscFixItem;
@@ -210,6 +212,7 @@ public class MenuManager
     toolsMenu.addSeparator();
     toolsMenu.add(getDeleteAllGamesItem());
     toolsMenu.add(getDeleteGamesForViewMenuItem());
+    toolsMenu.add(getDeleteAllGameViewsItem());
     toolsMenu.addSeparator();
     toolsMenu.add(getConvertSavedStatesItem());
     toolsMenu.add(getCopySavedStatesToFileLoaderItem());
@@ -812,6 +815,14 @@ public class MenuManager
     deleteAllGamesItem.addActionListener(e -> deleteAllGames());
     return deleteAllGamesItem;
   }
+  
+  private JMenuItem getDeleteAllGameViewsItem()
+  {
+    deleteAllGameViewsItem = new JMenuItem("Delete all gamelist views in database");
+    deleteAllGameViewsItem.setMnemonic('l');
+    deleteAllGameViewsItem.addActionListener(e -> deleteAllGamelistViews());
+    return deleteAllGameViewsItem;
+  }
 
   private JMenuItem getValidateDbItem()
   {
@@ -1218,7 +1229,7 @@ public class MenuManager
 
   private void deleteAllGames()
   {
-    DeleteDialog dialog = new DeleteDialog(true);
+    DeleteDialog dialog = new DeleteDialog(TYPE_OF_DELETE.ALL);
     dialog.pack();
     dialog.setLocationRelativeTo(MainWindow.getInstance());
     if (dialog.showDialog())
@@ -1227,7 +1238,18 @@ public class MenuManager
       {
         backupDb();
       }
-      startDeleteProgress(true);
+      startDeleteProgress(TYPE_OF_DELETE.ALL);
+    }
+  }
+  
+  private void deleteAllGamelistViews()
+  {
+    DeleteDialog dialog = new DeleteDialog(TYPE_OF_DELETE.ALL_VIEWS);
+    dialog.pack();
+    dialog.setLocationRelativeTo(MainWindow.getInstance());
+    if (dialog.showDialog())
+    {
+      startDeleteProgress(TYPE_OF_DELETE.ALL_VIEWS);
     }
   }
 
@@ -1239,7 +1261,7 @@ public class MenuManager
     }
     else
     {
-      DeleteDialog dialog = new DeleteDialog(false);
+      DeleteDialog dialog = new DeleteDialog(TYPE_OF_DELETE.VIEW);
       dialog.pack();
       dialog.setLocationRelativeTo(MainWindow.getInstance());
       if (dialog.showDialog())
@@ -1248,18 +1270,18 @@ public class MenuManager
         {
           backupDb();
         }
-        startDeleteProgress(false);
+        startDeleteProgress(TYPE_OF_DELETE.VIEW);
       }
     }
   }
 
-  private void startDeleteProgress(boolean deleteAll)
+  private void startDeleteProgress(TYPE_OF_DELETE typeOfDelete)
   {
     MainWindow.getInstance().getMainPanel().clearGameListSelection();
     DeleteProgressDialog delDialog = new DeleteProgressDialog(MainWindow.getInstance());
     delDialog.pack();
     delDialog.setLocationRelativeTo(MainWindow.getInstance());
-    DeleteWorker worker = new DeleteWorker(delDialog, deleteAll, uiModel);
+    DeleteWorker worker = new DeleteWorker(delDialog, typeOfDelete, uiModel);
     worker.execute();
     delDialog.setVisible(true);
   }

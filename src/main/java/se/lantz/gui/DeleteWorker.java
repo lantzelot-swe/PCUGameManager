@@ -2,6 +2,7 @@ package se.lantz.gui;
 
 import javax.swing.SwingWorker;
 
+import se.lantz.gui.DeleteDialog.TYPE_OF_DELETE;
 import se.lantz.model.MainViewModel;
 import se.lantz.util.ExceptionHandler;
 import se.lantz.util.FileManager;
@@ -9,12 +10,12 @@ import se.lantz.util.FileManager;
 public class DeleteWorker extends SwingWorker<Void, String>
 {
   private DeleteProgressDialog dialog;
-  private boolean deleteAll;
+  private TYPE_OF_DELETE typeOfDelete;
   private MainViewModel model;
 
-  public DeleteWorker(DeleteProgressDialog dialog, boolean deleteAll, MainViewModel model)
+  public DeleteWorker(DeleteProgressDialog dialog, TYPE_OF_DELETE typeOfDelete, MainViewModel model)
   {
-    this.deleteAll = deleteAll;
+    this.typeOfDelete = typeOfDelete;
     this.dialog = dialog;
     this.model = model;
   }
@@ -22,14 +23,18 @@ public class DeleteWorker extends SwingWorker<Void, String>
   @Override
   protected Void doInBackground() throws Exception
   {
-    if (deleteAll)
+    if (typeOfDelete.equals(TYPE_OF_DELETE.ALL))
     {
       model.deleteAllGames();
       FileManager.deleteAllFolderContent();
     }
-    else
+    else if (typeOfDelete.equals(TYPE_OF_DELETE.VIEW))
     {
       model.deleteAllGamesInCurrentView();
+    }
+    else
+    {
+      model.deleteAllGameListViews();
     }
     return null;
   }
@@ -46,7 +51,7 @@ public class DeleteWorker extends SwingWorker<Void, String>
       ExceptionHandler.handleException(e, "Error when deleting");
     }
     dialog.finish();
-    if (deleteAll)
+    if (!typeOfDelete.equals(TYPE_OF_DELETE.VIEW))
     {
       //Trigger a reload of game views
       model.reloadGameViews();

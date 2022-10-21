@@ -2,15 +2,26 @@ package se.lantz.gui;
 
 public class DeleteDialog extends BaseDialog
 {
-  DeletePanel deletePanel;
-  private final boolean deleteAll;
+  public static enum TYPE_OF_DELETE
+  {
+    ALL, VIEW, ALL_VIEWS
+  }
 
-  public DeleteDialog(boolean deleteAll)
+  DeletePanel deletePanel;
+  private final TYPE_OF_DELETE typeOfDelete;
+
+  public DeleteDialog(TYPE_OF_DELETE typeOfDelete)
   {
     super(MainWindow.getInstance());
-    this.deleteAll = deleteAll;
-    setTitle("Delete games");
-    ;
+    this.typeOfDelete = typeOfDelete;
+    if (typeOfDelete.equals(TYPE_OF_DELETE.ALL_VIEWS))
+    {
+      setTitle("Delete gamelist views");
+    }
+    else
+    {
+      setTitle("Delete games");
+    }
     addContent(getDeletePanel());
     this.setResizable(false);
   }
@@ -19,7 +30,7 @@ public class DeleteDialog extends BaseDialog
   {
     if (deletePanel == null)
     {
-      deletePanel = new DeletePanel(deleteAll);
+      deletePanel = new DeletePanel(typeOfDelete);
     }
     return deletePanel;
   }

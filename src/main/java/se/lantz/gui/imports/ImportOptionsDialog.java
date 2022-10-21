@@ -21,7 +21,7 @@ public class ImportOptionsDialog extends BaseDialog
     if (isCarouselImport)
     {
       setTitle("Import carousel folder");
-      this.setPreferredSize(new Dimension(450, 405));
+      this.setPreferredSize(new Dimension(450, 425));
     }
     else
     {

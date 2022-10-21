@@ -1151,6 +1151,15 @@ public class DbConnector
       ExceptionHandler.handleException(e, "Could not delete games in db.");
     }
   }
+  
+  public void deleteAllGameListViews()
+  {
+    List<GameView> gameViewList = loadGameViews();
+    for (GameView gameView : gameViewList)
+    {    
+      deleteView(gameView);
+    }
+  }
 
   public void deleteView(GameView view)
   {

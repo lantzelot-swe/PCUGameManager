@@ -734,6 +734,11 @@ public class MainViewModel extends AbstractModel
     //Reload the current view
     reloadCurrentGameView();
   }
+  
+  public void deleteAllGameListViews()
+  {
+    dbConnector.deleteAllGameListViews();
+  }
 
   public void deleteGameView(GameView view)
   {
