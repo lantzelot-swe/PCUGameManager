@@ -85,6 +85,7 @@ public class MenuManager
   private JMenuItem exportFLItem;
   private JMenuItem exportSavedStatesItem;
   private JMenuItem refreshItem;
+  private JMenuItem refreshAllItem;
 
   private JMenuItem toggleFavorite1Item;
   private JMenuItem toggleFavorite2Item;
@@ -199,6 +200,7 @@ public class MenuManager
     fileMenu.add(exportMenu);
     fileMenu.addSeparator();
     fileMenu.add(getRefreshItem());
+    fileMenu.add(getRefreshAllItem());
     fileMenu.addSeparator();
     fileMenu.add(getPreferencesMenuItem());
     fileMenu.addSeparator();
@@ -479,6 +481,16 @@ public class MenuManager
     refreshItem.setMnemonic('C');
     refreshItem.addActionListener(e -> reloadView());
     return refreshItem;
+  }
+
+  private JMenuItem getRefreshAllItem()
+  {
+    refreshAllItem = new JMenuItem("Reload all gamelist views");
+    KeyStroke keyStrokeToReloadGameViews = KeyStroke.getKeyStroke(KeyEvent.VK_F5, InputEvent.SHIFT_DOWN_MASK);
+    refreshAllItem.setAccelerator(keyStrokeToReloadGameViews);
+    refreshAllItem.setMnemonic('g');
+    refreshAllItem.addActionListener(e -> reloadAll());
+    return refreshAllItem;
   }
 
   private JMenuItem getExitItem()
@@ -776,7 +788,8 @@ public class MenuManager
     editViewTagItem.addActionListener(e -> {
       if (!mainWindow.getMainPanel().isNoGameSelected())
       {
-        String initialValue = mainWindow.getMainPanel().isSingleGameSelected() ? uiModel.getInfoModel().getViewTag() : "";
+        String initialValue =
+          mainWindow.getMainPanel().isSingleGameSelected() ? uiModel.getInfoModel().getViewTag() : "";
         String message = mainWindow.getMainPanel().isSingleGameSelected()
           ? "Enter the view tag to set for " + uiModel.getInfoModel().getTitle()
           : "Enter the view tag to set for the selected games";
@@ -815,7 +828,7 @@ public class MenuManager
     deleteAllGamesItem.addActionListener(e -> deleteAllGames());
     return deleteAllGamesItem;
   }
-  
+
   private JMenuItem getDeleteAllGameViewsItem()
   {
     deleteAllGameViewsItem = new JMenuItem("Delete all gamelist views in database");
@@ -1201,6 +1214,13 @@ public class MenuManager
     this.mainWindow.reloadCurrentGameView();
   }
 
+  private void reloadAll()
+  {
+    //Refresh game views
+    uiModel.reloadGameViews();
+    this.mainWindow.refreshMenuAndUI();
+  }
+
   private void backupDb()
   {
     BackupProgressDialog dialog = new BackupProgressDialog(this.mainWindow);
@@ -1241,7 +1261,7 @@ public class MenuManager
       startDeleteProgress(TYPE_OF_DELETE.ALL);
     }
   }
-  
+
   private void deleteAllGamelistViews()
   {
     DeleteDialog dialog = new DeleteDialog(TYPE_OF_DELETE.ALL_VIEWS);
