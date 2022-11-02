@@ -99,6 +99,11 @@ public class DbConnector
     columnList.add(DbConstants.VERTICALSHIFT);
     columnList.add(DbConstants.FAVORITE);
     columnList.add(DbConstants.VIEW_TAG);
+    columnList.add(DbConstants.DISK_2);
+    columnList.add(DbConstants.DISK_3);
+    columnList.add(DbConstants.DISK_4);
+    columnList.add(DbConstants.DISK_5);
+    columnList.add(DbConstants.DISK_6);
     //Check if database file exists, if not create an empty db.
     File dbFile = new File("./" + DB_NAME);
     if (!dbFile.exists())
@@ -108,6 +113,8 @@ public class DbConnector
     }
     //To be backwards compatible with 1.0 db, update if missing
     addLanguageAndDuplicateColumnsIfMissing();
+    //To be backwards compatible with 2.8.2 db, update if missing
+    addDiskColumnsIfMissing();
   }
 
   private void createNewDb()
@@ -129,6 +136,7 @@ public class DbConnector
   public void validateMissingColumnsAfterRestore()
   {
     addLanguageAndDuplicateColumnsIfMissing();
+    addDiskColumnsIfMissing();
   }
 
   private void addLanguageAndDuplicateColumnsIfMissing()
@@ -192,6 +200,87 @@ public class DbConnector
     catch (SQLException e)
     {
       ExceptionHandler.handleException(e, "Could not update db for language, duplicate columns and view tag");
+    }
+  }
+
+  private void addDiskColumnsIfMissing()
+  {
+    String tableInfoSql = "PRAGMA table_info(gameinfo)";
+    String addDisk2Sql = "ALTER TABLE gameinfo ADD COLUMN Disk2 STRING;";
+    String addDisk3Sql = "ALTER TABLE gameinfo ADD COLUMN Disk3 STRING;";
+    String addDisk4Sql = "ALTER TABLE gameinfo ADD COLUMN Disk4 STRING;";
+    String addDisk5Sql = "ALTER TABLE gameinfo ADD COLUMN Disk5 STRING;";
+    String addDisk6Sql = "ALTER TABLE gameinfo ADD COLUMN Disk6 STRING;";
+
+    try (Connection conn = this.connect(); PreparedStatement stmnt = conn.prepareStatement(tableInfoSql);
+      ResultSet rs = stmnt.executeQuery(); Statement addDisk2stmnt = conn.createStatement();
+      Statement addDisk3stmnt = conn.createStatement(); Statement addDisk4stmnt = conn.createStatement();
+      Statement addDisk5stmnt = conn.createStatement(); Statement addDisk6stmnt = conn.createStatement())
+    {
+      boolean disk2Available = false;
+      boolean disk3Available = false;
+      boolean disk4Available = false;
+      boolean disk5Available = false;
+      boolean disk6Available = false;
+      while (rs.next())
+      {
+        //Check if one of the language columns are available
+        if (rs.getString("Name").equals("Disk2"))
+        {
+          disk2Available = true;
+        }
+        if (rs.getString("Name").equals("Disk3"))
+        {
+          disk3Available = true;
+        }
+        if (rs.getString("Name").equals("Disk4"))
+        {
+          disk4Available = true;
+        }
+        if (rs.getString("Name").equals("Disk5"))
+        {
+          disk5Available = true;
+        }
+        if (rs.getString("Name").equals("Disk6"))
+        {
+          disk6Available = true;
+        }
+      }
+
+      if (!disk2Available)
+      {
+        logger.debug("Disk2 column is missing in the database, adding column.");
+        addDisk2stmnt.executeUpdate(addDisk2Sql);
+        logger.debug("Disk2 columns added.");
+      }
+      if (!disk3Available)
+      {
+        logger.debug("Disk3 column is missing in the database, adding column.");
+        addDisk3stmnt.executeUpdate(addDisk3Sql);
+        logger.debug("Disk3 column added.");
+      }
+      if (!disk4Available)
+      {
+        logger.debug("Disk4 column is missing in the database, adding column.");
+        addDisk4stmnt.executeUpdate(addDisk4Sql);
+        logger.debug("Disk4 column added.");
+      }
+      if (!disk5Available)
+      {
+        logger.debug("Disk5 column is missing in the database, adding column.");
+        addDisk5stmnt.executeUpdate(addDisk5Sql);
+        logger.debug("Disk5 column added.");
+      }
+      if (!disk6Available)
+      {
+        logger.debug("Disk6 column is missing in the database, adding column.");
+        addDisk5stmnt.executeUpdate(addDisk6Sql);
+        logger.debug("Disk6 column added.");
+      }
+    }
+    catch (SQLException e)
+    {
+      ExceptionHandler.handleException(e, "Could not update db for Disk columns");
     }
   }
 
@@ -646,7 +735,7 @@ public class DbConnector
       //Check old gamename, if empty add a view tag for it.
       String oldGameName = getOldGameName(rowData);
       //Strip  rowData from new filenames
-      String strippedRowData = stripRowDataFromOldFileNames(rowData);
+      String strippedRowData = stripRowDataFromOldFileNamesAndDisks(rowData);
       String duplicateIndex = rowData.substring(rowData.lastIndexOf(",") + 1);
       st.append(strippedRowData);
       if (addAsFavorite > 0)
@@ -658,11 +747,11 @@ public class DbConnector
         st.append(",0");
       }
       st.append(",");
-      
+
       if (getSystemInfo(rowData).contains("basic") && gameViewId != 0)
       {
         //An infoslot, append GIS:
-        st.append("\"GIS:" + gameViewId +  "\",");
+        st.append("\"GIS:" + gameViewId + "\",");
       }
       else if (oldGameName.isEmpty() && !getSystemInfo(rowData).contains("basic"))
       {
@@ -678,6 +767,18 @@ public class DbConnector
         //Append viewtag
         st.append("\"" + viewTag + "\",");
       }
+
+      //disk2
+      st.append("\"" + getDisk2FileName(rowData) + "\",");
+      //disk3
+      st.append("\"" + getDisk3FileName(rowData) + "\",");
+      //disk4
+      st.append("\"" + getDisk4FileName(rowData) + "\",");
+      //disk5
+      st.append("\"" + getDisk5FileName(rowData) + "\",");
+      //disk6
+      st.append("\"" + getDisk6FileName(rowData) + "\",");
+
       st.append(duplicateIndex);
       st.append("),(");
     }
@@ -700,16 +801,46 @@ public class DbConnector
     }
   }
 
-  private String stripRowDataFromOldFileNames(String rowData)
+  private String stripRowDataFromOldFileNamesAndDisks(String rowData)
   {
     String[] splittedRowData = rowData.split(COMMA);
     List<String> strippedDataList = new ArrayList<>();
-    //Remove last 4 entries
-    for (int i = 0; i < splittedRowData.length - 4; i++)
+    //Remove last 14 entries (old names and disks)
+    for (int i = 0; i < splittedRowData.length - 14; i++)
     {
       strippedDataList.add(splittedRowData[i]);
     }
     return String.join("\",\"", strippedDataList) + "\"";
+  }
+
+  private String getDisk2FileName(String rowData)
+  {
+    String[] splittedRowData = rowData.split(COMMA);
+    return splittedRowData[22].split("\"")[0];
+  }
+
+  private String getDisk3FileName(String rowData)
+  {
+    String[] splittedRowData = rowData.split(COMMA);
+    return splittedRowData[24].split("\"")[0];
+  }
+
+  private String getDisk4FileName(String rowData)
+  {
+    String[] splittedRowData = rowData.split(COMMA);
+    return splittedRowData[26].split("\"")[0];
+  }
+
+  private String getDisk5FileName(String rowData)
+  {
+    String[] splittedRowData = rowData.split(COMMA);
+    return splittedRowData[28].split("\"")[0];
+  }
+
+  private String getDisk6FileName(String rowData)
+  {
+    String[] splittedRowData = rowData.split(COMMA);
+    return splittedRowData[30].split("\"")[0];
   }
 
   private String getOldGameName(String rowData)
@@ -828,6 +959,11 @@ public class DbConnector
       returnValue.setVerticalShift(rs.getInt(DbConstants.VERTICALSHIFT));
       returnValue.setDuplicateIndex(rs.getInt(DbConstants.DUPLICATE_INDEX));
       returnValue.setViewTag(rs.getString(DbConstants.VIEW_TAG));
+      returnValue.setDisk2(rs.getString(DbConstants.DISK_2));
+      returnValue.setDisk3(rs.getString(DbConstants.DISK_3));
+      returnValue.setDisk4(rs.getString(DbConstants.DISK_4));
+      returnValue.setDisk5(rs.getString(DbConstants.DISK_5));
+      returnValue.setDisk6(rs.getString(DbConstants.DISK_6));
       logger.debug("SELECT Executed successfully");
     }
     catch (SQLException e)
@@ -974,6 +1110,16 @@ public class DbConnector
     st.append(details.getVerticalShift());
     st.append(",0,\"");
     st.append(details.getViewTag());
+    st.append(COMMA);
+    st.append(details.getDisk2());
+    st.append(COMMA);
+    st.append(details.getDisk3());
+    st.append(COMMA);
+    st.append(details.getDisk4());
+    st.append(COMMA);
+    st.append(details.getDisk5());
+    st.append(COMMA);
+    st.append(details.getDisk6());
     st.append("\",");
     st.append(details.getDuplicateIndex());
     st.append(");");
@@ -1079,6 +1225,26 @@ public class DbConnector
     sqlBuilder.append("=\"");
     sqlBuilder.append(details.getViewTag());
     sqlBuilder.append("\",");
+    sqlBuilder.append(DbConstants.DISK_2);
+    sqlBuilder.append("=\"");
+    sqlBuilder.append(details.getDisk2());
+    sqlBuilder.append("\",");
+    sqlBuilder.append(DbConstants.DISK_3);
+    sqlBuilder.append("=\"");
+    sqlBuilder.append(details.getDisk3());
+    sqlBuilder.append("\",");
+    sqlBuilder.append(DbConstants.DISK_4);
+    sqlBuilder.append("=\"");
+    sqlBuilder.append(details.getDisk4());
+    sqlBuilder.append("\",");
+    sqlBuilder.append(DbConstants.DISK_5);
+    sqlBuilder.append("=\"");
+    sqlBuilder.append(details.getDisk5());
+    sqlBuilder.append("\",");
+    sqlBuilder.append(DbConstants.DISK_6);
+    sqlBuilder.append("=\"");
+    sqlBuilder.append(details.getDisk6());
+    sqlBuilder.append("\",");
     sqlBuilder.append(DbConstants.VERTICALSHIFT);
     sqlBuilder.append("=");
     sqlBuilder.append(details.getVerticalShift());
@@ -1151,12 +1317,12 @@ public class DbConnector
       ExceptionHandler.handleException(e, "Could not delete games in db.");
     }
   }
-  
+
   public void deleteAllGameListViews()
   {
     List<GameView> gameViewList = loadGameViews();
     for (GameView gameView : gameViewList)
-    {    
+    {
       deleteView(gameView);
     }
   }
@@ -1212,7 +1378,7 @@ public class DbConnector
       ExceptionHandler.handleException(e, "Could not clear favorite values in db.");
     }
   }
-  
+
   public void setViewTag(String gameId, String viewTag)
   {
     String sql = "UPDATE gameinfo SET Viewtag = '" + viewTag + "' WHERE rowId = " + gameId + ";";

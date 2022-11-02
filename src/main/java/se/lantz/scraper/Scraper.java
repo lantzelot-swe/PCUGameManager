@@ -35,5 +35,5 @@ public interface Scraper
 
   boolean isC64();
   
-  File getGameFile();
+  List<File> getGameFiles();
 }

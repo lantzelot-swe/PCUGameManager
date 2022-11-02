@@ -44,7 +44,7 @@ public class C64comScraper implements Scraper
   private List<String> scrapedMusicList = new ArrayList<>();
   private String scrapedGenre;
   private BufferedImage scrapedCover;
-  private File scrapedFile;
+  private List<File> scrapedFiles;
 
   Map<String, String> genreMap = new HashMap<>();
   
@@ -241,8 +241,8 @@ public class C64comScraper implements Scraper
           .execute();
         
         //create a temp file and fetch the content
-        scrapedFile = FileManager.createTempFileForScraper(response.bodyStream(), "ScrapedFile.zip");
-        logger.debug("File to include as game: {}", scrapedFile != null ? scrapedFile.getAbsolutePath() : null);
+        scrapedFiles = FileManager.createTempFileForScraper(response.bodyStream(), "ScrapedFile.zip");
+        logger.debug("File to include as game: {}", !scrapedFiles.isEmpty() ? scrapedFiles.get(0).getAbsolutePath() : null);
       }
       catch (Exception e)
       {
@@ -349,9 +349,9 @@ public class C64comScraper implements Scraper
   }
   
   @Override
-  public File getGameFile()
+  public List<File> getGameFiles()
   {
-    return scrapedFile;
+    return scrapedFiles;
   }
 
   @Override

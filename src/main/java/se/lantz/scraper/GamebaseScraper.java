@@ -53,7 +53,7 @@ public class GamebaseScraper implements Scraper
   private int scrapedYear = 1985;
   private String scrapedGenre = "";
   private String scrapedComposer = "";
-  private File scrapedFile;
+  private List<File> scrapedFiles;
 
   public GamebaseScraper()
   {
@@ -222,9 +222,9 @@ public class GamebaseScraper implements Scraper
   }
 
   @Override
-  public File getGameFile()
+  public List<File> getGameFiles()
   {
-    return scrapedFile;
+    return scrapedFiles;
   }
 
   @Override
@@ -292,8 +292,8 @@ public class GamebaseScraper implements Scraper
         URLConnection conn = url.openConnection();
         InputStream inputStream = conn.getInputStream();
         //create a temp file and fetch the content
-        scrapedFile = FileManager.createTempFileForScraper(new BufferedInputStream(inputStream), "ScrapedFile.zip");
-        logger.debug("File to include as game: {}", scrapedFile != null ? scrapedFile.getAbsolutePath() : null);
+        scrapedFiles = FileManager.createTempFileForScraper(new BufferedInputStream(inputStream), "ScrapedFile.zip");
+        logger.debug("File to include as game: {}", !scrapedFiles.isEmpty() ? scrapedFiles.get(0).getAbsolutePath() : null);
       }
       catch (Exception e)
       {

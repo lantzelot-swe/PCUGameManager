@@ -1,6 +1,5 @@
 package se.lantz.model.data;
 
-import se.lantz.model.JoystickModel;
 import se.lantz.util.FileManager;
 
 /**
@@ -31,6 +30,12 @@ public class GameDetails
   private int verticalshift = 0;
   private int duplicateIndex = 0;
   private String viewTag = "";
+  private String disk2 = "";
+  private String disk3 = "";
+  private String disk4 = "";
+  private String disk5 = "";
+  private String disk6 = "";
+  
 
   public GameDetails()
   {
@@ -239,5 +244,55 @@ public class GameDetails
   public void setViewTag(String viewTag)
   {
     this.viewTag = viewTag == null ? "" : viewTag;
+  }
+  
+  public String getDisk2()
+  {
+    return disk2;
+  }
+
+  public void setDisk2(String disk2)
+  {
+    this.disk2 = disk2 == null ? "" : disk2;
+  }
+  
+  public String getDisk3()
+  {
+    return disk3;
+  }
+
+  public void setDisk3(String disk3)
+  {
+    this.disk3 = disk3 == null ? "" : disk3;
+  }
+  
+  public String getDisk4()
+  {
+    return disk4;
+  }
+
+  public void setDisk4(String disk4)
+  {
+    this.disk4 = disk4 == null ? "" : disk4;
+  }
+  
+  public String getDisk5()
+  {
+    return disk5;
+  }
+
+  public void setDisk5(String disk5)
+  {
+    this.disk5 = disk5 == null ? "" : disk5;
+  }
+  
+  public String getDisk6()
+  {
+    return disk6;
+  }
+
+  public void setDisk6(String disk6)
+  {
+    this.disk6 = disk6 == null ? "" : disk6;
   }
 }

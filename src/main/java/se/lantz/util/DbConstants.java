@@ -23,6 +23,11 @@ public class DbConstants
   public static final String FAVORITE = "Favorite";
   public static final String DUPLICATE_INDEX = "Duplicate";
   public static final String VIEW_TAG = "Viewtag";
+  public static final String DISK_2 = "Disk2";
+  public static final String DISK_3 = "Disk3";
+  public static final String DISK_4 = "Disk4";
+  public static final String DISK_5 = "Disk5";
+  public static final String DISK_6 = "Disk6";
   
   private DbConstants()
   {

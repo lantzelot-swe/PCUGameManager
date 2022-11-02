@@ -47,6 +47,7 @@ import com.github.junrar.rarfile.FileHeader;
 
 import se.lantz.db.DbConnector;
 import se.lantz.gui.exports.PublishWorker;
+import se.lantz.manager.ExportManager;
 import se.lantz.manager.SavedStatesManager;
 import se.lantz.model.InfoModel;
 import se.lantz.model.JoystickModel;
@@ -74,6 +75,7 @@ public class FileManager
   private static final String COVERS = "./covers/";
   private static final String SAVES = "./saves/";
   private static final String BACKUP = "./backup/";
+  public static final String DISKS = "./extradisks/";
 
   private static final Path TEMP_PATH = Paths.get("./temp");
   private static final Logger logger = LoggerFactory.getLogger(FileManager.class);
@@ -372,6 +374,21 @@ public class FileManager
     String gameName = infoModel.getGamesFile();
     Path gamePath = infoModel.getGamesPath();
 
+    String disk2Name = infoModel.getDisk2File();
+    Path disk2Path = infoModel.getDisk2Path();
+
+    String disk3Name = infoModel.getDisk3File();
+    Path disk3Path = infoModel.getDisk3Path();
+
+    String disk4Name = infoModel.getDisk4File();
+    Path disk4Path = infoModel.getDisk4Path();
+
+    String disk5Name = infoModel.getDisk5File();
+    Path disk5Path = infoModel.getDisk5Path();
+
+    String disk6Name = infoModel.getDisk6File();
+    Path disk6Path = infoModel.getDisk6Path();
+
     //Store on disk with the name in the models. The UI must make sure the names is according to the Maxi format.
 
     //Resize the files, cover size = 122x175
@@ -464,6 +481,63 @@ public class FileManager
       {
         ExceptionHandler.handleException(e, "Could not copy game file from " + source.toString());
       }
+    }
+
+    saveExtraDisk(disk2Name, disk2Path, 2);
+    saveExtraDisk(disk3Name, disk3Path, 3);
+    saveExtraDisk(disk4Name, disk4Path, 4);
+    saveExtraDisk(disk5Name, disk5Path, 5);
+    saveExtraDisk(disk6Name, disk6Path, 6);
+  }
+
+  private void saveExtraDisk(String diskName, Path diskPath, int diskIndex)
+  {
+    if (diskPath == null && diskName.isEmpty())
+    {
+      deleteExtraDiskIfExists(diskIndex);
+    }
+    else if (diskPath != null)
+    {
+      Path source = diskPath;
+      Path target = new File(DISKS + diskName).toPath();
+
+      if (Files.notExists(source))
+      {
+        System.err.printf("The path %s doesn't exist!", source);
+        return;
+      }
+
+      try
+      {
+        Files.copy(source, target, StandardCopyOption.REPLACE_EXISTING);
+      }
+      catch (IOException e)
+      {
+        ExceptionHandler.handleException(e, "Could not copy disk " + diskIndex + " file from " + source.toString());
+      }
+    }
+  }
+
+  private void deleteExtraDiskIfExists(int diskIndex)
+  {
+    Path d64Disk = new File(DISKS + infoModel.getDiskFileName(diskIndex, ".d64")).toPath();
+    Path g64Disk = new File(DISKS + infoModel.getDiskFileName(diskIndex, ".g64")).toPath();
+    Path d81Disk = new File(DISKS + infoModel.getDiskFileName(diskIndex, ".d81")).toPath();
+    Path d82Disk = new File(DISKS + infoModel.getDiskFileName(diskIndex, ".d82")).toPath();
+    Path d71Disk = new File(DISKS + infoModel.getDiskFileName(diskIndex, ".d71")).toPath();
+    Path x64Disk = new File(DISKS + infoModel.getDiskFileName(diskIndex, ".x64")).toPath();
+    try
+    {
+      Files.deleteIfExists(d64Disk);
+      Files.deleteIfExists(g64Disk);
+      Files.deleteIfExists(d81Disk);
+      Files.deleteIfExists(d82Disk);
+      Files.deleteIfExists(d71Disk);
+      Files.deleteIfExists(x64Disk);
+    }
+    catch (IOException e)
+    {
+      ExceptionHandler.handleException(e, "Could not delete extra disk files");
     }
   }
 
@@ -588,6 +662,30 @@ public class FileManager
         logger.debug("Could NOT rename game {} to {}", oldGame.getName(), newGame.getName());
       }
     }
+
+    //Extra disks
+    renameExtraDisk(infoModel.getDisk2File(), infoModel.getOldDisk2File(), 2);
+    renameExtraDisk(infoModel.getDisk3File(), infoModel.getOldDisk3File(), 3);
+    renameExtraDisk(infoModel.getDisk4File(), infoModel.getOldDisk4File(), 4);
+    renameExtraDisk(infoModel.getDisk5File(), infoModel.getOldDisk5File(), 5);
+    renameExtraDisk(infoModel.getDisk6File(), infoModel.getOldDisk6File(), 6);
+  }
+
+  private void renameExtraDisk(String diskFile, String oldDiskFile, int diskIndex)
+  {
+    if (!diskFile.isEmpty() && !oldDiskFile.isEmpty() && !diskFile.equals(oldDiskFile))
+    {
+      File oldDisk = new File(DISKS + oldDiskFile);
+      File newDisk = new File(DISKS + diskFile);
+      if (oldDisk.renameTo(newDisk))
+      {
+        logger.debug("Renamed disk " + diskIndex + " {} to {}", oldDisk.getName(), newDisk.getName());
+      }
+      else
+      {
+        logger.debug("Could NOT rename disk" + diskIndex + " {} to {}", oldDisk.getName(), newDisk.getName());
+      }
+    }
   }
 
   public static String generateFileNameFromTitle(String title, int duplicateIndex)
@@ -634,12 +732,12 @@ public class FileManager
     logger.debug("Game title: \"{}\" ---- New fileName: \"{}\"", title, newNameString);
     return newNameString;
   }
-  
+
   public static String generateSavedStatesFolderNameForFileLoader(String title, int duplicateIndex)
   {
     String name = generateFileNameFromTitleForFileLoader(title, duplicateIndex);
     //Special handling of titles where dots occur, e.g. G.A.C.C.R.R. or H.E.R.O.
-    int dotCount = (int)name.chars().filter(ch -> ch == '.').count();
+    int dotCount = (int) name.chars().filter(ch -> ch == '.').count();
     if (dotCount > 4)
     {
       //Strip string to only include 4 dots, seems to be a limit there
@@ -669,6 +767,11 @@ public class FileManager
         worker.publishMessage("Creating cjm file for " + gameDetails.getTitle());
         filename =
           generateFileNameFromTitleForFileLoader(gameDetails.getTitle(), gameDetails.getDuplicateIndex()) + ".cjm";
+        if (hasExtraDisks(gameDetails))
+        {
+          filename = generateFileNameFromTitleForFileLoader(gameDetails.getTitle(), gameDetails.getDuplicateIndex()) +
+            " (disk1).cjm";
+        }
       }
       else
       {
@@ -685,6 +788,12 @@ public class FileManager
       logger.error(message, e);
       worker.publishMessage(message);
     }
+  }
+
+  public static boolean hasExtraDisks(GameDetails gameDetails)
+  {
+    return !(gameDetails.getDisk2().isEmpty() && gameDetails.getDisk3().isEmpty() && gameDetails.getDisk4().isEmpty() &&
+      gameDetails.getDisk5().isEmpty() && gameDetails.getDisk6().isEmpty());
   }
 
   public void writeGameInfoFile(String fileName, File targetDir, GameDetails gameDetails, boolean fileLoader)
@@ -788,8 +897,9 @@ public class FileManager
       }
       else
       {
-        gamePathString = SavedStatesManager.SAVES + SavedStatesManager.getGameFolderName(infoModel.getGamesFile(), infoModel.getTitle()) +
-          "/" + savedStatesModel.getState1File();
+        gamePathString = SavedStatesManager.SAVES +
+          SavedStatesManager.getGameFolderName(infoModel.getGamesFile(), infoModel.getTitle()) + "/" +
+          savedStatesModel.getState1File();
       }
     }
       break;
@@ -802,8 +912,9 @@ public class FileManager
       }
       else
       {
-        gamePathString = SavedStatesManager.SAVES + SavedStatesManager.getGameFolderName(infoModel.getGamesFile(), infoModel.getTitle()) +
-          "/" + savedStatesModel.getState2File();
+        gamePathString = SavedStatesManager.SAVES +
+          SavedStatesManager.getGameFolderName(infoModel.getGamesFile(), infoModel.getTitle()) + "/" +
+          savedStatesModel.getState2File();
       }
       break;
     case Save2:
@@ -815,8 +926,9 @@ public class FileManager
       }
       else
       {
-        gamePathString = SavedStatesManager.SAVES + SavedStatesManager.getGameFolderName(infoModel.getGamesFile(), infoModel.getTitle()) +
-          "/" + savedStatesModel.getState3File();
+        gamePathString = SavedStatesManager.SAVES +
+          SavedStatesManager.getGameFolderName(infoModel.getGamesFile(), infoModel.getTitle()) + "/" +
+          savedStatesModel.getState3File();
       }
       break;
     case Save3:
@@ -828,8 +940,9 @@ public class FileManager
       }
       else
       {
-        gamePathString = SavedStatesManager.SAVES + SavedStatesManager.getGameFolderName(infoModel.getGamesFile(), infoModel.getTitle()) +
-          "/" + savedStatesModel.getState4File();
+        gamePathString = SavedStatesManager.SAVES +
+          SavedStatesManager.getGameFolderName(infoModel.getGamesFile(), infoModel.getTitle()) + "/" +
+          savedStatesModel.getState4File();
       }
       break;
     default:
@@ -1167,7 +1280,8 @@ public class FileManager
   public static String getConfiguredFavGameViewName(int favNumber)
   {
     String deafultName = "Favorites " + favNumber;
-    String configuredName = FileManager.getConfiguredProperties().getProperty(GameView.FAV_GAMEVIEW_NAME_PREF_KEY + favNumber);
+    String configuredName =
+      FileManager.getConfiguredProperties().getProperty(GameView.FAV_GAMEVIEW_NAME_PREF_KEY + favNumber);
     if (configuredName == null || configuredName.isEmpty())
     {
       return deafultName;
@@ -1184,7 +1298,7 @@ public class FileManager
     }
     return Boolean.parseBoolean(deleteInstallFiles);
   }
-  
+
   public static boolean isCropScreenshots()
   {
     if (cropScreenshots.isEmpty())
@@ -1294,6 +1408,7 @@ public class FileManager
     deleteDirContent(new File(COVERS));
     deleteDirContent(new File(SCREENS));
     deleteDirContent(new File(GAMES));
+    deleteDirContent(new File(DISKS));
   }
 
   private static void deleteDirContent(File dir)
@@ -1341,7 +1456,31 @@ public class FileManager
       File gameFile = new File(GAMES + details.getGame());
       gameFile.delete();
     }
-    //TODO: Shall we delete saved states also?? Or should the saved states be kept?
+    if (!details.getDisk2().isEmpty())
+    {
+      File gameFile = new File(DISKS + details.getDisk2());
+      gameFile.delete();
+    }
+    if (!details.getDisk3().isEmpty())
+    {
+      File gameFile = new File(DISKS + details.getDisk3());
+      gameFile.delete();
+    }
+    if (!details.getDisk4().isEmpty())
+    {
+      File gameFile = new File(DISKS + details.getDisk4());
+      gameFile.delete();
+    }
+    if (!details.getDisk5().isEmpty())
+    {
+      File gameFile = new File(DISKS + details.getDisk5());
+      gameFile.delete();
+    }
+    if (!details.getDisk6().isEmpty())
+    {
+      File gameFile = new File(DISKS + details.getDisk6());
+      gameFile.delete();
+    }
   }
 
   public static void restoreDb(String backupFolderName)
@@ -1656,7 +1795,8 @@ public class FileManager
    * @return The first entry in the zip file (unzipped) to be included with the game during import.
    * @throws IOException if a File cannot be created.
    */
-  public static File createTempFileForScraper(BufferedInputStream inputStream, String gameFilename) throws IOException
+  public static List<File> createTempFileForScraper(BufferedInputStream inputStream, String gameFilename)
+    throws IOException
   {
     Files.createDirectories(TEMP_PATH);
     File file = new File(TEMP_PATH + File.separator + gameFilename);
@@ -1671,9 +1811,9 @@ public class FileManager
     fos.close();
     if (gameFilename.toLowerCase().endsWith(".rar"))
     {
-      return unrarAndPickFirstValidEntry(file);
+      return Arrays.asList(unrarAndPickFirstValidEntry(file));
     }
-    return unzipAndPickFirstValidEntry(file);
+    return unzipAndPickValidEntries(file);
   }
 
   public static List<String> unzipVic20cart(File file)
@@ -1718,7 +1858,7 @@ public class FileManager
     return unzippedFilesList;
   }
 
-  public static File unzipAndPickFirstValidEntry(File file)
+  public static List<File> unzipAndPickValidEntries(File file)
   {
     String dirName = file.getName();
     dirName = dirName.replaceAll("\\.", "");
@@ -1726,7 +1866,7 @@ public class FileManager
     String unzippedBasePath = TEMP_PATH + File.separator + dirName + File.separator;
 
     String zipFilePath = file.getAbsolutePath();
-    Path filePath = null;
+    List<File> foundFilesList = new ArrayList<>();
     FileInputStream fis;
     //buffer for read and write data to file
     byte[] buffer = new byte[1024];
@@ -1734,8 +1874,8 @@ public class FileManager
     {
       fis = new FileInputStream(zipFilePath);
       ZipArchiveInputStream zis = new ZipArchiveInputStream(fis);
-      ZipEntry ze = getFirstMatchingZipEntry(zis);
-      if (ze != null)
+      ZipEntry ze = getNextMatchingZipEntry(zis);
+      while (ze != null)
       {
         String fileName = ze.getName();
         String extension = FilenameUtils.getExtension(fileName);
@@ -1753,10 +1893,11 @@ public class FileManager
           fos.write(buffer, 0, len);
         }
         fos.close();
-        //close this ZipEntry
-        zis.close();
-        filePath = newFile.toPath();
+        foundFilesList.add(newFile);
+        ze = getNextMatchingZipEntry(zis);
       }
+      //close this zip stream
+      zis.close();
       fis.close();
     }
     catch (IOException e)
@@ -1764,7 +1905,7 @@ public class FileManager
       ExceptionHandler.logMessage("Could not unzip file, using original file");
     }
     //Return original file if no zip entry found, it's not zipped
-    return filePath != null ? filePath.toFile() : file;
+    return foundFilesList.isEmpty() ? Arrays.asList(file) : foundFilesList;
   }
 
   public static File unrarAndPickFirstValidEntry(File file)
@@ -1813,12 +1954,12 @@ public class FileManager
     return fh;
   }
 
-  private static ZipEntry getFirstMatchingZipEntry(ZipArchiveInputStream zis) throws IOException
+  private static ZipEntry getNextMatchingZipEntry(ZipArchiveInputStream zis) throws IOException
   {
     ZipEntry ze = zis.getNextZipEntry();
     if (ze != null && !isValidFileEnding(ze.getName().trim().toLowerCase()))
     {
-      ze = getFirstMatchingZipEntry(zis);
+      ze = getNextMatchingZipEntry(zis);
     }
     return ze;
   }
@@ -1975,7 +2116,7 @@ public class FileManager
     {
       return "";
     }
-    
+
     Path gamesPath;
     if (savedStates)
     {
@@ -1989,10 +2130,10 @@ public class FileManager
     {
       //Check if a PCUAE folder exists (for PCUAE 2.0.0 and later)
       Path pcuaePath = deviceRoot.toPath().resolve("PCUAE");
-      
+
       if (pcuaePath.toFile().exists())
       {
-        gamesPath = deviceRoot.toPath().resolve("PCUAE/Carousel_Games/Games");     
+        gamesPath = deviceRoot.toPath().resolve("PCUAE/Carousel_Games/Games");
       }
       else
       {

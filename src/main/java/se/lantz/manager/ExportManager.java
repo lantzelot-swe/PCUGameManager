@@ -268,8 +268,7 @@ public class ExportManager
   {
     try
     {
-      Path targetGamePath = targetPath;
-      Files.createDirectories(targetGamePath);
+      Files.createDirectories(targetPath);
     }
     catch (IOException e)
     {
@@ -296,10 +295,17 @@ public class ExportManager
         }
         zipped = true;
       }
+      String gameFileNameWithoutExtension = FileManager.generateFileNameFromTitleForFileLoader(gameDetails.getTitle(),
+                                                                               gameDetails.getDuplicateIndex());
+      
       Path targetGamePath = targetPath
-        .resolve(FileManager.generateFileNameFromTitleForFileLoader(gameDetails.getTitle(),
-                                                                    gameDetails.getDuplicateIndex()) +
-          "." + extension);
+        .resolve(gameFileNameWithoutExtension + "." + extension);
+      if (FileManager.hasExtraDisks(gameDetails))
+      {
+        targetGamePath  = targetPath
+          .resolve(gameFileNameWithoutExtension + " (disk 1)." + extension);
+      }
+      
 
       try
       {
@@ -321,6 +327,37 @@ public class ExportManager
       {
         worker.publishMessage("ERROR: Could not copy files for " + gameDetails.getTitle() + ", " + e.getMessage());
         ExceptionHandler.handleException(e, "Could NOT copy files for: " + gameDetails.getTitle());
+      }
+      //Extra disks
+      copyExtraDiskForFileLoader(targetPath, gameFileNameWithoutExtension, gameDetails.getDisk2(), 2, worker);
+      copyExtraDiskForFileLoader(targetPath, gameFileNameWithoutExtension, gameDetails.getDisk3(), 3, worker);
+      copyExtraDiskForFileLoader(targetPath, gameFileNameWithoutExtension, gameDetails.getDisk4(), 4, worker);
+      copyExtraDiskForFileLoader(targetPath, gameFileNameWithoutExtension, gameDetails.getDisk5(), 5, worker);
+      copyExtraDiskForFileLoader(targetPath, gameFileNameWithoutExtension, gameDetails.getDisk6(), 6, worker);
+    }
+  }
+  
+  private void copyExtraDiskForFileLoader(Path targetPath, String gameFileNameWithoutExtension, String extraDiskName, int diskIndex, PublishWorker worker)
+  {
+    if (extraDiskName != null && !extraDiskName.isEmpty())
+    {
+      String extension = FilenameUtils.getExtension(extraDiskName);
+      
+      Path targetGamePath = targetPath
+        .resolve(gameFileNameWithoutExtension + " (disk " + diskIndex + ")_CD." + extension);
+      
+      Path extraDiskPath = Paths.get("./extradisks/" + extraDiskName);
+      
+      try
+      {
+        
+        worker.publishMessage("Copying extra disk file from " + extraDiskPath.toString() + " to " + targetGamePath);        
+        Files.copy(extraDiskPath, targetGamePath, StandardCopyOption.REPLACE_EXISTING);    
+      }
+      catch (IOException e)
+      {
+        worker.publishMessage("ERROR: Could not copy files for " + gameFileNameWithoutExtension + ", " + e.getMessage());
+        ExceptionHandler.handleException(e, "Could NOT copy files for: " + gameFileNameWithoutExtension);
       }
     }
   }

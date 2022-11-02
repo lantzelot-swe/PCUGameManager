@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -392,9 +393,9 @@ public class MobyGamesScraper implements Scraper
   }
 
   @Override
-  public File getGameFile()
+  public List<File> getGameFiles()
   {
     //No file to download
-    return null;
+    return Collections.emptyList();
   }
 }

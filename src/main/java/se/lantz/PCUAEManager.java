@@ -66,6 +66,7 @@ public class PCUAEManager
         Files.createDirectories(Paths.get("./games/"));
         Files.createDirectories(Paths.get("./saves/"));
         Files.createDirectories(Paths.get("./pcuae-install/"));
+        Files.createDirectories(Paths.get("./extradisks/"));
       }
       catch (IOException e)
       {

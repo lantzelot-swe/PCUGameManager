@@ -194,6 +194,11 @@ public class FilterPanel extends JPanel
       fieldTableComboBox.addItem(DbConstants.FAVORITE);
       fieldTableComboBox.addItem(DbConstants.GAME);
       fieldTableComboBox.addItem(DbConstants.VIEW_TAG);
+      fieldTableComboBox.addItem(DbConstants.DISK_2);
+      fieldTableComboBox.addItem(DbConstants.DISK_3);
+      fieldTableComboBox.addItem(DbConstants.DISK_4);
+      fieldTableComboBox.addItem(DbConstants.DISK_5);
+      fieldTableComboBox.addItem(DbConstants.DISK_6);
 
       fieldTableComboBox.addActionListener(e -> {
 
@@ -204,6 +209,14 @@ public class FilterPanel extends JPanel
         else if (fieldTableComboBox.getSelectedItem().equals(DbConstants.YEAR))
         {
           addIntOperators();
+        }
+        else if (fieldTableComboBox.getSelectedItem().equals(DbConstants.DISK_2) ||
+          fieldTableComboBox.getSelectedItem().equals(DbConstants.DISK_3) ||
+          fieldTableComboBox.getSelectedItem().equals(DbConstants.DISK_4) ||
+          fieldTableComboBox.getSelectedItem().equals(DbConstants.DISK_5) ||
+          fieldTableComboBox.getSelectedItem().equals(DbConstants.DISK_6))
+        {
+          addDiskOperators();
         }
         else
         {
@@ -222,6 +235,13 @@ public class FilterPanel extends JPanel
     getOperatorTableComboBox().addItem(ViewFilter.CONTAINS_TEXT);
     getOperatorTableComboBox().addItem(ViewFilter.NOT_CONTAINS_TEXT);
     getOperatorTableComboBox().addItem(ViewFilter.EQUALS_TEXT);
+    getOperatorTableComboBox().addItem(ViewFilter.EMPTY);
+    getOperatorTableComboBox().addItem(ViewFilter.NOT_EMPTY);
+  }
+
+  private void addDiskOperators()
+  {
+    getOperatorTableComboBox().removeAllItems();
     getOperatorTableComboBox().addItem(ViewFilter.EMPTY);
     getOperatorTableComboBox().addItem(ViewFilter.NOT_EMPTY);
   }
@@ -294,6 +314,12 @@ public class FilterPanel extends JPanel
             {
               setValueAt(ViewFilter.BEGINS_WITH_TEXT, row, 1);
             }
+            else if (value.equals(DbConstants.DISK_2) || value.equals(DbConstants.DISK_3) ||
+              value.equals(DbConstants.DISK_4) || value.equals(DbConstants.DISK_5) || value.equals(DbConstants.DISK_6))
+            {
+              setValueAt(ViewFilter.NOT_EMPTY, row, 1);
+              setValueAt("", row, 2);
+            }
           }
           super.setValueAt(value, row, column);
         }
@@ -330,6 +356,11 @@ public class FilterPanel extends JPanel
             else if (field.equals(DbConstants.YEAR))
             {
               addIntOperators();
+            }
+            else if (field.equals(DbConstants.DISK_2) || field.equals(DbConstants.DISK_3) ||
+              field.equals(DbConstants.DISK_4) || field.equals(DbConstants.DISK_5) || field.equals(DbConstants.DISK_6))
+            {
+              addDiskOperators();
             }
             else
             {

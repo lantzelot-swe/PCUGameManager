@@ -44,6 +44,22 @@ public class InfoModel extends AbstractModel implements CommonInfoModel
 
   private String viewTag = "";
 
+  private Path disk2Path;
+  private Path disk3Path;
+  private Path disk4Path;
+  private Path disk5Path;
+  private Path disk6Path;
+  private String disk2File = "";
+  private String disk3File = "";
+  private String disk4File = "";
+  private String disk5File = "";
+  private String disk6File = "";
+  private String oldDisk2File = "";
+  private String oldDisk3File = "";
+  private String oldDisk4File = "";
+  private String oldDisk5File = "";
+  private String oldDisk6File = "";
+
   public String getTitle()
   {
     return title;
@@ -253,6 +269,81 @@ public class InfoModel extends AbstractModel implements CommonInfoModel
     }
   }
 
+  public String getDisk2File()
+  {
+    return disk2File;
+  }
+
+  public void setDisk2File(String disk2File)
+  {
+    String old = getDisk2File();
+    this.disk2File = disk2File;
+    if (!Objects.equals(old, disk2File))
+    {
+      notifyChange();
+    }
+  }
+
+  public String getDisk3File()
+  {
+    return disk3File;
+  }
+
+  public void setDisk3File(String disk3File)
+  {
+    String old = getDisk3File();
+    this.disk3File = disk3File;
+    if (!Objects.equals(old, disk3File))
+    {
+      notifyChange();
+    }
+  }
+
+  public String getDisk4File()
+  {
+    return disk4File;
+  }
+
+  public void setDisk4File(String disk4File)
+  {
+    String old = getDisk4File();
+    this.disk4File = disk4File;
+    if (!Objects.equals(old, disk4File))
+    {
+      notifyChange();
+    }
+  }
+  
+  public String getDisk5File()
+  {
+    return disk5File;
+  }
+
+  public void setDisk5File(String disk5File)
+  {
+    String old = getDisk5File();
+    this.disk5File = disk5File;
+    if (!Objects.equals(old, disk5File))
+    {
+      notifyChange();
+    }
+  }
+  
+  public String getDisk6File()
+  {
+    return disk6File;
+  }
+
+  public void setDisk6File(String disk6File)
+  {
+    String old = getDisk6File();
+    this.disk6File = disk6File;
+    if (!Objects.equals(old, disk6File))
+    {
+      notifyChange();
+    }
+  }
+
   public String getCoverFile()
   {
     return coverFile;
@@ -371,6 +462,137 @@ public class InfoModel extends AbstractModel implements CommonInfoModel
     }
   }
 
+  public Path getDisk2Path()
+  {
+    return disk2Path;
+  }
+
+  public void setDisk2Path(File file)
+  {
+    Path old = getDisk2Path();
+    if (file == null)
+    {
+      this.disk2Path = null;
+    }
+    else
+    {
+      this.disk2Path = file.toPath();
+      String fileEnding = file.getName().substring(file.getName().lastIndexOf("."));
+      setDisk2File(getDiskFileName(2, fileEnding));
+    }
+
+    if (!Objects.equals(old, disk2Path))
+    {
+      notifyChange();
+    }
+  }
+
+  public String getDiskFileName(int diskIndex, String fileEnding)
+  {
+    return FileManager.generateFileNameFromTitle(this.title, getDuplicateIndex()) + "(DISK" + diskIndex + ")" +
+      fileEnding;
+  }
+
+  public Path getDisk3Path()
+  {
+    return disk3Path;
+  }
+
+  public void setDisk3Path(File file)
+  {
+    Path old = getDisk3Path();
+    if (file == null)
+    {
+      this.disk3Path = null;
+    }
+    else
+    {
+      this.disk3Path = file.toPath();
+      String fileEnding = file.getName().substring(file.getName().lastIndexOf("."));
+      setDisk3File(getDiskFileName(3, fileEnding));
+    }
+
+    if (!Objects.equals(old, disk3Path))
+    {
+      notifyChange();
+    }
+  }
+
+  public Path getDisk4Path()
+  {
+    return disk4Path;
+  }
+
+  public void setDisk4Path(File file)
+  {
+    Path old = getDisk4Path();
+    if (file == null)
+    {
+      this.disk4Path = null;
+    }
+    else
+    {
+      this.disk4Path = file.toPath();
+      String fileEnding = file.getName().substring(file.getName().lastIndexOf("."));
+      setDisk4File(getDiskFileName(4, fileEnding));
+    }
+
+    if (!Objects.equals(old, disk4Path))
+    {
+      notifyChange();
+    }
+  }
+  
+  public Path getDisk5Path()
+  {
+    return disk5Path;
+  }
+
+  public void setDisk5Path(File file)
+  {
+    Path old = getDisk5Path();
+    if (file == null)
+    {
+      this.disk5Path = null;
+    }
+    else
+    {
+      this.disk5Path = file.toPath();
+      String fileEnding = file.getName().substring(file.getName().lastIndexOf("."));
+      setDisk5File(getDiskFileName(5, fileEnding));
+    }
+
+    if (!Objects.equals(old, disk5Path))
+    {
+      notifyChange();
+    }
+  }
+  
+  public Path getDisk6Path()
+  {
+    return disk6Path;
+  }
+
+  public void setDisk6Path(File file)
+  {
+    Path old = getDisk6Path();
+    if (file == null)
+    {
+      this.disk6Path = null;
+    }
+    else
+    {
+      this.disk6Path = file.toPath();
+      String fileEnding = file.getName().substring(file.getName().lastIndexOf("."));
+      setDisk6File(getDiskFileName(6, fileEnding));
+    }
+
+    if (!Objects.equals(old, disk6Path))
+    {
+      notifyChange();
+    }
+  }
+
   public void updateFileNames()
   {
     //Keep track of the old names, used when renaming files when saving
@@ -379,6 +601,12 @@ public class InfoModel extends AbstractModel implements CommonInfoModel
     oldScreens2File = getScreens2File();
     oldGamesFile = getGamesFile();
 
+    oldDisk2File = getDisk2File();
+    oldDisk3File = getDisk3File();
+    oldDisk4File = getDisk4File();
+    oldDisk5File = getDisk5File();
+    oldDisk6File = getDisk6File();
+    
     disableChangeNotification(true);
     String fileName = FileManager.generateFileNameFromTitle(this.title, getDuplicateIndex());
     if (!getCoverFile().isEmpty() || getCoverImage() != null)
@@ -397,6 +625,31 @@ public class InfoModel extends AbstractModel implements CommonInfoModel
     {
       String fileEnding = getGamesFile().substring(getGamesFile().indexOf("."));
       setGamesFile(fileName + fileEnding);
+    }
+    if (!getDisk2File().isEmpty())
+    {
+      String fileEnding = getDisk2File().substring(getDisk2File().indexOf("."));
+      setDisk2File(getDiskFileName(2, fileEnding));
+    }
+    if (!getDisk3File().isEmpty())
+    {
+      String fileEnding = getDisk3File().substring(getDisk3File().indexOf("."));
+      setDisk3File(getDiskFileName(3, fileEnding));
+    }
+    if (!getDisk4File().isEmpty())
+    {
+      String fileEnding = getDisk4File().substring(getDisk4File().indexOf("."));
+      setDisk4File(getDiskFileName(4, fileEnding));
+    }
+    if (!getDisk5File().isEmpty())
+    {
+      String fileEnding = getDisk5File().substring(getDisk5File().indexOf("."));
+      setDisk5File(getDiskFileName(5, fileEnding));
+    }
+    if (!getDisk6File().isEmpty())
+    {
+      String fileEnding = getDisk6File().substring(getDisk6File().indexOf("."));
+      setDisk6File(getDiskFileName(6, fileEnding));
     }
     disableChangeNotification(false);
   }
@@ -429,7 +682,7 @@ public class InfoModel extends AbstractModel implements CommonInfoModel
   {
     return titleInDb.isEmpty();
   }
-  
+
   public boolean isInfoSlot()
   {
     return viewTag.contains("GIS:");
@@ -466,20 +719,55 @@ public class InfoModel extends AbstractModel implements CommonInfoModel
     this.screen1Image = null;
     this.screen2Image = null;
     this.gamesPath = null;
+    this.disk2Path = null;
+    this.disk3Path = null;
+    this.disk4Path = null;
+    this.disk5Path = null;
+    this.disk6Path = null;
     resetOldFileNames();
   }
-  
+
   public void resetOldFileNames()
   {
     this.oldGamesFile = "";
     this.oldCoverFile = "";
     this.oldScreens1File = "";
     this.oldScreens2File = "";
+    this.oldDisk2File = "";
+    this.oldDisk3File = "";
+    this.oldDisk4File = "";
+    this.oldDisk5File = "";
+    this.oldDisk6File = "";
   }
 
   public String getOldGamesFile()
   {
     return oldGamesFile;
+  }
+
+  public String getOldDisk2File()
+  {
+    return oldDisk2File;
+  }
+
+  public String getOldDisk3File()
+  {
+    return oldDisk3File;
+  }
+
+  public String getOldDisk4File()
+  {
+    return oldDisk4File;
+  }
+  
+  public String getOldDisk5File()
+  {
+    return oldDisk5File;
+  }
+  
+  public String getOldDisk6File()
+  {
+    return oldDisk6File;
   }
 
   public String getOldCoverFile()

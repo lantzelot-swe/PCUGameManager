@@ -32,6 +32,8 @@ vice/
 images/
 saves/
 pcuae-install/
+export/
+extradisks/
 
 pcu.properties
 

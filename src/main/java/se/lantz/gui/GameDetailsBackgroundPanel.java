@@ -59,6 +59,7 @@ public class GameDetailsBackgroundPanel extends JPanel
   private CombinedJoystickPanel joystickPanel;
   private SystemPanel systemPanel;
   private SaveStateBackgroundPanel savesBackgroundPanel;
+  private ExtraDisksPanel extraDisksPanel;
   private JPanel buttonPanel;
   private JButton saveButton;
   private ScraperDialog scraperDialog = null;
@@ -190,6 +191,7 @@ public class GameDetailsBackgroundPanel extends JPanel
       systemSavesTabbedPane = new JTabbedPane();
       systemSavesTabbedPane.addTab("System Settings", getSystemPanel());
       systemSavesTabbedPane.addTab("Saved states", getSavesBackgroundPanel());
+      systemSavesTabbedPane.addTab("Extra disks", getExtraDisksPanel());
       updateSavedStatesTabTitle();
     }
     return systemSavesTabbedPane;
@@ -233,6 +235,17 @@ public class GameDetailsBackgroundPanel extends JPanel
       .setBorder(new TitledBorder(null, "", TitledBorder.LEADING, TitledBorder.TOP, null, null));
     }
     return savesBackgroundPanel;
+  }
+  
+  private ExtraDisksPanel getExtraDisksPanel()
+  {
+    if (extraDisksPanel == null)
+    {
+      extraDisksPanel = new ExtraDisksPanel(model.getInfoModel());
+      extraDisksPanel
+      .setBorder(new TitledBorder(null, "", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+    }
+    return extraDisksPanel;
   }
 
   private JPanel getButtonPanel()

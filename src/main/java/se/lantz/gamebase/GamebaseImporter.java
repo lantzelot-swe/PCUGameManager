@@ -14,9 +14,11 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import se.lantz.gui.exports.PublishWorker;
 import se.lantz.manager.ImportManager;
@@ -166,10 +168,12 @@ public class GamebaseImporter
         condition = "WHERE (((Games.Fav)=True));";
         break;
       case QUERY:
+        titleQueryString = titleQueryString.replaceAll("'", "");
         condition = "WHERE (((Games.Name) LIKE '" + titleQueryString + "'));";
         break;
       case GENRE:
-        condition = "WHERE (Genres.PG_Id = " + selectedGenre.getPgId() + " AND Genres.GE_Id = " +  selectedGenre.getGeId() + ");";
+        condition =
+          "WHERE (Genres.PG_Id = " + selectedGenre.getPgId() + " AND Genres.GE_Id = " + selectedGenre.getGeId() + ");";
         break;
       default:
         break;
@@ -430,14 +434,22 @@ public class GamebaseImporter
     {
       try
       {
-        worker.publishMessage("Checking game file for " + gbGameInfo.getTitle()  + "...");
-        String gameFile = getFileToInclude(gbGamesPath, gbGameInfo.getGamefile(), gbGameInfo.isVic20Cart());
+        worker.publishMessage("Checking game file for " + gbGameInfo.getTitle() + "...");
+        List<String> gameFilesList =
+          getGameFilesToInclude(gbGamesPath, gbGameInfo.getGamefile(), gbGameInfo.isVic20Cart());
+        String mainGameFile = gameFilesList.get(0);
+        String disk2File = gameFilesList.size() > 1 ? gameFilesList.get(1) : "";
+        String disk3File = gameFilesList.size() > 2 ? gameFilesList.get(2) : "";
+        String disk4File = gameFilesList.size() > 3 ? gameFilesList.get(3) : "";
+        String disk5File = gameFilesList.size() > 4 ? gameFilesList.get(4) : "";
+        String disk6File = gameFilesList.size() > 5 ? gameFilesList.get(5) : "";
+
         importManager.addFromGamebaseImporter(gbGameInfo.getTitle(),
                                               gbGameInfo.getYear(),
                                               gbGameInfo.getPublisher(),
                                               gbGameInfo.getMusician(),
                                               gbGameInfo.getGenre(),
-                                              gameFile,
+                                              mainGameFile,
                                               gbGameInfo.getCoverFile(),
                                               gbGameInfo.getScreen1(),
                                               gbGameInfo.getScreen2(),
@@ -445,6 +457,11 @@ public class GamebaseImporter
                                               gbGameInfo.getJoy2config(),
                                               gbGameInfo.getAdvanced(),
                                               gbGameInfo.getDescription(),
+                                              disk2File,
+                                              disk3File,
+                                              disk4File,
+                                              disk5File,
+                                              disk6File,
                                               isC64);
       }
       catch (Exception e)
@@ -553,11 +570,11 @@ public class GamebaseImporter
     return returnValue;
   }
 
-  private String getFileToInclude(Path gbPath, String filenameInGb, boolean isVic20cart) throws IOException
+  private List<String> getGameFilesToInclude(Path gbPath, String filenameInGb, boolean isVic20cart) throws IOException
   {
     if (filenameInGb.isEmpty())
     {
-      return "";
+      return Arrays.asList("");
     }
 
     File gameFile = gbPath.resolve(filenameInGb).toFile();
@@ -565,25 +582,31 @@ public class GamebaseImporter
     importIndexForTempFiles++;
     if (isVic20cart)
     {
-      return FileManager.getTempFileForVic20Cart(new BufferedInputStream(new FileInputStream(gameFile)),
-                                                 importIndexForTempFiles + "_" + gameFile.getName())
-        .toPath().toString();
+      return Arrays.asList(
+                           FileManager
+                             .getTempFileForVic20Cart(new BufferedInputStream(new FileInputStream(gameFile)),
+                                                      importIndexForTempFiles + "_" + gameFile.getName())
+                             .toPath().toString());
     }
     else
     {
-      File selectedFile = FileManager.createTempFileForScraper(new BufferedInputStream(new FileInputStream(gameFile)),
-                                                               importIndexForTempFiles + "_" + gameFile.getName());
+      List<File> selectedFilesList =
+        FileManager.createTempFileForScraper(new BufferedInputStream(new FileInputStream(gameFile)),
+                                             importIndexForTempFiles + "_" + gameFile.getName());
+
+      File mainGameFile = selectedFilesList.get(0);
+
+      List<String> returnList =
+        selectedFilesList.stream().map(file -> file.toPath().toString()).collect(Collectors.toList());
+
       //Do not compress some files: Vice doesn't seem to unzip them properly
-      if (FileManager.shouldCompressFile(selectedFile.getName()))
+      if (FileManager.shouldCompressFile(mainGameFile.getName()))
       {
-        Path compressedFilePath = selectedFile.toPath().getParent().resolve(selectedFile.getName() + ".gz");
-        FileManager.compressGzip(selectedFile.toPath(), compressedFilePath);
-        return compressedFilePath.toString();
+        Path compressedFilePath = mainGameFile.toPath().getParent().resolve(mainGameFile.getName() + ".gz");
+        FileManager.compressGzip(mainGameFile.toPath(), compressedFilePath);
+        returnList.set(0, compressedFilePath.toString());
       }
-      else
-      {
-        return selectedFile.toPath().toString();
-      }
+      return returnList;
     }
   }
 

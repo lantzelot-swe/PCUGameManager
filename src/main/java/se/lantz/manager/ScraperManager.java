@@ -126,10 +126,30 @@ public class ScraperManager
 
     if (fields.isGame())
     {
-      File scrapedFile = usedScraper.getGameFile();
-      if (scrapedFile != null)
+      List<File> scrapedFiles = usedScraper.getGameFiles();
+      if (scrapedFiles.size() > 0)
       {
-        infoModel.setGamesPath(scrapedFile);
+        infoModel.setGamesPath(scrapedFiles.get(0));
+      }
+      if (scrapedFiles.size() > 1)
+      {
+        infoModel.setDisk2Path(scrapedFiles.get(1));
+      }
+      if (scrapedFiles.size() > 2)
+      {
+        infoModel.setDisk3Path(scrapedFiles.get(2));
+      }
+      if (scrapedFiles.size() > 3)
+      {
+        infoModel.setDisk4Path(scrapedFiles.get(3));
+      }
+      if (scrapedFiles.size() > 4)
+      {
+        infoModel.setDisk5Path(scrapedFiles.get(4));
+      }
+      if (scrapedFiles.size() > 5)
+      {
+        infoModel.setDisk6Path(scrapedFiles.get(5));
       }
     }
     //Set system based on the scraped URL

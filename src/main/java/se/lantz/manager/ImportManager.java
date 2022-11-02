@@ -20,13 +20,11 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.imageio.ImageIO;
-import javax.swing.JOptionPane;
 
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import se.lantz.gui.MainWindow;
 import se.lantz.gui.exports.PublishWorker;
 import se.lantz.model.MainViewModel;
 import se.lantz.model.data.GameView;
@@ -484,6 +482,16 @@ public class ImportManager
                      oldScreen1File,
                      oldScreen2File,
                      oldGameFile,
+                     "",
+                     "",
+                     "",
+                     "",
+                     "",
+                     "",
+                     "",
+                     "",
+                     "",
+                     "",
                      duplicateIndex);
     }
     catch (Exception e)
@@ -506,6 +514,11 @@ public class ImportManager
                                       String joy2config,
                                       String advanced,
                                       String description,
+                                      String disk2,
+                                      String disk3,
+                                      String disk4,
+                                      String disk5,
+                                      String disk6,
                                       boolean isC64)
   {
     //Generate proper names for files
@@ -514,6 +527,14 @@ public class ImportManager
     String newCoverfile = fileName + "-cover.png";
     String newScreen1file = fileName + "-00.png";
     String newScreen2file = fileName + "-01.png";
+    
+
+    
+    String newDisk2file = constructExtraDiskName(fileName, disk2, 2);
+    String newDisk3file = constructExtraDiskName(fileName, disk3, 3);
+    String newDisk4file = constructExtraDiskName(fileName, disk4, 4);
+    String newDisk5file = constructExtraDiskName(fileName, disk5, 5);
+    String newDisk6file = constructExtraDiskName(fileName, disk6, 6);
 
     String newGamefile = "";
     if (gamefile.isEmpty())
@@ -557,7 +578,28 @@ public class ImportManager
                    screen1file,
                    screen2file,
                    gamefile,
+                   newDisk2file,
+                   disk2,
+                   newDisk3file,
+                   disk3,
+                   newDisk4file,
+                   disk4,
+                   newDisk5file,
+                   disk5,
+                   newDisk6file,
+                   disk6,
                    duplicateIndex);
+  }
+  
+  private String constructExtraDiskName(String newGameName, String originalDiskName, int diskIndex)
+  {
+    if (originalDiskName.isEmpty())
+    {
+      return "";
+    }
+    String strippedDiskFile = originalDiskName.substring(1);
+    String fileEnding = strippedDiskFile.substring(strippedDiskFile.indexOf("."));
+    return newGameName + "(DISK" + diskIndex + ")" + fileEnding;
   }
 
   private void addToDbRowList(String title,
@@ -582,6 +624,16 @@ public class ImportManager
                               String oldScreen1File,
                               String oldScreen2File,
                               String oldGameFile,
+                              String disk2File,
+                              String oldDisk2File,
+                              String disk3File,
+                              String oldDisk3File,
+                              String disk4File,
+                              String oldDisk4File,
+                              String disk5File,
+                              String oldDisk5File,
+                              String disk6File,
+                              String oldDisk6File,
                               int duplicateIndex)
   {
     List<String> list = Arrays.asList(title,
@@ -605,7 +657,17 @@ public class ImportManager
                                       oldCoverFile,
                                       oldScreen1File,
                                       oldScreen2File,
-                                      oldGameFile);
+                                      oldGameFile,
+                                      disk2File,
+                                      oldDisk2File,
+                                      disk3File,
+                                      oldDisk3File,
+                                      disk4File,
+                                      oldDisk4File,
+                                      disk5File,
+                                      oldDisk5File,
+                                      disk6File,
+                                      oldDisk6File);
     String result = String.join("\",\"", list);
     //Add duplicateIndex so that it can be added properly when importing
     result = "\"" + result + "\"," + Integer.toString(duplicateIndex);
@@ -693,6 +755,21 @@ public class ImportManager
     String oldScreen1Name = "";
     String oldScreen2Name = "";
     String oldGameName = "";
+    
+    String disk2Name = "";
+    String oldDisk2Name = "";
+    
+    String disk3Name = "";
+    String oldDisk3Name = "";
+    
+    String disk4Name = "";
+    String oldDisk4Name = "";
+    
+    String disk5Name = "";
+    String oldDisk5Name = "";
+    
+    String disk6Name = "";
+    String oldDisk6Name = "";
 
     String[] splittedForPaths = dbRowData.split("\",\"");
 
@@ -705,6 +782,16 @@ public class ImportManager
     oldScreen1Name = splittedForPaths[19];
     oldScreen2Name = splittedForPaths[20];
     oldGameName = splittedForPaths[21].split("\"")[0];
+    disk2Name = splittedForPaths[22].split("\"")[0];
+    oldDisk2Name  = splittedForPaths[23].split("\"")[0];
+    disk3Name = splittedForPaths[24].split("\"")[0];
+    oldDisk3Name  = splittedForPaths[25].split("\"")[0];
+    disk4Name = splittedForPaths[26].split("\"")[0];
+    oldDisk4Name  = splittedForPaths[27].split("\"")[0];
+    disk5Name = splittedForPaths[28].split("\"")[0];
+    oldDisk5Name  = splittedForPaths[29].split("\"")[0];
+    disk6Name = splittedForPaths[30].split("\"")[0];
+    oldDisk6Name  = splittedForPaths[31].split("\"")[0];
 
     String advanced = splittedForPaths[16];
 
@@ -822,11 +909,37 @@ public class ImportManager
       {
         useMissingGameFile(advanced, targetGamePath);
       }
+      
+      //Extra disks
+      copyExtraDisk(gameName, oldDisk2Name, disk2Name, worker, 2);
+      copyExtraDisk(gameName, oldDisk3Name, disk3Name, worker, 3);
+      copyExtraDisk(gameName, oldDisk4Name, disk4Name, worker, 4);
+      copyExtraDisk(gameName, oldDisk5Name, disk5Name, worker, 5);
+      copyExtraDisk(gameName, oldDisk6Name, disk6Name, worker, 6);
     }
     catch (Exception e)
     {
       worker.publishMessage("ERROR: Could not copy files for " + gameName + ", " + e.getMessage());
       ExceptionHandler.handleException(e, "Could NOT copy files for: " + gameName);
+    }
+  }
+  
+  private void copyExtraDisk(String gameName, String sourcePath, String targetName, PublishWorker worker,  int index)
+  {
+    if (!sourcePath.isEmpty())
+    {
+      Path diskPath = new File(sourcePath).toPath();
+      Path diskTargetPath = Paths.get("./extradisks/" + targetName);
+      worker.publishMessage("Copying extra disk " + index + " from " + diskPath.toString() + " to " + diskTargetPath.toString());
+      try
+      {
+        Files.copy(diskPath, diskTargetPath, StandardCopyOption.REPLACE_EXISTING);
+      }
+      catch (Exception e)
+      {
+        worker.publishMessage("ERROR: Could not copy disk file for " + gameName + ", " + e.getMessage());
+        ExceptionHandler.logException(e, "Could not copy disk file for " + gameName);
+      }
     }
   }
 

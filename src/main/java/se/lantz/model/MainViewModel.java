@@ -278,6 +278,11 @@ public class MainViewModel extends AbstractModel
     infoModel.setScreens2File(currentGameDetails.getScreen2());
     infoModel.setDuplicateIndex(currentGameDetails.getDuplicateIndex());
     infoModel.setViewTag(currentGameDetails.getViewTag());
+    infoModel.setDisk2File(currentGameDetails.getDisk2());
+    infoModel.setDisk3File(currentGameDetails.getDisk3());
+    infoModel.setDisk4File(currentGameDetails.getDisk4());
+    infoModel.setDisk5File(currentGameDetails.getDisk5());
+    infoModel.setDisk6File(currentGameDetails.getDisk6());
     joy1Model.setConfigStringFromDb(currentGameDetails.getJoy1());
     joy2Model.setConfigStringFromDb(currentGameDetails.getJoy2());
     systemModel.setConfigStringFromDb(currentGameDetails.getSystem());
@@ -613,6 +618,11 @@ public class MainViewModel extends AbstractModel
       updatedGame.setSystem(systemModel.getConfigString());
       updatedGame.setVerticalShift(systemModel.getVerticalShift());
       updatedGame.setViewTag(infoModel.getViewTag());
+      updatedGame.setDisk2(infoModel.getDisk2File());
+      updatedGame.setDisk3(infoModel.getDisk3File());
+      updatedGame.setDisk4(infoModel.getDisk4File());
+      updatedGame.setDisk5(infoModel.getDisk5File());
+      updatedGame.setDisk6(infoModel.getDisk6File());
 
       if (currentGameId.isEmpty())
       {
