@@ -321,6 +321,13 @@ public class FilterPanel extends JPanel
               setValueAt("", row, 2);
             }
           }
+          else if (column == 1)
+          {
+            if (value.equals(ViewFilter.EMPTY) || value.equals(ViewFilter.NOT_EMPTY))
+            {
+              setValueAt("", row, 2);
+            }
+          }
           super.setValueAt(value, row, column);
         }
       };

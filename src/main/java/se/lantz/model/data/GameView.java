@@ -34,7 +34,7 @@ public class GameView implements Comparable
   public GameView(int gameViewId)
   {
     this.gameViewId = gameViewId;
-    
+
   }
 
   public String getName()
@@ -105,10 +105,13 @@ public class GameView implements Comparable
     int index = 0;
     for (ViewFilter viewFilter : andFiltersList)
     {
-      index++;
-      if (index > 1)
+      if (index == 0)
       {
-        builder.append(" AND ");
+        builder.append("((");
+      }
+      if (index > 0)
+      {
+        builder.append(" AND (");
       }
       builder.append(viewFilter.getField());
       switch (viewFilter.getOperator())
@@ -183,18 +186,31 @@ public class GameView implements Comparable
         logger.debug("Unexpected value: {}", viewFilter.getOperator());
         break;
       }
+      builder.append(")");
+      index++;
+      if (index == andFiltersList.size())
+      {
+        builder.append(")");
+      }
     }
     index = 0;
     for (ViewFilter viewFilter : orFiltersList)
     {
-      if (index == 0 && !andFiltersList.isEmpty())
+      if (index == 0)
       {
-        builder.append(" AND ( ");
+        if (!andFiltersList.isEmpty())
+        {
+          builder.append(" AND ((");
+        }
+        else
+        {
+          builder.append(" ((");
+        }
       }
-      index++;
-      if (index > 1)
+
+      if (index > 0)
       {
-        builder.append(" OR ");
+        builder.append(" OR (");
       }
       builder.append(viewFilter.getField());
       switch (viewFilter.getOperator())
@@ -251,10 +267,12 @@ public class GameView implements Comparable
         logger.debug("Unexpected value: {}", viewFilter.getOperator());
         break;
       }
-    }
-    if (!andFiltersList.isEmpty() && !orFiltersList.isEmpty())
-    {
       builder.append(")");
+      index++;
+      if (index == orFiltersList.size())
+      {
+        builder.append(")");
+      }
     }
     this.sqlQuery = builder.toString();
   }
@@ -273,12 +291,12 @@ public class GameView implements Comparable
   {
     this.gameCount = count;
   }
-  
+
   public int getGameCount()
   {
     return this.gameCount;
   }
-  
+
   public String getFavNamePreferencesKey()
   {
     if (gameViewId < -1)

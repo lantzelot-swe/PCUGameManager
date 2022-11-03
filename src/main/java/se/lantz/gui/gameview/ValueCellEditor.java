@@ -15,6 +15,7 @@ import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DocumentFilter;
 
+import se.lantz.model.data.ViewFilter;
 import se.lantz.util.DbConstants;
 
 public class ValueCellEditor implements TableCellEditor
@@ -24,6 +25,8 @@ public class ValueCellEditor implements TableCellEditor
   private final static int STRING = 1;
 
   private final static int NUM_EDITOR = 2;
+  
+  private final static int NOP_EDITOR = 3;
 
   DefaultCellEditor[] cellEditors;
 
@@ -33,7 +36,7 @@ public class ValueCellEditor implements TableCellEditor
 
   public ValueCellEditor()
   {
-    cellEditors = new DefaultCellEditor[3];
+    cellEditors = new DefaultCellEditor[4];
     comboBox = new JComboBox<>();
     comboBox.addItem("true");
     comboBox.addItem("false");
@@ -43,6 +46,10 @@ public class ValueCellEditor implements TableCellEditor
     JTextField numberField = new JTextField();
     ((AbstractDocument) numberField.getDocument()).setDocumentFilter(new NumberDocumentFilter());
     cellEditors[NUM_EDITOR] = new DefaultCellEditor(numberField);
+    
+    JTextField disabledTextField = new JTextField();
+    disabledTextField.setEditable(false);
+    cellEditors[NOP_EDITOR] = new DefaultCellEditor(disabledTextField);
     flg = STRING;
   }
 
@@ -50,6 +57,7 @@ public class ValueCellEditor implements TableCellEditor
   {
 
     String field = (String) table.getModel().getValueAt(row, 0);
+    String operator = (String) table.getModel().getValueAt(row, 1);
     if (field.equals(DbConstants.FAVORITE))
     {
       flg = BOOLEAN;
@@ -59,6 +67,11 @@ public class ValueCellEditor implements TableCellEditor
     {
       flg = NUM_EDITOR;
       return cellEditors[NUM_EDITOR].getTableCellEditorComponent(table, value, isSelected, row, column);
+    }
+    else if (operator.equals(ViewFilter.EMPTY) || operator.equals(ViewFilter.NOT_EMPTY))
+    {
+      flg = NOP_EDITOR;
+      return cellEditors[NOP_EDITOR].getTableCellEditorComponent(table, value, isSelected, row, column);
     }
     else
     {
