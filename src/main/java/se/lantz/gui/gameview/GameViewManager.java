@@ -69,25 +69,43 @@ public class GameViewManager
       }
     }
   }
-  
+
   private boolean okToSave(GameView gameView)
   {
-    String title = "Invalid name";
+    String title = "No filters";
+    if (gameView.getViewFilters().isEmpty())
+    {
+      JOptionPane.showMessageDialog(MainWindow.getInstance(),
+                                    "The gamelist view have no filters defined, add a filter and try again.",
+                                    title,
+                                    JOptionPane.ERROR_MESSAGE);
+      return false;
+    }
+
+    title = "Invalid name";
     //Check name towards all other available gameviews, no duplicates. Also minimum two characters
     if (gameView.getName().length() < 2)
-    {     
-      JOptionPane.showMessageDialog(MainWindow.getInstance(), "The gamelist view name is too short, give it a different name.", title, JOptionPane.ERROR_MESSAGE);
+    {
+      JOptionPane.showMessageDialog(MainWindow.getInstance(),
+                                    "The gamelist view name is too short, give it a different name.",
+                                    title,
+                                    JOptionPane.ERROR_MESSAGE);
       return false;
     }
     for (int i = 0; i < uiModel.getGameViewModel().getSize(); i++)
     {
       GameView currentView = uiModel.getGameViewModel().getElementAt(i);
-      if (currentView.getGameViewId() != gameView.getGameViewId() && currentView.getName().equalsIgnoreCase(gameView.getName()))
+      if (currentView.getGameViewId() != gameView.getGameViewId() &&
+        currentView.getName().equalsIgnoreCase(gameView.getName()))
       {
-        JOptionPane.showMessageDialog(MainWindow.getInstance(), "A gamelist view with the same name aleady exists, give it a different name.", title, JOptionPane.ERROR_MESSAGE);
+        JOptionPane.showMessageDialog(MainWindow.getInstance(),
+                                      "A gamelist view with the same name aleady exists, give it a different name.",
+                                      title,
+                                      JOptionPane.ERROR_MESSAGE);
         return false;
       }
     }
+
     return true;
   }
 
@@ -104,7 +122,7 @@ public class GameViewManager
       MainWindow.getInstance().selectViewAfterRestore();
     }
   }
-  
+
   public void renameFavoritesView(GameView gameView)
   {
     GameViewRenameFavoritesDialog dialog = new GameViewRenameFavoritesDialog(MainWindow.getInstance(), gameView);
@@ -118,7 +136,7 @@ public class GameViewManager
       if (okToSave(gameView))
       {
         saveFavNameInPreferences(gameView);
-        
+
         //Refresh after renaming
         MainWindow.getInstance().refreshMenuAndUI();
         //Trigger reload of game view after editing
@@ -134,7 +152,7 @@ public class GameViewManager
       }
     }
   }
-  
+
   private void saveFavNameInPreferences(GameView gameView)
   {
     Properties configuredProperties = FileManager.getConfiguredProperties();
