@@ -18,9 +18,11 @@ import se.lantz.util.FileManager;
 
 public class ScraperManager
 {
-  public enum SCRAPER {
+  public enum SCRAPER
+  {
     moby, c64com, gamebase
   }
+
   Scraper mobyScraper = new MobyGamesScraper();
   Scraper c64comScraper = new C64comScraper();
   Scraper gamebaseScraper = new GamebaseScraper();
@@ -37,7 +39,7 @@ public class ScraperManager
     this.infoModel = model.getInfoModel();
     this.systemModel = model.getSystemModel();
   }
-  
+
   public void setScrapertoUse(SCRAPER scraper)
   {
     switch (scraper)
@@ -76,7 +78,7 @@ public class ScraperManager
   {
     return screenshotsList;
   }
-  
+
   public void scrapeCovers()
   {
     coversList = usedScraper.scrapeCovers();
@@ -129,27 +131,32 @@ public class ScraperManager
       List<File> scrapedFiles = usedScraper.getGameFiles();
       if (scrapedFiles.size() > 0)
       {
-        infoModel.setGamesPath(scrapedFiles.get(0));
-      }
-      if (scrapedFiles.size() > 1)
-      {
-        infoModel.setDisk2Path(scrapedFiles.get(1));
-      }
-      if (scrapedFiles.size() > 2)
-      {
-        infoModel.setDisk3Path(scrapedFiles.get(2));
-      }
-      if (scrapedFiles.size() > 3)
-      {
-        infoModel.setDisk4Path(scrapedFiles.get(3));
-      }
-      if (scrapedFiles.size() > 4)
-      {
-        infoModel.setDisk5Path(scrapedFiles.get(4));
-      }
-      if (scrapedFiles.size() > 5)
-      {
-        infoModel.setDisk6Path(scrapedFiles.get(5));
+        File gameFile = scrapedFiles.get(0);
+        infoModel.setGamesPath(gameFile);
+        //Add extra disks for game
+        if (FileManager.isValidDiskFileEnding(gameFile.getName()))
+        {
+          if (scrapedFiles.size() > 1)
+          {
+            infoModel.setDisk2Path(scrapedFiles.get(1));
+          }
+          if (scrapedFiles.size() > 2)
+          {
+            infoModel.setDisk3Path(scrapedFiles.get(2));
+          }
+          if (scrapedFiles.size() > 3)
+          {
+            infoModel.setDisk4Path(scrapedFiles.get(3));
+          }
+          if (scrapedFiles.size() > 4)
+          {
+            infoModel.setDisk5Path(scrapedFiles.get(4));
+          }
+          if (scrapedFiles.size() > 5)
+          {
+            infoModel.setDisk6Path(scrapedFiles.get(5));
+          }
+        }
       }
     }
     //Set system based on the scraped URL
@@ -182,7 +189,7 @@ public class ScraperManager
       }
     }
   }
-  
+
   public void updateModelWithCoverImage(BufferedImage cover)
   {
     infoModel.setCoverImage(cover);

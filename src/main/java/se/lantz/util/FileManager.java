@@ -47,7 +47,6 @@ import com.github.junrar.rarfile.FileHeader;
 
 import se.lantz.db.DbConnector;
 import se.lantz.gui.exports.PublishWorker;
-import se.lantz.manager.ExportManager;
 import se.lantz.manager.SavedStatesManager;
 import se.lantz.model.InfoModel;
 import se.lantz.model.JoystickModel;
@@ -1786,9 +1785,8 @@ public class FileManager
   }
 
   /**
-   * Creates a temporary file from inputStream, unzips the File and picks the first valid entry in the file. Since GB64
-   * for example can contain multiple disk images The first one is picked (no support for disk swap in the carousel).
-   * For some file a .NFO file is the first entry, which will not work when passing it to the carousel.
+   * Creates a temporary file from inputStream, unzips the File and picks the first valid entry (or multiple ones if
+   * disk files) in the file.
    * 
    * @param inputStream The stream to read from
    * @param gameFilename The name of the file
@@ -1969,7 +1967,7 @@ public class FileManager
     return validFileEndingList.stream().anyMatch(ending -> fileName.endsWith(ending));
   }
 
-  private static boolean isValidDiskFileEnding(String fileName)
+  public static boolean isValidDiskFileEnding(String fileName)
   {
     if (fileName.isEmpty())
     {

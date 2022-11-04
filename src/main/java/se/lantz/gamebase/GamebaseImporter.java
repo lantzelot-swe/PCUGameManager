@@ -594,6 +594,7 @@ public class GamebaseImporter
         FileManager.createTempFileForScraper(new BufferedInputStream(new FileInputStream(gameFile)),
                                              importIndexForTempFiles + "_" + gameFile.getName());
 
+      sortToGetCorrectMainGameFileFirst(selectedFilesList);
       File mainGameFile = selectedFilesList.get(0);
 
       List<String> returnList =
@@ -607,6 +608,17 @@ public class GamebaseImporter
         returnList.set(0, compressedFilePath.toString());
       }
       return returnList;
+    }
+  }
+
+  private void sortToGetCorrectMainGameFileFirst(List<File> files)
+  {
+    //Check all files for a crt file and sort that one first, some games may have save disks in a cart zip
+    List<File> crtFiles = files.stream().filter(file -> file.getName().endsWith(".crt")).collect(Collectors.toList());
+    if (!crtFiles.isEmpty())
+    {
+      files.remove(crtFiles.get(0));
+      files.add(0, crtFiles.get(0));
     }
   }
 
