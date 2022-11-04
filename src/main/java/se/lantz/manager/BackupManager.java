@@ -50,6 +50,11 @@ public class BackupManager
     FileManager.backupGames(currentFolderName);
   }
   
+  public void backupExtraDisks()
+  {
+    FileManager.backupExtraDisks(currentFolderName);
+  }
+  
   public void backupSaves()
   {
     FileManager.backupSaves(currentFolderName);

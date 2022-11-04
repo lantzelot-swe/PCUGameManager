@@ -1368,6 +1368,21 @@ public class FileManager
     }
   }
 
+  public static void backupExtraDisks(String targetFolderName)
+  {
+    File outputFolder = new File(BACKUP + "/" + targetFolderName + "/");
+    try
+    {
+      Files.createDirectories(outputFolder.toPath());
+      Path disks = new File(DISKS).toPath();
+      copyDirectory(disks.toString(), outputFolder.toPath().resolve("extradisks").toString());
+    }
+    catch (IOException e)
+    {
+      ExceptionHandler.handleException(e, "Could not create backup of extradisks.");
+    }
+  }
+
   public static void backupSaves(String targetFolderName)
   {
     File outputFolder = new File(BACKUP + "/" + targetFolderName + "/");
@@ -1539,6 +1554,25 @@ public class FileManager
     catch (IOException e)
     {
       ExceptionHandler.handleException(e, "Could not restore backup of games.");
+    }
+  }
+
+  public static void restoreExtraDisks(String backupFolderName)
+  {
+    File backupFolder = new File(BACKUP + "/" + backupFolderName + "/");
+    try
+    {
+      File extradisksDir = new File(DISKS);
+      deleteDirContent(extradisksDir);
+      Path extraDisksDir = backupFolder.toPath().resolve("extradisks");
+      if (extraDisksDir.toFile().exists())
+      {
+        copyDirectory(extraDisksDir.toString(), extradisksDir.toPath().toString());
+      }
+    }
+    catch (IOException e)
+    {
+      ExceptionHandler.handleException(e, "Could not restore backup of extradisks.");
     }
   }
 

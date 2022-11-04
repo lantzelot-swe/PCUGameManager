@@ -45,6 +45,11 @@ public class RestoreManager
     FileManager.restoreGames(currentFolderName);
   }
   
+  public void restoreExtraDisks()
+  {
+    FileManager.restoreExtraDisks(currentFolderName);
+  }
+  
   public void restoreSaves()
   {
     FileManager.restoreSaves(currentFolderName);
