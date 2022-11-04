@@ -310,15 +310,15 @@ public class FilterPanel extends JPanel
                 setValueAt("1986", row, 2);
               }
             }
-            else if (getValueAt(row, 0).equals(DbConstants.YEAR) || getValueAt(row, 0).equals(DbConstants.FAVORITE))
-            {
-              setValueAt(ViewFilter.BEGINS_WITH_TEXT, row, 1);
-            }
             else if (value.equals(DbConstants.DISK_2) || value.equals(DbConstants.DISK_3) ||
               value.equals(DbConstants.DISK_4) || value.equals(DbConstants.DISK_5) || value.equals(DbConstants.DISK_6))
             {
               setValueAt(ViewFilter.NOT_EMPTY, row, 1);
               setValueAt("", row, 2);
+            }
+            else if (getValueAt(row, 0).equals(DbConstants.YEAR) || getValueAt(row, 0).equals(DbConstants.FAVORITE))
+            {
+              setValueAt(ViewFilter.BEGINS_WITH_TEXT, row, 1);
             }
           }
           else if (column == 1)
