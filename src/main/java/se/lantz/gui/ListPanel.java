@@ -169,7 +169,16 @@ public class ListPanel extends JPanel
             if (!uiModel.isDisableChangeNotifcation())
             {
               getList().clearSelection();
-              uiModel.setSelectedGameView((GameView) listViewComboBox.getSelectedItem());
+              GameView selectedItem = (GameView) listViewComboBox.getSelectedItem();
+              uiModel.setSelectedGameView(selectedItem);
+              if (selectedItem.getGameViewId() != -1 && selectedItem.getGameCount() < selectedItem.getFileCount())
+              {
+                listViewComboBox.setToolTipText("(Number of games/Number of game files incl. extra disks)");
+              }
+              else
+              {
+                listViewComboBox.setToolTipText(null);
+              }
               //TODO: keep track of selected index for the view and select it once data is updated
               updateViewInfoLabel();
               SwingUtilities.invokeLater(() -> {
@@ -207,6 +216,7 @@ public class ListPanel extends JPanel
           }
         });
     }
+    
     return listViewComboBox;
   }
 

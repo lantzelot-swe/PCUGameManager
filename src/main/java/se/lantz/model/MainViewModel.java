@@ -395,6 +395,7 @@ public class MainViewModel extends AbstractModel
     logger.debug("Fetched all games from db in " + (System.currentTimeMillis() - start) + " ms");
     gameListModel.addAllGames(gamesList);
     gameView.setGameCount(gamesList.size());
+    gameView.setFileCount(getFileCount(gamesList));
     if (gameView.getGameViewId() == GameView.ALL_GAMES_ID)
     {
       this.allGamesCount = gamesList.size();
@@ -492,7 +493,16 @@ public class MainViewModel extends AbstractModel
     }
     this.disableChangeNotification(false);
     logger.debug("...done.");
-
+  }
+  
+  private int getFileCount(List<GameListData> gamesList)
+  {
+    int fileCount = 0;
+    for (GameListData gameListData : gamesList)
+    {
+      fileCount = fileCount + gameListData.getFileCount();
+    }
+    return fileCount;
   }
 
   public int getAllGamesCount()

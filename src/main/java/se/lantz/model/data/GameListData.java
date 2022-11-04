@@ -7,6 +7,7 @@ public class GameListData implements Comparable
   private String gameId = "";
   private int favorite = 0;
   private boolean infoSlot = false;
+  private int fileCount = 1;
 
   public GameListData(String title, String gameFileName, String gameId, int favorite, boolean infoSlot)
   {
@@ -76,6 +77,16 @@ public class GameListData implements Comparable
   public void setGameFileName(String gameFileName)
   {
     this.gameFileName = gameFileName;
+  }
+
+  public int getFileCount()
+  {
+    return fileCount;
+  }
+
+  public void setFileCount(int fileCount)
+  {
+    this.fileCount = fileCount;
   }
 
   @Override

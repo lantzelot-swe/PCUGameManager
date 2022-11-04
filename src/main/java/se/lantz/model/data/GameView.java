@@ -30,6 +30,8 @@ public class GameView implements Comparable
   private int gameViewId;
 
   private int gameCount = -1;
+  
+  private int fileCount = -1;
 
   public GameView(int gameViewId)
   {
@@ -62,7 +64,14 @@ public class GameView implements Comparable
   {
     if (gameCount > -1)
     {
-      return name + " (" + gameCount + ")";
+      if (gameViewId != -1 && gameCount < fileCount)
+      {
+        return name + " (" + gameCount + "/" + fileCount +  ")";
+      }
+      else
+      {
+        return name + " (" + gameCount +  ")";
+      }
     }
     return name;
   }
@@ -286,17 +295,27 @@ public class GameView implements Comparable
   {
     this.gameViewId = gameViewId;
   }
+  
+  public int getGameCount()
+  {
+    return this.gameCount;
+  }
 
   public void setGameCount(int count)
   {
     this.gameCount = count;
   }
 
-  public int getGameCount()
+  public int getFileCount()
   {
-    return this.gameCount;
+    return fileCount;
   }
 
+  public void setFileCount(int fileCount)
+  {
+    this.fileCount = fileCount;
+  }
+  
   public String getFavNamePreferencesKey()
   {
     if (gameViewId < -1)

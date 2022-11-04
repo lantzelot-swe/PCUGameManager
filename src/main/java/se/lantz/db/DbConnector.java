@@ -313,7 +313,7 @@ public class DbConnector
 
     //Construct SQL
     StringBuilder sqlBuilder = new StringBuilder();
-    sqlBuilder.append("SELECT title, gamefile, rowid, favorite, viewtag FROM gameinfo ");
+    sqlBuilder.append("SELECT title, gamefile, rowid, favorite, viewtag, disk2, disk3, disk4, disk5, disk6 FROM gameinfo ");
     sqlBuilder.append(view.getSqlQuery());
     sqlBuilder.append(" ORDER BY title COLLATE NOCASE ASC");
 
@@ -337,6 +337,14 @@ public class DbConnector
         }
         else
         {
+          //Update file count
+          int fileCount = 1;
+          fileCount = updateDiskCount(rs.getString("disk2"), fileCount);
+          fileCount = updateDiskCount(rs.getString("disk3"), fileCount);
+          fileCount = updateDiskCount(rs.getString("disk4"), fileCount);
+          fileCount = updateDiskCount(rs.getString("disk5"), fileCount);
+          fileCount = updateDiskCount(rs.getString("disk6"), fileCount);
+          data.setFileCount(fileCount);
           returnList.add(data);
         }
       }
@@ -349,6 +357,16 @@ public class DbConnector
     Collections.sort(returnList, new GameListDataComparator());
     return returnList;
   }
+  
+  private int updateDiskCount(String disk, int fileCount)
+  {
+    if (disk != null && !disk.isEmpty())
+    {
+      fileCount++;
+    }
+    return fileCount;
+  }
+  
 
   public List<GameListData> fetchAllGamesForGameCount()
   {
