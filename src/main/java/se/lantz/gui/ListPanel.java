@@ -7,6 +7,7 @@ import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
@@ -162,32 +163,17 @@ public class ListPanel extends JPanel
     if (listViewComboBox == null)
     {
       listViewComboBox = new JComboBox<>();
-      listViewComboBox.addActionListener(new ActionListener()
+      listViewComboBox.addItemListener(event -> {
+        if (event.getStateChange() == ItemEvent.SELECTED)
         {
-          public void actionPerformed(ActionEvent e)
+          ComboPopup popup = (ComboPopup) listViewComboBox.getUI().getAccessibleChild(listViewComboBox, 0);
+          if (!popup.isVisible())
           {
-            if (!uiModel.isDisableChangeNotifcation())
-            {
-              getList().clearSelection();
-              GameView selectedItem = (GameView) listViewComboBox.getSelectedItem();
-              uiModel.setSelectedGameView(selectedItem);
-              if (selectedItem.getGameViewId() != -1 && selectedItem.getGameCount() < selectedItem.getFileCount())
-              {
-                listViewComboBox.setToolTipText("(Number of games/Number of game files incl. extra disks)");
-              }
-              else
-              {
-                listViewComboBox.setToolTipText(null);
-              }
-              //TODO: keep track of selected index for the view and select it once data is updated
-              updateViewInfoLabel();
-              SwingUtilities.invokeLater(() -> {
-                getList().setSelectedIndex(0);
-                getList().ensureIndexIsVisible(0);
-              });
-            }
+            setSelectedGameView();
           }
-        });
+        }
+      });
+
       listViewComboBox.setModel(uiModel.getGameViewModel());
       listViewComboBox.setRenderer(new GameListDataRenderer(uiModel.getSavedStatesManager()));
       listViewComboBox.addPopupMenuListener(new PopupMenuListener()
@@ -206,7 +192,7 @@ public class ListPanel extends JPanel
           @Override
           public void popupMenuWillBecomeInvisible(PopupMenuEvent e)
           {
-            //Empty
+            setSelectedGameView();
           }
 
           @Override
@@ -216,8 +202,32 @@ public class ListPanel extends JPanel
           }
         });
     }
-    
+
     return listViewComboBox;
+  }
+
+  private void setSelectedGameView()
+  {
+    if (!uiModel.isDisableChangeNotifcation())
+    {
+      getList().clearSelection();
+      GameView selectedItem = (GameView) listViewComboBox.getSelectedItem();
+      uiModel.setSelectedGameView(selectedItem);
+      if (selectedItem.getGameViewId() != -1 && selectedItem.getGameCount() < selectedItem.getFileCount())
+      {
+        listViewComboBox.setToolTipText("(Number of games/Number of game files incl. extra disks)");
+      }
+      else
+      {
+        listViewComboBox.setToolTipText(null);
+      }
+      //TODO: keep track of selected index for the view and select it once data is updated
+      updateViewInfoLabel();
+      SwingUtilities.invokeLater(() -> {
+        getList().setSelectedIndex(0);
+        getList().ensureIndexIsVisible(0);
+      });
+    }
   }
 
   List<GameListData> getSelectedGameListData()
