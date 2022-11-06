@@ -2160,16 +2160,24 @@ public class FileManager
     }
     else
     {
-      //Check if a PCUAE folder exists (for PCUAE 2.0.0 and later)
-      Path pcuaePath = deviceRoot.toPath().resolve("PCUAE");
-
-      if (pcuaePath.toFile().exists())
+      //Check for a "Games" folder first (PCUAE 3.0.0)
+      Path gamesDirPath = deviceRoot.toPath().resolve("Games");
+      if (gamesDirPath.toFile().exists())
       {
-        gamesPath = deviceRoot.toPath().resolve("PCUAE/Carousel_Games/Games");
+        gamesPath = gamesDirPath;
       }
       else
       {
-        gamesPath = deviceRoot.toPath().resolve("Carousel_Games/Games");
+        //Check if a PCUAE folder exists (for PCUAE 2.0.0)
+        Path pcuaePath = deviceRoot.toPath().resolve("PCUAE");
+        if (pcuaePath.toFile().exists())
+        {
+          gamesPath = deviceRoot.toPath().resolve("PCUAE/Carousel_Games/Games");
+        }
+        else
+        {
+          gamesPath = deviceRoot.toPath().resolve("Carousel_Games/Games");
+        }
       }
     }
     return gamesPath.toString();
