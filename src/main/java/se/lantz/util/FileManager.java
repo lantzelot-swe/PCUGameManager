@@ -727,7 +727,24 @@ public class FileManager
       newNameString = newNameString + "_" + duplicateIndex;
     }
     newNameString = newNameString.trim();
-
+  
+    //Special chars that is not handed in the file loader/media access
+    newNameString = newNameString.replaceAll("á", "a");
+    newNameString = newNameString.replaceAll("é", "e");
+    newNameString = newNameString.replaceAll("å", "a");
+    newNameString = newNameString.replaceAll("ä", "a");
+    newNameString = newNameString.replaceAll("ö", "o");
+    newNameString = newNameString.replaceAll("ü", "u");
+    newNameString = newNameString.replaceAll("°", "Degrees");
+    newNameString = newNameString.replaceAll("Ó", "O");
+    newNameString = newNameString.replaceAll("Ú", "U");
+    newNameString = newNameString.replaceAll("Ü", "U");
+    newNameString = newNameString.replaceAll("ñ", "n");
+    newNameString = newNameString.replaceAll("ß", "ss");
+    newNameString = newNameString.replaceAll("½", "half");
+    newNameString = newNameString.replaceAll("Ø", "o");
+    newNameString = newNameString.replaceAll("æ", "ae");
+    
     logger.debug("Game title: \"{}\" ---- New fileName: \"{}\"", title, newNameString);
     return newNameString;
   }
@@ -769,7 +786,7 @@ public class FileManager
         if (hasExtraDisks(gameDetails))
         {
           filename = generateFileNameFromTitleForFileLoader(gameDetails.getTitle(), gameDetails.getDuplicateIndex()) +
-            " (disk1).cjm";
+            " (disk 1).cjm";
         }
       }
       else
