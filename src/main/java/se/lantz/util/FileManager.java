@@ -716,7 +716,7 @@ public class FileManager
   public static String generateFileNameFromTitleForFileLoader(String title, int duplicateIndex)
   {
     List<Character> forbiddenCharsList =
-      ":,'ï¿½!+*<>/[]?|\"".chars().mapToObj(item -> (char) item).collect(Collectors.toList());
+      ":,'ï¿!+*<>/?|\"".chars().mapToObj(item -> (char) item).collect(Collectors.toList());
 
     List<Character> newName = title.chars().mapToObj(item -> (char) item)
       .filter(character -> !forbiddenCharsList.contains(character)).collect(Collectors.toList());
@@ -728,7 +728,7 @@ public class FileManager
     }
     newNameString = newNameString.trim();
   
-    //Special chars that is not handed in the file loader/media access
+    //Special chars that is not handed properly in the file loader/media access that have reasonable replacements
     newNameString = newNameString.replaceAll("á", "a");
     newNameString = newNameString.replaceAll("é", "e");
     newNameString = newNameString.replaceAll("å", "a");
@@ -744,6 +744,8 @@ public class FileManager
     newNameString = newNameString.replaceAll("½", "half");
     newNameString = newNameString.replaceAll("Ø", "o");
     newNameString = newNameString.replaceAll("æ", "ae");
+    newNameString = newNameString.replaceAll("\\[", "(");
+    newNameString = newNameString.replaceAll("\\]", ")");
     
     logger.debug("Game title: \"{}\" ---- New fileName: \"{}\"", title, newNameString);
     return newNameString;
