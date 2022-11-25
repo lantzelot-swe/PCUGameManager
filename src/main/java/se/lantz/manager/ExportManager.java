@@ -236,7 +236,18 @@ public class ExportManager
         if (!gameDetails.getGame().isEmpty())
         {
           worker.publishMessage("Copying game file from " + gamePath.toString());
-          Files.copy(gamePath, targetGamePath, StandardCopyOption.REPLACE_EXISTING);
+          //Disk images are decompressed to allow for saving Hi-scores to the disk, VICE does not
+          //rezip images. 
+          if (FileManager.isValidDiskFileEnding(gameDetails.getGame()))
+          {
+            //Remove extension (.gz) from file name
+            targetGamePath = targetPath.resolve("games/" + FilenameUtils.removeExtension(gameDetails.getGame()));
+            FileManager.decompressGzip(gamePath, targetGamePath);
+          }
+          else
+          {
+            Files.copy(gamePath, targetGamePath, StandardCopyOption.REPLACE_EXISTING);
+          }
         }
       }
       catch (IOException e)
@@ -246,7 +257,7 @@ public class ExportManager
       }
     }
   }
-
+  
   public void copyGamesForFileLoader(PublishWorker worker)
   {
     if (gameViewMode)

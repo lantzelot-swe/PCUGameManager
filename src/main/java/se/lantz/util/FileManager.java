@@ -846,7 +846,17 @@ public class FileManager
       fw.write("E:" + gameDetails.getGenre() + "\n");
       fw.write("Y:" + gameDetails.getYear() + "\n");
 
-      fw.write("F:" + "games/" + gameDetails.getGame() + "\n");
+      
+      if (FileManager.isValidDiskFileEnding(gameDetails.getGame()))
+      {
+        //Remove extension (.gz) from file name, same is done in ExportManager.copyFilesForCarousel()
+        fw.write("F:" + "games/" + FilenameUtils.removeExtension(gameDetails.getGame()) + "\n");
+      }
+      else
+      {
+        fw.write("F:" + "games/" + gameDetails.getGame() + "\n");
+      }
+      
       fw.write("C:" + "covers/" + gameDetails.getCover() + "\n");
       if (!gameDetails.getScreen1().isEmpty())
       {
