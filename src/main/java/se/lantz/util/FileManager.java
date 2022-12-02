@@ -96,6 +96,8 @@ public class FileManager
     Arrays.asList("d64", "t64", "prg", "p00", "d81", "d82", "d71", "x64", "g64", "tap", "crt", "vsf");
 
   private static List<String> validDiskFilesEndingList = Arrays.asList("d64", "d81", "d82", "d71", "x64", "g64");
+  
+  private static List<String> compressedDiskFilesEndingList = Arrays.asList("d64", "d71", "x64", "g64");
 
   static
   {
@@ -847,7 +849,7 @@ public class FileManager
       fw.write("Y:" + gameDetails.getYear() + "\n");
 
       
-      if (FileManager.isValidDiskFileEnding(gameDetails.getGame()))
+      if (FileManager.isValidCompressedDiskFileEnding(gameDetails.getGame()))
       {
         //Remove extension (.gz) from file name, same is done in ExportManager.copyFilesForCarousel()
         fw.write("F:" + "games/" + FilenameUtils.removeExtension(gameDetails.getGame()) + "\n");
@@ -2037,6 +2039,11 @@ public class FileManager
       return false;
     }
     return validDiskFilesEndingList.stream().anyMatch(ending -> StringUtils.containsIgnoreCase(fileName, "." + ending));
+  }
+  
+  public static boolean isValidCompressedDiskFileEnding(String fileName)
+  {
+    return compressedDiskFilesEndingList.stream().anyMatch(ending -> StringUtils.containsIgnoreCase(fileName, "." + ending));
   }
 
   public static List<String> convertAllScreenshotsTo32Bit() throws IOException

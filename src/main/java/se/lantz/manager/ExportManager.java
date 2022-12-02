@@ -238,7 +238,7 @@ public class ExportManager
           worker.publishMessage("Copying game file from " + gamePath.toString());
           //Disk images are decompressed to allow for saving Hi-scores to the disk, VICE does not
           //rezip images. 
-          if (FileManager.isValidDiskFileEnding(gameDetails.getGame()))
+          if (FileManager.isValidCompressedDiskFileEnding(gameDetails.getGame()))
           {
             //Remove extension (.gz) from file name
             targetGamePath = targetPath.resolve("games/" + FilenameUtils.removeExtension(gameDetails.getGame()));
