@@ -5,4 +5,6 @@ To run the PCUAE Manager you first need a "full version" that includes a JRE, yo
 
 The manager will check for new versions when started. Updates can be downloaded and installed automatically. It will also check for new versions of the manin PCUAE software when installing to a USB drive from the manager.
 
-PCUAE Manager is free to use, but any donations are welcome. Please make a PayPal donation if you like to support the development: [Paypal donation](https://www.paypal.com/donate?hosted_button_id=K9JVYADTX38HE)
+PCUAE Manager is free to use, but any donations are welcome. Please make a PayPal donation if you like to support the development: [Paypal donation](https://www.paypal.com/donate?hosted_button_id=K9JVYADTX38HE).
+
+![manager](https://user-images.githubusercontent.com/75668734/206676342-ff86c485-1c82-4944-a78a-d5603452bbbe.gif)
