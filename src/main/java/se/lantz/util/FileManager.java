@@ -726,7 +726,7 @@ public class FileManager
     if (duplicateIndex > 0)
     {
       //Just add the duplicate index if there are several games with the same name
-      newNameString = newNameString + "_" + duplicateIndex;
+      newNameString = newNameString + " (" + duplicateIndex + ")";
     }
     newNameString = newNameString.trim();
   
