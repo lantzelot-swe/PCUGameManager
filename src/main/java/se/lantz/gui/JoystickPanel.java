@@ -17,9 +17,12 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 
+import se.lantz.gui.exports.ExportGamesDialog;
+import se.lantz.gui.gamepad.GamePadDialog;
 import se.lantz.model.JoystickModel;
 import se.lantz.util.CustomUndoPlainDocument;
 import se.lantz.util.TextComponentSupport;
+import javax.swing.JButton;
 
 public class JoystickPanel extends JPanel
 {
@@ -40,6 +43,7 @@ public class JoystickPanel extends JPanel
   private JoystickModel model;
   private JPanel configPanel;
   private JCheckBox mouseCheckBox;
+  private JButton gamepadButton;
 
   public JoystickPanel(int portnumber, JoystickModel model)
   {
@@ -312,18 +316,24 @@ public class JoystickPanel extends JPanel
       configPanel.setLayout(gbl_configPanel);
       GridBagConstraints gbc_configLabel = new GridBagConstraints();
       gbc_configLabel.anchor = GridBagConstraints.WEST;
-      gbc_configLabel.insets = new Insets(4, 5, 0, 5);
+      gbc_configLabel.insets = new Insets(1, 5, 5, 5);
       gbc_configLabel.gridx = 0;
       gbc_configLabel.gridy = 0;
       configPanel.add(getConfigLabel(), gbc_configLabel);
       GridBagConstraints gbc_configTextField = new GridBagConstraints();
-      gbc_configTextField.insets = new Insets(3, 0, 0, 5);
+      gbc_configTextField.insets = new Insets(3, 0, 5, 0);
       gbc_configTextField.fill = GridBagConstraints.HORIZONTAL;
       gbc_configTextField.weightx = 1.0;
       gbc_configTextField.anchor = GridBagConstraints.NORTHWEST;
       gbc_configTextField.gridx = 1;
       gbc_configTextField.gridy = 0;
       configPanel.add(getConfigTextField(), gbc_configTextField);
+      GridBagConstraints gbc_gamepadButton = new GridBagConstraints();
+      gbc_gamepadButton.anchor = GridBagConstraints.EAST;
+      gbc_gamepadButton.insets = new Insets(2, 10, 5, 5);
+      gbc_gamepadButton.gridx = 2;
+      gbc_gamepadButton.gridy = 0;
+      configPanel.add(getGamepadButton(), gbc_gamepadButton);
     }
     return configPanel;
   }
@@ -337,5 +347,23 @@ public class JoystickPanel extends JPanel
       mouseCheckBox.addItemListener((e) -> model.setMouse(mouseCheckBox.isSelected()));
     }
     return mouseCheckBox;
+  }
+  private JButton getGamepadButton() {
+    if (gamepadButton == null) {
+    	gamepadButton = new JButton("...");
+    	gamepadButton.setMargin(new Insets(1, 10, 1, 10));
+    	gamepadButton.addActionListener(new ActionListener() {
+    	  public void actionPerformed(ActionEvent e) {
+    	    final GamePadDialog gamePadDialog = new GamePadDialog(MainWindow.getInstance(), model);
+    	    gamePadDialog.pack();
+    	    gamePadDialog.setLocationRelativeTo(getGamepadButton());
+    	    if (gamePadDialog.showDialog())
+    	    {
+    	      model.setConfigString(gamePadDialog.getJoyConfigString());
+    	    }
+    	  }
+    	});
+    }
+    return gamepadButton;
   }
 }

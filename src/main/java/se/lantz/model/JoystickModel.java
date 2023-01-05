@@ -33,6 +33,11 @@ public class JoystickModel extends AbstractModel
       configList.add("");
     }
   }
+  
+  public boolean isPort1()
+  {
+    return this.port1;
+  }
 
   private void setupKeyKodes()
   {
@@ -201,13 +206,13 @@ public class JoystickModel extends AbstractModel
       setRightFire("");
       setTl("");
       setTr("");
-      setUnused1("");
+      setLeftShoulder("");
       setA("");
       setB("");
       setC("");
-      setUnused2("");
-      setUnused3("");
-      setUnused4("");
+      setRightShoulder("");
+      setLeftStick("");
+      setRightStick("");
       this.latestConfigString = configString;
     }
     else
@@ -244,13 +249,13 @@ public class JoystickModel extends AbstractModel
       setRightFire(newConfigList.get(5));
       setTl(newConfigList.get(6));
       setTr(newConfigList.get(7));
-      setUnused1(newConfigList.get(8));
+      setLeftShoulder(newConfigList.get(8));
       setA(newConfigList.get(9));
       setB(newConfigList.get(10));
       setC(newConfigList.get(11));
-      setUnused2(newConfigList.get(12));
-      setUnused3(newConfigList.get(13));
-      setUnused4(newConfigList.get(14));
+      setRightShoulder(newConfigList.get(12));
+      setLeftStick(newConfigList.get(13));
+      setRightStick(newConfigList.get(14));
       this.latestConfigString = configString;
     }
     disableChangeNotification(false);
@@ -377,16 +382,16 @@ public class JoystickModel extends AbstractModel
     }
   }
 
-  public String getUnused1()
+  public String getLeftShoulder()
   {
     return configList.get(8);
   }
 
-  public void setUnused1(String unused1)
+  public void setLeftShoulder(String leftShoulder)
   {
-    String old = getUnused1();
-    configList.set(8, unused1);
-    if (!Objects.equals(old, unused1))
+    String old = getLeftShoulder();
+    configList.set(8, leftShoulder);
+    if (!Objects.equals(old, leftShoulder))
     {
       notifyChange();
     }
@@ -437,46 +442,46 @@ public class JoystickModel extends AbstractModel
     }
   }
 
-  public String getUnused2()
+  public String getRightShoulder()
   {
     return configList.get(12);
   }
 
-  public void setUnused2(String unused2)
+  public void setRightShoulder(String rightShoulder)
   {
-    String old = getUnused2();
-    configList.set(12, unused2);
-    if (!Objects.equals(old, unused2))
+    String old = getRightShoulder();
+    configList.set(12, rightShoulder);
+    if (!Objects.equals(old, rightShoulder))
     {
       notifyChange();
     }
   }
 
-  public String getUnused3()
+  public String getLeftStick()
   {
     return configList.get(13);
   }
 
-  public void setUnused3(String unused3)
+  public void setLeftStick(String leftStick)
   {
-    String old = getUnused3();
-    configList.set(13, unused3);
-    if (!Objects.equals(old, unused3))
+    String old = getLeftStick();
+    configList.set(13, leftStick);
+    if (!Objects.equals(old, leftStick))
     {
       notifyChange();
     }
   }
 
-  public String getUnused4()
+  public String getRightStick()
   {
     return configList.get(14);
   }
 
-  public void setUnused4(String unused4)
+  public void setRightStick(String rightStick)
   {
-    String old = getUnused4();
-    configList.set(14, unused4);
-    if (!Objects.equals(old, unused4))
+    String old = getRightStick();
+    configList.set(14, rightStick);
+    if (!Objects.equals(old, rightStick))
     {
       notifyChange();
     }
