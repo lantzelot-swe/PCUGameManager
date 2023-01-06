@@ -10,6 +10,7 @@ public class GamePadDialog extends BaseDialog
 {
   private GamepadBackgroundPanel panel;
   private JoystickModel model;
+  private Dimension dialogSize = new Dimension(660, 790);
 
   public GamePadDialog(Frame owner, JoystickModel model)
   {
@@ -18,8 +19,8 @@ public class GamePadDialog extends BaseDialog
     this.model = new JoystickModel(model.isPort1());
     setTitle("Edit joystick/gamepad configuration");
     addContent(getGamepadBackgroundPanel());
-    this.setPreferredSize(new Dimension(660, 770));
-    this.setMinimumSize(new Dimension(660, 770));
+    this.setPreferredSize(dialogSize);
+    this.setResizable(false);
     //Set initial values to the model
     this.model.setConfigStringFromDb(model.getConfigString());
   }
@@ -32,7 +33,7 @@ public class GamePadDialog extends BaseDialog
     }
     return panel;
   }
-  
+
   public String getJoyConfigString()
   {
     return this.model.getConfigString();

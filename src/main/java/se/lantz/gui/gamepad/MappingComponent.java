@@ -1,14 +1,19 @@
 package se.lantz.gui.gamepad;
 
+import java.awt.Component;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.KeyboardFocusManager;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.beans.Beans;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 
 import se.lantz.gui.KeySelectionComboBox;
 import se.lantz.gui.gamepad.GamePadImagePanel.GamePadButton;
@@ -183,13 +188,42 @@ public class MappingComponent extends JPanel
           @Override
           public void mouseExited(MouseEvent e)
           {
-            imagePanel.setCurrentButtonAndRepaint(null);
+            if (!keySelectionComboBox.hasFocus())
+            {
+              Component focusOwner = KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner();
+              if (focusOwner instanceof KeySelectionComboBox)
+              {
+                MappingComponent focusedMappingComponent = (MappingComponent)SwingUtilities.getAncestorOfClass(MappingComponent.class, focusOwner);
+                if (focusedMappingComponent != null)
+                {
+                  imagePanel.setCurrentButtonAndRepaint(focusedMappingComponent.button);
+                }             
+              }
+              else
+              {
+                imagePanel.setCurrentButtonAndRepaint(null);
+              }
+            }
           }
 
           @Override
           public void mouseEntered(MouseEvent me)
           {
             imagePanel.setCurrentButtonAndRepaint(button);
+          }
+        });
+      keySelectionComboBox.addFocusListener(new FocusAdapter()
+        {
+          @Override
+          public void focusGained(FocusEvent e)
+          {
+            imagePanel.setCurrentButtonAndRepaint(button);
+          }
+
+          @Override
+          public void focusLost(FocusEvent e)
+          {
+            imagePanel.setCurrentButtonAndRepaint(null);
           }
         });
     }

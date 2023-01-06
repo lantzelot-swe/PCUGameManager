@@ -64,7 +64,7 @@ public class GamePadInfoPanel extends JPanel
     if (extraButtonsInfoLabel == null) {
     	extraButtonsInfoLabel = new JLabel("<html>Notice the extra buttons <b>left shoulder</b>, <b>right shoulder</b>, <b>left stick</b> and <b>right stick</b>. \r\n" + 
     	  "They are not available on the joystick but are common on alternative USB controllers. \r\n" + 
-    	  "The latter two are for controllers with two sticks that press down for additional button functions. It’s up to you what you map to those buttons (if anything).</html>");
+    	  "The latter two are for controllers with two sticks that press down for additional button functions. It’s up to you what you map to those buttons (if anything). Below are the functions for THEC64 Joystick shown in parenthesis for comparison.</html>");
     }
     return extraButtonsInfoLabel;
   }

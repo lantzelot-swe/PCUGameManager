@@ -37,7 +37,7 @@ public class GamePadImagePanel extends JPanel
     }
   }
 
-  ImageIcon gamepadImage = new ImageIcon(getClass().getResource("/se/lantz/logitech320.png"));
+  ImageIcon gamepadImage = new ImageIcon(getClass().getResource("/se/lantz/logitech.png"));
   private JLabel imageLabel;
 
   private GamePadButton currentButton = null;
@@ -103,10 +103,13 @@ public class GamePadImagePanel extends JPanel
       graphics2D.fillRect(72, 57, 12, 20);
       break;
     case A:
+      graphics2D.drawOval(241, 94, 22, 22);
       break;
     case B:
+      graphics2D.drawOval(263, 72, 22, 22);
       break;
     case BACK_GUIDE:
+      graphics2D.drawOval(124, 55, 20, 16);
       break;
     case DOWN:
       //Oval around dpad
@@ -121,10 +124,13 @@ public class GamePadImagePanel extends JPanel
       graphics2D.fillRect(54, 75, 20, 12);
       break;
     case LEFT_SHOULDER:
+      graphics2D.drawRect(242, 240, 35, 25);
       break;
     case LEFT_STICK:
+      graphics2D.fillOval(202, 126, 15, 15);
       break;
     case LEFT_TRIGGER:
+      graphics2D.drawOval(240, 270, 36, 36);
       break;
     case RIGHT:
       //Oval around dpad
@@ -133,14 +139,19 @@ public class GamePadImagePanel extends JPanel
       graphics2D.fillRect(82, 75, 20, 12);
       break;
     case RIGHT_SHOULDER:
+      graphics2D.drawRect(48, 240, 35, 25);
       break;
     case RIGHT_STICK:
+      graphics2D.fillOval(114, 126, 15, 15);
       break;
     case RIGHT_TRIGGER:
+      graphics2D.drawOval(48, 270, 36, 36);
       break;
     case X:
+      graphics2D.drawOval(219, 72, 22, 22);
       break;
     case Y:
+      graphics2D.drawOval(241, 49, 22, 22);
       break;
     default:
       break;
