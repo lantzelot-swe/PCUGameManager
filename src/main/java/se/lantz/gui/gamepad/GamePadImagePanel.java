@@ -127,7 +127,7 @@ public class GamePadImagePanel extends JPanel
       graphics2D.drawRect(242, 240, 35, 25);
       break;
     case LEFT_STICK:
-      graphics2D.fillOval(202, 126, 15, 15);
+      graphics2D.fillOval(114, 126, 15, 15);
       break;
     case LEFT_TRIGGER:
       graphics2D.drawOval(240, 270, 36, 36);
@@ -142,7 +142,7 @@ public class GamePadImagePanel extends JPanel
       graphics2D.drawRect(48, 240, 35, 25);
       break;
     case RIGHT_STICK:
-      graphics2D.fillOval(114, 126, 15, 15);
+      graphics2D.fillOval(202, 126, 15, 15);
       break;
     case RIGHT_TRIGGER:
       graphics2D.drawOval(48, 270, 36, 36);
