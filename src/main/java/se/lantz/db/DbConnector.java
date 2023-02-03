@@ -954,6 +954,7 @@ public class DbConnector
     String sql = "SELECT * FROM gameinfo WHERE rowid = " + gameId;
     logger.debug("Generated SELECT String:\n{}", sql);
     GameDetails returnValue = new GameDetails();
+    returnValue.setGameId(gameId);
     try (Connection conn = this.connect(); PreparedStatement pstmt = conn.prepareStatement(sql))
     {
       ResultSet rs = pstmt.executeQuery();

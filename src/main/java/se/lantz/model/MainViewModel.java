@@ -104,6 +104,7 @@ public class MainViewModel extends AbstractModel
       .setPrimaryWithoutListenerNotification(!Boolean.valueOf(e.getActionCommand())));
 
     resetDataChangedAfterInit();
+    fileManager.setDbConnector(dbConnector);
   }
 
   public DbConnector getDbConnector()

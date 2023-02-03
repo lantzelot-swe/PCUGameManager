@@ -99,6 +99,7 @@ public class FileManager
   
   private static List<String> compressedDiskFilesEndingList = Arrays.asList("d64", "d71", "x64", "g64");
 
+  private static DbConnector dbconnector;
   static
   {
     try
@@ -122,6 +123,11 @@ public class FileManager
     this.systemModel = model.getSystemModel();
     this.savedStatesModel = model.getSavedStatesModel();
     this.model = model;
+  }
+  
+  public void setDbConnector(DbConnector ref)
+  {
+    dbconnector = ref;
   }
 
   public static InputStream getMissingC64GameFile() throws URISyntaxException
@@ -715,18 +721,27 @@ public class FileManager
     return newNameString;
   }
 
-  public static String generateFileNameFromTitleForFileLoader(String title, int duplicateIndex)
+  public static String generateFileNameFromTitleForFileLoader(String gameId, String title, String author, int duplicateIndex)
   {
+    String correctedAuthor = author.replace("\\", " ");
+    correctedAuthor = author.replace("/", " ");
     List<Character> forbiddenCharsList =
       ":,'ï¿!+*<>/?|\"".chars().mapToObj(item -> (char) item).collect(Collectors.toList());
 
     List<Character> newName = title.chars().mapToObj(item -> (char) item)
       .filter(character -> !forbiddenCharsList.contains(character)).collect(Collectors.toList());
     String newNameString = newName.stream().map(String::valueOf).collect(Collectors.joining());
-    if (duplicateIndex > 0)
+    if (duplicateIndex > 0 || (!gameId.isEmpty() && dbconnector.getGameDuplicateIndexToUse(title, gameId) > 1))
     {
-      //Just add the duplicate index if there are several games with the same name
-      newNameString = newNameString + " (" + duplicateIndex + ")";
+      //Add author and the duplicate index if larger than 0 if there are several games with the same name
+      if (duplicateIndex == 0)
+      {
+        newNameString = newNameString + " (" + correctedAuthor + ")";
+      }
+      else
+      {
+        newNameString = newNameString + " (" + correctedAuthor + ")("+ duplicateIndex +")";
+      }
     }
     newNameString = newNameString.trim();
   
@@ -749,13 +764,20 @@ public class FileManager
     newNameString = newNameString.replaceAll("\\[", "(");
     newNameString = newNameString.replaceAll("\\]", ")");
     
+    newNameString = newNameString.replace("((", "(");
+    newNameString = newNameString.replace("))", ")");
+    newNameString = newNameString.replace(">", "");
+    newNameString = newNameString.replace("<", "");
+    newNameString = newNameString.replace("?", "");
+    newNameString = newNameString.replace("*", "");
+    
     logger.debug("Game title: \"{}\" ---- New fileName: \"{}\"", title, newNameString);
     return newNameString;
   }
 
   public static String generateSavedStatesFolderNameForFileLoader(String title, int duplicateIndex)
   {
-    String name = generateFileNameFromTitleForFileLoader(title, duplicateIndex);
+    String name = generateFileNameFromTitleForFileLoader("", title, "", duplicateIndex);
     //Special handling of titles where dots occur, e.g. G.A.C.C.R.R. or H.E.R.O.
     int dotCount = (int) name.chars().filter(ch -> ch == '.').count();
     if (dotCount > 4)
@@ -786,10 +808,10 @@ public class FileManager
         }
         worker.publishMessage("Creating cjm file for " + gameDetails.getTitle());
         filename =
-          generateFileNameFromTitleForFileLoader(gameDetails.getTitle(), gameDetails.getDuplicateIndex()) + ".cjm";
+          generateFileNameFromTitleForFileLoader(gameDetails.getGameId(), gameDetails.getTitle(), gameDetails.getAuthor(), gameDetails.getDuplicateIndex()) + ".cjm";
         if (hasExtraDisks(gameDetails))
         {
-          filename = generateFileNameFromTitleForFileLoader(gameDetails.getTitle(), gameDetails.getDuplicateIndex()) +
+          filename = generateFileNameFromTitleForFileLoader(gameDetails.getGameId(), gameDetails.getTitle(), gameDetails.getAuthor(), gameDetails.getDuplicateIndex()) +
             " (disk 1).cjm";
         }
       }

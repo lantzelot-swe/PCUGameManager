@@ -36,6 +36,8 @@ public class GameDetails
   private String disk5 = "";
   private String disk6 = "";
   
+  private String gameId = "";
+  
 
   public GameDetails()
   {
@@ -294,5 +296,15 @@ public class GameDetails
   public void setDisk6(String disk6)
   {
     this.disk6 = disk6 == null ? "" : disk6;
+  }
+
+  public String getGameId()
+  {
+    return gameId;
+  }
+
+  public void setGameId(String gameId)
+  {
+    this.gameId = gameId;
   }
 }
