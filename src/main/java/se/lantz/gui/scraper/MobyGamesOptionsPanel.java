@@ -31,6 +31,8 @@ import se.lantz.manager.ScraperManager;
 import se.lantz.model.InfoModel;
 import se.lantz.model.data.ScraperFields;
 import se.lantz.util.ExceptionHandler;
+import javax.swing.JRadioButton;
+import javax.swing.ButtonGroup;
 
 public class MobyGamesOptionsPanel extends JPanel
 {
@@ -54,6 +56,10 @@ public class MobyGamesOptionsPanel extends JPanel
   private JCheckBox genreCheckBox;
   private JCheckBox composerCheckBox;
   private InfoModel model;
+  private JPanel platformPanel;
+  private JRadioButton c64RadioButton;
+  private JRadioButton vic20RadioButton;
+  private final ButtonGroup platformButtonGroup = new ButtonGroup();
 
   public MobyGamesOptionsPanel(ScraperManager scraper, JButton okButton, InfoModel model)
   {
@@ -61,33 +67,44 @@ public class MobyGamesOptionsPanel extends JPanel
     this.okButton = okButton;
     this.model = model;
     GridBagLayout gridBagLayout = new GridBagLayout();
+    gridBagLayout.rowWeights = new double[]{0.0, 1.0, 0.0, 0.0, 0.0};
+    gridBagLayout.columnWeights = new double[]{1.0, 0.0};
     setLayout(gridBagLayout);
     GridBagConstraints gbc_infoLabel = new GridBagConstraints();
     gbc_infoLabel.gridwidth = 2;
     gbc_infoLabel.weightx = 1.0;
     gbc_infoLabel.fill = GridBagConstraints.HORIZONTAL;
-    gbc_infoLabel.insets = new Insets(10, 10, 5, 10);
+    gbc_infoLabel.insets = new Insets(10, 10, 0, 10);
     gbc_infoLabel.gridx = 0;
     gbc_infoLabel.gridy = 0;
     add(getInfoEditorPane(), gbc_infoLabel);
+    GridBagConstraints gbc_platformPanel = new GridBagConstraints();
+    gbc_platformPanel.anchor = GridBagConstraints.NORTH;
+    gbc_platformPanel.insets = new Insets(0, 0, 10, 0);
+    gbc_platformPanel.weightx = 1.0;
+    gbc_platformPanel.gridwidth = 2;
+    gbc_platformPanel.fill = GridBagConstraints.BOTH;
+    gbc_platformPanel.gridx = 0;
+    gbc_platformPanel.gridy = 1;
+    add(getPlatformPanel(), gbc_platformPanel);
     GridBagConstraints gbc_urlTextField = new GridBagConstraints();
     gbc_urlTextField.weightx = 1.0;
     gbc_urlTextField.insets = new Insets(0, 10, 10, 5);
     gbc_urlTextField.fill = GridBagConstraints.HORIZONTAL;
     gbc_urlTextField.gridx = 0;
-    gbc_urlTextField.gridy = 1;
+    gbc_urlTextField.gridy = 2;
     add(getUrlTextField(), gbc_urlTextField);
     GridBagConstraints gbc_connectButton = new GridBagConstraints();
     gbc_connectButton.anchor = GridBagConstraints.NORTHWEST;
     gbc_connectButton.insets = new Insets(0, 0, 10, 10);
     gbc_connectButton.gridx = 1;
-    gbc_connectButton.gridy = 1;
+    gbc_connectButton.gridy = 2;
     add(getConnectButton(), gbc_connectButton);
     GridBagConstraints gbc_connectionStatusLabel = new GridBagConstraints();
     gbc_connectionStatusLabel.gridwidth = 2;
-    gbc_connectionStatusLabel.insets = new Insets(0, 10, 10, 5);
+    gbc_connectionStatusLabel.insets = new Insets(0, 10, 10, 0);
     gbc_connectionStatusLabel.gridx = 0;
-    gbc_connectionStatusLabel.gridy = 2;
+    gbc_connectionStatusLabel.gridy = 3;
     add(getConnectionStatusLabel(), gbc_connectionStatusLabel);
     GridBagConstraints gbc_fieldsPanel = new GridBagConstraints();
     gbc_fieldsPanel.insets = new Insets(0, 0, 10, 0);
@@ -96,7 +113,7 @@ public class MobyGamesOptionsPanel extends JPanel
     gbc_fieldsPanel.weighty = 1.0;
     gbc_fieldsPanel.weightx = 1.0;
     gbc_fieldsPanel.gridx = 0;
-    gbc_fieldsPanel.gridy = 3;
+    gbc_fieldsPanel.gridy = 4;
     add(getFieldsPanel(), gbc_fieldsPanel);
     okButton.setEnabled(false);
   }
@@ -107,8 +124,9 @@ public class MobyGamesOptionsPanel extends JPanel
     {
       String info = "<html>To scrape information from mobygames.com you need to specify the URL for a specific game." +
         "<ol><li>Go to <a href='https:/www.mobygames.com/'>https:/www.mobygames.com/</a> and search for the game you want to<br>scrape information for.</li>" +
-        "<li>Go to the Commodore 64 or VIC-20 version of the game and copy the URL to the<br>field below." +
-        "(Example: https://www.mobygames.com/game/c64/arkanoid)</li></ol></html>";
+        "<li>Go to the game and copy the URL to the field below.<br>" +
+        "(Example: https://www.mobygames.com/game/1087/arkanoid/)</li>" +
+        "<li>Choose the platform you want to scrape for below:</li></ol></html>";
 
       infoEditorPane = new JEditorPane("text/html", info);
       infoEditorPane.putClientProperty(JEditorPane.HONOR_DISPLAY_PROPERTIES, Boolean.TRUE);
@@ -332,6 +350,7 @@ public class MobyGamesOptionsPanel extends JPanel
     returnValue.setCover(coverCheckBox.isSelected());
     returnValue.setScreenshots(screensCheckBox.isSelected());
     returnValue.setComposer(composerCheckBox.isSelected());
+    returnValue.setPlatform(c64RadioButton.isSelected());
     return returnValue;
   }
 
@@ -413,5 +432,45 @@ public class MobyGamesOptionsPanel extends JPanel
     getComposerCheckBox().setSelected(model.getComposer().isEmpty());
     getCoverCheckBox().setSelected(model.getCoverFile().isEmpty() && model.getCoverImage() == null);
     getScreensCheckBox().setSelected((model.getScreens1File().isEmpty() && model.getScreen1Image() == null) || (model.getScreens1File().isEmpty() && model.getScreen1Image() == null));
+  }
+  private JPanel getPlatformPanel() {
+    if (platformPanel == null) {
+    	platformPanel = new JPanel();
+    	GridBagLayout gbl_platformPanel = new GridBagLayout();
+    	gbl_platformPanel.columnWidths = new int[]{0, 0};
+    	gbl_platformPanel.rowHeights = new int[]{0, 0, 0};
+    	gbl_platformPanel.columnWeights = new double[]{0.0, Double.MIN_VALUE};
+    	gbl_platformPanel.rowWeights = new double[]{0.0, 0.0, Double.MIN_VALUE};
+    	platformPanel.setLayout(gbl_platformPanel);
+    	GridBagConstraints gbc_c64RadioButton = new GridBagConstraints();
+    	gbc_c64RadioButton.weightx = 1.0;
+    	gbc_c64RadioButton.gridx = 0;
+    	gbc_c64RadioButton.gridy = 0;
+    	platformPanel.add(getC64RadioButton(), gbc_c64RadioButton);
+    	GridBagConstraints gbc_vic20RadioButton = new GridBagConstraints();
+    	gbc_vic20RadioButton.weightx = 1.0;
+    	gbc_vic20RadioButton.gridx = 0;
+    	gbc_vic20RadioButton.gridy = 1;
+    	platformPanel.add(getVic20RadioButton(), gbc_vic20RadioButton);
+    }
+    return platformPanel;
+  }
+
+  private JRadioButton getC64RadioButton()
+  {
+    if (c64RadioButton == null)
+    {
+    	c64RadioButton = new JRadioButton("C64");
+    	platformButtonGroup.add(c64RadioButton);
+    	c64RadioButton.setSelected(true);
+    }
+    return c64RadioButton;
+  }
+  private JRadioButton getVic20RadioButton() {
+    if (vic20RadioButton == null) {
+    	vic20RadioButton = new JRadioButton("VIC-20");
+    	platformButtonGroup.add(vic20RadioButton);
+    }
+    return vic20RadioButton;
   }
 }

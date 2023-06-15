@@ -14,17 +14,18 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import javax.imageio.ImageIO;
+import javax.swing.JOptionPane;
 
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
-import org.jsoup.nodes.Node;
 import org.jsoup.nodes.TextNode;
 import org.jsoup.select.Elements;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import se.lantz.gui.MainWindow;
 import se.lantz.model.data.ScraperFields;
 import se.lantz.util.ExceptionHandler;
 import se.lantz.util.FileManager;
@@ -33,14 +34,21 @@ public class MobyGamesScraper implements Scraper
 {
   private static final Logger logger = LoggerFactory.getLogger(MobyGamesScraper.class);
 
+  //"#main > div.flex.flex-space-between > div.mb > h1"
+  private String titleCssQuery = "#main > div.flex.flex-space-between > div.mb > h1";
+
   private String mobyGamesGameUrl = "";
-  private String descriptionCssQuery = "#main > div > div:eq(2) > div";
-  private String titleCssQuery = ".niceHeaderTitle > a";
-  private String authorCssQuery = "#coreGameRelease > div:contains(Published)";
-  private String yearCssQuery = "#coreGameRelease > div:contains(Released)";
-  private String genreCssQuery = "#coreGameGenre > div > div:contains(Genre)";
-  private String screensCssQuery = ".thumbnail-image-wrapper > a";
-  private String coversCssQuery = ".thumbnail-image-wrapper > a";
+  private String descriptionCssQuery = "#description-text";
+  private String authorCssQuery = "#publisherLinks > li:eq(0) > a";
+  private String yearC64CssQuery = "#tcommodore-64";
+  private String yearVic20Query = "#tvic-20";
+  private String alternateYearQuery = "#infoBlock > div.info-release > dl > dd:eq(1) > a:eq(0)";
+  private String genreCssQuery = "#infoBlock > div.info-genres > dl > dd:eq(1) > a";
+  private String screensCssQuery = "#main";
+  private String coversCssQuery = "#main";
+
+  private String creditsC64TableQuery = "#credits-platform-27 > div > table";
+  private String creditsVic20TableQuery = "#credits-platform-43 > div > table";
 
   Map<String, String> genreMap = new HashMap<>();
   private String scrapedTitle = "";
@@ -51,11 +59,15 @@ public class MobyGamesScraper implements Scraper
   private String scrapedComposer = "";
   private BufferedImage scrapedCover = null;
 
+  private boolean isC64Game = true;
+
+  private boolean missingGame = false;
+
   public MobyGamesScraper()
   {
     //Keys are Genres defined on MobyGames, values are supported genres in the tool
-    genreMap.put("Adventure, Role-Playing (RPG)", "adventure");
-    genreMap.put("Racing / driving", "driving");
+    genreMap.put("Adventure, Role-playing (RPG)", "adventure");
+    genreMap.put("Racing / Driving", "driving");
     genreMap.put("Puzzle, Strategy / tactics", "puzzle");
     genreMap.put("Educational", "programming");
     genreMap.put("Simulation", "simulation");
@@ -80,16 +92,25 @@ public class MobyGamesScraper implements Scraper
     scrapedDescription = "";
     scrapedCover = null;
     scrapedGenre = "";
+    missingGame = false;
   }
 
   @Override
   public void scrapeInformation(ScraperFields fields)
   {
+    this.isC64Game = fields.isC64();
     Document doc;
     try
     {
       Connection.Response result = Jsoup.connect(mobyGamesGameUrl).method(Connection.Method.GET).execute();
       doc = result.parse();
+
+      if (!checkGameAvailability())
+      {
+        this.missingGame = true;
+        return;
+      }
+
       //Fetch title
       if (fields.isTitle())
       {
@@ -102,20 +123,19 @@ public class MobyGamesScraper implements Scraper
       }
       if (fields.isAuthor())
       {
-        scrapedAuthor = scarpeElementValue(doc, authorCssQuery);
+        Elements queryElements = doc.select(authorCssQuery);
+        Element first = queryElements.first();
+        if (first != null)
+        {
+          scrapedAuthor = getTextFromElement(first);
+        }
       }
       if (fields.isYear())
       {
-        Pattern p = Pattern.compile("\\d+");
-        Matcher m = p.matcher(scarpeElementValue(doc, yearCssQuery));
-        if (m.find())
+        String yearQuery = isC64Game ? yearC64CssQuery : yearVic20Query;
+        if (!scrapeYear(doc, yearQuery))
         {
-          scrapedYear = Integer.parseInt(m.group());
-          //Some may have a specific day, e.g. Mar 17, 2020
-          if (m.find())
-          {
-            scrapedYear = Integer.parseInt(m.group());
-          }
+          scrapeYear(doc, alternateYearQuery);
         }
       }
       if (fields.isDescription())
@@ -129,16 +149,43 @@ public class MobyGamesScraper implements Scraper
         {
           scrapedGenre = genre;
         }
+        else
+        {
+          //Default to adventure
+          scrapedGenre = "adventure";
+        }
       }
       if (fields.isComposer())
       {
-        scrapedComposer = scrapeComposer(doc);
+        scrapedComposer = scrapeComposer();
       }
     }
     catch (IOException e)
     {
       ExceptionHandler.handleException(e, "Could not scrape information");
     }
+  }
+
+  private boolean scrapeYear(Document doc, String query)
+  {
+    Pattern p = Pattern.compile("\\d+");
+    Elements queryElements = doc.select(query);
+    Element first = queryElements.first();
+    if (first != null)
+    {
+      Matcher m = p.matcher(getTextFromElement(first));
+      if (m.find())
+      {
+        scrapedYear = Integer.parseInt(m.group());
+        //Some may have a specific day, e.g. Mar 17, 2020
+        if (m.find())
+        {
+          scrapedYear = Integer.parseInt(m.group());
+        }
+        return true;
+      }
+    }
+    return false;
   }
 
   @Override
@@ -189,29 +236,13 @@ public class MobyGamesScraper implements Scraper
     Elements descriptionDiv = doc.select(descriptionCssQuery);
     if (descriptionDiv.first() != null)
     {
-      List<Node> childNodes = descriptionDiv.first().childNodes();
       StringBuilder builder = new StringBuilder();
-      for (Node node : childNodes)
+      for (String section : descriptionDiv.first().getElementsByTag("p").eachText())
       {
-        if (node instanceof TextNode)
-        {
-          if (((TextNode) node).text().length() > 1)
-          {
-            builder.append(((TextNode) node).text());
-          }
-        }
-        else if (node instanceof Element)
-        {
-          Element nodeElement = (Element) node;
-          if (nodeElement.className().equalsIgnoreCase("sideBarLinks"))
-          {
-            //Description section ends
-            break;
-          }
-          builder.append(getTextFromElement(nodeElement));
-        }
+        builder.append(section);
+        builder.append(" ");
       }
-      return builder.toString();
+      return builder.toString().trim();
     }
     return "";
   }
@@ -231,90 +262,128 @@ public class MobyGamesScraper implements Scraper
 
   public String scrapeGenre(Document doc)
   {
-    String genreFromMobyGames = scarpeElementValue(doc, genreCssQuery);
-    String[] split = genreFromMobyGames.split(", ");
-    for (int i = 0; i < split.length; i++)
+    Elements queryElements = doc.select(genreCssQuery);
+    Element first = queryElements.first();
+    if (first != null)
     {
-      //Map towards available genres, return first one found
-      for (Map.Entry<String, String> entry : genreMap.entrySet())
+      String genreFromMobyGames = getTextFromElement(first);
+      String[] split = genreFromMobyGames.split(", ");
+      for (int i = 0; i < split.length; i++)
       {
-        if (entry.getKey().contains(split[i]))
+        //Map towards available genres, return first one found
+        for (Map.Entry<String, String> entry : genreMap.entrySet())
         {
-          return entry.getValue();
+          if (entry.getKey().toLowerCase().contains(split[i].toLowerCase()))
+          {
+            return entry.getValue();
+          }
         }
       }
     }
     return "";
   }
 
-  private String scarpeElementValue(Document doc, String cssQuery)
+  public String scrapeComposer()
   {
     String value = "";
-    //Fetch the right element
-    Elements queryElements = doc.select(cssQuery);
-    Element first = queryElements.first();
-    if (first != null)
-    {
-      int index = queryElements.first().elementSiblingIndex();
-      Element valueElement = first.parent().child(index + 1);
-      value = valueElement.text();
-    }
-    return value;
-  }
 
-  public String scrapeComposer(Document doc)
-  {
-    String value = "";
-    //Look for div with music in sidebar
-    String cssQuery = ".sideBarContent";
-    Elements queryElements = doc.select(cssQuery);
-    Element first = queryElements.first();
-    if (first != null)
+    String creditsTableQuery = isC64Game ? creditsC64TableQuery : creditsVic20TableQuery;
+
+    String creditsPath = isC64Game ? "/credits/c64" : "/credits/vic-20";
+    Document doc;
+    try
     {
-      boolean musicFound = false;
-      for (Node node : first.childNodes())
+      Connection.Response result =
+        Jsoup.connect(mobyGamesGameUrl + creditsPath).method(Connection.Method.GET).execute();
+      doc = result.parse();
+      //Fetch the right element
+      Elements creditsElements = doc.select(creditsTableQuery);
+      if (creditsElements.first() != null)
       {
-        if (node instanceof TextNode)
+        Element first = creditsElements.first();
+        Elements creditTd = first.getElementsByTag("td");
+
+        List<Element> musicElements = creditTd.stream()
+          .filter(element -> element.text().toLowerCase().contains("music")).collect(Collectors.toList());
+        if (musicElements.isEmpty())
         {
-          String test = ((TextNode) node).text();
-          if (test.contains("Music") || test.contains("music"))
-          {
-            musicFound = true;
-          }
+          musicElements = creditTd.stream().filter(element -> element.text().toLowerCase().contains("sound"))
+            .collect(Collectors.toList());
         }
-        else if (node instanceof Element && musicFound)
+        if (!musicElements.isEmpty())
         {
-          value = ((Element) node).text();
-          if (!value.isEmpty())
-          {
-            break;
-          }
+          Element musicElement = musicElements.get(0);
+          Element musicParent = musicElement.parent();
+
+          value = musicParent.getElementsByTag("a").first().text();
         }
       }
     }
+    catch (IOException e)
+    {
+      ExceptionHandler.handleException(e, "Could not scrape composer");
+    }
+
     return value;
+  }
+
+  public boolean checkGameAvailability()
+  {
+    boolean available = false;
+
+    String creditsPath = isC64Game ? "/credits/c64" : "/credits/vic-20";
+    try
+    {
+      Connection.Response result =
+        Jsoup.connect(mobyGamesGameUrl + creditsPath).method(Connection.Method.GET).execute();
+      result.parse();
+      available = true;
+    }
+    catch (org.jsoup.HttpStatusException ex)
+    {
+      JOptionPane.showMessageDialog(MainWindow
+        .getInstance(), "No game available for " + (isC64Game ? "C64" : "VIC-20") + " with URL = " + mobyGamesGameUrl);
+    }
+    catch (IOException e)
+    {
+      ExceptionHandler.handleException(e, "Could not check gamme availability.");
+    }
+    return available;
   }
 
   @Override
   public List<BufferedImage> scrapeScreenshots()
   {
-    String cssQueryForBigScreenshot = "#main > div > div:eq(1) > div > div > img"; //*[@id="main"]/div/div[2]/div/div/img
+
+    String cssQueryForBigScreenshot = "#main > div.text-center.mb > figure > img"; //*[@id="main"]/div/div[2]/div/div/img
+
+    String screensPath = isC64Game ? "/screenshots/c64" : "/screenshots/vic-20";
 
     List<BufferedImage> returnList = new ArrayList<>();
+
+    if (missingGame)
+    {
+      return returnList;
+    }
     Document doc;
     try
     {
       Connection.Response result =
-        Jsoup.connect(mobyGamesGameUrl + "/screenshots").method(Connection.Method.GET).execute();
+        Jsoup.connect(mobyGamesGameUrl + screensPath).method(Connection.Method.GET).execute();
       doc = result.parse();
       //Fetch the right element
       Elements coverElements = doc.select(screensCssQuery);
+      Element first = coverElements.first();
+      Elements imageTags = first.getElementsByTag("figure");
 
-      logger.debug("Number of screenshots found: {}", coverElements.size());
+      List<Element> screenElements =
+        imageTags.stream().map(el -> el.getElementsByTag("a").first()).collect(Collectors.toList());
+
+      logger.debug("Number of screenshots found: {}", screenElements.size());
       //Scrape max 6 screens
-      for (int i = 0; i < Math.min(6, coverElements.size()); i++)
+      for (int i = 0; i < Math.min(6, screenElements.size()); i++)
       {
-        String bigScreenUrl = coverElements.get(i).attr("href");
+        String bigScreenUrl = screenElements.get(i).attr("href");
         logger.debug("Screen URL = " + bigScreenUrl);
         returnList.add(scrapeBigImage(bigScreenUrl, cssQueryForBigScreenshot));
       }
@@ -329,21 +398,31 @@ public class MobyGamesScraper implements Scraper
   @Override
   public List<BufferedImage> scrapeCovers()
   {
-    String cssQueryForBigCover = "#main > div > div:eq(1) > center > img"; //*[@id="main"]/div/div[2]/center/img
+    String cssQueryForBigCover = "#main > div.text-center.mb > figure > img"; //*[@id="main"]/div/div[2]/center/img
+
+    String coversPath = isC64Game ? "/covers/c64/" : "/covers/vic-20/";
+
     List<BufferedImage> returnList = new ArrayList<>();
+    if (missingGame)
+    {
+      return returnList;
+    }
     Document doc;
     try
     {
-      Connection.Response result =
-        Jsoup.connect(mobyGamesGameUrl + "/cover-art").method(Connection.Method.GET).execute();
+      Connection.Response result = Jsoup.connect(mobyGamesGameUrl + coversPath).method(Connection.Method.GET).execute();
       doc = result.parse();
       //Fetch the right element
       Elements coverElements = doc.select(coversCssQuery);
+      Element first = coverElements.first();
+      Elements imageTags = first.getElementsByTag("figure");
 
-      logger.debug("Number of cover art found: {}", coverElements.size());
+      logger.debug("Number of cover art found: {}", imageTags.size());
 
-      List<Element> filteredElements = coverElements.stream()
-        .filter(element -> element.attr("title").contains("Front Cover")).collect(Collectors.toList());
+      List<Element> filteredElements = imageTags.stream().filter(element -> {
+        Elements test = element.getElementsByTag("small");
+        return test.first().text().contains("Front Cover");
+      }).map(el -> el.getElementsByTag("a").first()).collect(Collectors.toList());
 
       //Scrape max 6 covers
       for (int i = 0; i < Math.min(6, filteredElements.size()); i++)
@@ -389,7 +468,7 @@ public class MobyGamesScraper implements Scraper
   @Override
   public boolean isC64()
   {
-    return mobyGamesGameUrl.contains("c64");
+    return isC64Game;
   }
 
   @Override

@@ -53,7 +53,7 @@ public class GamebaseScraper implements Scraper
   private int scrapedYear = 1985;
   private String scrapedGenre = "";
   private String scrapedComposer = "";
-  private List<File> scrapedFiles;
+  private List<File> scrapedFiles = new ArrayList<File>();
 
   public GamebaseScraper()
   {
@@ -85,6 +85,7 @@ public class GamebaseScraper implements Scraper
     scrapedAuthor = "";
     scrapedComposer = "";
     scrapedGenre = "";
+    scrapedFiles = new ArrayList<File>();
   }
 
   @Override

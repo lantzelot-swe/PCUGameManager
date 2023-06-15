@@ -11,6 +11,7 @@ public class ScraperFields
   private boolean screenshots = true;
   private boolean composer = true;
   private boolean game = false;
+  private boolean c64_platform = true;
 
   public ScraperFields()
   {
@@ -105,5 +106,15 @@ public class ScraperFields
   public void setGame(boolean game)
   {
     this.game = game;
+  }
+
+  public boolean isC64()
+  {
+    return c64_platform;
+  }
+
+  public void setPlatform(boolean isC64)
+  {
+    this.c64_platform = isC64;
   }
 }
