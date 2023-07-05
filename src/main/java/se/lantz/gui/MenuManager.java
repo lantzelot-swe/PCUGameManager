@@ -1073,6 +1073,7 @@ public class MenuManager
         uiModel.reloadGameViews();
         MainWindow.getInstance().selectViewAfterRestore();
         MainWindow.getInstance().repaintAfterModifications();
+        MainWindow.getInstance().refreshMenuAndUI();
       }
       else
       {

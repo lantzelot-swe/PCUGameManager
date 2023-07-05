@@ -2,9 +2,11 @@ package se.lantz.gui.imports;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import se.lantz.gamebase.GamebaseImporter;
 import se.lantz.gamebase.GbGameInfo;
+import se.lantz.gamebase.GenreInfo;
 import se.lantz.manager.ImportManager;
 
 public class GamebaseImportWorker extends AbstractImportWorker
@@ -27,6 +29,88 @@ public class GamebaseImportWorker extends AbstractImportWorker
     progressValueString = "Querying gamebase db...";
     publish("Reading from gamebase db... this may take a while, be patient!");
 
+    if (gbInporter.isImportAllWithViews())
+    {
+      int totalProcessed = 0;
+      //Get all genres and create viewtags, then run one-by-one
+      int counter = 0;
+      for (GenreInfo genre : gbInporter.getAvailableGenres())
+      {
+        if (counter == 0)
+        {
+          counter++;
+          continue;
+        }
+        if (counter > 1)
+        {
+          break;
+        }
+        counter++;
+        this.gbInporter.setGenreOption(genre);
+        publish("Processing games for " + genre.getGenreName());
+        importManager.setViewTag(genre.getGenreName());
+        String viewName = getViewName(genre);
+        importManager.setViewName(viewName);
+        int processedForGenre = executeImport();
+
+        createAdditionalGameViews(processedForGenre, viewName, genre.getGenreName());
+
+        totalProcessed = totalProcessed + processedForGenre;
+      }
+      publish("Processed " + totalProcessed + " games.");
+      progressValueString = "Finished!";
+      progressValue++;
+      publish("Done!");
+      return null;
+    }
+    else
+    {
+      int numberOfGamesProcessed = executeImport();
+      if (numberOfGamesProcessed > 0)
+      {
+        publish("Processed " + numberOfGamesProcessed + " games.");
+        progressValueString = "Finished!";
+        progressValue++;
+        publish("Done!");
+      }
+      return null;
+    }
+  }
+
+  private void createAdditionalGameViews(int processedGames, String viewName, String viewTag)
+  {
+    //Lets use 250 as limit for each view
+    int numOfViews = processedGames / 250;
+    if (processedGames % 250 > 0)
+    {
+      numOfViews++;
+    }
+    for (int i = 2; i < (numOfViews + 1); i++)
+    {
+      //Create additional views to be filled later
+      importManager.setViewName(viewName + "/" + i);
+      importManager.setViewTag(viewTag + "-" + i);
+      importManager.createGameViewForViewTag(this);
+    }
+  }
+
+  private String getViewName(GenreInfo info)
+  {
+    String newName = info.getGenreName();
+    newName = newName.replaceAll(" - ", "/");
+    newName = newName.replace("[", "");
+    newName = newName.replace("]", "");
+    if (newName.startsWith("/"))
+    {
+      newName = newName.substring(1);
+    }
+    //Always use capital first letter
+    newName = Pattern.compile("^.").matcher(newName).replaceFirst(m -> m.group().toUpperCase());
+    return newName;
+  }
+
+  private int executeImport()
+  {
     gbInporter.importFromGamebase(this);
     progressValueString = "Checking game files...";
 
@@ -41,7 +125,7 @@ public class GamebaseImportWorker extends AbstractImportWorker
         progressMaximum = 1;
         progressValue = 1;
         publish("Import cancelled, no games where added to the db.");
-        return null;
+        return -1;
       }
       progressValue++;
       progressValueString = String.format("Checking game files (batch %s of %s)", progressValue, progressMaximum);
@@ -70,7 +154,7 @@ public class GamebaseImportWorker extends AbstractImportWorker
           publish("Import cancelled, " + (chunkCount * ImportManager.DB_ROW_CHUNK_SIZE) +
             " games where added to the db.");
         }
-        return null;
+        return -1;
       }
       chunkCount++;
       progressValue++;
@@ -84,12 +168,7 @@ public class GamebaseImportWorker extends AbstractImportWorker
     }
     //Create game view if view tag is defined
     importManager.createGameViewForViewTag(this);
-    int numberOfGamesProcessed = importManager.clearAfterImport();
-    publish("Processed " + numberOfGamesProcessed + " games.");
-    progressValueString = "Finished!";
-    progressValue++;
-    publish("Done!");
-    return null;
+    return importManager.clearAfterImport();
   }
 
   @Override

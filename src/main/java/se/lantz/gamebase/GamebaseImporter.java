@@ -32,7 +32,7 @@ public class GamebaseImporter
 
   public enum Options
   {
-    ALL, FAVORITES, QUERY, GENRE;
+    ALL, ALL_WITH_VIEWS, FAVORITES, QUERY, GENRE;
   }
 
   private final ImportManager importManager;
@@ -79,6 +79,17 @@ public class GamebaseImporter
     this.selectedGenre = options.getGenre();
     this.includeEntriesWithMissingGameFile = options.isIncludeMissingGameFileEntries();
     return readPathsIni();
+  }
+
+  public void setGenreOption(GenreInfo genre)
+  {
+    this.selectedGenre = genre;
+    this.selectedOption = Options.GENRE;
+  }
+
+  public boolean isImportAllWithViews()
+  {
+    return selectedOption.equals(Options.ALL_WITH_VIEWS);
   }
 
   /**
@@ -627,6 +638,11 @@ public class GamebaseImporter
     gbGameInfoList.clear();
     FileManager.deleteTempFolder();
     importIndexForTempFiles = 0;
+  }
+
+  public List<GenreInfo> getAvailableGenres() throws SQLException
+  {
+    return getAvailableGenres(this.gbDatabasePath);
   }
 
   public List<GenreInfo> getAvailableGenres(Path gbDbPath) throws SQLException

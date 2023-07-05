@@ -60,6 +60,7 @@ public class ImportManager
   private Options selectedOption;
   private int addAsFavorite = -1;
   private String viewTag;
+  private String viewName;
   private boolean createGameViews = false;
   private List<Path> foundCarouselsPaths = new ArrayList<Path>();
 
@@ -81,6 +82,11 @@ public class ImportManager
   public void setViewTag(String viewTag)
   {
     this.viewTag = viewTag;
+  }
+
+  public void setViewName(String viewName)
+  {
+    this.viewName = viewName;
   }
 
   public void setCreateGameViews(boolean createGameViews)
@@ -240,12 +246,12 @@ public class ImportManager
   {
     if (!this.createGameViews && this.viewTag != null && !this.viewTag.isEmpty())
     {
-      String newViewName = this.viewTag;
+      String newViewName = this.viewName != null ? this.viewName : this.viewTag;
 
-      this.setViewTag(newViewName);
-      worker.publishMessage("\nCreating game view for view tag: " + newViewName);
+      this.setViewTag(viewTag);
+      worker.publishMessage("\nCreating game view " + newViewName + " for view tag: " + viewTag);
 
-      ViewFilter filter = new ViewFilter(DbConstants.VIEW_TAG, ViewFilter.EQUALS_TEXT, newViewName, true);
+      ViewFilter filter = new ViewFilter(DbConstants.VIEW_TAG, ViewFilter.EQUALS_TEXT, viewTag, true);
       GameView newView = new GameView(0);
       newView.setViewFilters(Arrays.asList(filter));
       newView.setName(newViewName.replaceAll("_", " "));
@@ -1027,6 +1033,8 @@ public class ImportManager
     int size = dbRowDataList.size();
     dbRowDataList.clear();
     gameInfoFilesMap.clear();
+    viewName = null;
+    viewTag = null;
     return size;
   }
 
@@ -1037,6 +1045,8 @@ public class ImportManager
     gameInfoFilesMap.clear();
     gameFileNamesDuringImportMap.clear();
     uiModel.cleanupAfterImport();
+    viewName = null;
+    viewTag = null;
     return size;
   }
 }

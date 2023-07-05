@@ -48,9 +48,12 @@ public class GameBaseOptionsPanel extends JPanel
   private JComboBox<GenreInfo> genreComboBox;
   private GamebaseImporter importerReference;
   private boolean genresLoaded = false;
+  private JRadioButton allWithViewsButton;
+  private ImportOptionsPanel parentPanel;
 
-  public GameBaseOptionsPanel()
+  public GameBaseOptionsPanel(ImportOptionsPanel parentPanel)
   {
+    this.parentPanel = parentPanel;
     GridBagLayout gridBagLayout = new GridBagLayout();
     setLayout(gridBagLayout);
     GridBagConstraints gbc_selectDirPanel = new GridBagConstraints();
@@ -89,6 +92,7 @@ public class GameBaseOptionsPanel extends JPanel
     gbc_includeMissingCheckBox.gridy = 5;
     add(getIncludeMissingCheckBox(), gbc_includeMissingCheckBox);
 
+    setEnablementOfComponents();
   }
 
   protected void setGamebaseImporter(GamebaseImporter importerReference)
@@ -101,7 +105,11 @@ public class GameBaseOptionsPanel extends JPanel
     GamebaseOptions options = new GamebaseOptions();
     options.setGamebaseDbFile(getSelectDirPanel().getTargetDirectory().toPath());
     options.setC64(getC64RadioButton().isSelected());
-    if (getFavoritesRadioButton().isSelected())
+    if (getAllWithViewsButton().isSelected())
+    {
+      options.setSelectedOption(Options.ALL_WITH_VIEWS);
+    }
+    else if (getFavoritesRadioButton().isSelected())
     {
       options.setSelectedOption(Options.FAVORITES);
     }
@@ -148,10 +156,15 @@ public class GameBaseOptionsPanel extends JPanel
       GridBagLayout gbl_gameOptionsPanel = new GridBagLayout();
       gbl_gameOptionsPanel.columnWeights = new double[] { 1.0 };
       gameOptionsPanel.setLayout(gbl_gameOptionsPanel);
+      GridBagConstraints gbc_allWithViewsButton = new GridBagConstraints();
+      gbc_allWithViewsButton.anchor = GridBagConstraints.WEST;
+      gbc_allWithViewsButton.gridx = 0;
+      gbc_allWithViewsButton.gridy = 0;
+      gameOptionsPanel.add(getAllWithViewsButton(), gbc_allWithViewsButton);
       GridBagConstraints gbc_favoritesRadioButton = new GridBagConstraints();
       gbc_favoritesRadioButton.anchor = GridBagConstraints.WEST;
       gbc_favoritesRadioButton.gridx = 0;
-      gbc_favoritesRadioButton.gridy = 0;
+      gbc_favoritesRadioButton.gridy = 2;
       gameOptionsPanel.add(getFavoritesRadioButton(), gbc_favoritesRadioButton);
       GridBagConstraints gbc_allRadioButton = new GridBagConstraints();
       gbc_allRadioButton.anchor = GridBagConstraints.WEST;
@@ -161,25 +174,25 @@ public class GameBaseOptionsPanel extends JPanel
       GridBagConstraints gbc_queryRadioButton = new GridBagConstraints();
       gbc_queryRadioButton.anchor = GridBagConstraints.WEST;
       gbc_queryRadioButton.gridx = 0;
-      gbc_queryRadioButton.gridy = 2;
+      gbc_queryRadioButton.gridy = 3;
       gameOptionsPanel.add(getQueryRadioButton(), gbc_queryRadioButton);
       GridBagConstraints gbc_titleQueryTextField = new GridBagConstraints();
-      gbc_titleQueryTextField.insets = new Insets(0, 20, 0, 10);
+      gbc_titleQueryTextField.insets = new Insets(0, 20, 5, 10);
       gbc_titleQueryTextField.anchor = GridBagConstraints.WEST;
       gbc_titleQueryTextField.fill = GridBagConstraints.HORIZONTAL;
       gbc_titleQueryTextField.gridx = 0;
-      gbc_titleQueryTextField.gridy = 3;
+      gbc_titleQueryTextField.gridy = 4;
       gameOptionsPanel.add(getTitleQueryTextField(), gbc_titleQueryTextField);
       GridBagConstraints gbc_genreRadioButton = new GridBagConstraints();
       gbc_genreRadioButton.anchor = GridBagConstraints.WEST;
       gbc_genreRadioButton.gridx = 0;
-      gbc_genreRadioButton.gridy = 4;
+      gbc_genreRadioButton.gridy = 5;
       gameOptionsPanel.add(getGenreRadioButton(), gbc_genreRadioButton);
       GridBagConstraints gbc_genreComboBox = new GridBagConstraints();
-      gbc_genreComboBox.insets = new Insets(0, 20, 5, 10);
+      gbc_genreComboBox.insets = new Insets(0, 20, 0, 10);
       gbc_genreComboBox.fill = GridBagConstraints.HORIZONTAL;
       gbc_genreComboBox.gridx = 0;
-      gbc_genreComboBox.gridy = 5;
+      gbc_genreComboBox.gridy = 6;
       gameOptionsPanel.add(getGenreComboBox(), gbc_genreComboBox);
     }
     return gameOptionsPanel;
@@ -190,12 +203,11 @@ public class GameBaseOptionsPanel extends JPanel
     if (favoritesRadioButton == null)
     {
       favoritesRadioButton = new JRadioButton("All games marked as favorites in the gamebase db");
-      favoritesRadioButton.setSelected(true);
       favoritesRadioButton.addActionListener(new ActionListener()
         {
           public void actionPerformed(ActionEvent e)
           {
-            enableQueryOrGenre();
+            setEnablementOfComponents();
           }
         });
       optionButtonGroup.add(favoritesRadioButton);
@@ -207,12 +219,12 @@ public class GameBaseOptionsPanel extends JPanel
   {
     if (allRadioButton == null)
     {
-      allRadioButton = new JRadioButton("ALL games (WARNING: This can take a very long time)");
+      allRadioButton = new JRadioButton("ALL games (No gamelist views created)");
       allRadioButton.addActionListener(new ActionListener()
         {
           public void actionPerformed(ActionEvent e)
           {
-            enableQueryOrGenre();
+            setEnablementOfComponents();
           }
         });
       optionButtonGroup.add(allRadioButton);
@@ -229,7 +241,7 @@ public class GameBaseOptionsPanel extends JPanel
         {
           public void actionPerformed(ActionEvent e)
           {
-            enableQueryOrGenre();
+            setEnablementOfComponents();
           }
         });
       optionButtonGroup.add(queryRadioButton);
@@ -333,7 +345,7 @@ public class GameBaseOptionsPanel extends JPanel
         {
           public void actionPerformed(ActionEvent e)
           {
-            enableQueryOrGenre();
+            setEnablementOfComponents();
             loadGenres();
           }
         });
@@ -394,5 +406,29 @@ public class GameBaseOptionsPanel extends JPanel
 
       }
     }
+  }
+
+  private JRadioButton getAllWithViewsButton()
+  {
+    if (allWithViewsButton == null)
+    {
+      allWithViewsButton = new JRadioButton("ALL games - create gamelist views based on genre");
+      optionButtonGroup.add(allWithViewsButton);
+      allWithViewsButton.setSelected(true);
+      allWithViewsButton.addActionListener(new ActionListener()
+        {
+          public void actionPerformed(ActionEvent e)
+          {
+            setEnablementOfComponents();
+          }
+        });
+    }
+    return allWithViewsButton;
+  }
+
+  private void setEnablementOfComponents()
+  {
+    enableQueryOrGenre();
+    parentPanel.setOptionsEnabled(!getAllWithViewsButton().isSelected());
   }
 }
