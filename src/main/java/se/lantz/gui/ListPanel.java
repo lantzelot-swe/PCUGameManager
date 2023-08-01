@@ -481,7 +481,8 @@ public class ListPanel extends JPanel
     int selectedGames = list.getSelectedIndices().length;
     if (selectedGames > 1)
     {
-      text = text + " (" + selectedGames + ")";
+      int selectedFileCount = uiModel.getFileCount(list.getSelectedValuesList()); 
+      text = text + " (" + selectedGames +  "/" + selectedFileCount + ")";
     }
     getViewInfoLabel().setText(text);
   }

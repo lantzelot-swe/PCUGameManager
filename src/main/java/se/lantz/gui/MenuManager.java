@@ -121,6 +121,8 @@ public class MenuManager
   private JMenuItem convertSavedStatesItem;
   private JMenuItem copySavedStatesItem;
   private JMenuItem resetJoystickConfigItem;
+  private JMenuItem enableAccurateDiskItem;
+  private JMenuItem disableAccurateDiskItem;
 
   private JMenuItem installPCUAEItem;
   private JMenuItem installAmigaModeItem;
@@ -219,6 +221,8 @@ public class MenuManager
     toolsMenu.add(getConvertSavedStatesItem());
     toolsMenu.add(getCopySavedStatesToFileLoaderItem());
     toolsMenu.add(getResetJoystickConfigItem());
+    toolsMenu.add(getEnableAccurateDiskItem());
+    toolsMenu.add(getDisableAccurateDiskItem());
     toolsMenu.addSeparator();
     toolsMenu.add(getPalNtscFixMenuItem());
     pcuaeMenu = new JMenu("PCUAE");
@@ -892,6 +896,28 @@ public class MenuManager
     }
     return resetJoystickConfigItem;
   }
+  
+  private JMenuItem getEnableAccurateDiskItem()
+  {
+    if (enableAccurateDiskItem == null)
+    {
+      enableAccurateDiskItem = new JMenuItem("Enable accurate disk for current gamelist view");
+      enableAccurateDiskItem.setMnemonic('e');
+      enableAccurateDiskItem.addActionListener(e -> enableAccurateDisk());
+    }
+    return enableAccurateDiskItem;
+  }
+  
+  private JMenuItem getDisableAccurateDiskItem()
+  {
+    if (disableAccurateDiskItem == null)
+    {
+      disableAccurateDiskItem = new JMenuItem("Disable accurate disk for current gamelist view");
+      disableAccurateDiskItem.setMnemonic('u');
+      disableAccurateDiskItem.addActionListener(e -> disableAccurateDisk());
+    }
+    return disableAccurateDiskItem;
+  }
 
   private JMenuItem getInstallPCUAEItem()
   {
@@ -1441,6 +1467,46 @@ public class MenuManager
       JOptionPane.showMessageDialog(MainWindow.getInstance().getMainPanel(),
                                     "Joystick configurations updated.",
                                     "Reset joystick configurations",
+                                    JOptionPane.INFORMATION_MESSAGE);
+      MainWindow.getInstance().reloadCurrentGameView();
+    }
+  }
+  
+  private void enableAccurateDisk()
+  {
+    String message = "Do you want to enable accurate disk for all disk games in the current gamelist view?";
+
+    int option = JOptionPane.showConfirmDialog(MainWindow.getInstance().getMainPanel(),
+                                               message,
+                                               "Enable accurate disk",
+                                               JOptionPane.YES_NO_OPTION,
+                                               JOptionPane.QUESTION_MESSAGE);
+    if (option == JOptionPane.YES_OPTION)
+    {
+      uiModel.enableAccurateDiskForAllGamesInCurrentView();
+      JOptionPane.showMessageDialog(MainWindow.getInstance().getMainPanel(),
+                                    "Accurate disk enabled for all disk games.",
+                                    "Enable accurate disk",
+                                    JOptionPane.INFORMATION_MESSAGE);
+      MainWindow.getInstance().reloadCurrentGameView();
+    }
+  }
+  
+  private void disableAccurateDisk()
+  {
+    String message = "Do you want to disable accurate disk for all disk games in the current gamelist view?";
+
+    int option = JOptionPane.showConfirmDialog(MainWindow.getInstance().getMainPanel(),
+                                               message,
+                                               "Disable accurate disk",
+                                               JOptionPane.YES_NO_OPTION,
+                                               JOptionPane.QUESTION_MESSAGE);
+    if (option == JOptionPane.YES_OPTION)
+    {
+      uiModel.disableAccurateDiskForAllGamesInCurrentView();
+      JOptionPane.showMessageDialog(MainWindow.getInstance().getMainPanel(),
+                                    "Accurate disk disabled for all disk games.",
+                                    "Disable accurate disk",
                                     JOptionPane.INFORMATION_MESSAGE);
       MainWindow.getInstance().reloadCurrentGameView();
     }

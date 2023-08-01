@@ -313,7 +313,8 @@ public class DbConnector
 
     //Construct SQL
     StringBuilder sqlBuilder = new StringBuilder();
-    sqlBuilder.append("SELECT title, gamefile, rowid, favorite, viewtag, disk2, disk3, disk4, disk5, disk6 FROM gameinfo ");
+    sqlBuilder
+      .append("SELECT title, gamefile, rowid, favorite, viewtag, disk2, disk3, disk4, disk5, disk6 FROM gameinfo ");
     sqlBuilder.append(view.getSqlQuery());
     sqlBuilder.append(" ORDER BY title COLLATE NOCASE ASC");
 
@@ -357,7 +358,7 @@ public class DbConnector
     Collections.sort(returnList, new GameListDataComparator());
     return returnList;
   }
-  
+
   private int updateDiskCount(String disk, int fileCount)
   {
     if (disk != null && !disk.isEmpty())
@@ -366,7 +367,6 @@ public class DbConnector
     }
     return fileCount;
   }
-  
 
   public List<GameListData> fetchAllGamesForGameCount()
   {
@@ -1528,6 +1528,57 @@ public class DbConnector
     catch (SQLException e)
     {
       ExceptionHandler.handleException(e, "Could not update joystick configurations");
+    }
+  }
+
+  public void setAccurateDiskForView(GameView view, boolean accurateDisk)
+  {
+
+    String validDiskEndings =
+      "(gamefile LIKE '%D64%' OR gamefile LIKE '%D8%' OR gamefile LIKE '%D7%' OR gamefile LIKE '%X64%' OR gamefile LIKE '%G64%')";
+    StringBuilder accurateDiskBuilder = new StringBuilder();
+
+    if (accurateDisk)
+    {
+      accurateDiskBuilder.append("UPDATE gameinfo SET System = System || ',driveicon,accuratedisk' ");
+      if (view.getSqlQuery().isEmpty())
+      {
+        accurateDiskBuilder.append("WHERE ");
+      }
+      else
+      {
+        accurateDiskBuilder.append(view.getSqlQuery());
+        accurateDiskBuilder.append(" AND ");
+      }
+
+      accurateDiskBuilder.append(validDiskEndings);
+      accurateDiskBuilder.append(" AND System NOT LIKE '%accuratedisk%'");
+    }
+    else
+    {
+      accurateDiskBuilder.append("UPDATE gameinfo SET System = REPLACE(System, ',driveicon,accuratedisk', '') ");
+      if (view.getSqlQuery().isEmpty())
+      {
+        accurateDiskBuilder.append("WHERE ");
+      }
+      else
+      {
+        accurateDiskBuilder.append(view.getSqlQuery());
+        accurateDiskBuilder.append(" AND ");
+      }
+      accurateDiskBuilder.append(validDiskEndings);
+    }
+    logger.debug("Generated SQL for accurate disk:\n{}", accurateDiskBuilder.toString());
+
+    try (Connection conn = this.connect();
+      PreparedStatement adstmt = conn.prepareStatement(accurateDiskBuilder.toString());)
+    {
+      int value = adstmt.executeUpdate();
+      logger.debug("Executed successfully, value = {}", value);
+    }
+    catch (SQLException e)
+    {
+      ExceptionHandler.handleException(e, "Could not update accurate disk");
     }
   }
 }

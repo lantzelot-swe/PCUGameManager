@@ -944,7 +944,7 @@ public class ScreenshotsPanel extends JPanel
     if (viewTagTextField == null)
     {
       viewTagTextField = new JTextField();
-      viewTagTextField.setColumns(15);
+      viewTagTextField.setColumns(25);
       viewTagTextField.setDocument(new CustomUndoPlainDocument()
         {
           @Override

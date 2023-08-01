@@ -34,24 +34,18 @@ public class GamebaseImportWorker extends AbstractImportWorker
       int totalProcessed = 0;
       //Get all genres and create viewtags, then run one-by-one
       int counter = 0;
-      for (GenreInfo genre : gbInporter.getAvailableGenres())
+      List<GenreInfo> genreList = gbInporter.getAvailableGenres();
+      int numberOfGenres = genreList.size();
+      for (GenreInfo genre : genreList)
       {
-        if (counter == 0)
-        {
-          counter++;
-          continue;
-        }
-        if (counter > 1)
-        {
-          break;
-        }
         counter++;
         this.gbInporter.setGenreOption(genre);
         publish("Processing games for " + genre.getGenreName());
         importManager.setViewTag(genre.getGenreName());
         String viewName = getViewName(genre);
         importManager.setViewName(viewName);
-        int processedForGenre = executeImport();
+        String additonalInfo = ", genre: " + genre.getGenreName() + " (" + counter + " of " + numberOfGenres + ")";
+        int processedForGenre = executeImport(additonalInfo);
 
         createAdditionalGameViews(processedForGenre, viewName, genre.getGenreName());
 
@@ -65,7 +59,7 @@ public class GamebaseImportWorker extends AbstractImportWorker
     }
     else
     {
-      int numberOfGamesProcessed = executeImport();
+      int numberOfGamesProcessed = executeImport("");
       if (numberOfGamesProcessed > 0)
       {
         publish("Processed " + numberOfGamesProcessed + " games.");
@@ -87,7 +81,7 @@ public class GamebaseImportWorker extends AbstractImportWorker
     }
     for (int i = 2; i < (numOfViews + 1); i++)
     {
-      //Create additional views to be filled later
+      //Create additional views that can be filled later by editing view tags
       importManager.setViewName(viewName + "/" + i);
       importManager.setViewTag(viewTag + "-" + i);
       importManager.createGameViewForViewTag(this);
@@ -109,10 +103,10 @@ public class GamebaseImportWorker extends AbstractImportWorker
     return newName;
   }
 
-  private int executeImport()
+  private int executeImport(String additionalInfo)
   {
     gbInporter.importFromGamebase(this);
-    progressValueString = "Checking game files...";
+    progressValueString = "Checking game files" + additionalInfo;
 
     List<List<GbGameInfo>> listChunks = gbInporter.getGbGameInfoChunks();
     progressMaximum = listChunks.size();
@@ -128,12 +122,12 @@ public class GamebaseImportWorker extends AbstractImportWorker
         return -1;
       }
       progressValue++;
-      progressValueString = String.format("Checking game files (batch %s of %s)", progressValue, progressMaximum);
+      progressValueString = String.format("Checking game files (batch %s of %s)" + additionalInfo, progressValue, progressMaximum);
       gbInporter.checkGameFileForGbGames(gbInfoList, this);
     }
 
     List<List<String>> dbRowReadChunks = importManager.getDbRowReadChunks();
-    progressValueString = "Importing to db and copying files...";
+    progressValueString = "Importing to db and copying files" + additionalInfo;
     progressMaximum = dbRowReadChunks.size();
     progressValue = 0;
     publish("\nImporting to db, copying covers, screens and game files...");
@@ -159,7 +153,7 @@ public class GamebaseImportWorker extends AbstractImportWorker
       chunkCount++;
       progressValue++;
       progressValueString =
-        String.format("Importing to db and copying files (batch %s of %s)", progressValue, progressMaximum);
+        String.format("Importing to db and copying files (batch %s of %s)" + additionalInfo, progressValue, progressMaximum);
       //Copy the list to avoid modifying it when reading several chunks
       ArrayList<String> copyList = new ArrayList<>();
       copyList.addAll(rowList);

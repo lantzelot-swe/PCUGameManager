@@ -496,7 +496,7 @@ public class MainViewModel extends AbstractModel
     logger.debug("...done.");
   }
   
-  private int getFileCount(List<GameListData> gamesList)
+  public int getFileCount(List<GameListData> gamesList)
   {
     int fileCount = 0;
     for (GameListData gameListData : gamesList)
@@ -1011,6 +1011,16 @@ public class MainViewModel extends AbstractModel
   public void resetJoystickConfigsForCurrentView()
   {
     dbConnector.resetJoystickConfigsForView(getSelectedGameView());
+  }
+  
+  public void enableAccurateDiskForAllGamesInCurrentView()
+  {
+    dbConnector.setAccurateDiskForView(getSelectedGameView(), true);
+  }
+  
+  public void disableAccurateDiskForAllGamesInCurrentView()
+  {
+    dbConnector.setAccurateDiskForView(getSelectedGameView(), false);
   }
 
   private void generateInfoSlot(GameDetails gameDetails)
