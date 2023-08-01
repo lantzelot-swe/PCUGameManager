@@ -41,3 +41,4 @@ pcu.properties
 .classpath
 .project
 *.mdb
+pcusb.db

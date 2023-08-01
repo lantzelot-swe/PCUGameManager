@@ -96,7 +96,7 @@ public class FileManager
     Arrays.asList("d64", "t64", "prg", "p00", "d81", "d82", "d71", "x64", "g64", "tap", "crt", "vsf");
 
   private static List<String> validDiskFilesEndingList = Arrays.asList("d64", "d81", "d82", "d71", "x64", "g64");
-  
+
   private static List<String> compressedDiskFilesEndingList = Arrays.asList("d64", "d71", "x64", "g64");
 
   private static DbConnector dbconnector;
@@ -124,7 +124,7 @@ public class FileManager
     this.savedStatesModel = model.getSavedStatesModel();
     this.model = model;
   }
-  
+
   public void setDbConnector(DbConnector ref)
   {
     dbconnector = ref;
@@ -721,7 +721,10 @@ public class FileManager
     return newNameString;
   }
 
-  public static String generateFileNameFromTitleForFileLoader(String gameId, String title, String author, int duplicateIndex)
+  public static String generateFileNameFromTitleForFileLoader(String gameId,
+                                                              String title,
+                                                              String author,
+                                                              int duplicateIndex)
   {
     String correctedAuthor = author.replace("\\", " ");
     correctedAuthor = author.replace("/", " ");
@@ -740,11 +743,11 @@ public class FileManager
       }
       else
       {
-        newNameString = newNameString + " (" + correctedAuthor + ")("+ duplicateIndex +")";
+        newNameString = newNameString + " (" + correctedAuthor + ")(" + duplicateIndex + ")";
       }
     }
     newNameString = newNameString.trim();
-  
+
     //Special chars that is not handed properly in the file loader/media access that have reasonable replacements
     newNameString = newNameString.replaceAll("á", "a");
     newNameString = newNameString.replaceAll("é", "e");
@@ -763,14 +766,14 @@ public class FileManager
     newNameString = newNameString.replaceAll("æ", "ae");
     newNameString = newNameString.replaceAll("\\[", "(");
     newNameString = newNameString.replaceAll("\\]", ")");
-    
+
     newNameString = newNameString.replace("((", "(");
     newNameString = newNameString.replace("))", ")");
     newNameString = newNameString.replace(">", "");
     newNameString = newNameString.replace("<", "");
     newNameString = newNameString.replace("?", "");
     newNameString = newNameString.replace("*", "");
-    
+
     logger.debug("Game title: \"{}\" ---- New fileName: \"{}\"", title, newNameString);
     return newNameString;
   }
@@ -807,11 +810,17 @@ public class FileManager
           return;
         }
         worker.publishMessage("Creating cjm file for " + gameDetails.getTitle());
-        filename =
-          generateFileNameFromTitleForFileLoader(gameDetails.getGameId(), gameDetails.getTitle(), gameDetails.getAuthor(), gameDetails.getDuplicateIndex()) + ".cjm";
+        filename = generateFileNameFromTitleForFileLoader(gameDetails.getGameId(),
+                                                          gameDetails.getTitle(),
+                                                          gameDetails.getAuthor(),
+                                                          gameDetails.getDuplicateIndex()) +
+          ".cjm";
         if (hasExtraDisks(gameDetails))
         {
-          filename = generateFileNameFromTitleForFileLoader(gameDetails.getGameId(), gameDetails.getTitle(), gameDetails.getAuthor(), gameDetails.getDuplicateIndex()) +
+          filename = generateFileNameFromTitleForFileLoader(gameDetails.getGameId(),
+                                                            gameDetails.getTitle(),
+                                                            gameDetails.getAuthor(),
+                                                            gameDetails.getDuplicateIndex()) +
             " (disk 1).cjm";
         }
       }
@@ -870,7 +879,6 @@ public class FileManager
       fw.write("E:" + gameDetails.getGenre() + "\n");
       fw.write("Y:" + gameDetails.getYear() + "\n");
 
-      
       if (FileManager.isValidCompressedDiskFileEnding(gameDetails.getGame()))
       {
         //Remove extension (.gz) from file name, same is done in ExportManager.copyFilesForCarousel()
@@ -880,7 +888,7 @@ public class FileManager
       {
         fw.write("F:" + "games/" + gameDetails.getGame() + "\n");
       }
-      
+
       fw.write("C:" + "covers/" + gameDetails.getCover() + "\n");
       if (!gameDetails.getScreen1().isEmpty())
       {
@@ -2062,10 +2070,11 @@ public class FileManager
     }
     return validDiskFilesEndingList.stream().anyMatch(ending -> StringUtils.containsIgnoreCase(fileName, "." + ending));
   }
-  
+
   public static boolean isValidCompressedDiskFileEnding(String fileName)
   {
-    return compressedDiskFilesEndingList.stream().anyMatch(ending -> StringUtils.containsIgnoreCase(fileName, "." + ending));
+    return compressedDiskFilesEndingList.stream()
+      .anyMatch(ending -> StringUtils.containsIgnoreCase(fileName, "." + ending));
   }
 
   public static List<String> convertAllScreenshotsTo32Bit() throws IOException
@@ -2218,25 +2227,35 @@ public class FileManager
     }
     else
     {
-      //Check for a "Games" folder first (PCUAE 3.0.0)
-      Path gamesDirPath = deviceRoot.toPath().resolve("Games");
+      //Check for "THEC64-CAROUSEL-GAMES" first (PCUAE 3.2.0)
+      Path gamesDirPath = deviceRoot.toPath().resolve("THEC64-CAROUSEL-GAMES");
       if (gamesDirPath.toFile().exists())
       {
         gamesPath = gamesDirPath;
       }
       else
       {
-        //Check if a PCUAE folder exists (for PCUAE 2.0.0)
-        Path pcuaePath = deviceRoot.toPath().resolve("PCUAE");
-        if (pcuaePath.toFile().exists())
+        //Check for a "Games" folder (PCUAE 3.0.0)
+        gamesDirPath = deviceRoot.toPath().resolve("Games");
+        if (gamesDirPath.toFile().exists())
         {
-          gamesPath = deviceRoot.toPath().resolve("PCUAE/Carousel_Games/Games");
+          gamesPath = gamesDirPath;
         }
         else
         {
-          gamesPath = deviceRoot.toPath().resolve("Carousel_Games/Games");
+          //Check if a PCUAE folder exists (for PCUAE 2.0.0)
+          Path pcuaePath = deviceRoot.toPath().resolve("PCUAE");
+          if (pcuaePath.toFile().exists())
+          {
+            gamesPath = deviceRoot.toPath().resolve("PCUAE/Carousel_Games/Games");
+          }
+          else
+          {
+            gamesPath = deviceRoot.toPath().resolve("Carousel_Games/Games");
+          }
         }
       }
+
     }
     return gamesPath.toString();
   }
