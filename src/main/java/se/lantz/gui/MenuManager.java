@@ -1,5 +1,6 @@
 package se.lantz.gui;
 
+import java.awt.Cursor;
 import java.awt.Desktop;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
@@ -1243,9 +1244,11 @@ public class MenuManager
 
   private void reloadAll()
   {
+    this.mainWindow.setWaitCursor(true);
     //Refresh game views
     uiModel.reloadGameViews();
     this.mainWindow.refreshMenuAndUI();
+    this.mainWindow.setWaitCursor(false);
   }
 
   private void backupDb()

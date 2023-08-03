@@ -219,15 +219,16 @@ public class MainViewModel extends AbstractModel
     for (GameView gameView : gameViewList)
     {
       gameViewModel.addElement(gameView);
+      //Select each gameview to load all games so that the game count is shown directly (may be a performance issue?)
+      gameViewModel.setSelectedItem(gameView);
     }
+    gameViewModel.setSelectedItem(allGameView);
   }
 
   public void reloadGameViews()
   {
-    this.disableChangeNotification(true);
     gameViewModel.removeAllElements();
     setupGameViews();
-    this.disableChangeNotification(false);
   }
 
   public GameListModel getGameListModel()
@@ -495,7 +496,7 @@ public class MainViewModel extends AbstractModel
     this.disableChangeNotification(false);
     logger.debug("...done.");
   }
-  
+
   public int getFileCount(List<GameListData> gamesList)
   {
     int fileCount = 0;
@@ -755,7 +756,7 @@ public class MainViewModel extends AbstractModel
     //Reload the current view
     reloadCurrentGameView();
   }
-  
+
   public void deleteAllGameListViews()
   {
     dbConnector.deleteAllGameListViews();
@@ -957,7 +958,7 @@ public class MainViewModel extends AbstractModel
   {
     favorites10Count = toggleFavorite(data, 10, favorites10Count, favorites10View);
   }
-  
+
   public void setViewTag(GameListData data, String viewTag)
   {
     if (data != null && !data.getGameId().isEmpty())
@@ -1012,12 +1013,12 @@ public class MainViewModel extends AbstractModel
   {
     dbConnector.resetJoystickConfigsForView(getSelectedGameView());
   }
-  
+
   public void enableAccurateDiskForAllGamesInCurrentView()
   {
     dbConnector.setAccurateDiskForView(getSelectedGameView(), true);
   }
-  
+
   public void disableAccurateDiskForAllGamesInCurrentView()
   {
     dbConnector.setAccurateDiskForView(getSelectedGameView(), false);

@@ -54,9 +54,9 @@ public class PCUAEManager
 
       mainWindow.setSize(Math.min(width, 1500), Math.min(height - 40, 825));
       mainWindow.setMinimumSize(new Dimension(Math.min(width, 1300), Math.min(height - 40, 700)));
-      mainWindow.setVisible(true);
       mainWindow.setLocationRelativeTo(null);
       mainWindow.initialize();
+      mainWindow.setVisible(true);
 
       //Make sure all folders are available
       try
