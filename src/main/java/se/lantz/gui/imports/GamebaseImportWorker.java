@@ -41,8 +41,8 @@ public class GamebaseImportWorker extends AbstractImportWorker
         counter++;
         this.gbInporter.setGenreOption(genre);
         publish("Processing games for " + genre.getGenreName());
-        importManager.setViewTag(genre.getGenreName());
         String viewName = getViewName(genre);
+        importManager.setViewTag(viewName);
         importManager.setViewName(viewName);
         String additonalInfo = ", genre: " + genre.getGenreName() + " (" + counter + " of " + numberOfGenres + ")";
         int processedForGenre = executeImport(additonalInfo);
@@ -94,6 +94,7 @@ public class GamebaseImportWorker extends AbstractImportWorker
     newName = newName.replaceAll(" - ", "/");
     newName = newName.replace("[", "");
     newName = newName.replace("]", "");
+    newName = newName.replace("'", "");
     if (newName.startsWith("/"))
     {
       newName = newName.substring(1);
@@ -160,8 +161,11 @@ public class GamebaseImportWorker extends AbstractImportWorker
       publish(importManager.insertRowsIntoDb(copyList, 0).toString());
       importManager.copyFiles(true, copyList, this);
     }
-    //Create game view if view tag is defined
-    importManager.createGameViewForViewTag(this);
+    //Create game view if view tag is defined and processed games are not empty
+    if (!dbRowReadChunks.isEmpty())
+    {
+      importManager.createGameViewForViewTag(this);
+    }
     return importManager.clearAfterImport();
   }
 
