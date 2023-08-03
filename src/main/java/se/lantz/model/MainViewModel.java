@@ -216,12 +216,20 @@ public class MainViewModel extends AbstractModel
 
     List<GameView> gameViewList = dbConnector.loadGameViews();
     Collections.sort(gameViewList);
+    
     for (GameView gameView : gameViewList)
     {
       gameViewModel.addElement(gameView);
       //Select each gameview to load all games so that the game count is shown directly (may be a performance issue?)
       gameViewModel.setSelectedItem(gameView);
     }
+    
+    if (gameViewList.isEmpty())
+    {
+      //Select the last favorites to get count on all (not sure why that works...)
+      gameViewModel.setSelectedItem(gameViewModel.getElementAt(gameViewModel.getSize()-1));
+    }
+    //Finish by selecting all games view again
     gameViewModel.setSelectedItem(allGameView);
   }
 
