@@ -10,6 +10,9 @@ import se.lantz.util.DbConstants;
 
 public class GameView implements Comparable
 {
+  private static final String fontRedStart = "<FONT COLOR=\"#ff0000\">";
+  private static final String fontRedEnd = "</FONT COLOR>";
+
   public static final String FAV_GAMEVIEW_NAME_PREF_KEY = "GameViewFavoritesName_";
   public static final int ALL_GAMES_ID = -1;
   public static final int FAVORITES_ID = -2;
@@ -30,7 +33,7 @@ public class GameView implements Comparable
   private int gameViewId;
 
   private int gameCount = -1;
-  
+
   private int fileCount = -1;
 
   public GameView(int gameViewId)
@@ -62,18 +65,28 @@ public class GameView implements Comparable
   @Override
   public String toString()
   {
+    String text = "";
     if (gameCount > -1)
     {
-      if (gameViewId != -1 && gameCount < fileCount)
+      if (gameViewId != -1)
       {
-        return name + " (" + gameCount + "/" + fileCount +  ")";
+        String gameCountString = gameCount > 255 ? fontRedStart + gameCount + fontRedEnd : gameCount + "";
+        String fileCountString = fileCount > 255 ? fontRedStart + fileCount + fontRedEnd : fileCount + "";
+        if (gameCount < fileCount)
+        {
+          text = name + " (" + gameCountString + "/" + fileCountString + ")";
+        }
+        else
+        {
+          text = name + " (" + gameCountString + ")";
+        }
       }
       else
       {
-        return name + " (" + gameCount +  ")";
+        text = name + " (" + gameCount + ")";
       }
     }
-    return name;
+    return "<html>" + text + "</html>";
   }
 
   public List<ViewFilter> getViewFilters()
@@ -295,7 +308,7 @@ public class GameView implements Comparable
   {
     this.gameViewId = gameViewId;
   }
-  
+
   public int getGameCount()
   {
     return this.gameCount;
@@ -315,7 +328,7 @@ public class GameView implements Comparable
   {
     this.fileCount = fileCount;
   }
-  
+
   public String getFavNamePreferencesKey()
   {
     if (gameViewId < -1)
