@@ -65,7 +65,7 @@ public class GameView implements Comparable
   @Override
   public String toString()
   {
-    String text = "";
+    String text = name;
     if (gameCount > -1)
     {
       if (gameViewId != -1)
