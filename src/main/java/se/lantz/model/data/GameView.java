@@ -344,6 +344,7 @@ public class GameView implements Comparable
   @Override
   public int compareTo(Object o)
   {
-    return this.name.compareTo(o.toString());
+    String comparer = o instanceof GameView ? ((GameView)o).name : o.toString();
+    return this.name.compareTo(comparer);
   }
 }
