@@ -53,6 +53,7 @@ import se.lantz.manager.pcuae.AtariModeInstallManager;
 import se.lantz.manager.pcuae.LinuxModeInstallManager;
 import se.lantz.manager.pcuae.PCUAEInstallManager;
 import se.lantz.manager.pcuae.RetroarchModeInstallManager;
+import se.lantz.manager.pcuae.ScummVMModeInstallManager;
 import se.lantz.manager.pcuae.ViceModeInstallManager;
 import se.lantz.model.MainViewModel;
 import se.lantz.model.data.GameListData;
@@ -131,6 +132,7 @@ public class MenuManager
   private JMenuItem installLinuxModeItem;
   private JMenuItem installRetroarchModeItem;
   private JMenuItem installViceModeItem;
+  private JMenuItem installScummVMModeItem;
   private JMenuItem deleteInstallFilesItem;
 
   private JMenuItem helpItem;
@@ -152,6 +154,7 @@ public class MenuManager
   private LinuxModeInstallManager installLinuxManager;
   private RetroarchModeInstallManager installRetroarchManager;
   private ViceModeInstallManager installViceManager;
+  private ScummVMModeInstallManager installScummVMManager;
   private MainWindow mainWindow;
   private int currentFavoritesCount = 10;
 
@@ -171,6 +174,7 @@ public class MenuManager
     this.installLinuxManager = new LinuxModeInstallManager();
     this.installRetroarchManager = new RetroarchModeInstallManager();
     this.installViceManager = new ViceModeInstallManager();
+    this.installScummVMManager = new ScummVMModeInstallManager();
     uiModel.setSavedStatesManager(savedStatesManager);
     setupMenues();
   }
@@ -234,6 +238,7 @@ public class MenuManager
     pcuaeModeMenu.add(getInstallAtariModeItem());
     pcuaeModeMenu.add(getInstallLinuxModeItem());
     pcuaeModeMenu.add(getInstallRetroarchModeItem());
+    pcuaeModeMenu.add(getInstallScummVMModeItem());
     pcuaeModeMenu.add(getInstallViceModeItem());
     pcuaeMenu.add(pcuaeModeMenu);
     pcuaeMenu.addSeparator();
@@ -900,7 +905,7 @@ public class MenuManager
     }
     return resetJoystickConfigItem;
   }
-  
+
   private JMenuItem getEnableAccurateDiskItem()
   {
     if (enableAccurateDiskItem == null)
@@ -911,7 +916,7 @@ public class MenuManager
     }
     return enableAccurateDiskItem;
   }
-  
+
   private JMenuItem getDisableAccurateDiskItem()
   {
     if (disableAccurateDiskItem == null)
@@ -988,7 +993,18 @@ public class MenuManager
     }
     return installViceModeItem;
   }
-  
+
+  private JMenuItem getInstallScummVMModeItem()
+  {
+    if (installScummVMModeItem == null)
+    {
+      installScummVMModeItem = new JMenuItem("Install ScummVM mode...");
+      installScummVMModeItem.setMnemonic('s');
+      installScummVMModeItem.addActionListener(e -> installScummVMMode());
+    }
+    return installScummVMModeItem;
+  }
+
   private JMenuItem getDeleteInstallFilesItem()
   {
     if (deleteInstallFilesItem == null)
@@ -1488,16 +1504,13 @@ public class MenuManager
       MainWindow.getInstance().reloadCurrentGameView();
     }
   }
-  
+
   private void enableAccurateDisk()
   {
     String message = "Do you want to enable accurate disk for all disk games in the current gamelist view?";
 
-    int option = JOptionPane.showConfirmDialog(MainWindow.getInstance().getMainPanel(),
-                                               message,
-                                               "Enable accurate disk",
-                                               JOptionPane.YES_NO_OPTION,
-                                               JOptionPane.QUESTION_MESSAGE);
+    int option = JOptionPane.showConfirmDialog(MainWindow.getInstance()
+      .getMainPanel(), message, "Enable accurate disk", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
     if (option == JOptionPane.YES_OPTION)
     {
       uiModel.enableAccurateDiskForAllGamesInCurrentView();
@@ -1508,16 +1521,13 @@ public class MenuManager
       MainWindow.getInstance().reloadCurrentGameView();
     }
   }
-  
+
   private void disableAccurateDisk()
   {
     String message = "Do you want to disable accurate disk for all disk games in the current gamelist view?";
 
-    int option = JOptionPane.showConfirmDialog(MainWindow.getInstance().getMainPanel(),
-                                               message,
-                                               "Disable accurate disk",
-                                               JOptionPane.YES_NO_OPTION,
-                                               JOptionPane.QUESTION_MESSAGE);
+    int option = JOptionPane.showConfirmDialog(MainWindow.getInstance()
+      .getMainPanel(), message, "Disable accurate disk", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
     if (option == JOptionPane.YES_OPTION)
     {
       uiModel.disableAccurateDiskForAllGamesInCurrentView();
@@ -1558,7 +1568,12 @@ public class MenuManager
   {
     installViceManager.installViceMode();
   }
-  
+
+  private void installScummVMMode()
+  {
+    installScummVMManager.installScummVMMode();
+  }
+
   private void deleteInstallFiles()
   {
     String message = "Are you sure you want to delete all downloaded PCUAE installation files from the install folder?";
@@ -1574,8 +1589,8 @@ public class MenuManager
                                     "All files deleted.",
                                     "Delete all installation files",
                                     JOptionPane.INFORMATION_MESSAGE);
-      
-    } 
+
+    }
   }
 
   private JEditorPane getPalNtscEditorPane()

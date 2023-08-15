@@ -48,6 +48,7 @@ public abstract class BaseInstallManager implements AWTEventListener
   protected static final String LINUX_MODE_INSTALL_NAME = "linux";
   protected static final String RETROARCH_MODE_INSTALL_NAME = "retroarch";
   protected static final String VICE_MODE_INSTALL_NAME = "vice";
+  protected static final String SCUMMVM_MODE_INSTALL_NAME = "scummvm";
 
   private boolean blockEvents = false;
   protected ExecutorService singleThreadExecutor = Executors.newSingleThreadExecutor();
@@ -157,7 +158,8 @@ public abstract class BaseInstallManager implements AWTEventListener
             //Check so that no other is part of the name
             return !(name.contains(AMIGA_MODE_INSTALL_NAME) || name.contains(ATARI_MODE_INSTALL_NAME) ||
               name.contains(LINUX_MODE_INSTALL_NAME) || name.contains(RETROARCH_MODE_INSTALL_NAME) ||
-              name.contains(VICE_MODE_INSTALL_NAME)) && name.endsWith(".exe");
+              name.contains(VICE_MODE_INSTALL_NAME) || name.contains(SCUMMVM_MODE_INSTALL_NAME)) &&
+              name.endsWith(".exe");
           }
           else
           {
@@ -251,11 +253,20 @@ public abstract class BaseInstallManager implements AWTEventListener
             }
             break;
           }
+
+          case SCUMMVM_MODE_INSTALL_NAME:
+          {
+            if (assetName.contains(SCUMMVM_MODE_INSTALL_NAME))
+            {
+              downloadUrl = asset.getAsJsonObject().get("browser_download_url").getAsString();
+            }
+            break;
+          }
           case PCUAE_INSTALL_NAME:
           {
             if (!(assetName.contains(AMIGA_MODE_INSTALL_NAME) || assetName.contains(ATARI_MODE_INSTALL_NAME) ||
               assetName.contains(LINUX_MODE_INSTALL_NAME) || assetName.contains(RETROARCH_MODE_INSTALL_NAME) ||
-              assetName.contains(VICE_MODE_INSTALL_NAME)))
+              assetName.contains(VICE_MODE_INSTALL_NAME) || assetName.contains(SCUMMVM_MODE_INSTALL_NAME)))
             {
               downloadUrl = asset.getAsJsonObject().get("browser_download_url").getAsString();
             }
