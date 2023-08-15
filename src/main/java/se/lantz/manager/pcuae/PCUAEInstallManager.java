@@ -1,10 +1,11 @@
 package se.lantz.manager.pcuae;
 
+import java.io.File;
+
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 
 import se.lantz.gui.MainWindow;
-import se.lantz.util.FileManager;
 
 public class PCUAEInstallManager extends BaseInstallManager
 {
@@ -16,7 +17,7 @@ public class PCUAEInstallManager extends BaseInstallManager
   {
     this.exportMenuItem = exportMenuItem;
   }
-  
+
   public void checkForNewVersionAtStartup()
   {
     readVersionFromInstallFolder(PCUAE_INSTALL_NAME);
@@ -54,4 +55,13 @@ public class PCUAEInstallManager extends BaseInstallManager
     }
   }
 
+  public void deleteAllInstallFiles()
+  {
+    File installFolder = new File(INSTALL_FOLDER);
+    File[] availableFiles = installFolder.listFiles();
+    for (File file : availableFiles)
+    {
+      file.delete();
+    }
+  }
 }

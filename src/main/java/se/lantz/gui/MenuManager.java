@@ -131,6 +131,7 @@ public class MenuManager
   private JMenuItem installLinuxModeItem;
   private JMenuItem installRetroarchModeItem;
   private JMenuItem installViceModeItem;
+  private JMenuItem deleteInstallFilesItem;
 
   private JMenuItem helpItem;
   private JMenuItem pcuaeWikiItem;
@@ -235,6 +236,8 @@ public class MenuManager
     pcuaeModeMenu.add(getInstallRetroarchModeItem());
     pcuaeModeMenu.add(getInstallViceModeItem());
     pcuaeMenu.add(pcuaeModeMenu);
+    pcuaeMenu.addSeparator();
+    pcuaeMenu.add(getDeleteInstallFilesItem());
 
     helpMenu = new JMenu("Help");
     helpMenu.setMnemonic('H');
@@ -985,6 +988,17 @@ public class MenuManager
     }
     return installViceModeItem;
   }
+  
+  private JMenuItem getDeleteInstallFilesItem()
+  {
+    if (deleteInstallFilesItem == null)
+    {
+      deleteInstallFilesItem = new JMenuItem("Delete all installation files in install folder");
+      deleteInstallFilesItem.setMnemonic('d');
+      deleteInstallFilesItem.addActionListener(e -> deleteInstallFiles());
+    }
+    return deleteInstallFilesItem;
+  }
 
   private JMenuItem getHelpItem()
   {
@@ -1543,6 +1557,25 @@ public class MenuManager
   private void installViceMode()
   {
     installViceManager.installViceMode();
+  }
+  
+  private void deleteInstallFiles()
+  {
+    String message = "Are you sure you want to delete all downloaded PCUAE installation files from the install folder?";
+    int option = JOptionPane.showConfirmDialog(MainWindow.getInstance().getMainPanel(),
+                                               message,
+                                               "Delete all installation files",
+                                               JOptionPane.YES_NO_OPTION,
+                                               JOptionPane.QUESTION_MESSAGE);
+    if (option == JOptionPane.YES_OPTION)
+    {
+      installPCUAEManager.deleteAllInstallFiles();
+      JOptionPane.showMessageDialog(this.mainWindow,
+                                    "All files deleted.",
+                                    "Delete all installation files",
+                                    JOptionPane.INFORMATION_MESSAGE);
+      
+    } 
   }
 
   private JEditorPane getPalNtscEditorPane()
