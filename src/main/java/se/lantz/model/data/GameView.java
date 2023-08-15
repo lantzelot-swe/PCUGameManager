@@ -11,7 +11,8 @@ import se.lantz.util.DbConstants;
 public class GameView implements Comparable
 {
   private static final String fontRedStart = "<FONT COLOR=\"#ff0000\">";
-  private static final String fontRedEnd = "</FONT COLOR>";
+  private static final String fontEnd = "</FONT COLOR>";
+  private static final String fontBlackStart = "<FONT COLOR=\"#000000\">";
 
   public static final String FAV_GAMEVIEW_NAME_PREF_KEY = "GameViewFavoritesName_";
   public static final int ALL_GAMES_ID = -1;
@@ -70,8 +71,10 @@ public class GameView implements Comparable
     {
       if (gameViewId != -1)
       {
-        String gameCountString = gameCount > 255 ? fontRedStart + gameCount + fontRedEnd : gameCount + "";
-        String fileCountString = fileCount > 255 ? fontRedStart + fileCount + fontRedEnd : fileCount + "";
+        String gameCountString =
+          gameCount > 255 ? fontRedStart + gameCount + fontEnd : fontBlackStart + gameCount + fontEnd;
+        String fileCountString =
+          fileCount > 255 ? fontRedStart + fileCount + fontEnd : fontBlackStart + fileCount + fontEnd;
         if (gameCount < fileCount)
         {
           text = name + " (" + gameCountString + "/" + fileCountString + ")";
