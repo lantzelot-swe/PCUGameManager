@@ -38,21 +38,18 @@ public class GamebaseImportWorker extends AbstractImportWorker
       int numberOfGenres = genreList.size();
       for (GenreInfo genre : genreList)
       {
-        if (genre.getGenreName().contains("Collect"))
-        {
-          counter++;
-          this.gbInporter.setGenreOption(genre);
-          publish("Processing games for " + genre.getGenreName());
-          String viewName = getViewName(genre);
-          importManager.setViewTag(viewName);
-          importManager.setViewName(viewName);
-          String additonalInfo = ", genre: " + genre.getGenreName() + " (" + counter + " of " + numberOfGenres + ")";
-          int processedForGenre = executeImport(additonalInfo);
+        counter++;
+        this.gbInporter.setGenreOption(genre);
+        publish("Processing games for " + genre.getGenreName());
+        String viewName = getViewName(genre);
+        importManager.setViewTag(viewName);
+        importManager.setViewName(viewName);
+        String additonalInfo = ", genre: " + genre.getGenreName() + " (" + counter + " of " + numberOfGenres + ")";
+        int processedForGenre = executeImport(additonalInfo);
 
-          createAdditionalGameViews(processedForGenre, viewName);
+        createAdditionalGameViews(processedForGenre, viewName);
 
-          totalProcessed = totalProcessed + processedForGenre;
-        }
+        totalProcessed = totalProcessed + processedForGenre;
       }
       publish("Processed " + totalProcessed + " games.");
       progressValueString = "Finished!";
