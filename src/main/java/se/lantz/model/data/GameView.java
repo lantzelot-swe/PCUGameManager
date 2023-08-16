@@ -143,31 +143,31 @@ public class GameView implements Comparable
       {
       case ViewFilter.BEGINS_WITH_TEXT:
         builder.append(" LIKE '");
-        builder.append(viewFilter.getFilterData());
+        builder.append(adaptFilterData(viewFilter.getFilterData()));
         builder.append("%'");
         break;
 
       case ViewFilter.ENDS_WITH_TEXT:
         builder.append(" LIKE '%");
-        builder.append(viewFilter.getFilterData());
+        builder.append(adaptFilterData(viewFilter.getFilterData()));
         builder.append("'");
         break;
 
       case ViewFilter.CONTAINS_TEXT:
         builder.append(" LIKE '%");
-        builder.append(viewFilter.getFilterData());
+        builder.append(adaptFilterData(viewFilter.getFilterData()));
         builder.append("%'");
         break;
 
       case ViewFilter.NOT_CONTAINS_TEXT:
         builder.append(" NOT LIKE '%");
-        builder.append(viewFilter.getFilterData());
+        builder.append(adaptFilterData(viewFilter.getFilterData()));
         builder.append("%'");
         break;
 
       case ViewFilter.EQUALS_TEXT:
         builder.append(" LIKE '");
-        builder.append(viewFilter.getFilterData());
+        builder.append(adaptFilterData(viewFilter.getFilterData()));
         builder.append("'");
         break;
 
@@ -194,18 +194,18 @@ public class GameView implements Comparable
         }
         else
         {
-          builder.append(viewFilter.getFilterData());
+          builder.append(adaptFilterData(viewFilter.getFilterData()));
         }
         break;
 
       case ViewFilter.BEFORE:
         builder.append(" < ");
-        builder.append(viewFilter.getFilterData());
+        builder.append(adaptFilterData(viewFilter.getFilterData()));
         break;
 
       case ViewFilter.AFTER:
         builder.append(" > ");
-        builder.append(viewFilter.getFilterData());
+        builder.append(adaptFilterData(viewFilter.getFilterData()));
         break;
       default:
         logger.debug("Unexpected value: {}", viewFilter.getOperator());
@@ -242,25 +242,25 @@ public class GameView implements Comparable
       {
       case ViewFilter.BEGINS_WITH_TEXT:
         builder.append(" LIKE '");
-        builder.append(viewFilter.getFilterData());
+        builder.append(adaptFilterData(viewFilter.getFilterData()));
         builder.append("%'");
         break;
 
       case ViewFilter.ENDS_WITH_TEXT:
         builder.append(" LIKE '%");
-        builder.append(viewFilter.getFilterData());
+        builder.append(adaptFilterData(viewFilter.getFilterData()));
         builder.append("'");
         break;
 
       case ViewFilter.CONTAINS_TEXT:
         builder.append(" LIKE '%");
-        builder.append(viewFilter.getFilterData());
+        builder.append(adaptFilterData(viewFilter.getFilterData()));
         builder.append("%'");
         break;
 
       case ViewFilter.EQUALS_TEXT:
         builder.append(" LIKE '");
-        builder.append(viewFilter.getFilterData());
+        builder.append(adaptFilterData(viewFilter.getFilterData()));
         builder.append("'");
         break;
 
@@ -276,17 +276,17 @@ public class GameView implements Comparable
 
       case ViewFilter.IS:
         builder.append(" = ");
-        builder.append(viewFilter.getFilterData());
+        builder.append(adaptFilterData(viewFilter.getFilterData()));
         break;
 
       case ViewFilter.BEFORE:
         builder.append(" < ");
-        builder.append(viewFilter.getFilterData());
+        builder.append(adaptFilterData(viewFilter.getFilterData()));
         break;
 
       case ViewFilter.AFTER:
         builder.append(" > ");
-        builder.append(viewFilter.getFilterData());
+        builder.append(adaptFilterData(viewFilter.getFilterData()));
         break;
       default:
         logger.debug("Unexpected value: {}", viewFilter.getOperator());
@@ -300,6 +300,11 @@ public class GameView implements Comparable
       }
     }
     this.sqlQuery = builder.toString();
+  }
+  
+  private String adaptFilterData(String data)
+  {
+    return data.replaceAll("'", "''");
   }
 
   public int getGameViewId()
