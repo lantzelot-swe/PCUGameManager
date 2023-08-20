@@ -534,6 +534,11 @@ public class MainViewModel extends AbstractModel
   {
     dbConnector.saveGameView(gameView);
   }
+  
+  public void createAndUpdateGameViewForImportedGBGames(String mainGameView)
+  {
+    dbConnector.createAndUpdateGameViewForImportedGBGames(mainGameView);
+  }
 
   public void addSaveChangeListener(PropertyChangeListener saveChangeListener)
   {

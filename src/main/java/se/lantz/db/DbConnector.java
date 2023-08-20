@@ -11,6 +11,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -357,6 +359,135 @@ public class DbConnector
     //Sort again since "NOCASE ASC" doesn't seem completely reliable
     Collections.sort(returnList, new GameListDataComparator());
     return returnList;
+  }
+
+  public void createAndUpdateGameViewForImportedGBGames(String mainViewTag)
+  {
+    StringBuilder sqlBuilder = new StringBuilder();
+    sqlBuilder.append("SELECT rowid, disk2, disk3, disk4, disk5, disk6 FROM gameinfo WHERE Viewtag LIKE '");
+    sqlBuilder.append(mainViewTag.replaceAll("'", "''"));
+    sqlBuilder.append("' ORDER BY title COLLATE NOCASE ASC");
+
+    //Map containing gameId and diskCount for each game
+    LinkedHashMap<Integer, Integer> sortedGameMap = new LinkedHashMap<>();
+
+    logger.debug("Generated View SQL: {}", sqlBuilder);
+    try (Connection conn = this.connect(); Statement stmt = conn.createStatement();
+      ResultSet rs = stmt.executeQuery(sqlBuilder.toString()))
+    {
+      // loop through the result set
+      while (rs.next())
+      {
+        int additionalDiskCount = 0;
+        additionalDiskCount = updateDiskCount(rs.getString("disk2"), additionalDiskCount);
+        additionalDiskCount = updateDiskCount(rs.getString("disk3"), additionalDiskCount);
+        additionalDiskCount = updateDiskCount(rs.getString("disk4"), additionalDiskCount);
+        additionalDiskCount = updateDiskCount(rs.getString("disk5"), additionalDiskCount);
+        additionalDiskCount = updateDiskCount(rs.getString("disk6"), additionalDiskCount);
+        sortedGameMap.put(rs.getInt("rowId"), additionalDiskCount);
+      }
+    }
+    catch (SQLException e)
+    {
+      ExceptionHandler.handleException(e, "Could not fetch all games for updating game views during gb import");
+    }
+    int viewNumber = 1;
+    int i = 0;
+    int additionalDiskCount = 0;
+
+    int firstGameInView = -1;
+    int lastGameInView = -1;
+    //Loop through and update gameView for games 
+    for (Integer gameId : sortedGameMap.keySet())
+    {
+      if (i == 0)
+      {
+        firstGameInView = gameId;
+      }
+      additionalDiskCount = additionalDiskCount + sortedGameMap.get(gameId);
+      if (((i + additionalDiskCount) / 250) > (viewNumber - 1))
+      {
+        //Rename previous game view before creating a new one
+        renameGameView(mainViewTag, viewNumber, firstGameInView, lastGameInView);
+
+        viewNumber++;
+        //Create new game view
+        String name = mainViewTag + "/" + viewNumber;
+        ViewFilter filter = new ViewFilter(DbConstants.VIEW_TAG, ViewFilter.EQUALS_TEXT, name, true);
+        GameView newView = new GameView(0);
+        newView.setViewFilters(Arrays.asList(filter));
+        newView.setName(name.replaceAll("_", " "));
+        saveGameView(newView);
+        firstGameInView = gameId;
+      }
+      else
+      {
+        lastGameInView = gameId;
+      }
+      if (viewNumber > 1)
+      {
+        //Tag with right game tag
+        setViewTag(gameId.toString(), mainViewTag.replaceAll("'", "''") + "/" + viewNumber);
+      }
+      i++;
+    }
+    //Rename the last view also
+    if (viewNumber > 1)
+    {
+      renameGameView(mainViewTag, viewNumber, firstGameInView, lastGameInView);
+    }
+  }
+
+  private void renameGameView(String originalViewName, int viewNumber, int firstGameId, int lastGameId)
+  {
+    String firstGameTitle = "";
+    String lastGameTitle = "";
+    StringBuilder sqlBuilder = new StringBuilder();
+    sqlBuilder.append("SELECT title FROM gameinfo WHERE rowId IN (");
+    sqlBuilder.append(firstGameId);
+    sqlBuilder.append(", ");
+    sqlBuilder.append(lastGameId);
+    sqlBuilder.append(") ORDER BY title COLLATE NOCASE ASC");
+
+    logger.debug("Generated View SQL: {}", sqlBuilder);
+    try (Connection conn = this.connect(); Statement stmt = conn.createStatement();
+      ResultSet rs = stmt.executeQuery(sqlBuilder.toString()))
+    {
+      rs.next();
+      firstGameTitle = rs.getString("title");
+      rs.next();
+      lastGameTitle = rs.getString("title");
+    }
+    catch (SQLException e)
+    {
+      ExceptionHandler.handleException(e, "Could not fetch title by id");
+    }
+    
+    String oldViewName = viewNumber > 1 ? originalViewName + "/" + viewNumber : originalViewName;
+    
+    //Always use "0" as for first view (sorting is a bit random...)
+    String firstGameLetter = viewNumber == 1 ? "0" : firstGameTitle.substring(0, 1).toUpperCase();
+    String newViewName = originalViewName + "/" + firstGameLetter + "-" +
+      lastGameTitle.substring(0, 1).toUpperCase();
+
+    sqlBuilder = new StringBuilder();
+    sqlBuilder.append("");
+
+    sqlBuilder.append("UPDATE gameview SET name = '");
+    sqlBuilder.append(newViewName.replaceAll("'", "''"));
+    sqlBuilder.append("' WHERE name = '");
+    sqlBuilder.append(oldViewName.replaceAll("'", "''"));
+    sqlBuilder.append("';");
+    logger.debug("Generated update view SQL: {}", sqlBuilder);
+    try (Connection conn = this.connect();
+      PreparedStatement gameViewstmt = conn.prepareStatement(sqlBuilder.toString()))
+    {
+      gameViewstmt.executeUpdate();
+    }
+    catch (SQLException e)
+    {
+      ExceptionHandler.handleException(e, "Could not update gameview name during gb import");
+    }
   }
 
   private int updateDiskCount(String disk, int fileCount)

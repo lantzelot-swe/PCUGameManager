@@ -46,9 +46,8 @@ public class GamebaseImportWorker extends AbstractImportWorker
         importManager.setViewName(viewName);
         String additonalInfo = ", genre: " + genre.getGenreName() + " (" + counter + " of " + numberOfGenres + ")";
         int processedForGenre = executeImport(additonalInfo);
-
-        createAdditionalGameViews(processedForGenre, viewName);
-
+        //Read the games from the DB, create game views and edit the viewTag so that a max of 250 games ends up in each game view
+        importManager.createAndUpdateGameViewForImportedGBGames(viewName);
         totalProcessed = totalProcessed + processedForGenre;
       }
       publish("Processed " + totalProcessed + " games.");
@@ -71,27 +70,10 @@ public class GamebaseImportWorker extends AbstractImportWorker
     }
   }
 
-  private void createAdditionalGameViews(int processedGames, String viewName)
-  {
-    //Lets use 250 as limit for each view
-    int numOfViews = processedGames / 250;
-    if (processedGames % 250 > 0)
-    {
-      numOfViews++;
-    }
-    for (int i = 2; i < (numOfViews + 1); i++)
-    {
-      //Create additional views that can be filled later by editing view tags
-      String name = viewName + "/" + i;
-      importManager.setViewName(name);
-      importManager.setViewTag(name);
-      importManager.createGameViewForViewTag(this);
-    }
-  }
-
   private String getViewName(GenreInfo info)
   {
     String newName = info.getGenreName();
+    newName = newName.replaceAll("/", " ");
     newName = newName.replaceAll(" - ", "/");
     newName = newName.replace("[", "");
     newName = newName.replace("]", "");

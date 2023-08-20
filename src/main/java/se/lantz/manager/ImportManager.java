@@ -258,6 +258,11 @@ public class ImportManager
       uiModel.saveGameView(newView);
     }
   }
+  
+  public void createAndUpdateGameViewForImportedGBGames(String mainViewName)
+  {
+    uiModel.createAndUpdateGameViewForImportedGBGames(mainViewName);
+  }
 
   public void readGameInfoFiles(PublishWorker worker)
   {
