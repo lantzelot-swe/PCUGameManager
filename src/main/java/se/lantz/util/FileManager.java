@@ -710,11 +710,11 @@ public class FileManager
     //Just add the duplicate index if there are several games with the same name
     if (duplicateIndex > 0 && duplicateIndex < 10)
     {
-      newNameString = newNameString + "0" + duplicateIndex;
+      newNameString = newNameString + "-0" + duplicateIndex;
     }
     else if (duplicateIndex > 9)
     {
-      newNameString = newNameString + duplicateIndex;
+      newNameString = newNameString + "-" +  duplicateIndex;
     }
 
     logger.debug("Game title: \"{}\" ---- New fileName: \"{}\"", title, newNameString);
