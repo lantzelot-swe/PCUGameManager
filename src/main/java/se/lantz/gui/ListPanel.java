@@ -12,6 +12,7 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.JButton;
@@ -27,18 +28,24 @@ import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
 import javax.swing.ToolTipManager;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import javax.swing.event.ListDataEvent;
+import javax.swing.event.ListDataListener;
 import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
 import javax.swing.plaf.basic.ComboPopup;
 
+import org.jdesktop.swingx.JXSearchField;
+
 import se.lantz.gui.gameview.GameViewManager;
+import se.lantz.model.GameListModel;
 import se.lantz.model.MainViewModel;
 import se.lantz.model.data.GameListData;
 import se.lantz.model.data.GameView;
 
 public class ListPanel extends JPanel
 {
-  private JPanel listPanel;
   private JScrollPane listScrollPane;
   private JList<GameListData> list;
   private JPanel listViewPanel;
@@ -49,9 +56,83 @@ public class ListPanel extends JPanel
   private GameViewManager gameViewManager;
   private MainViewModel uiModel;
   private MainPanel mainPanel;
+  private JXSearchField filterTextField;
 
   private boolean delayDetailsUpdate = false;
   private boolean pageButtonPressed = false;
+
+  private boolean isFiltering = false;
+  private ListDataListener listDataListener = new ListDataListener()
+    {
+
+      @Override
+      public void intervalAdded(ListDataEvent e)
+      {
+        triggerListFiltering();
+      }
+
+      @Override
+      public void intervalRemoved(ListDataEvent e)
+      {
+        triggerListFiltering();
+      }
+
+      @Override
+      public void contentsChanged(ListDataEvent e)
+      {
+        triggerListFiltering();
+      }
+
+    };
+  private DocumentListener filterTextFieldListener = new DocumentListener()
+    {
+      @Override
+      public void insertUpdate(DocumentEvent e)
+      {
+        filter();
+      }
+
+      @Override
+      public void removeUpdate(DocumentEvent e)
+      {
+        filter();
+      }
+
+      @Override
+      public void changedUpdate(DocumentEvent e)
+      {
+        filter();
+      }
+
+      private void filter()
+      {
+        isFiltering = true;
+        GameListModel listModel = uiModel.getGameListModel();
+        GameListData selectedGame = list.getSelectedValue();
+        listModel.clear();
+        String filterText = filterTextField.getText();
+        List<GameListData> filteredList = new ArrayList<>();
+        for (GameListData item : listModel.getCurrentGameList())
+        {
+          if (listModel.filterMatch(item, filterText))
+          {
+            filteredList.add(item);
+          }
+        }
+        //Add all at once (for performance!)
+        listModel.addAll(filteredList);
+        if (filteredList.contains(selectedGame))
+        {
+          list.setSelectedValue(selectedGame, true);
+        }
+        else if (!filteredList.isEmpty())
+        {
+          list.setSelectedIndex(0);
+        }
+        updateViewInfoLabel();
+        isFiltering = false;
+      }
+    };
 
   public ListPanel(final MainPanel mainPanel, final MainViewModel uiModel)
   {
@@ -69,20 +150,29 @@ public class ListPanel extends JPanel
     gbc_listViewPanel.gridx = 0;
     gbc_listViewPanel.gridy = 0;
     add(getListViewPanel(), gbc_listViewPanel);
+    GridBagConstraints gbc_FilterConstraints = new GridBagConstraints();
+    gbc_FilterConstraints.weighty = 0.0;
+    gbc_FilterConstraints.weightx = 1.0;
+    gbc_FilterConstraints.fill = GridBagConstraints.HORIZONTAL;
+    gbc_FilterConstraints.insets = new Insets(0, 5, 5, 5);
+    gbc_FilterConstraints.gridx = 0;
+    gbc_FilterConstraints.gridy = 1;
+    add(getFilterTextField(), gbc_FilterConstraints);
+
     GridBagConstraints gbc_listScrollPane = new GridBagConstraints();
     gbc_listScrollPane.weighty = 1.0;
     gbc_listScrollPane.weightx = 1.0;
     gbc_listScrollPane.fill = GridBagConstraints.BOTH;
     gbc_listScrollPane.insets = new Insets(0, 5, 5, 5);
     gbc_listScrollPane.gridx = 0;
-    gbc_listScrollPane.gridy = 1;
+    gbc_listScrollPane.gridy = 2;
     add(getListScrollPane(), gbc_listScrollPane);
     GridBagConstraints gbc_viewInfoPanel = new GridBagConstraints();
     gbc_viewInfoPanel.weightx = 1.0;
     gbc_viewInfoPanel.anchor = GridBagConstraints.NORTH;
     gbc_viewInfoPanel.fill = GridBagConstraints.HORIZONTAL;
     gbc_viewInfoPanel.gridx = 0;
-    gbc_viewInfoPanel.gridy = 2;
+    gbc_viewInfoPanel.gridy = 3;
     add(getViewInfoPanel(), gbc_viewInfoPanel);
   }
 
@@ -113,6 +203,32 @@ public class ListPanel extends JPanel
       listViewPanel.add(getListViewComboBox(), gbc_listViewComboBox);
     }
     return listViewPanel;
+  }
+
+  private JXSearchField getFilterTextField()
+  {
+    if (filterTextField == null)
+    {
+      filterTextField = new JXSearchField();
+      filterTextField.getDocument().addDocumentListener(filterTextFieldListener);
+      String tooltipText =
+        "<html>Type to search on game title in<br>the current gamelist view.<p><br>Special tags:<br><b>a:</b> - match Author<br><b>c:</b> - match Composer<br><b>y:</b> - match Year<br><b>v:</b> - match View tag<p>Use ',' as separator<br>to match several tags.<p><br>Example: <i>a:imagine,c:martin galway</i></html>";
+      filterTextField.setToolTipText(tooltipText);
+    }
+    return filterTextField;
+  }
+
+  public void clearFilter()
+  {
+    getFilterTextField().setText("");
+  }
+
+  private void triggerListFiltering()
+  {
+    if (!isFiltering)
+    {
+      filterTextFieldListener.changedUpdate(null);
+    }
   }
 
   private JButton getListViewEditButton()
@@ -175,7 +291,9 @@ public class ListPanel extends JPanel
       });
 
       listViewComboBox.setModel(uiModel.getGameViewModel());
-      listViewComboBox.setRenderer(new GameListDataRenderer(uiModel.getSavedStatesManager()));
+      listViewComboBox.setRenderer(new GameListDataRenderer(uiModel.getSavedStatesManager(),
+                                                            getFilterTextField(),
+                                                            uiModel.getGameListModel()));
       listViewComboBox.addPopupMenuListener(new PopupMenuListener()
         {
           @Override
@@ -221,11 +339,11 @@ public class ListPanel extends JPanel
       {
         listViewComboBox.setToolTipText(null);
       }
-      //TODO: keep track of selected index for the view and select it once data is updated
-      updateViewInfoLabel();
       SwingUtilities.invokeLater(() -> {
+        updateViewInfoLabel();
         getList().setSelectedIndex(0);
         getList().ensureIndexIsVisible(0);
+        getList().requestFocusInWindow();
       });
     }
   }
@@ -468,7 +586,11 @@ public class ListPanel extends JPanel
         }
       });
       list.setModel(uiModel.getGameListModel());
-      list.setCellRenderer(new GameListDataRenderer(uiModel.getSavedStatesManager()));
+      list.setCellRenderer(new GameListDataRenderer(uiModel.getSavedStatesManager(),
+                                                    getFilterTextField(),
+                                                    uiModel.getGameListModel()));
+      //Add listener to filter on changeg
+      uiModel.getGameListModel().addListDataListener(listDataListener);
       //Remove from tootlipManager to avoid throwing a nullpointer for CTRL+F1
       ToolTipManager.sharedInstance().unregisterComponent(list);
     }
@@ -481,8 +603,8 @@ public class ListPanel extends JPanel
     int selectedGames = list.getSelectedIndices().length;
     if (selectedGames > 1)
     {
-      int selectedFileCount = uiModel.getFileCount(list.getSelectedValuesList()); 
-      text = text + " (" + selectedGames +  "/" + selectedFileCount + ")";
+      int selectedFileCount = uiModel.getFileCount(list.getSelectedValuesList());
+      text = text + " (" + selectedGames + "/" + selectedFileCount + ")";
     }
     getViewInfoLabel().setText(text);
   }

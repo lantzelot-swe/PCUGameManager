@@ -36,4 +36,7 @@
   <classpathentry kind="var" path="M2_REPO/regexp/regexp/1.3/regexp-1.3.jar" sourcepath="M2_REPO/regexp/regexp/1.3/regexp-1.3-sources.jar"/>
   <classpathentry kind="var" path="M2_REPO/com/github/dyorgio/runtime/run-as-root/1.2.3/run-as-root-1.2.3.jar" sourcepath="M2_REPO/com/github/dyorgio/runtime/run-as-root/1.2.3/run-as-root-1.2.3-sources.jar"/>
   <classpathentry kind="var" path="M2_REPO/com/github/dyorgio/runtime/out-process/1.2.7/out-process-1.2.7.jar" sourcepath="M2_REPO/com/github/dyorgio/runtime/out-process/1.2.7/out-process-1.2.7-sources.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/swinglabs/swingx/1.6.1/swingx-1.6.1.jar" sourcepath="M2_REPO/org/swinglabs/swingx/1.6.1/swingx-1.6.1-sources.jar"/>
+  <classpathentry kind="var" path="M2_REPO/com/jhlabs/filters/2.0.235/filters-2.0.235.jar" sourcepath="M2_REPO/com/jhlabs/filters/2.0.235/filters-2.0.235-sources.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/swinglabs/swing-worker/1.1/swing-worker-1.1.jar" sourcepath="M2_REPO/org/swinglabs/swing-worker/1.1/swing-worker-1.1-sources.jar"/>
 </classpath>

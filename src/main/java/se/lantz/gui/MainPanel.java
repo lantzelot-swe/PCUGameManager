@@ -49,7 +49,7 @@ public class MainPanel extends JPanel
     return splitPane;
   }
 
-  private ListPanel getListPanel()
+  public ListPanel getListPanel()
   {
     if (listPanel == null)
     {

@@ -1277,6 +1277,7 @@ public class MenuManager
     this.mainWindow.setWaitCursor(true);
     //Refresh game views
     uiModel.reloadGameViews();
+    this.mainWindow.getMainPanel().getListPanel().clearFilter();
     this.mainWindow.refreshMenuAndUI();
     this.mainWindow.setWaitCursor(false);
   }

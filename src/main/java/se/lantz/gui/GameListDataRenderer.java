@@ -3,7 +3,13 @@ package se.lantz.gui;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Font;
+import java.awt.FontMetrics;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.Insets;
+import java.awt.geom.Rectangle2D;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.BorderFactory;
 import javax.swing.DefaultListCellRenderer;
@@ -13,6 +19,7 @@ import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 
 import se.lantz.manager.SavedStatesManager;
+import se.lantz.model.GameListModel;
 import se.lantz.model.InfoModel;
 import se.lantz.model.data.GameListData;
 import se.lantz.model.data.GameView;
@@ -39,16 +46,20 @@ public class GameListDataRenderer extends DefaultListCellRenderer
   private ImageIcon saves2Icon = new ImageIcon(this.getClass().getResource("/se/lantz/16x16SaveIcon-2.png"));
   private ImageIcon saves3Icon = new ImageIcon(this.getClass().getResource("/se/lantz/16x16SaveIcon-3.png"));
   private ImageIcon saves4Icon = new ImageIcon(this.getClass().getResource("/se/lantz/16x16SaveIcon-4.png"));
-  
+
   private ImageIcon warningIcon = new ImageIcon(getClass().getResource("/se/lantz/warning-icon.png"));
 
   private final Font bold;
   private final Font boldItalic;
   private SavedStatesManager savedStatesManager;
+  private JTextField filterField;
+  private GameListModel listModel;
 
-  public GameListDataRenderer(SavedStatesManager savedStatesManager)
+  public GameListDataRenderer(SavedStatesManager savedStatesManager, JTextField filterField, GameListModel listModel)
   {
     this.savedStatesManager = savedStatesManager;
+    this.filterField = filterField;
+    this.listModel = listModel;
     this.boldItalic = getFont().deriveFont(Font.BOLD + Font.ITALIC);
     this.bold = getFont().deriveFont(Font.BOLD);
     this.setHorizontalTextPosition(SwingConstants.LEADING);
@@ -67,6 +78,7 @@ public class GameListDataRenderer extends DefaultListCellRenderer
     if (value instanceof GameListData)
     {
       handleGameListData(value, isSelected, list);
+      highlightText(listModel.getTitleFilterText((GameListData)value, filterField.getText()));
     }
     else
     {
@@ -130,8 +142,9 @@ public class GameListDataRenderer extends DefaultListCellRenderer
       this.setIcon(warningIcon);
     }
     else
-    { 
-      int numberOfSavedStates = savedStatesManager.getNumberOfSavedStatesForGame(listData.getGameFileName(), listData.getTitle());
+    {
+      int numberOfSavedStates =
+        savedStatesManager.getNumberOfSavedStatesForGame(listData.getGameFileName(), listData.getTitle());
       if (numberOfSavedStates == 1)
       {
         this.setIcon(saves1Icon);
@@ -212,10 +225,10 @@ public class GameListDataRenderer extends DefaultListCellRenderer
     else if (view.getGameViewId() == GameView.FAVORITES_10_ID)
     {
       this.setFont(boldItalic);
-      this.setForeground(isSelected ? fav5ColorSelected : fav5Color);     
+      this.setForeground(isSelected ? fav5ColorSelected : fav5Color);
     }
     //Check if view is a favorite and the last one configured
-    if (view.getGameViewId() == -FileManager.getConfiguredNumberOfFavorites()-1)
+    if (view.getGameViewId() == -FileManager.getConfiguredNumberOfFavorites() - 1)
     {
       if (index > -1)
       {
@@ -240,5 +253,75 @@ public class GameListDataRenderer extends DefaultListCellRenderer
     {
       setIconTextGap(0);
     }
+
+  }
+
+  private List<Rectangle2D> rectangles = new ArrayList<>();
+  private Color colorHighlight = Color.YELLOW;
+
+  public void reset()
+  {
+    rectangles.clear();
+    repaint();
+  }
+
+  public void highlightText(String textToHighlight)
+  {
+    if (textToHighlight == null)
+    {
+      return;
+    }
+    reset();
+
+    final String textToMatch = textToHighlight.toLowerCase().trim();
+    if (textToMatch.length() == 0)
+    {
+      return;
+    }
+    textToHighlight = textToHighlight.trim();
+
+    final String labelText = getText().toLowerCase();
+    if (labelText.contains(textToMatch))
+    {
+      FontMetrics fm = getFontMetrics(getFont());
+      float w = -1;
+      final float h = fm.getHeight() - 1;
+      int i = 0;
+      while (true)
+      {
+        i = labelText.indexOf(textToMatch, i);
+        if (i == -1)
+        {
+          break;
+        }
+        if (w == -1)
+        {
+          String matchingText = getText().substring(i, i + textToHighlight.length());
+          w = fm.stringWidth(matchingText);
+        }
+        String preText = getText().substring(0, i);
+        float x = fm.stringWidth(preText);
+        rectangles.add(new Rectangle2D.Float(x, 1, w, h));
+        i = i + textToMatch.length();
+      }
+      repaint();
+    }
+  }
+
+  @Override
+  protected void paintComponent(Graphics g)
+  {
+    if (rectangles.size() > 0)
+    {
+      Graphics2D g2d = (Graphics2D) g;
+      Color c = g2d.getColor();
+      for (Rectangle2D rectangle : rectangles)
+      {
+        g2d.setColor(colorHighlight);
+        g2d.fill(rectangle);
+      }
+      g2d.setColor(c);
+    }
+    super.paintComponent(g);
   }
 }

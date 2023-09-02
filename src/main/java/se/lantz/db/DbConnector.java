@@ -316,7 +316,7 @@ public class DbConnector
     //Construct SQL
     StringBuilder sqlBuilder = new StringBuilder();
     sqlBuilder
-      .append("SELECT title, gamefile, rowid, favorite, viewtag, disk2, disk3, disk4, disk5, disk6 FROM gameinfo ");
+      .append("SELECT title, composer, year, author, gamefile, rowid, favorite, viewtag, disk2, disk3, disk4, disk5, disk6 FROM gameinfo ");
     sqlBuilder.append(view.getSqlQuery());
     sqlBuilder.append(" ORDER BY title COLLATE NOCASE ASC");
 
@@ -333,6 +333,12 @@ public class DbConnector
                                              Integer.toString(rs.getInt("rowid")),
                                              rs.getInt("Favorite"),
                                              viewTag != null && viewTag.contains("GIS:"));
+        
+        //For filtering
+        data.setComposer(rs.getString("Composer"));
+        data.setAuthor(rs.getString("Author"));
+        data.setYear(rs.getInt("Year"));
+        data.setViewTag(rs.getString("Viewtag"));
 
         if (data.isInfoSlot() && !viewTag.equalsIgnoreCase("GIS:" + view.getGameViewId()))
         {

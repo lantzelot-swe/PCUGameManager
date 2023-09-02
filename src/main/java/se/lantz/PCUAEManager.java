@@ -10,6 +10,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 
 import javax.swing.SwingUtilities;
+import javax.swing.ToolTipManager;
 import javax.swing.UIManager;
 
 import se.lantz.gui.MainWindow;
@@ -34,6 +35,7 @@ public class PCUAEManager
       Thread.setDefaultUncaughtExceptionHandler(new TopLevelExceptionHandler());
       // Set System L&F
       UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+      ToolTipManager.sharedInstance().setDismissDelay(10000);
       //Setup C64 font
       GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
       InputStream fontStream = PCUAEManager.class.getResourceAsStream("/se/lantz/C64_Pro-STYLE.ttf");

@@ -8,6 +8,11 @@ public class GameListData implements Comparable
   private int favorite = 0;
   private boolean infoSlot = false;
   private int fileCount = 1;
+  //Properties below are used for filtering
+  private String composer = "";
+  private String author = "";
+  private int year = 0;
+  private String viewTag = "";
 
   public GameListData(String title, String gameFileName, String gameId, int favorite, boolean infoSlot)
   {
@@ -136,5 +141,45 @@ public class GameListData implements Comparable
   public int compareTo(Object o)
   {
     return title.compareTo(o.toString());
+  }
+
+  public String getComposer()
+  {
+    return composer;
+  }
+
+  public void setComposer(String composer)
+  {
+    this.composer = composer;
+  }
+
+  public String getAuthor()
+  {
+    return author;
+  }
+
+  public void setAuthor(String author)
+  {
+    this.author = author;
+  }
+
+  public int getYear()
+  {
+    return year;
+  }
+
+  public void setYear(int year)
+  {
+    this.year = year;
+  }
+
+  public String getViewTag()
+  {
+    return viewTag;
+  }
+
+  public void setViewTag(String viewTag)
+  {
+    this.viewTag = viewTag;
   }
 }
