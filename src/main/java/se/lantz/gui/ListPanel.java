@@ -61,6 +61,8 @@ public class ListPanel extends JPanel
   private boolean delayDetailsUpdate = false;
   private boolean pageButtonPressed = false;
 
+  private boolean filterEnabled = true;
+
   private boolean isFiltering = false;
   private ListDataListener listDataListener = new ListDataListener()
     {
@@ -106,31 +108,34 @@ public class ListPanel extends JPanel
 
       private void filter()
       {
-        isFiltering = true;
-        GameListModel listModel = uiModel.getGameListModel();
-        GameListData selectedGame = list.getSelectedValue();
-        listModel.clear();
-        String filterText = filterTextField.getText();
-        List<GameListData> filteredList = new ArrayList<>();
-        for (GameListData item : listModel.getCurrentGameList())
+        if (filterEnabled)
         {
-          if (listModel.filterMatch(item, filterText))
+          isFiltering = true;
+          GameListModel listModel = uiModel.getGameListModel();
+          GameListData selectedGame = list.getSelectedValue();
+          listModel.clear();
+          String filterText = filterTextField.getText();
+          List<GameListData> filteredList = new ArrayList<>();
+          for (GameListData item : listModel.getCurrentGameList())
           {
-            filteredList.add(item);
+            if (listModel.filterMatch(item, filterText))
+            {
+              filteredList.add(item);
+            }
           }
+          //Add all at once (for performance!)
+          listModel.addAll(filteredList);
+          if (filteredList.contains(selectedGame))
+          {
+            list.setSelectedValue(selectedGame, true);
+          }
+          else if (!filteredList.isEmpty())
+          {
+            list.setSelectedIndex(0);
+          }
+          updateViewInfoLabel();
+          isFiltering = false;
         }
-        //Add all at once (for performance!)
-        listModel.addAll(filteredList);
-        if (filteredList.contains(selectedGame))
-        {
-          list.setSelectedValue(selectedGame, true);
-        }
-        else if (!filteredList.isEmpty())
-        {
-          list.setSelectedIndex(0);
-        }
-        updateViewInfoLabel();
-        isFiltering = false;
       }
     };
 
@@ -621,10 +626,17 @@ public class ListPanel extends JPanel
   {
     getListViewComboBox().setEnabled(!uiModel.isDataChanged());
     getListViewEditButton().setEnabled(!uiModel.isDataChanged());
+    if (!getFilterTextField().hasFocus())
+    {
+      getFilterTextField().setEnabled(!uiModel.isDataChanged());
+    }
+    filterEnabled = !uiModel.isDataChanged();
   }
 
   public void addNewGame()
   {
+    getFilterTextField().setText("");
+    filterEnabled = false;
     //Add new entry and select in the list
     uiModel.addNewGameListData();
     int rowToSelect = getList().getModel().getSize() - 1;
@@ -632,6 +644,7 @@ public class ListPanel extends JPanel
     getList().ensureIndexIsVisible(rowToSelect);
     mainPanel.getGameDetailsBackgroundPanel().updateSelectedGame(list.getSelectedValue());
     mainPanel.getGameDetailsBackgroundPanel().focusTitleField();
+    getFilterTextField().setEnabled(false);
   }
 
   public void addNewInfoSlot()
