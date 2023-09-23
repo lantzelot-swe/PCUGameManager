@@ -217,7 +217,7 @@ public class ListPanel extends JPanel
       filterTextField = new JXSearchField();
       filterTextField.getDocument().addDocumentListener(filterTextFieldListener);
       String tooltipText =
-        "<html>Type to search on game title in<br>the current gamelist view.<p><br>Special tags:<br><b>a:</b> - match Author<br><b>c:</b> - match Composer<br><b>y:</b> - match Year<br><b>v:</b> - match View tag<p>Use ',' as separator<br>to match several tags.<p><br>Example: <i>a:imagine,c:martin galway</i></html>";
+        "<html>Type to search on game title in<br>the current gamelist view.<p><br><u>Special tags</u><br><b>a:</b> - match Author<br><b>c:</b> - match Composer<br><b>y:</b> - match Year<br><b>v:</b> - match View tag<br><b>s:</b> - match System config<p><br>Use ',' as separator to<br>match several tags.<p>Example: <i>a:imagine,c:martin galway</i><br></html>";
       filterTextField.setToolTipText(tooltipText);
     }
     return filterTextField;

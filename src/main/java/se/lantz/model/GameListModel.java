@@ -61,6 +61,11 @@ public class GameListModel extends DefaultListModel<GameListData>
       String viewTag = filterText.substring(2);
       found = data.getViewTag().toLowerCase().contains(viewTag);
     }
+    else if (filterText.startsWith("s:"))
+    {
+      String systemConfig = filterText.substring(2);
+      found = data.getSystem().toLowerCase().contains(systemConfig);
+    }
     else
     {
       found = data.getTitle().toLowerCase().contains(filterText);

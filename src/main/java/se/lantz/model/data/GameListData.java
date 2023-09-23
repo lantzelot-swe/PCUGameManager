@@ -13,6 +13,7 @@ public class GameListData implements Comparable
   private String author = "";
   private int year = 0;
   private String viewTag = "";
+  private String system = "";
 
   public GameListData(String title, String gameFileName, String gameId, int favorite, boolean infoSlot)
   {
@@ -181,5 +182,15 @@ public class GameListData implements Comparable
   public void setViewTag(String viewTag)
   {
     this.viewTag = viewTag;
+  }
+
+  public String getSystem()
+  {
+    return system;
+  }
+
+  public void setSystem(String system)
+  {
+    this.system = system;
   }
 }
