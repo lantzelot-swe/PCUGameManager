@@ -133,12 +133,16 @@ public class MainPanel extends JPanel
       if (value == JOptionPane.YES_OPTION)
       {
         int currentSelectedIndex = getListPanel().getSelectedIndexInList();
-        for (GameListData gameListData : selectedGameListData)
+        if (selectedGameListData.size() > 1)
         {
-          getGameDetailsBackgroundPanel().updateSelectedGame(gameListData);
-          uiModel.deleteCurrentGame();
+          uiModel.deleteGames(selectedGameListData);
         }
-        repaintAfterModifications();
+        else
+        {                
+          uiModel.deleteCurrentGame();        
+        }
+        //Reload the current view
+        reloadCurrentGameView();
         getListPanel().setSelectedIndexInList(currentSelectedIndex);
       }
     }

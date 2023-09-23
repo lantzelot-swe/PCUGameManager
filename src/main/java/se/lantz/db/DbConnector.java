@@ -1474,6 +1474,24 @@ public class DbConnector
       ExceptionHandler.handleException(e, "Could not delete games in db.");
     }
   }
+  
+  public void deleteGames(List<GameListData> selectedGameListData)
+  {
+    List<String> idList = selectedGameListData.stream().map(data -> data.getGameId()).collect(Collectors.toList());
+    String idsString = String.join(",", idList);
+    
+    String sql = "DELETE FROM gameinfo where rowId IN (" + idsString + ");";
+    logger.debug("Generated DELETE String:\n{}", sql);
+    try (Connection conn = this.connect(); PreparedStatement pstmt = conn.prepareStatement(sql))
+    {
+      int value = pstmt.executeUpdate();
+      logger.debug("Executed successfully, value = {}", value);
+    }
+    catch (SQLException e)
+    {
+      ExceptionHandler.handleException(e, "Could not delete games in db.");
+    }
+  }
 
   public void deleteAllGameListViews()
   {

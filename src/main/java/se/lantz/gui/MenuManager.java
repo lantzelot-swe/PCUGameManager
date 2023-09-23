@@ -396,7 +396,11 @@ public class MenuManager
     deleteGameItem.setAccelerator(keyStrokeToAddGame);
     deleteGameItem.setMnemonic('D');
 
-    deleteGameItem.addActionListener(e -> mainWindow.getMainPanel().deleteCurrentGame());
+    deleteGameItem.addActionListener(e -> {
+      mainWindow.setWaitCursor(true);
+      mainWindow.getMainPanel().deleteCurrentGame();
+      mainWindow.setWaitCursor(false);
+    });
     return deleteGameItem;
   }
 

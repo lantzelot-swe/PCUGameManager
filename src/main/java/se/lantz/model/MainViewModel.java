@@ -742,9 +742,20 @@ public class MainViewModel extends AbstractModel
       //Update all games count, will be reset if its All that is loaded
       allGamesCount--;
       allGameView.setGameCount(allGamesCount);
-      //Reload the current view
-      reloadCurrentGameView();
     }
+  }
+  
+  public void deleteGames(List<GameListData> selectedGameListData)
+  {
+    //First delete all covers, screens and games 
+    for (GameListData gameListData : selectedGameListData)
+    {
+      GameDetails details = dbConnector.getGameDetails(gameListData.getGameId());
+      FileManager.deleteFilesForGame(details);
+      allGamesCount--;
+      allGameView.setGameCount(allGamesCount);
+    }
+    dbConnector.deleteGames(selectedGameListData);
   }
 
   public void deleteAllGames()
