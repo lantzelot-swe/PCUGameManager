@@ -168,10 +168,8 @@ public class GamebaseImporter
     {
       Statement statement = connection.createStatement();
 
-      String sql =
-        "SELECT Games.Name, Musicians.Musician, PGenres.ParentGenre, Publishers.Publisher, Games.Filename, Games.ScrnshotFilename, Years.Year, Games.GA_Id, Games.Control, Games.V_PalNTSC, Games.V_TrueDriveEmu, Games.Gemus\r\n" +
-          "FROM PGenres INNER JOIN (Years INNER JOIN (Publishers INNER JOIN ((Games INNER JOIN Musicians ON Games.MU_Id = Musicians.MU_Id) INNER JOIN Genres ON Games.GE_Id = Genres.GE_Id) ON Publishers.PU_Id = Games.PU_Id) ON Years.YE_Id = Games.YE_Id) ON PGenres.PG_Id = Genres.PG_Id\r\n";
-
+      String sql = "SELECT Games.Name, Musicians.Musician, PGenres.ParentGenre, Publishers.Publisher, Games.Filename, Games.ScrnshotFilename, Years.Year, Games.GA_Id, Games.Control, Games.V_PalNTSC, Games.V_TrueDriveEmu, Games.Gemus, Crackers.Cracker\r\n" + 
+        "FROM Crackers INNER JOIN (PGenres INNER JOIN (Years INNER JOIN (Publishers INNER JOIN ((Games INNER JOIN Musicians ON Games.MU_Id = Musicians.MU_Id) INNER JOIN Genres ON Games.GE_Id = Genres.GE_Id) ON Publishers.PU_Id = Games.PU_Id) ON Years.YE_Id = Games.YE_Id) ON PGenres.PG_Id = Genres.PG_Id) ON Crackers.CR_Id = Games.CR_Id\r\n";
       String condition = "";
       switch (selectedOption)
       {
@@ -226,8 +224,9 @@ public class GamebaseImporter
       int palOrNtsc = result.getInt("V_PalNTSC");
       int trueDriveEmu = result.getInt("V_TrueDriveEmu");
       String gemus = result.getString("Gemus");
+      String cracker = result.getString("Cracker");
 
-      String vic20Description = "";
+      String description = "";
       boolean vic20Cart = false;
 
       worker.publishMessage("Creating game info for " + title + "...");
@@ -247,11 +246,13 @@ public class GamebaseImporter
         {
           gamefile = gbExtrasPath.toString() + "\\" + cartridgePath;
         }
+        
+        description = "Cracker: " + cracker;
       }
       else
       {
         //Description: add key-value pairs for Vic-20 since that holds important info about memory expansion
-        vic20Description = gemus;
+        description = gemus;
         //1: Cartridge preferred
         String cartridgePath = getCartridgePath(gameId, statement);
         if (!cartridgePath.isEmpty())
@@ -263,7 +264,7 @@ public class GamebaseImporter
         {
           //2: GameFile
           //Extra check for cart or not for vic-20: if description contains "cart", treat it as a cart.
-          if (vic20Description.contains("cart"))
+          if (description.contains("cart"))
           {
             vic20Cart = true;
           }
@@ -338,7 +339,7 @@ public class GamebaseImporter
                                         joy1config,
                                         joy2config,
                                         advanced,
-                                        vic20Description,
+                                        description,
                                         vic20Cart));
       return true;
     }
