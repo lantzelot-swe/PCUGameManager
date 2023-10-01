@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import javax.swing.JEditorPane;
 import javax.swing.JMenu;
@@ -111,6 +112,7 @@ public class MenuManager
   private JMenuItem clearFavorites10Item;
 
   private JMenuItem editViewTagItem;
+  private JMenuItem editPrimaryJoystickItem;
 
   private JMenuItem backupDbItem;
   private JMenuItem restoreDbItem;
@@ -336,6 +338,7 @@ public class MenuManager
     }
     editMenu.addSeparator();
     editMenu.add(getEditViewTagItem());
+    editMenu.add(getPrimaryJoystickItem());
     return editMenu;
   }
 
@@ -820,6 +823,43 @@ public class MenuManager
       }
     });
     return editViewTagItem;
+  }
+
+  private JMenuItem getPrimaryJoystickItem()
+  {
+
+    editPrimaryJoystickItem = new JMenuItem("Edit primary Joystick...");
+    KeyStroke keyStrokeToEditJoy = KeyStroke.getKeyStroke(KeyEvent.VK_J, InputEvent.CTRL_DOWN_MASK);
+    editPrimaryJoystickItem.setAccelerator(keyStrokeToEditJoy);
+    editPrimaryJoystickItem.addActionListener(e -> {
+      if (!mainWindow.getMainPanel().isNoGameSelected())
+      {
+        PrimaryJoystickDialog dialog = new PrimaryJoystickDialog(MainWindow.getInstance());
+        dialog.pack();
+        dialog.setLocationRelativeTo(this.mainWindow);
+        
+   
+        if (dialog.showDialog())
+        {
+          mainWindow.setWaitCursor(true);
+          List<String> selectedGameIds = mainWindow.getMainPanel().getListPanel().getSelectedGameListData().stream()
+            .map(data -> data.getGameId()).collect(Collectors.toList());
+
+          uiModel.updatePrimaryJoystickPort(selectedGameIds, dialog.isPort1Primary());
+
+          mainWindow.setWaitCursor(false);
+          JOptionPane.showMessageDialog(MainWindow.getInstance().getMainPanel(),
+                                        "Primary joystick port updated for the selected games.",
+                                        "Primary port",
+                                        JOptionPane.INFORMATION_MESSAGE);
+          if (selectedGameIds.size() == 1)
+          {
+            MainWindow.getInstance().reloadCurrentGameView();
+          }
+        }
+      }
+    });
+    return editPrimaryJoystickItem;
   }
 
   private JMenuItem getBackupDbItem()

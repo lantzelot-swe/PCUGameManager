@@ -991,6 +991,14 @@ public class MainViewModel extends AbstractModel
       gameListModel.notifyChange();
     }
   }
+  
+  public void setPrimaryJoystick(boolean port1)
+  {
+    //Enough to toggle on joy 1 model?
+    getJoy1Model().setPrimary(port1);
+    //Save the current game
+    saveData();
+  }
 
   private int toggleFavorite(GameListData data, int favoritesNumber, int favoritesCount, GameView favoritesView)
   {
@@ -1036,6 +1044,11 @@ public class MainViewModel extends AbstractModel
   public void resetJoystickConfigsForCurrentView()
   {
     dbConnector.resetJoystickConfigsForView(getSelectedGameView());
+  }
+  
+  public void updatePrimaryJoystickPort(List<String> gameIdList, boolean port1)
+  {
+    dbConnector.updatePrimaryJoystickPort(gameIdList, port1);
   }
 
   public void enableAccurateDiskForAllGamesInCurrentView()

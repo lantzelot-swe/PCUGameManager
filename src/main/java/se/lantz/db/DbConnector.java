@@ -333,7 +333,7 @@ public class DbConnector
                                              Integer.toString(rs.getInt("rowid")),
                                              rs.getInt("Favorite"),
                                              viewTag != null && viewTag.contains("GIS:"));
-        
+
         //For filtering
         data.setComposer(rs.getString("Composer"));
         data.setAuthor(rs.getString("Author"));
@@ -469,13 +469,12 @@ public class DbConnector
     {
       ExceptionHandler.handleException(e, "Could not fetch title by id");
     }
-    
+
     String oldViewName = viewNumber > 1 ? originalViewName + "/" + viewNumber : originalViewName;
-    
+
     //Always use "0" as for first view (sorting is a bit random...)
     String firstGameLetter = viewNumber == 1 ? "0" : firstGameTitle.substring(0, 1).toUpperCase();
-    String newViewName = originalViewName + "/" + firstGameLetter + "-" +
-      lastGameTitle.substring(0, 1).toUpperCase();
+    String newViewName = originalViewName + "/" + firstGameLetter + "-" + lastGameTitle.substring(0, 1).toUpperCase();
 
     sqlBuilder = new StringBuilder();
     sqlBuilder.append("");
@@ -1474,12 +1473,12 @@ public class DbConnector
       ExceptionHandler.handleException(e, "Could not delete games in db.");
     }
   }
-  
+
   public void deleteGames(List<GameListData> selectedGameListData)
   {
     List<String> idList = selectedGameListData.stream().map(data -> data.getGameId()).collect(Collectors.toList());
     String idsString = String.join(",", idList);
-    
+
     String sql = "DELETE FROM gameinfo where rowId IN (" + idsString + ");";
     logger.debug("Generated DELETE String:\n{}", sql);
     try (Connection conn = this.connect(); PreparedStatement pstmt = conn.prepareStatement(sql))
@@ -1684,6 +1683,41 @@ public class DbConnector
     catch (SQLException e)
     {
       ExceptionHandler.handleException(e, "Could not update joystick configurations");
+    }
+  }
+
+  public void updatePrimaryJoystickPort(List<String> idList, boolean port1)
+  {
+    String joy1Default = "J:1*:";
+    String joy1NotDefault = "J:1:";
+    String joy2Default = "J:2*:";
+    String joy2NotDefault = "J:2:";
+
+    String idListString = String.join(",", idList);
+    StringBuilder sqlBuilder = new StringBuilder();
+
+    String expression = String
+      .format("UPDATE gameinfo SET Joy1Config = REPLACE(Joy1Config, '%s', '%s'),Joy2Config = REPLACE(Joy2Config, '%s', '%s')  WHERE rowId IN (",
+              port1 ? joy1NotDefault : joy1Default,
+              port1 ? joy1Default : joy1NotDefault,
+              port1 ? joy2Default : joy2NotDefault,
+              port1 ? joy2NotDefault : joy2Default  
+                );
+
+    sqlBuilder.append(expression);
+    sqlBuilder.append(idListString);
+    sqlBuilder.append(");");
+
+    logger.debug("Generated SQL for primary joy ports:\n{}", sqlBuilder.toString());
+
+    try (Connection conn = this.connect(); PreparedStatement joy1tmt = conn.prepareStatement(sqlBuilder.toString());)
+    {
+      int value = joy1tmt.executeUpdate();
+      logger.debug("Executed successfully, value = {}", value);
+    }
+    catch (SQLException e)
+    {
+      ExceptionHandler.handleException(e, "Could not update primary joystick port");
     }
   }
 
