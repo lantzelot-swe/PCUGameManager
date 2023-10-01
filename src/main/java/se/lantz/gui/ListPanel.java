@@ -649,6 +649,7 @@ public class ListPanel extends JPanel
 
   public void addNewInfoSlot()
   {
+    filterEnabled = false;
     //Add new entry and select in the list
     uiModel.addNewInfoSlotData();
     int rowToSelect = getList().getModel().getSize() - 1;
@@ -826,7 +827,7 @@ public class ListPanel extends JPanel
       mainPanel.repaintAfterModifications();
     }
   }
-
+  
   public void reloadCurrentGameView()
   {
     GameListData selectedData = getList().getSelectedValue();
