@@ -117,8 +117,6 @@ public class GameViewManager
     if (value == JOptionPane.YES_OPTION)
     {
       uiModel.deleteGameView(view);
-      //Trigger a reload of game views
-      uiModel.reloadGameViews();
       MainWindow.getInstance().selectViewAfterRestore();
     }
   }

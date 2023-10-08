@@ -791,7 +791,7 @@ public class MainViewModel extends AbstractModel
     if (view.getGameViewId() > GameView.ALL_GAMES_ID)
     {
       dbConnector.deleteView(view);
-      reloadGameViews();
+      gameViewModel.removeElement(view);
     }
   }
 
