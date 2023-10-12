@@ -619,7 +619,7 @@ public class DbConnector
     if (view.getGameViewId() > 0)
     {
       sqlBuilder.append("UPDATE gameview SET name = '");
-      sqlBuilder.append(view.getName());
+      sqlBuilder.append(view.getName().replace("'", "''"));
       sqlBuilder.append("' WHERE viewId = ");
       sqlBuilder.append(view.getGameViewId());
       sqlBuilder.append(";");
@@ -627,7 +627,7 @@ public class DbConnector
     else
     {
       sqlBuilder.append("INSERT INTO gameview (name) VALUES (\"");
-      sqlBuilder.append(view.getName());
+      sqlBuilder.append(view.getName().replace("'", "''"));
       sqlBuilder.append("\");");
     }
     String gameViewsql = sqlBuilder.toString();
