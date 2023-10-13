@@ -275,6 +275,8 @@ public class ListPanel extends JPanel
 
           }
         });
+      
+      listViewEditButton.setToolTipText("<html>Manage gamelist views</html>" );
     }
     return listViewEditButton;
   }
