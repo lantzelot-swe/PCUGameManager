@@ -288,6 +288,10 @@ public class FilterPanel extends JPanel
         @Override
         public void setValueAt(Object value, int row, int column)
         {
+          if (value == null)
+          {
+            return;
+          }
           if (column == 0)
           {
             if (value.equals(DbConstants.FAVORITE))
