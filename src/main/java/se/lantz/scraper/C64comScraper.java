@@ -66,8 +66,11 @@ public class C64comScraper implements Scraper
   public void connect(String url) throws IOException
   {
     this.c64comGameUrl = "";
+    //HTTPS does not seem to work, replace with http
+    String urlToUse = url.replace("https", "http");
+    
     //c64.com gives no errors for invalid urls. Check if there is an non-empty title to make sure it's valid
-    Connection.Response result = Jsoup.connect(url).method(Connection.Method.GET).execute();
+    Connection.Response result = Jsoup.connect(urlToUse).method(Connection.Method.GET).execute();
     Document doc = result.parse();     
     //Fetch right frame 
     Document mainFrameDocument = Jsoup.connect(doc.select(FRAME_NAME_TEXT).first().absUrl("src")).get();
@@ -79,7 +82,7 @@ public class C64comScraper implements Scraper
       throw new IllegalArgumentException();     
     }
     
-    this.c64comGameUrl = url;
+    this.c64comGameUrl = urlToUse;
     resetFields();
   }
   
