@@ -45,6 +45,21 @@ public class PCUAEManager
     {
       ExceptionHandler.handleException(e, "Startup failure");
     }
+    
+    //Make sure all folders are available
+    try
+    {
+      Files.createDirectories(Paths.get("./screens/"));
+      Files.createDirectories(Paths.get("./covers/"));
+      Files.createDirectories(Paths.get("./games/"));
+      Files.createDirectories(Paths.get("./saves/"));
+      Files.createDirectories(Paths.get("./pcuae-install/"));
+      Files.createDirectories(Paths.get("./extradisks/"));
+    }
+    catch (IOException e)
+    {
+      e.printStackTrace();
+    }
 
     SwingUtilities.invokeLater(() -> {
 
@@ -60,23 +75,6 @@ public class PCUAEManager
       mainWindow.initialize();
       mainWindow.setVisible(true);
 
-      //Make sure all folders are available
-      try
-      {
-        Files.createDirectories(Paths.get("./screens/"));
-        Files.createDirectories(Paths.get("./covers/"));
-        Files.createDirectories(Paths.get("./games/"));
-        Files.createDirectories(Paths.get("./saves/"));
-        Files.createDirectories(Paths.get("./pcuae-install/"));
-        Files.createDirectories(Paths.get("./extradisks/"));
-      }
-      catch (IOException e)
-      {
-        e.printStackTrace();
-      }
-
-      
-      
       //Check for new versions at startup, but only when running stand-alone, not during development.
       if (!FileManager.getPcuVersionFromManifest().isEmpty())
       {
