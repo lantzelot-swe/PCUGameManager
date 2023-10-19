@@ -11,7 +11,7 @@ import java.util.Objects;
 
 public class JoystickModel extends AbstractModel
 {
-  public static final String DEFAULT_CONFIG = "JU,JD,JL,JR,JF,JF,SP,EN,,F1,F3,F5,,,";
+  public static final String DEFAULT_CONFIG = "JU,JD,JL,JR,JF,JF,SP,EN,CU,Y,N,RS,CD,F1,F7";
   private final boolean port1;
   private boolean primary = false;
   private boolean mouse = false;

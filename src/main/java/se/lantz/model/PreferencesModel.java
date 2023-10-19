@@ -45,12 +45,12 @@ public class PreferencesModel extends AbstractModel implements CommonInfoModel
   private boolean cropScreenshots = false;
 
   private String description =
-    "For more Info on PCUAE look in The Help Menu. Main keys are CTRL + F1 for The Help Menu, CTRL + F3 for Carousel Version Changer, CTRL + F5 for Mode Changer, CTRL + F7 for PCUAE Option Menu, CTRL + SHIFT + F7 for Carousel Gamelist Changer.";
+    "For more Info on PCUAE go to https://github.com/CommodoreOS/PCUAE. Main keys: CTRL + F1 for Carousel Gamelist Changer, CTRL + F3 for Carousel Version Changer, CTRL + F5 for Mode Changer (Amiga, Atari, linux etc), CTRL + F7 for PCUAE Options Menu.";
   private String descriptionDe = "";
   private String descriptionFr = "";
   private String descriptionEs = "";
   private String descriptionIt = "";
-  private int year = 2022;
+  private int year = 2023;
   private String genre = "adventure";
   private String author = "";
   private String composer = "C64 SID Background Music";
