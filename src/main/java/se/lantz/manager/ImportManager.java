@@ -1043,12 +1043,18 @@ public class ImportManager
     return size;
   }
 
-  public int clearAfterImport()
+  public void clearAfterImport()
   {
+    //Clear after import completed
+    gameFileNamesDuringImportMap.clear();
+  }
+  
+  public int importExecuted()
+  {
+    //Clear for next iteration
     int size = dbRowDataList.size();
     dbRowDataList.clear();
-    gameInfoFilesMap.clear();
-    gameFileNamesDuringImportMap.clear();
+    gameInfoFilesMap.clear();  
     uiModel.cleanupAfterImport();
     viewName = null;
     viewTag = null;

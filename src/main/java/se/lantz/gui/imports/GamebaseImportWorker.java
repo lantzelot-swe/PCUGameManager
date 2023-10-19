@@ -149,7 +149,7 @@ public class GamebaseImportWorker extends AbstractImportWorker
     {
       importManager.createGameViewForViewTag(this);
     }
-    return importManager.clearAfterImport();
+    return importManager.importExecuted();
   }
 
   @Override
