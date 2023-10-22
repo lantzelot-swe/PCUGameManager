@@ -22,6 +22,7 @@ import java.util.stream.Collectors;
 
 import se.lantz.gui.exports.PublishWorker;
 import se.lantz.manager.ImportManager;
+import se.lantz.model.JoystickModel;
 import se.lantz.scraper.GamebaseScraper;
 import se.lantz.util.ExceptionHandler;
 import se.lantz.util.FileManager;
@@ -45,7 +46,7 @@ public class GamebaseImporter
 
   private boolean isC64 = true;
 
-  private String joyBase = ":JU,JD,JL,JR,JF,JF,SP,EN,,F1,F3,F5,,,";
+  private String joyBase = ":" + JoystickModel.DEFAULT_CONFIG;
   private List<GbGameInfo> gbGameInfoList = new ArrayList<>();
   private int importIndexForTempFiles = 0;
 
