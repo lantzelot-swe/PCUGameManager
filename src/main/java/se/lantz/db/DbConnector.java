@@ -11,7 +11,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -371,9 +370,9 @@ public class DbConnector
   public void createAndUpdateGameViewForImportedGBGames(String mainViewTag)
   {
     StringBuilder sqlBuilder = new StringBuilder();
-    sqlBuilder.append("SELECT rowid, disk2, disk3, disk4, disk5, disk6 FROM gameinfo WHERE Viewtag LIKE '");
-    sqlBuilder.append(mainViewTag.replaceAll("'", "''"));
-    sqlBuilder.append("' ORDER BY title COLLATE NOCASE ASC");
+    sqlBuilder.append("SELECT rowid, disk2, disk3, disk4, disk5, disk6 FROM gameinfo WHERE Viewtag LIKE \"");
+    sqlBuilder.append(mainViewTag);
+    sqlBuilder.append("\" ORDER BY title COLLATE NOCASE ASC");
 
     //Map containing gameId and diskCount for each game
     LinkedHashMap<Integer, Integer> sortedGameMap = new LinkedHashMap<>();
@@ -434,7 +433,7 @@ public class DbConnector
       if (viewNumber > 1)
       {
         //Tag with right game tag
-        setViewTag(gameId.toString(), mainViewTag.replaceAll("'", "''") + "/" + viewNumber);
+        setViewTag(gameId.toString(), mainViewTag + "/" + viewNumber);
       }
       i++;
     }
@@ -473,17 +472,17 @@ public class DbConnector
     String oldViewName = viewNumber > 1 ? originalViewName + "/" + viewNumber : originalViewName;
 
     //Always use "0" as for first view (sorting is a bit random...)
-    String firstGameLetter = viewNumber == 1 ? "0" : firstGameTitle.substring(0, 1).toUpperCase();
-    String newViewName = originalViewName + "/" + firstGameLetter + "-" + lastGameTitle.substring(0, 1).toUpperCase();
+    String firstGameLetters = viewNumber == 1 ? "0" : getBeginLetters(firstGameTitle);
+    String newViewName = originalViewName + "/" + firstGameLetters + "-" + getBeginLetters(lastGameTitle);
 
     sqlBuilder = new StringBuilder();
     sqlBuilder.append("");
 
-    sqlBuilder.append("UPDATE gameview SET name = '");
-    sqlBuilder.append(newViewName.replaceAll("'", "''"));
-    sqlBuilder.append("' WHERE name = '");
-    sqlBuilder.append(oldViewName.replaceAll("'", "''"));
-    sqlBuilder.append("';");
+    sqlBuilder.append("UPDATE gameview SET name = \"");
+    sqlBuilder.append(newViewName);
+    sqlBuilder.append("\" WHERE name = \"");
+    sqlBuilder.append(oldViewName);
+    sqlBuilder.append("\";");
     logger.debug("Generated update view SQL: {}", sqlBuilder);
     try (Connection conn = this.connect();
       PreparedStatement gameViewstmt = conn.prepareStatement(sqlBuilder.toString()))
@@ -494,6 +493,15 @@ public class DbConnector
     {
       ExceptionHandler.handleException(e, "Could not update gameview name during gb import");
     }
+  }
+
+  private String getBeginLetters(String title)
+  {
+    if (title.length() > 1)
+    {
+      return title.substring(0, 1).toUpperCase() + title.substring(1, 2).toLowerCase();
+    }
+    return title.substring(0, 1).toUpperCase();
   }
 
   private int updateDiskCount(String disk, int fileCount)
@@ -618,16 +626,16 @@ public class DbConnector
     sqlBuilder.append("");
     if (view.getGameViewId() > 0)
     {
-      sqlBuilder.append("UPDATE gameview SET name = '");
-      sqlBuilder.append(view.getName().replace("'", "''"));
-      sqlBuilder.append("' WHERE viewId = ");
+      sqlBuilder.append("UPDATE gameview SET name = \"");
+      sqlBuilder.append(view.getName());
+      sqlBuilder.append("\" WHERE viewId = ");
       sqlBuilder.append(view.getGameViewId());
       sqlBuilder.append(";");
     }
     else
     {
       sqlBuilder.append("INSERT INTO gameview (name) VALUES (\"");
-      sqlBuilder.append(view.getName().replace("'", "''"));
+      sqlBuilder.append(view.getName());
       sqlBuilder.append("\");");
     }
     String gameViewsql = sqlBuilder.toString();
@@ -1555,7 +1563,7 @@ public class DbConnector
 
   public void setViewTag(String gameId, String viewTag)
   {
-    String sql = "UPDATE gameinfo SET Viewtag = '" + viewTag + "' WHERE rowId = " + gameId + ";";
+    String sql = "UPDATE gameinfo SET Viewtag = \"" + viewTag + "\" WHERE rowId = " + gameId + ";";
     try (Connection conn = this.connect(); PreparedStatement favoritestmt = conn.prepareStatement(sql))
     {
       int value = favoritestmt.executeUpdate();
@@ -1701,8 +1709,7 @@ public class DbConnector
               port1 ? joy1NotDefault : joy1Default,
               port1 ? joy1Default : joy1NotDefault,
               port1 ? joy2Default : joy2NotDefault,
-              port1 ? joy2NotDefault : joy2Default  
-                );
+              port1 ? joy2NotDefault : joy2Default);
 
     sqlBuilder.append(expression);
     sqlBuilder.append(idListString);
