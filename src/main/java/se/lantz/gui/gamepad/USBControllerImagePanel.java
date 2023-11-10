@@ -17,9 +17,9 @@ import javax.swing.JPanel;
 
 import se.lantz.util.FileManager;
 
-public class GamePadImagePanel extends JPanel
+public class USBControllerImagePanel extends JPanel
 {
-  public enum GamePadButton
+  public enum USBControllerButton
   {
     UP("Up", Character.toString(0x1f815)), DOWN("Down", Character.toString(0x1f817)),
     LEFT("Left", Character.toString(0x1f814)), RIGHT("Right", Character.toString(0x1f816)), A("A", "A"), B("B", "B"),
@@ -30,7 +30,7 @@ public class GamePadImagePanel extends JPanel
     public final String label;
     public final String joyMapping;
 
-    private GamePadButton(String label, String joyMapping)
+    private USBControllerButton(String label, String joyMapping)
     {
       this.label = label;
       this.joyMapping = joyMapping;
@@ -40,9 +40,9 @@ public class GamePadImagePanel extends JPanel
   ImageIcon gamepadImage = new ImageIcon(getClass().getResource("/se/lantz/logitech.png"));
   private JLabel imageLabel;
 
-  private GamePadButton currentButton = null;
+  private USBControllerButton currentButton = null;
 
-  public GamePadImagePanel()
+  public USBControllerImagePanel()
   {
     GridBagLayout gridBagLayout = new GridBagLayout();
     setLayout(gridBagLayout);
@@ -77,7 +77,7 @@ public class GamePadImagePanel extends JPanel
     return imageLabel;
   }
 
-  public void setCurrentButtonAndRepaint(GamePadButton button)
+  public void setCurrentButtonAndRepaint(USBControllerButton button)
   {
     this.currentButton = button;
     this.repaint();

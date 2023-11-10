@@ -3,32 +3,32 @@ package se.lantz.gui.gamepad;
 import java.awt.GridBagLayout;
 
 import javax.swing.JPanel;
-import se.lantz.gui.gamepad.GamePadImagePanel.GamePadButton;
+import se.lantz.gui.gamepad.USBControllerImagePanel.USBControllerButton;
 import se.lantz.model.JoystickModel;
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
 
-public class GamePadMappingPanel extends JPanel
+public class USBControllerMappingPanel extends JPanel
 {
-  private MappingComponent upComponent;
+  private USBControllerMappingComponent upComponent;
   private JoystickModel model;
-  private MappingComponent downComponent;
-  private MappingComponent leftComponent;
-  private MappingComponent rightComponent;
-  private MappingComponent xComponent;
-  private MappingComponent yComponent;
-  private MappingComponent aComponent;
-  private MappingComponent bComponent;
-  private MappingComponent leftTriggerComponent;
-  private MappingComponent rightTriggerComponent;
-  private MappingComponent backGuideComponent;
-  private MappingComponent leftShoulderComponent;
-  private MappingComponent rightShoulderComponent;
-  private MappingComponent leftStickComponent;
-  private MappingComponent rightStickComponent;
-  private GamePadImagePanel imagePanel;
+  private USBControllerMappingComponent downComponent;
+  private USBControllerMappingComponent leftComponent;
+  private USBControllerMappingComponent rightComponent;
+  private USBControllerMappingComponent xComponent;
+  private USBControllerMappingComponent yComponent;
+  private USBControllerMappingComponent aComponent;
+  private USBControllerMappingComponent bComponent;
+  private USBControllerMappingComponent leftTriggerComponent;
+  private USBControllerMappingComponent rightTriggerComponent;
+  private USBControllerMappingComponent backGuideComponent;
+  private USBControllerMappingComponent leftShoulderComponent;
+  private USBControllerMappingComponent rightShoulderComponent;
+  private USBControllerMappingComponent leftStickComponent;
+  private USBControllerMappingComponent rightStickComponent;
+  private USBControllerImagePanel imagePanel;
 
-  public GamePadMappingPanel(JoystickModel model, GamePadImagePanel imagePanel)
+  public USBControllerMappingPanel(JoystickModel model, USBControllerImagePanel imagePanel)
   {
     this.model = model;
     this.imagePanel = imagePanel;
@@ -114,93 +114,93 @@ public class GamePadMappingPanel extends JPanel
     gbc_rightStickComponent.gridy = 7;
     add(getRightStickComponent(), gbc_rightStickComponent);
   }
-  private MappingComponent getUpComponent() {
+  private USBControllerMappingComponent getUpComponent() {
     if (upComponent == null) {
-    	upComponent = new MappingComponent(GamePadButton.UP, model, imagePanel);
+    	upComponent = new USBControllerMappingComponent(USBControllerButton.UP, model, imagePanel);
     }
     return upComponent;
   }
-  private MappingComponent getDowngComponent() {
+  private USBControllerMappingComponent getDowngComponent() {
     if (downComponent == null) {
-    	downComponent = new MappingComponent(GamePadButton.DOWN, model, imagePanel);
+    	downComponent = new USBControllerMappingComponent(USBControllerButton.DOWN, model, imagePanel);
     }
     return downComponent;
   }
-  private MappingComponent getMappingComponent_2() {
+  private USBControllerMappingComponent getMappingComponent_2() {
     if (leftComponent == null) {
-    	leftComponent = new MappingComponent(GamePadButton.LEFT, model, imagePanel);
+    	leftComponent = new USBControllerMappingComponent(USBControllerButton.LEFT, model, imagePanel);
     }
     return leftComponent;
   }
-  private MappingComponent getRightComponent() {
+  private USBControllerMappingComponent getRightComponent() {
     if (rightComponent == null) {
-    	rightComponent = new MappingComponent(GamePadButton.RIGHT, model, imagePanel);
+    	rightComponent = new USBControllerMappingComponent(USBControllerButton.RIGHT, model, imagePanel);
     }
     return rightComponent;
   }
-  private MappingComponent getXComponent() {
+  private USBControllerMappingComponent getXComponent() {
     if (xComponent == null) {
-    	xComponent = new MappingComponent(GamePadButton.X, model, imagePanel);
+    	xComponent = new USBControllerMappingComponent(USBControllerButton.X, model, imagePanel);
     }
     return xComponent;
   }
-  private MappingComponent getYComponent() {
+  private USBControllerMappingComponent getYComponent() {
     if (yComponent == null) {
-    	yComponent = new MappingComponent(GamePadButton.Y, model, imagePanel);
+    	yComponent = new USBControllerMappingComponent(USBControllerButton.Y, model, imagePanel);
     }
     return yComponent;
   }
-  private MappingComponent getAComponent() {
+  private USBControllerMappingComponent getAComponent() {
     if (aComponent == null) {
-    	aComponent = new MappingComponent(GamePadButton.A, model, imagePanel);
+    	aComponent = new USBControllerMappingComponent(USBControllerButton.A, model, imagePanel);
     }
     return aComponent;
   }
-  private MappingComponent getBComponent() {
+  private USBControllerMappingComponent getBComponent() {
     if (bComponent == null) {
-    	bComponent = new MappingComponent(GamePadButton.B, model, imagePanel);
+    	bComponent = new USBControllerMappingComponent(USBControllerButton.B, model, imagePanel);
     }
     return bComponent;
   }
-  private MappingComponent getLeftTriggerComponent() {
+  private USBControllerMappingComponent getLeftTriggerComponent() {
     if (leftTriggerComponent == null) {
-    	leftTriggerComponent = new MappingComponent(GamePadButton.LEFT_TRIGGER, model, imagePanel);
+    	leftTriggerComponent = new USBControllerMappingComponent(USBControllerButton.LEFT_TRIGGER, model, imagePanel);
     }
     return leftTriggerComponent;
   }
-  private MappingComponent getRightTriggerComponent() {
+  private USBControllerMappingComponent getRightTriggerComponent() {
     if (rightTriggerComponent == null) {
-    	rightTriggerComponent = new MappingComponent(GamePadButton.RIGHT_TRIGGER, model, imagePanel);
+    	rightTriggerComponent = new USBControllerMappingComponent(USBControllerButton.RIGHT_TRIGGER, model, imagePanel);
     }
     return rightTriggerComponent;
   }
-  private MappingComponent getBackGuideComponent() {
+  private USBControllerMappingComponent getBackGuideComponent() {
     if (backGuideComponent == null) {
-    	backGuideComponent = new MappingComponent(GamePadButton.BACK_GUIDE, model, imagePanel);
+    	backGuideComponent = new USBControllerMappingComponent(USBControllerButton.BACK_GUIDE, model, imagePanel);
     }
     return backGuideComponent;
   }
-  private MappingComponent getLeftShoulderComponent() {
+  private USBControllerMappingComponent getLeftShoulderComponent() {
     if (leftShoulderComponent == null) {
-    	leftShoulderComponent = new MappingComponent(GamePadButton.LEFT_SHOULDER, model, imagePanel);
+    	leftShoulderComponent = new USBControllerMappingComponent(USBControllerButton.LEFT_SHOULDER, model, imagePanel);
     }
     return leftShoulderComponent;
   }
-  private MappingComponent getRightShoulderComponent() {
+  private USBControllerMappingComponent getRightShoulderComponent() {
     if (rightShoulderComponent == null) {
-    	rightShoulderComponent = new MappingComponent(GamePadButton.RIGHT_SHOULDER, model, imagePanel);
+    	rightShoulderComponent = new USBControllerMappingComponent(USBControllerButton.RIGHT_SHOULDER, model, imagePanel);
     }
     return rightShoulderComponent;
   }
-  private MappingComponent getLeftStickComponent() {
+  private USBControllerMappingComponent getLeftStickComponent() {
     if (leftStickComponent == null) {
-    	leftStickComponent = new MappingComponent(GamePadButton.LEFT_STICK, model, imagePanel);
+    	leftStickComponent = new USBControllerMappingComponent(USBControllerButton.LEFT_STICK, model, imagePanel);
     }
     return leftStickComponent;
   }
-  private MappingComponent getRightStickComponent() {
+  private USBControllerMappingComponent getRightStickComponent() {
     if (rightStickComponent == null) {
-    	rightStickComponent = new MappingComponent(GamePadButton.RIGHT_STICK, model, imagePanel);
+    	rightStickComponent = new USBControllerMappingComponent(USBControllerButton.RIGHT_STICK, model, imagePanel);
     }
     return rightStickComponent;
   }

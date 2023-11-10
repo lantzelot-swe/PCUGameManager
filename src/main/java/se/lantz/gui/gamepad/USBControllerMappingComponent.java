@@ -16,19 +16,19 @@ import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
 import se.lantz.gui.KeySelectionComboBox;
-import se.lantz.gui.gamepad.GamePadImagePanel.GamePadButton;
+import se.lantz.gui.gamepad.USBControllerImagePanel.USBControllerButton;
 import se.lantz.model.JoystickModel;
 
-public class MappingComponent extends JPanel
+public class USBControllerMappingComponent extends JPanel
 {
   private JLabel buttonTextLabel;
   private KeySelectionComboBox keySelectionComboBox;
   private JLabel joyMapLabel;
-  private GamePadButton button;
+  private USBControllerButton button;
   private JoystickModel model;
-  private GamePadImagePanel imagePanel;
+  private USBControllerImagePanel imagePanel;
 
-  public MappingComponent(GamePadButton button, JoystickModel model, GamePadImagePanel imagePanel)
+  public USBControllerMappingComponent(USBControllerButton button, JoystickModel model, USBControllerImagePanel imagePanel)
   {
     this.button = button;
     this.model = model;
@@ -193,7 +193,7 @@ public class MappingComponent extends JPanel
               Component focusOwner = KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner();
               if (focusOwner instanceof KeySelectionComboBox)
               {
-                MappingComponent focusedMappingComponent = (MappingComponent)SwingUtilities.getAncestorOfClass(MappingComponent.class, focusOwner);
+                USBControllerMappingComponent focusedMappingComponent = (USBControllerMappingComponent)SwingUtilities.getAncestorOfClass(USBControllerMappingComponent.class, focusOwner);
                 if (focusedMappingComponent != null)
                 {
                   imagePanel.setCurrentButtonAndRepaint(focusedMappingComponent.button);

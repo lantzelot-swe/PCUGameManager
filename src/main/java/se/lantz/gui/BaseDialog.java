@@ -51,7 +51,7 @@ public class BaseDialog extends JDialog
     getRootPane().setDefaultButton(getOkButton());
   }
 
-  protected void addContent(JPanel panel)
+  protected void addContent(JComponent panel)
   {
     getBackgroundPanel().add(panel, BorderLayout.CENTER);
   }

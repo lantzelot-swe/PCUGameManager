@@ -8,13 +8,13 @@ import javax.swing.JPanel;
 
 import se.lantz.model.JoystickModel;
 
-public class GamepadBackgroundPanel extends JPanel
+public class USBControllerBackgroundPanel extends JPanel
 {
-  private GamePadInfoPanel gamePadInfoPanel;
-  private GamePadImagePanel gamePadImagePanel;
-  private GamePadMappingPanel gamePadMappingPanel;
+  private USBControllerInfoPanel gamePadInfoPanel;
+  private USBControllerImagePanel gamePadImagePanel;
+  private USBControllerMappingPanel gamePadMappingPanel;
   private JoystickModel model;
-  public GamepadBackgroundPanel(JoystickModel model) {
+  public USBControllerBackgroundPanel(JoystickModel model) {
     this.model = model;
     GridBagLayout gridBagLayout = new GridBagLayout();
     setLayout(gridBagLayout);
@@ -45,21 +45,21 @@ public class GamepadBackgroundPanel extends JPanel
     gbc_gamePadMappingPanel.gridy = 1;
     add(getGamePadMappingPanel(), gbc_gamePadMappingPanel);
   }
-  private GamePadInfoPanel getGamePadInfoPanel() {
+  private USBControllerInfoPanel getGamePadInfoPanel() {
     if (gamePadInfoPanel == null) {
-    	gamePadInfoPanel = new GamePadInfoPanel();
+    	gamePadInfoPanel = new USBControllerInfoPanel();
     }
     return gamePadInfoPanel;
   }
-  private GamePadImagePanel getGamePadImagePanel() {
+  private USBControllerImagePanel getGamePadImagePanel() {
     if (gamePadImagePanel == null) {
-    	gamePadImagePanel = new GamePadImagePanel();
+    	gamePadImagePanel = new USBControllerImagePanel();
     }
     return gamePadImagePanel;
   }
-  private GamePadMappingPanel getGamePadMappingPanel() {
+  private USBControllerMappingPanel getGamePadMappingPanel() {
     if (gamePadMappingPanel == null) {
-    	gamePadMappingPanel = new GamePadMappingPanel(model, getGamePadImagePanel());
+    	gamePadMappingPanel = new USBControllerMappingPanel(model, getGamePadImagePanel());
     }
     return gamePadMappingPanel;
   }

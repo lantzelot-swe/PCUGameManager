@@ -11,7 +11,7 @@ import java.awt.GridBagConstraints;
 import java.awt.Insets;
 import java.awt.Color;
 
-public class GamePadInfoPanel extends JPanel
+public class USBControllerInfoPanel extends JPanel
 {
   ImageIcon compImage = new ImageIcon(getClass().getResource("/se/lantz/joystick-comp.png"));
   
@@ -19,7 +19,7 @@ public class GamePadInfoPanel extends JPanel
   private JLabel compImageLabel;
   private JLabel extraButtonsInfoLabel;
 
-  public GamePadInfoPanel()
+  public USBControllerInfoPanel()
   {
     setBackground(Color.WHITE);
     GridBagLayout gridBagLayout = new GridBagLayout();
