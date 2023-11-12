@@ -943,9 +943,9 @@ public class MenuManager
   {
     if (resetJoystickConfigItem == null)
     {
-      resetJoystickConfigItem = new JMenuItem("Reset joystick configs for current gamelist view");
+      resetJoystickConfigItem = new JMenuItem("Reset controller configs for current gamelist view");
       resetJoystickConfigItem.setMnemonic('j');
-      resetJoystickConfigItem.addActionListener(e -> resetJoystickConfigs());
+      resetJoystickConfigItem.addActionListener(e -> resetControllerConfigs());
     }
     return resetJoystickConfigItem;
   }
@@ -1528,23 +1528,23 @@ public class MenuManager
 
   }
 
-  private void resetJoystickConfigs()
+  private void resetControllerConfigs()
   {
-    String message = "Do you want to reset the joystick configurations for all games in the current gamelist view?\n" +
-      "Only the mappings are reset to the default (defined in preferences), primary joystick is preserved.\n" +
-      "The second joystick is also reset with the default mappings.";
+    String message = "Do you want to reset the controller configurations for all games in the current gamelist view?\n" +
+      "Only the mappings are reset to the default (defined in preferences), primary controller port is preserved.\n" +
+      "The second controller is also reset with the default mappings.";
 
     int option = JOptionPane.showConfirmDialog(MainWindow.getInstance().getMainPanel(),
                                                message,
-                                               "Reset joystick configurations",
+                                               "Reset controller configurations",
                                                JOptionPane.YES_NO_OPTION,
                                                JOptionPane.QUESTION_MESSAGE);
     if (option == JOptionPane.YES_OPTION)
     {
       uiModel.resetJoystickConfigsForCurrentView();
       JOptionPane.showMessageDialog(MainWindow.getInstance().getMainPanel(),
-                                    "Joystick configurations updated.",
-                                    "Reset joystick configurations",
+                                    "Controller configurations updated.",
+                                    "Reset controller configurations",
                                     JOptionPane.INFORMATION_MESSAGE);
       MainWindow.getInstance().reloadCurrentGameView();
     }

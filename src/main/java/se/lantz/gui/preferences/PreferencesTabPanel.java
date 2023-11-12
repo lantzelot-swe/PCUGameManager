@@ -44,7 +44,7 @@ public class PreferencesTabPanel extends JPanel
       tabbedPane = new JTabbedPane(JTabbedPane.TOP);
       tabbedPane.addTab("Misc.", null, getMiscPanel(), null);
       tabbedPane.addTab("Favorites", null, getFavPanel(), null);
-      tabbedPane.addTab("Joystick", null, getJoystickBackgroundPanel(), null);
+      tabbedPane.addTab("Controller", null, getJoystickBackgroundPanel(), null);
       tabbedPane.addTab("Infoslot", null, getInfoSlotBackgroundPanel(), null);
     }
     return tabbedPane;
@@ -148,7 +148,7 @@ public class PreferencesTabPanel extends JPanel
     if (infoLabel == null)
     {
       infoLabel =
-        new JLabel("<html>Specify the default joystick configuration to use when adding new games. Port 1 and Port 2 uses the same mapping.</html>");
+        new JLabel("<html>Specify the default controller configuration to use when adding new games. Port 1 and Port 2 uses the same mapping.</html>");
     }
     return infoLabel;
   }

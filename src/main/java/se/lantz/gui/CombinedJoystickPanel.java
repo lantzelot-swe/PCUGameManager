@@ -21,7 +21,7 @@ public class CombinedJoystickPanel extends JPanel
 
   public CombinedJoystickPanel(MainViewModel model)
   {
-    setBorder(new TitledBorder(null, "Joystick configuration", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+    setBorder(new TitledBorder(null, "Controller configuration", TitledBorder.LEADING, TitledBorder.TOP, null, null));
     this.model = model;
     GridBagLayout gridBagLayout = new GridBagLayout();
     setLayout(gridBagLayout);

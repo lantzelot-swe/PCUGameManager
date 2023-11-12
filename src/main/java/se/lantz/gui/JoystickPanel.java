@@ -11,18 +11,17 @@ import java.awt.event.FocusListener;
 import java.beans.Beans;
 
 import javax.swing.ImageIcon;
+import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 
-import se.lantz.gui.exports.ExportGamesDialog;
 import se.lantz.gui.gamepad.GamePadDialog;
 import se.lantz.model.JoystickModel;
 import se.lantz.util.CustomUndoPlainDocument;
 import se.lantz.util.TextComponentSupport;
-import javax.swing.JButton;
 
 public class JoystickPanel extends JPanel
 {
@@ -151,13 +150,14 @@ public class JoystickPanel extends JPanel
       getConfigTextField().setText(model.getConfigString());
     }
     getImageLabel().setIcon(model.isMouse() ? mouseImage : joyImage);
+    getGamepadButton().setEnabled(!model.isMouse());
   }
 
   private JCheckBox getPrimaryJoyCheckBox()
   {
     if (primaryJoyCheckBox == null)
     {
-      String text = "Use port " + portnumber + " as Primary joystick";
+      String text = "Use port " + portnumber + " as primary controller";
       primaryJoyCheckBox = new JCheckBox(text);
       primaryJoyCheckBox.addItemListener((e) -> model.setPrimary(primaryJoyCheckBox.isSelected()));
     }
@@ -344,7 +344,10 @@ public class JoystickPanel extends JPanel
     {
       String text = "Use mouse";
       mouseCheckBox = new JCheckBox(text);
-      mouseCheckBox.addItemListener((e) -> model.setMouse(mouseCheckBox.isSelected()));
+      mouseCheckBox.addItemListener((e) -> {
+        model.setMouse(mouseCheckBox.isSelected());
+        getGamepadButton().setEnabled(!mouseCheckBox.isSelected());
+      });
     }
     return mouseCheckBox;
   }
