@@ -23,6 +23,7 @@ import javax.swing.event.HyperlinkEvent;
 
 import se.lantz.gamebase.GamebaseImporter;
 import se.lantz.gui.DeleteDialog.TYPE_OF_DELETE;
+import se.lantz.gui.carousel.CarouselDialog;
 import se.lantz.gui.dbbackup.BackupProgressDialog;
 import se.lantz.gui.dbbackup.BackupWorker;
 import se.lantz.gui.dbrestore.RestoreDbDialog;
@@ -89,6 +90,8 @@ public class MenuManager
   private JMenuItem exportSavedStatesItem;
   private JMenuItem refreshItem;
   private JMenuItem refreshAllItem;
+
+  private JMenuItem carouselPreviewItem;
 
   private JMenuItem toggleFavorite1Item;
   private JMenuItem toggleFavorite2Item;
@@ -208,6 +211,9 @@ public class MenuManager
     exportMenu.add(getExportFileLoaderItem());
     exportMenu.add(getExportSavedStatesItem());
     fileMenu.add(exportMenu);
+    fileMenu.addSeparator();
+    fileMenu.add(getCarouselPreviewMenuItem());
+
     fileMenu.addSeparator();
     fileMenu.add(getRefreshItem());
     fileMenu.add(getRefreshAllItem());
@@ -435,6 +441,14 @@ public class MenuManager
 
     runGameItem.addActionListener(e -> mainWindow.getMainPanel().runCurrentGame());
     return runGameItem;
+  }
+
+  JMenuItem getCarouselPreviewMenuItem()
+  {
+    carouselPreviewItem = new JMenuItem("Carousel preview...");
+
+    carouselPreviewItem.addActionListener(e -> showCarouselPreview());
+    return carouselPreviewItem;
   }
 
   private JMenuItem getImportCarouselItem()
@@ -837,8 +851,7 @@ public class MenuManager
         PrimaryJoystickDialog dialog = new PrimaryJoystickDialog(MainWindow.getInstance());
         dialog.pack();
         dialog.setLocationRelativeTo(this.mainWindow);
-        
-   
+
         if (dialog.showDialog())
         {
           mainWindow.setWaitCursor(true);
@@ -1530,9 +1543,10 @@ public class MenuManager
 
   private void resetControllerConfigs()
   {
-    String message = "Do you want to reset the controller configurations for all games in the current gamelist view?\n" +
-      "Only the mappings are reset to the default (defined in preferences), primary controller port is preserved.\n" +
-      "The second controller is also reset with the default mappings.";
+    String message =
+      "Do you want to reset the controller configurations for all games in the current gamelist view?\n" +
+        "Only the mappings are reset to the default (defined in preferences), primary controller port is preserved.\n" +
+        "The second controller is also reset with the default mappings.";
 
     int option = JOptionPane.showConfirmDialog(MainWindow.getInstance().getMainPanel(),
                                                message,
@@ -1706,5 +1720,15 @@ public class MenuManager
   void checkForNewPCUAEVersionAtStartup()
   {
     installPCUAEManager.checkForNewVersionAtStartup();
+  }
+
+  private void showCarouselPreview()
+  {
+    //TEST
+    CarouselDialog prefDialog = new CarouselDialog(this.mainWindow);
+    prefDialog.pack();
+    prefDialog.setLocationRelativeTo(MainWindow.getInstance());
+    prefDialog.showDialog();
+
   }
 }
