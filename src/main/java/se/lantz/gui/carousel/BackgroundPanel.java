@@ -3,17 +3,32 @@ package se.lantz.gui.carousel;
 import java.awt.Graphics;
 import java.awt.Image;
 
+import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
+import javax.swing.JButton;
 import javax.swing.JPanel;
+
+import se.lantz.model.MainViewModel;
+import se.lantz.model.carousel.CarouselPreviewModel;
+import se.lantz.model.data.GameDetails;
+
 import java.awt.GridBagLayout;
 import javax.swing.JLabel;
 import java.awt.GridBagConstraints;
 import java.awt.Font;
 import java.awt.Insets;
+import java.awt.image.BufferedImage;
+import java.beans.Beans;
+import java.io.File;
+import java.io.IOException;
 import java.awt.Color;
 
 public class BackgroundPanel extends JPanel {
-  public BackgroundPanel() {
+  private CarouselPreviewModel model;
+  
+  public BackgroundPanel(final MainViewModel uiModel) {
+    model = new CarouselPreviewModel(uiModel);
+    
     GridBagLayout gridBagLayout = new GridBagLayout();
     setLayout(gridBagLayout);
     GridBagConstraints gbc_coverPanel = new GridBagConstraints();
@@ -41,10 +56,43 @@ public class BackgroundPanel extends JPanel {
     add(getTextPanel(), gbc_textPanel);
     
     setBackground("/se/lantz/carousel/Carousel1400x788-modified.png");
+    
+    if (!Beans.isDesignTime())
+    {
+      model.addPropertyChangeListener(CarouselPreviewModel.SELECTED_GAME, e -> reloadScreens());
+      //trigger once at startup
+      reloadScreens();
+    }
   }
+  
+  private void reloadScreens()
+  {
+    String filename = model.getSelectedGame().getScreen1();
+      BufferedImage image = null;
+      if (!filename.isEmpty())
+      {
+        File imagefile = new File("./screens/" + filename);
+        try
+        {
+          image = ImageIO.read(imagefile);
+          Image newImage = image.getScaledInstance(694, 401, Image.SCALE_SMOOTH);
+          getScreenshotLabel().setIcon(new ImageIcon(newImage));
+        }
+        catch (IOException e)
+        {
+          getScreenshotLabel().setIcon(null);
+        }
+      }
+      else
+      {
+        getScreenshotLabel().setIcon(null);
+      }
+  }
+  
+  
+  
 
   private Image background;
-  private JLabel lblNewLabel;
   private JLabel screenShotLabel;
   private TextPanel textPanel;
   private CoverPanel coverPanel;
@@ -72,16 +120,16 @@ public class BackgroundPanel extends JPanel {
   private JLabel getScreenshotLabel() {
     if (screenShotLabel == null) {
     	screenShotLabel = new JLabel();
-    	screenShotLabel.setBackground(Color.YELLOW);
-    	Image image = new ImageIcon(getClass().getResource("/se/lantz/carousel/test.png")).getImage();
-    	Image scaledImage = image.getScaledInstance(694, 401, Image.SCALE_SMOOTH);
-    	screenShotLabel.setIcon(new ImageIcon(scaledImage));
+    	
+//    	Image image = new ImageIcon(getClass().getResource(selectedGame.getScreen1())).getImage();
+//    	Image scaledImage = image.getScaledInstance(694, 401, Image.SCALE_SMOOTH);
+//    	screenShotLabel.setIcon(new ImageIcon(scaledImage));
     }
     return screenShotLabel;
   }
   private TextPanel getTextPanel() {
     if (textPanel == null) {
-    	textPanel = new TextPanel();
+    	textPanel = new TextPanel(model);
     }
     return textPanel;
   }

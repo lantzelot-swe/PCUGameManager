@@ -23,7 +23,7 @@ import javax.swing.event.HyperlinkEvent;
 
 import se.lantz.gamebase.GamebaseImporter;
 import se.lantz.gui.DeleteDialog.TYPE_OF_DELETE;
-import se.lantz.gui.carousel.CarouselDialog;
+import se.lantz.gui.carousel.CarouselPreviewDialog;
 import se.lantz.gui.dbbackup.BackupProgressDialog;
 import se.lantz.gui.dbbackup.BackupWorker;
 import se.lantz.gui.dbrestore.RestoreDbDialog;
@@ -1725,7 +1725,7 @@ public class MenuManager
   private void showCarouselPreview()
   {
     //TEST
-    CarouselDialog prefDialog = new CarouselDialog(this.mainWindow);
+    CarouselPreviewDialog prefDialog = new CarouselPreviewDialog(this.mainWindow, this.uiModel);
     prefDialog.pack();
     prefDialog.setLocationRelativeTo(MainWindow.getInstance());
     prefDialog.showDialog();

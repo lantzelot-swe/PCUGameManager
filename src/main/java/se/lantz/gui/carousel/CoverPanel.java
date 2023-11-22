@@ -23,12 +23,18 @@ public class CoverPanel extends JPanel
 {
   private JPanel panel;
   private JScrollPane scrollPane;
-  private JLabel test1Label;
+
+  int scrollingTimerIndex = 0;
+  boolean scrolingStopped = true;
+  boolean scrollDirectionRight = true;
+
+  private ActionListener timerListener = e -> scrollFromTimer();
+
+  private Timer scrolingTimer = new Timer(10, timerListener);
 
   public CoverPanel()
   {
     //    setBorder(new LineBorder(new Color(0, 0, 0)));
-    setBackground(new Color(138, 137, 138));
     GridBagLayout gridBagLayout = new GridBagLayout();
     gridBagLayout.rowWeights = new double[] { 1.0 };
     gridBagLayout.columnWeights = new double[] { 1.0 };
@@ -73,37 +79,26 @@ public class CoverPanel extends JPanel
             scrollOneGame(false);
           }
         });
+      panel.setBackground(new Color(138, 137, 138));
     }
     return panel;
   }
 
-  int test = 0;
-
-  ActionListener timerListener = (e) -> {
-    scrollFromTimer();
-  };
-
-  Timer javaTimer = new Timer(10, timerListener);
-  boolean stopped = true;
-  boolean scrollDirectionRight = true;
-
   private void scrollFromTimer()
   {
-    int valueToScroll = scrollDirectionRight
-      ? scrollPane.getHorizontalScrollBar().getValue() + 32
-      : scrollPane.getHorizontalScrollBar().getValue() - 32;
+    int currentScrollValue = scrollPane.getHorizontalScrollBar().getValue();
+    int newScrollValue = scrollDirectionRight ? currentScrollValue + 32 : currentScrollValue - 32;
     //Scroll 
-    scrollPane.getHorizontalScrollBar().setValue(valueToScroll);
-    test++;
-    if (test > 4)
+    scrollPane.getHorizontalScrollBar().setValue(newScrollValue);
+    scrollingTimerIndex++;
+    if (scrollingTimerIndex > 5)
     {
-      int lastScrollValue = scrollDirectionRight
-        ? scrollPane.getHorizontalScrollBar().getValue() + 10
-        : scrollPane.getHorizontalScrollBar().getValue() - 10;
+      //Scroll one last time
+      int lastScrollValue = scrollDirectionRight ? currentScrollValue + 10 : currentScrollValue - 10;
       scrollPane.getHorizontalScrollBar().setValue(lastScrollValue);
-      test = 0;
-      javaTimer.stop();
-      stopped = true;
+      scrollingTimerIndex = 0;
+      scrolingTimer.stop();
+      scrolingStopped = true;
     }
   }
 
@@ -118,14 +113,12 @@ public class CoverPanel extends JPanel
       scrollPane.getHorizontalScrollBar().setUnitIncrement(10);
       scrollPane.getHorizontalScrollBar().setBlockIncrement(10);
 
+      //Remove all previously registered mouse wheel listeners to not interfere
       for (MouseWheelListener listener : scrollPane.getMouseWheelListeners())
       {
         scrollPane.removeMouseWheelListener(listener);
       }
-
-      scrollPane.addMouseWheelListener(a -> {
-        scrollOneGame(a.getWheelRotation() > 0);
-      });
+      scrollPane.addMouseWheelListener(a -> scrollOneGame(a.getWheelRotation() > 0));
     }
     return scrollPane;
   }
@@ -150,16 +143,18 @@ public class CoverPanel extends JPanel
     JLabel label = new JLabel("Label");
     label.setBorder(new LineBorder(new Color(0, 0, 0)));
     label.setPreferredSize(new Dimension(125, 175));
+//    label.setBackground(Color.red);
+//    label.setOpaque(true);
     return label;
   }
 
   private void scrollOneGame(boolean right)
   {
-    if (stopped)
+    if (scrolingStopped)
     {
       scrollDirectionRight = right;
-      stopped = false;
-      javaTimer.start();
+      scrolingStopped = false;
+      scrolingTimer.start();
     }
   }
 }

@@ -7,6 +7,9 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.LayoutManager;
+import java.beans.Beans;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -16,6 +19,9 @@ import javax.swing.text.MutableAttributeSet;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
 
+import se.lantz.model.carousel.CarouselPreviewModel;
+import se.lantz.model.data.GameDetails;
+
 public class TextPanel extends JPanel
 {
   private JLabel titleLabel;
@@ -24,11 +30,14 @@ public class TextPanel extends JPanel
   private JLabel composerLabel;
   private JLabel genreLabel;
   private JLabel yearLabel;
+  private CarouselPreviewModel model;
+  
+  Map<String, String> genreMap = new HashMap<>();
 
-  public TextPanel()
+  public TextPanel(final CarouselPreviewModel model)
   {
+    this.model = model;
     setFont(new Font("Microsoft Sans Serif", Font.BOLD, 20));
-//    setBorder(new LineBorder(new Color(0, 0, 0)));
     setOpaque(false);
     GridBagLayout gridBagLayout = new GridBagLayout();
     setLayout(gridBagLayout);
@@ -48,7 +57,7 @@ public class TextPanel extends JPanel
     gbc_textArea.fill = GridBagConstraints.BOTH;
     gbc_textArea.gridx = 0;
     gbc_textArea.gridy = 1;
-    add(getTextArea(), gbc_textArea);
+    add(getTextPane(), gbc_textArea);
     GridBagConstraints gbc_authorLabel = new GridBagConstraints();
     gbc_authorLabel.gridwidth = 2;
     gbc_authorLabel.insets = new Insets(6, 145, 0, 0);
@@ -77,8 +86,40 @@ public class TextPanel extends JPanel
     gbc_yearLabel.gridx = 1;
     gbc_yearLabel.gridy = 4;
     add(getYearLabel(), gbc_yearLabel);
-    // TODO Auto-generated constructor stub
+    if (!Beans.isDesignTime())
+    {
+      model.addPropertyChangeListener(CarouselPreviewModel.SELECTED_GAME, e -> selectedGameChanged());
+      //trigger once at startup
+      selectedGameChanged();
+    }
+    
+    //TODO Centralize this. look at GenreComboBox
+    genreMap.put("", "----");
+    genreMap.put("adventure", "Adventure");
+    genreMap.put("driving", "Driving");
+    genreMap.put("maze", "Maze");
+    genreMap.put("platform", "Platform");
+    genreMap.put("programming", "Programming");
+    genreMap.put("puzzle", "Puzzle");
+    genreMap.put("shoot", "Shoot'em up");
+    genreMap.put("simulation", "Simulation");
+    genreMap.put("sport", "Sport");
   }
+  
+  private void selectedGameChanged()
+  {
+    GameDetails selectedGame = model.getSelectedGame();
+    if (selectedGame != null)
+    {
+      getTitleLabel().setText(selectedGame.getTitle());
+      getTextPane().setText(selectedGame.getDescription());
+      getAuthorLabel().setText(selectedGame.getAuthor().isEmpty() ? " " : selectedGame.getAuthor());
+      getComposerLabel().setText(selectedGame.getComposer().isEmpty() ? " " : selectedGame.getComposer());
+      getGenreLabel().setText(genreMap.get(selectedGame.getGenre()));
+      getYearLabel().setText(selectedGame.getYear() + "");
+    }
+  }
+  
 
   public TextPanel(LayoutManager layout)
   {
@@ -103,19 +144,17 @@ public class TextPanel extends JPanel
     if (titleLabel == null)
     {
       titleLabel = new JLabel("California Games");
-//      titleLabel.setBorder(new LineBorder(new Color(0, 0, 0)));
       titleLabel.setBackground(Color.ORANGE);
       titleLabel.setFont(new Font("Microsoft Sans Serif", Font.BOLD, 37));
     }
     return titleLabel;
   }
 
-  private JTextPane getTextArea()
+  private JTextPane getTextPane()
   {
     if (textPane == null)
     {
       textPane = new JTextPane();
-//      textPane.setBorder(new LineBorder(new Color(0, 0, 0)));
       textPane.setForeground(Color.WHITE);
       textPane.setFont(new Font("Verdana", Font.PLAIN, 21));
       textPane.setOpaque(false);
@@ -124,6 +163,8 @@ public class TextPanel extends JPanel
         textPane
         .setText(text512);
       changeLineSpacing(textPane, -0.12f, true);
+      textPane.setEditable(false);
+      textPane.setFocusable(false);
       textPane.setPreferredSize(new Dimension(100, 275));
     }
     return textPane;

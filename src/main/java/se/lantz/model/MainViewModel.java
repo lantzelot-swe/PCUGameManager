@@ -349,6 +349,16 @@ public class MainViewModel extends AbstractModel
     List<GameListData> gamesList = dbConnector.fetchGamesByView(gameView);
     return readGameDetailsForExport(worker, gamesList);
   }
+  
+  public List<GameDetails> readGameDetailsForCarouselPreview()
+  {
+    List<GameDetails> returnList = new ArrayList<>();
+    for (GameListData game : dbConnector.fetchGamesByView(getSelectedGameView()))
+    {
+      returnList.add(dbConnector.getGameDetails(game.getGameId()));
+    }
+    return returnList;
+  }
 
   public void exportGameInfoFile(GameDetails gameDetails, File targetDir, PublishWorker worker, boolean fileLoader)
   {
@@ -502,6 +512,7 @@ public class MainViewModel extends AbstractModel
       }
     }
     this.disableChangeNotification(false);
+    this.notifyChange("selectedGamelistView", null, null);
     logger.debug("...done.");
   }
 
@@ -1166,5 +1177,10 @@ public class MainViewModel extends AbstractModel
     g.setColor(color);
     g.drawString(title, imgWidth / 2 - (int) textWidth / 2, imgHeight / 2 + (int) textHeight / 2);
     g.dispose();
+  }
+  
+  public GameDetails getCurrentGameDetails()
+  {
+    return this.currentGameDetails;
   }
 }
