@@ -31,4 +31,7 @@
 		<appender-ref ref="STDOUT" />
 		<appender-ref ref="FILE" />
 	</root>
+
+	<logger name="se.lantz.model.carousel" level="DEBUG" />
+    <logger name="se.lantz.gui.carousel" level="DEBUG" />
 </configuration>

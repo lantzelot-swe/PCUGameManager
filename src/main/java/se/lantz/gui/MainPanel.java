@@ -284,4 +284,9 @@ public class MainPanel extends JPanel
   {
     getGameDetailsBackgroundPanel().updateSavedStatesTabTitle();
   }
+  
+  public void setSelectedGameInGameList(String gameId)
+  {
+    getListPanel().setSelectedGameInGameList(gameId);
+  }
 }

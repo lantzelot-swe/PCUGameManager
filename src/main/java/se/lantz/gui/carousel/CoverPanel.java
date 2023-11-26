@@ -4,23 +4,40 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.Image;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseWheelListener;
+import java.awt.image.BufferedImage;
+import java.beans.Beans;
+import java.io.File;
+import java.io.IOException;
+import java.util.List;
 
+import javax.imageio.ImageIO;
 import javax.swing.AbstractAction;
+import javax.swing.BorderFactory;
+import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.KeyStroke;
 import javax.swing.Timer;
-import javax.swing.border.LineBorder;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import se.lantz.gui.MainWindow;
+import se.lantz.model.carousel.CarouselPreviewModel;
+import se.lantz.model.data.GameDetails;
 
 public class CoverPanel extends JPanel
 {
+  private static final Logger logger = LoggerFactory.getLogger(CarouselPreviewModel.class);
+
   private JPanel panel;
   private JScrollPane scrollPane;
 
@@ -30,11 +47,14 @@ public class CoverPanel extends JPanel
 
   private ActionListener timerListener = e -> scrollFromTimer();
 
-  private Timer scrolingTimer = new Timer(10, timerListener);
+  private Timer scrolingTimer = new Timer(7, timerListener);
+  private CarouselPreviewModel model;
+  private MainWindow mainWindow;
 
-  public CoverPanel()
+  public CoverPanel(CarouselPreviewModel model, final MainWindow mainWindow)
   {
-    //    setBorder(new LineBorder(new Color(0, 0, 0)));
+    this.model = model;
+    this.mainWindow = mainWindow;
     GridBagLayout gridBagLayout = new GridBagLayout();
     gridBagLayout.rowWeights = new double[] { 1.0 };
     gridBagLayout.columnWeights = new double[] { 1.0 };
@@ -47,7 +67,17 @@ public class CoverPanel extends JPanel
     gbc_scrollPane.gridx = 0;
     gbc_scrollPane.gridy = 0;
     add(getScrollPane(), gbc_scrollPane);
-    addCovers(100);
+    addCovers(10);
+
+    if (!Beans.isDesignTime())
+    {
+      model.addPropertyChangeListener(CarouselPreviewModel.SELECTED_GAME, e -> {
+        reloadScreens();
+        updateSelectedBorder();
+      });
+      //trigger once at startup
+      reloadScreens();
+    }
   }
 
   private JPanel getPanel()
@@ -99,6 +129,18 @@ public class CoverPanel extends JPanel
       scrollingTimerIndex = 0;
       scrolingTimer.stop();
       scrolingStopped = true;
+      //Select the next game in the list
+      String gameId = "";
+
+      if (scrollDirectionRight)
+      {
+        gameId = model.getNextGameToSelectWhenScrollingRight().getGameId();
+      }
+      else
+      {
+        gameId = model.getNextGameToSelectWhenScrollingLeft().getGameId();
+      }
+      this.mainWindow.setSelectedGameInGameList(gameId);
     }
   }
 
@@ -125,12 +167,22 @@ public class CoverPanel extends JPanel
 
   private void addCovers(int converCount)
   {
-
     for (int i = 0; i < converCount; i++)
     {
       GridBagConstraints gbc_label = new GridBagConstraints();
       gbc_label.fill = GridBagConstraints.BOTH;
-      gbc_label.insets = new Insets(5, 22, 5, 23);
+      if (i == 0)
+      {
+        gbc_label.insets = new Insets(5, 100, 5, 23);
+      }
+      else if (i == converCount - 1)
+      {
+        gbc_label.insets = new Insets(5, 22, 5, 100);
+      }
+      else
+      {
+        gbc_label.insets = new Insets(5, 22, 5, 23);
+      }
       gbc_label.weighty = 1.0;
       gbc_label.gridx = i;
       gbc_label.gridy = 0;
@@ -140,11 +192,12 @@ public class CoverPanel extends JPanel
 
   private JLabel getLabel(int index)
   {
-    JLabel label = new JLabel("Label");
-    label.setBorder(new LineBorder(new Color(0, 0, 0)));
+    JLabel label = new JLabel();
     label.setPreferredSize(new Dimension(125, 175));
-//    label.setBackground(Color.red);
-//    label.setOpaque(true);
+    if (index == 4)
+    {
+      label.setBorder(BorderFactory.createLineBorder(Color.YELLOW, 5));
+    }
     return label;
   }
 
@@ -156,5 +209,63 @@ public class CoverPanel extends JPanel
       scrolingStopped = false;
       scrolingTimer.start();
     }
+  }
+
+  private void reloadScreens()
+  {
+    panel.setVisible(false);
+    //Remove all existing
+    panel.removeAll();
+    addCovers(10);
+    List<GameDetails> games = model.getGameDetails();
+
+    for (int i = 0; i < games.size(); i++)
+    {
+      GameDetails game = games.get(i);
+      loadScreen((JLabel) panel.getComponent(i), game);
+    }
+    scrollToPosition();
+    panel.setVisible(true);
+  }
+
+  private void updateSelectedBorder()
+  {
+    for (int i = 0; i < panel.getComponentCount(); i++)
+    {
+      ((JLabel) panel.getComponent(i)).setBorder(null);
+    }
+
+    List<GameDetails> games = model.getGameDetails();
+
+    for (int i = 0; i < games.size(); i++)
+    {
+      if (games.indexOf(model.getSelectedGame()) == i)
+      {
+        //        logger.debug("Setting selected border to cover nr " + i);
+        ((JLabel) panel.getComponent(i)).setBorder(BorderFactory.createLineBorder(Color.YELLOW, 5));
+      }
+    }
+  }
+
+  private void loadScreen(JLabel label, GameDetails game)
+  {
+    String filename = game.getCover();
+    File imagefile = new File("./covers/" + filename);
+    try
+    {
+      BufferedImage image = ImageIO.read(imagefile);
+      Image newImage = image.getScaledInstance(125, 175, Image.SCALE_SMOOTH);
+      label.setIcon(new ImageIcon(newImage));
+    }
+    catch (IOException e)
+    {
+      (label).setIcon(null);
+    }
+  }
+
+  public void scrollToPosition()
+  {
+    //Scroll one game 
+    scrollPane.getHorizontalScrollBar().setValue(200);
   }
 }

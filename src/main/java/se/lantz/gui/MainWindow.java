@@ -145,4 +145,9 @@ public final class MainWindow extends JFrame
   {
     this.menuManager.checkForNewPCUAEVersionAtStartup();
   }
+  
+  public void setSelectedGameInGameList(String gameId)
+  {
+    getMainPanel().setSelectedGameInGameList(gameId);
+  }
 }

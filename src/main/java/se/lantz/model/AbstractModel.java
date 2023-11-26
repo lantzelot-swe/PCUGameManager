@@ -59,6 +59,15 @@ public abstract class AbstractModel
       propertyChangeSupport.firePropertyChange(property, oldValue, newValue);
     }
   }
+  
+  protected void notifyChange(String property)
+  {
+    if (!disable)
+    {
+      dataChanged = true;
+      propertyChangeSupport.firePropertyChange(property, null, null);
+    }
+  }
 
   public boolean isDataChanged()
   {

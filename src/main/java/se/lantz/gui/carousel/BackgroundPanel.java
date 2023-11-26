@@ -8,6 +8,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 
+import se.lantz.gui.MainWindow;
 import se.lantz.model.MainViewModel;
 import se.lantz.model.carousel.CarouselPreviewModel;
 import se.lantz.model.data.GameDetails;
@@ -25,9 +26,11 @@ import java.awt.Color;
 
 public class BackgroundPanel extends JPanel {
   private CarouselPreviewModel model;
+  private MainWindow mainWindow;
   
-  public BackgroundPanel(final MainViewModel uiModel) {
-    model = new CarouselPreviewModel(uiModel);
+  public BackgroundPanel(final CarouselPreviewModel model, final MainWindow mainWindow) {
+    this.mainWindow = mainWindow;
+    this.model = model;
     
     GridBagLayout gridBagLayout = new GridBagLayout();
     setLayout(gridBagLayout);
@@ -67,6 +70,10 @@ public class BackgroundPanel extends JPanel {
   
   private void reloadScreens()
   {
+    if (model.getSelectedGame() == null)
+    {
+      return;
+    }
     String filename = model.getSelectedGame().getScreen1();
       BufferedImage image = null;
       if (!filename.isEmpty())
@@ -135,8 +142,14 @@ public class BackgroundPanel extends JPanel {
   }
   private CoverPanel getCoverPanel() {
     if (coverPanel == null) {
-    	coverPanel = new CoverPanel();
+    	coverPanel = new CoverPanel(model, this.mainWindow);
     }
     return coverPanel;
+  }
+  
+  public void initialScroll()
+  {
+    //Scroll one game 
+    getCoverPanel().scrollToPosition();
   }
 }

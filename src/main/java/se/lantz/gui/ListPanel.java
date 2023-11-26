@@ -275,8 +275,8 @@ public class ListPanel extends JPanel
 
           }
         });
-      
-      listViewEditButton.setToolTipText("<html>Manage gamelist views</html>" );
+
+      listViewEditButton.setToolTipText("<html>Manage gamelist views</html>");
     }
     return listViewEditButton;
   }
@@ -385,6 +385,25 @@ public class ListPanel extends JPanel
     list.setSelectionInterval(indexToSelect, indexToSelect);
     updateSelectedGame();
     list.ensureIndexIsVisible(indexToSelect);
+  }
+
+  public void setSelectedGameInGameList(String gameId)
+  {
+    List<GameListData> currentGameList = uiModel.getGameListModel().getCurrentGameList();
+    for (int i = 0; i < currentGameList.size(); i++)
+    {
+      if (currentGameList.get(i).getGameId().equals(gameId))
+      {
+        int indexToSelect = i;
+        if (i >= uiModel.getGameListModel().getSize())
+        {
+          indexToSelect = uiModel.getGameListModel().getSize() - 1;
+        }
+        list.setSelectionInterval(indexToSelect, indexToSelect);
+        list.ensureIndexIsVisible(indexToSelect);
+        break;
+      }
+    }
   }
 
   public void clearGameListSelection()
@@ -829,7 +848,7 @@ public class ListPanel extends JPanel
       mainPanel.repaintAfterModifications();
     }
   }
-  
+
   public void reloadCurrentGameView()
   {
     GameListData selectedData = getList().getSelectedValue();

@@ -216,18 +216,18 @@ public class MainViewModel extends AbstractModel
 
     List<GameView> gameViewList = dbConnector.loadGameViews();
     Collections.sort(gameViewList);
-    
+
     for (GameView gameView : gameViewList)
     {
       gameViewModel.addElement(gameView);
       //Select each gameview to load all games so that the game count is shown directly (may be a performance issue?)
       gameViewModel.setSelectedItem(gameView);
     }
-    
+
     if (gameViewList.isEmpty())
     {
       //Select the last favorites to get count on all (not sure why that works...)
-      gameViewModel.setSelectedItem(gameViewModel.getElementAt(gameViewModel.getSize()-1));
+      gameViewModel.setSelectedItem(gameViewModel.getElementAt(gameViewModel.getSize() - 1));
     }
     //Finish by selecting all games view again
     gameViewModel.setSelectedItem(allGameView);
@@ -349,15 +349,69 @@ public class MainViewModel extends AbstractModel
     List<GameListData> gamesList = dbConnector.fetchGamesByView(gameView);
     return readGameDetailsForExport(worker, gamesList);
   }
-  
+
   public List<GameDetails> readGameDetailsForCarouselPreview()
   {
     List<GameDetails> returnList = new ArrayList<>();
-    for (GameListData game : dbConnector.fetchGamesByView(getSelectedGameView()))
+    GameListData current = this.selectedData;
+    List<GameListData> gamesInView = dbConnector.fetchGamesByView(getSelectedGameView());
+    int selectedGameIndex = gamesInView.indexOf(current);
+    
+    if (selectedGameIndex < 0)
     {
+      return returnList;
+    }
+    
+    int start = selectedGameIndex - 4;
+    int end = selectedGameIndex + 6;
+
+    List<GameListData> subList = new ArrayList<>(
+      gamesInView.subList(start < 0 ? 0 : start, end > (gamesInView.size() - 1) ? gamesInView.size() : end));
+
+    //Add to beginning if negative
+    for (int i = 0; i < -start; i++)
+    {
+      int listIndex = gamesInView.size()- 1 - i;
+      subList.add(0, gamesInView.get(listIndex));
+    }
+    
+    //Add at end if larger than list size
+    for (int i = 0; i < (end - gamesInView.size()); i++)
+    {
+      subList.add(gamesInView.get(i));
+    }
+
+    for (GameListData game : subList)
+    {
+      //find the selected position in the list and return 4 before and 5 after
       returnList.add(dbConnector.getGameDetails(game.getGameId()));
     }
     return returnList;
+  }
+  
+  public GameDetails getNextGameDetailsWhenScrolling(boolean scrollingRight)
+  {
+    GameListData current = this.selectedData;
+    List<GameListData> gamesInView = dbConnector.fetchGamesByView(getSelectedGameView());
+    int selectedGameIndex = gamesInView.indexOf(current);
+    int indexToAdd = 0;
+    if (scrollingRight)
+    {
+      indexToAdd = selectedGameIndex + 5;
+      if (indexToAdd > gamesInView.size()-1)
+      {
+        indexToAdd = indexToAdd - gamesInView.size();
+      }
+    }
+    else
+    {
+      indexToAdd = selectedGameIndex - 4;
+      if (indexToAdd < 0)
+      {
+        indexToAdd = gamesInView.size()-1 + indexToAdd;
+      }
+    }
+    return dbConnector.getGameDetails(gamesInView.get(indexToAdd).getGameId());
   }
 
   public void exportGameInfoFile(GameDetails gameDetails, File targetDir, PublishWorker worker, boolean fileLoader)
@@ -545,7 +599,7 @@ public class MainViewModel extends AbstractModel
   {
     dbConnector.saveGameView(gameView);
   }
-  
+
   public void createAndUpdateGameViewForImportedGBGames(String mainGameView)
   {
     dbConnector.createAndUpdateGameViewForImportedGBGames(mainGameView);
@@ -755,7 +809,7 @@ public class MainViewModel extends AbstractModel
       allGameView.setGameCount(allGamesCount);
     }
   }
-  
+
   public void deleteGames(List<GameListData> selectedGameListData)
   {
     //First delete all covers, screens and games 
@@ -1002,7 +1056,7 @@ public class MainViewModel extends AbstractModel
       gameListModel.notifyChange();
     }
   }
-  
+
   public void setPrimaryJoystick(boolean port1)
   {
     //Enough to toggle on joy 1 model?
@@ -1056,7 +1110,7 @@ public class MainViewModel extends AbstractModel
   {
     dbConnector.resetJoystickConfigsForView(getSelectedGameView());
   }
-  
+
   public void updatePrimaryJoystickPort(List<String> gameIdList, boolean port1)
   {
     dbConnector.updatePrimaryJoystickPort(gameIdList, port1);
@@ -1178,7 +1232,7 @@ public class MainViewModel extends AbstractModel
     g.drawString(title, imgWidth / 2 - (int) textWidth / 2, imgHeight / 2 + (int) textHeight / 2);
     g.dispose();
   }
-  
+
   public GameDetails getCurrentGameDetails()
   {
     return this.currentGameDetails;
