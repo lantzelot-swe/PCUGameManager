@@ -6,9 +6,9 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Image;
 import java.awt.Insets;
-import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelListener;
 import java.awt.image.BufferedImage;
 import java.beans.Beans;
@@ -17,14 +17,12 @@ import java.io.IOException;
 import java.util.List;
 
 import javax.imageio.ImageIO;
-import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
-import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.KeyStroke;
+import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 
 import org.slf4j.Logger;
@@ -88,27 +86,6 @@ public class CoverPanel extends JPanel
       GridBagLayout gbl_panel = new GridBagLayout();
       panel.setLayout(gbl_panel);
 
-      panel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, 0),
-                                                               "scrollRight");
-      panel.getActionMap().put("scrollRight", new AbstractAction()
-        {
-          @Override
-          public void actionPerformed(ActionEvent e)
-          {
-            scrollOneGame(true);
-          }
-        });
-
-      panel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, 0),
-                                                               "scrollLeft");
-      panel.getActionMap().put("scrollLeft", new AbstractAction()
-        {
-          @Override
-          public void actionPerformed(ActionEvent e)
-          {
-            scrollOneGame(false);
-          }
-        });
       panel.setBackground(new Color(138, 137, 138));
     }
     return panel;
@@ -134,11 +111,11 @@ public class CoverPanel extends JPanel
 
       if (scrollDirectionRight)
       {
-        gameId = model.getNextGameToSelectWhenScrollingRight().getGameId();
+        gameId = model.getNextGameToSelectWhenScrollingRight();
       }
       else
       {
-        gameId = model.getNextGameToSelectWhenScrollingLeft().getGameId();
+        gameId = model.getNextGameToSelectWhenScrollingLeft();
       }
       this.mainWindow.setSelectedGameInGameList(gameId);
     }
@@ -160,7 +137,6 @@ public class CoverPanel extends JPanel
       {
         scrollPane.removeMouseWheelListener(listener);
       }
-      scrollPane.addMouseWheelListener(a -> scrollOneGame(a.getWheelRotation() > 0));
     }
     return scrollPane;
   }
@@ -197,6 +173,19 @@ public class CoverPanel extends JPanel
     if (index == 4)
     {
       label.setBorder(BorderFactory.createLineBorder(Color.YELLOW, 5));
+      label.addMouseListener(new MouseAdapter()
+      {
+
+        @Override
+        public void mouseClicked(MouseEvent e)
+        {
+          if (SwingUtilities.isLeftMouseButton(e) && e.getClickCount() == 2)
+          {
+            //trigger run game
+            mainWindow.getMainPanel().runCurrentGame();
+          }
+        }
+      });
     }
     return label;
   }
@@ -209,6 +198,18 @@ public class CoverPanel extends JPanel
       scrolingStopped = false;
       scrolingTimer.start();
     }
+  }
+  
+  protected void pageUpTriggered()
+  {
+    String gameId = model.getGameIdForPageUp();
+    this.mainWindow.setSelectedGameInGameList(gameId);
+  }
+  
+  protected void pageDownTriggered()
+  {
+    String gameId = model.getGameIdForPageDown();
+    this.mainWindow.setSelectedGameInGameList(gameId);
   }
 
   private void reloadScreens()

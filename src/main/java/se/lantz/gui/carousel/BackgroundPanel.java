@@ -1,38 +1,42 @@
 package se.lantz.gui.carousel;
 
 import java.awt.Graphics;
-import java.awt.Image;
-
-import javax.imageio.ImageIO;
-import javax.swing.AbstractAction;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JComponent;
-import javax.swing.JPanel;
-import javax.swing.KeyStroke;
-
-import se.lantz.gui.MainWindow;
-import se.lantz.model.MainViewModel;
-import se.lantz.model.carousel.CarouselPreviewModel;
-import se.lantz.model.data.GameDetails;
-
-import java.awt.GridBagLayout;
-import javax.swing.JLabel;
 import java.awt.GridBagConstraints;
-import java.awt.Font;
+import java.awt.GridBagLayout;
+import java.awt.Image;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 import java.beans.Beans;
 import java.io.File;
 import java.io.IOException;
-import java.awt.Color;
+
+import javax.imageio.ImageIO;
+import javax.swing.AbstractAction;
+import javax.swing.ImageIcon;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.KeyStroke;
+import javax.swing.Timer;
+
+import se.lantz.gui.MainWindow;
+import se.lantz.model.carousel.CarouselPreviewModel;
 
 public class BackgroundPanel extends JPanel
 {
+  private boolean screen1Showing = true;
+  private ActionListener screenshotSwitchAction = e -> loadScreenshot(!screen1Showing);
+  private Timer screenshotRotationTimer = new Timer(4000, screenshotSwitchAction);
   private CarouselPreviewModel model;
   private MainWindow mainWindow;
+
+  private Image background;
+  private JLabel screenShotLabel;
+  private TextPanel textPanel;
+  private CoverPanel coverPanel;
 
   public BackgroundPanel(final CarouselPreviewModel model, final MainWindow mainWindow)
   {
@@ -85,6 +89,45 @@ public class BackgroundPanel extends JPanel
           mainWindow.getMainPanel().runCurrentGame();
         }
       });
+
+    getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, 0), "scrollRight");
+    getActionMap().put("scrollRight", new AbstractAction()
+      {
+        @Override
+        public void actionPerformed(ActionEvent e)
+        {
+          getCoverPanel().scrollOneGame(true);
+        }
+      });
+
+    getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, 0), "scrollLeft");
+    getActionMap().put("scrollLeft", new AbstractAction()
+      {
+        @Override
+        public void actionPerformed(ActionEvent e)
+        {
+          getCoverPanel().scrollOneGame(false);
+        }
+      });
+    
+    getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_PAGE_UP, 0), "pageUp");
+    getActionMap().put("pageUp", new AbstractAction()
+      {
+        @Override
+        public void actionPerformed(ActionEvent e)
+        {
+          getCoverPanel().pageUpTriggered();
+        }
+      });
+      getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_PAGE_DOWN, 0), "pageDown");
+      getActionMap().put("pageDown", new AbstractAction()
+        {
+          @Override
+          public void actionPerformed(ActionEvent e)
+          {
+            getCoverPanel().pageDownTriggered();
+          }
+        });
   }
 
   private void reloadScreens()
@@ -93,7 +136,13 @@ public class BackgroundPanel extends JPanel
     {
       return;
     }
-    String filename = model.getSelectedGame().getScreen1();
+    loadScreenshot(true);
+    screenshotRotationTimer.restart();
+  }
+  
+  private void loadScreenshot(boolean screen1)
+  {
+    String filename = screen1 ? model.getSelectedGame().getScreen1() : model.getSelectedGame().getScreen2();
     BufferedImage image = null;
     if (!filename.isEmpty())
     {
@@ -113,12 +162,8 @@ public class BackgroundPanel extends JPanel
     {
       getScreenshotLabel().setIcon(null);
     }
+    screen1Showing = screen1;
   }
-
-  private Image background;
-  private JLabel screenShotLabel;
-  private TextPanel textPanel;
-  private CoverPanel coverPanel;
 
   public void paintComponent(Graphics g)
   {
@@ -147,10 +192,6 @@ public class BackgroundPanel extends JPanel
     if (screenShotLabel == null)
     {
       screenShotLabel = new JLabel();
-
-      //    	Image image = new ImageIcon(getClass().getResource(selectedGame.getScreen1())).getImage();
-      //    	Image scaledImage = image.getScaledInstance(694, 401, Image.SCALE_SMOOTH);
-      //    	screenShotLabel.setIcon(new ImageIcon(scaledImage));
     }
     return screenShotLabel;
   }

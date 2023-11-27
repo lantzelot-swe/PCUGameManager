@@ -21,6 +21,7 @@ import javax.swing.text.StyleConstants;
 
 import se.lantz.model.carousel.CarouselPreviewModel;
 import se.lantz.model.data.GameDetails;
+import se.lantz.util.GenreMap;
 
 public class TextPanel extends JPanel
 {
@@ -31,8 +32,7 @@ public class TextPanel extends JPanel
   private JLabel genreLabel;
   private JLabel yearLabel;
   private CarouselPreviewModel model;
-  
-  Map<String, String> genreMap = new HashMap<>();
+  private GenreMap genreMap = new GenreMap();
 
   public TextPanel(final CarouselPreviewModel model)
   {
@@ -92,18 +92,6 @@ public class TextPanel extends JPanel
       //trigger once at startup
       selectedGameChanged();
     }
-    
-    //TODO Centralize this. look at GenreComboBox
-    genreMap.put("", "----");
-    genreMap.put("adventure", "Adventure");
-    genreMap.put("driving", "Driving");
-    genreMap.put("maze", "Maze");
-    genreMap.put("platform", "Platform");
-    genreMap.put("programming", "Programming");
-    genreMap.put("puzzle", "Puzzle");
-    genreMap.put("shoot", "Shoot'em up");
-    genreMap.put("simulation", "Simulation");
-    genreMap.put("sport", "Sport");
   }
   
   private void selectedGameChanged()
@@ -113,32 +101,13 @@ public class TextPanel extends JPanel
     {
       getTitleLabel().setText(selectedGame.getTitle());
       getTextPane().setText(selectedGame.getDescription());
-      getAuthorLabel().setText(selectedGame.getAuthor().isEmpty() ? " " : selectedGame.getAuthor());
-      getComposerLabel().setText(selectedGame.getComposer().isEmpty() ? " " : selectedGame.getComposer());
+      getAuthorLabel().setText(selectedGame.getAuthor().isEmpty() ? "-" : selectedGame.getAuthor());
+      getComposerLabel().setText(selectedGame.getComposer().isEmpty() ? "-" : selectedGame.getComposer());
       getGenreLabel().setText(genreMap.get(selectedGame.getGenre()));
       getYearLabel().setText(selectedGame.getYear() + "");
     }
   }
   
-
-  public TextPanel(LayoutManager layout)
-  {
-    super(layout);
-    // TODO Auto-generated constructor stub
-  }
-
-  public TextPanel(boolean isDoubleBuffered)
-  {
-    super(isDoubleBuffered);
-    // TODO Auto-generated constructor stub
-  }
-
-  public TextPanel(LayoutManager layout, boolean isDoubleBuffered)
-  {
-    super(layout, isDoubleBuffered);
-    // TODO Auto-generated constructor stub
-  }
-
   private JLabel getTitleLabel()
   {
     if (titleLabel == null)

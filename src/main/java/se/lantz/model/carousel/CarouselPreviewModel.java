@@ -65,16 +65,28 @@ public class CarouselPreviewModel extends AbstractModel
     return selectedGame;
   }
 
-  public GameDetails getNextGameToSelectWhenScrollingRight()
+  public String getNextGameToSelectWhenScrollingRight()
   {
     int index = dataList.indexOf(selectedGame) + 1;
-    return dataList.get(index);
+    return dataList.get(index).getGameId();
   }
 
-  public GameDetails getNextGameToSelectWhenScrollingLeft()
+  public String getNextGameToSelectWhenScrollingLeft()
   {
     int index = dataList.indexOf(selectedGame) - 1;
-    return dataList.get(index);
+    return dataList.get(index).getGameId();
+  }
+  
+  public String getGameIdForPageUp()
+  {
+    int index = dataList.indexOf(selectedGame) - 4;
+    return dataList.get(index).getGameId();
+  }
+  
+  public String getGameIdForPageDown()
+  {
+    int index = dataList.indexOf(selectedGame) + 4;
+    return dataList.get(index).getGameId();
   }
 
   public void setSelectedGame(GameDetails selectedGame)
@@ -82,7 +94,14 @@ public class CarouselPreviewModel extends AbstractModel
     logger.debug("setSelectedGame: " + selectedGame);
     //Update the entire data list
     dataList = mainModel.readGameDetailsForCarouselPreview();
-    this.selectedGame = dataList.get(4);
-    this.notifyChange(SELECTED_GAME);
+    if (dataList.size() < 10)
+    {
+      this.notifyChange(CLOSE_PREVIEW);
+    }
+    else
+    {
+      this.selectedGame = dataList.get(4);
+      this.notifyChange(SELECTED_GAME);
+    }
   }
 }
