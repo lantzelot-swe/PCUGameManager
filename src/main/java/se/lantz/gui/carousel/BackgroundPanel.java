@@ -4,9 +4,12 @@ import java.awt.Graphics;
 import java.awt.Image;
 
 import javax.imageio.ImageIO;
+import javax.swing.AbstractAction;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JPanel;
+import javax.swing.KeyStroke;
 
 import se.lantz.gui.MainWindow;
 import se.lantz.model.MainViewModel;
@@ -18,20 +21,24 @@ import javax.swing.JLabel;
 import java.awt.GridBagConstraints;
 import java.awt.Font;
 import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 import java.beans.Beans;
 import java.io.File;
 import java.io.IOException;
 import java.awt.Color;
 
-public class BackgroundPanel extends JPanel {
+public class BackgroundPanel extends JPanel
+{
   private CarouselPreviewModel model;
   private MainWindow mainWindow;
-  
-  public BackgroundPanel(final CarouselPreviewModel model, final MainWindow mainWindow) {
+
+  public BackgroundPanel(final CarouselPreviewModel model, final MainWindow mainWindow)
+  {
     this.mainWindow = mainWindow;
     this.model = model;
-    
+
     GridBagLayout gridBagLayout = new GridBagLayout();
     setLayout(gridBagLayout);
     GridBagConstraints gbc_coverPanel = new GridBagConstraints();
@@ -57,17 +64,29 @@ public class BackgroundPanel extends JPanel {
     gbc_textPanel.gridx = 1;
     gbc_textPanel.gridy = 0;
     add(getTextPanel(), gbc_textPanel);
-    
+
     setBackground("/se/lantz/carousel/Carousel1400x788-modified.png");
-    
+
     if (!Beans.isDesignTime())
     {
       model.addPropertyChangeListener(CarouselPreviewModel.SELECTED_GAME, e -> reloadScreens());
       //trigger once at startup
       reloadScreens();
     }
+
+    this.addMouseWheelListener(a -> getCoverPanel().scrollOneGame(a.getWheelRotation() > 0));
+
+    this.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "runGame");
+    this.getActionMap().put("runGame", new AbstractAction()
+      {
+        @Override
+        public void actionPerformed(ActionEvent e)
+        {
+          mainWindow.getMainPanel().runCurrentGame();
+        }
+      });
   }
-  
+
   private void reloadScreens()
   {
     if (model.getSelectedGame() == null)
@@ -75,78 +94,85 @@ public class BackgroundPanel extends JPanel {
       return;
     }
     String filename = model.getSelectedGame().getScreen1();
-      BufferedImage image = null;
-      if (!filename.isEmpty())
+    BufferedImage image = null;
+    if (!filename.isEmpty())
+    {
+      File imagefile = new File("./screens/" + filename);
+      try
       {
-        File imagefile = new File("./screens/" + filename);
-        try
-        {
-          image = ImageIO.read(imagefile);
-          Image newImage = image.getScaledInstance(694, 401, Image.SCALE_SMOOTH);
-          getScreenshotLabel().setIcon(new ImageIcon(newImage));
-        }
-        catch (IOException e)
-        {
-          getScreenshotLabel().setIcon(null);
-        }
+        image = ImageIO.read(imagefile);
+        Image newImage = image.getScaledInstance(694, 401, Image.SCALE_SMOOTH);
+        getScreenshotLabel().setIcon(new ImageIcon(newImage));
       }
-      else
+      catch (IOException e)
       {
         getScreenshotLabel().setIcon(null);
       }
+    }
+    else
+    {
+      getScreenshotLabel().setIcon(null);
+    }
   }
-  
-  
-  
 
   private Image background;
   private JLabel screenShotLabel;
   private TextPanel textPanel;
   private CoverPanel coverPanel;
 
-  public void paintComponent(Graphics g) {
+  public void paintComponent(Graphics g)
+  {
 
     int width = this.getSize().width;
     int height = this.getSize().height;
 
-    if (this.background != null) {
+    if (this.background != null)
+    {
       g.drawImage(this.background, 0, 0, width, height, null);
     }
 
     super.paintComponent(g);
   }
 
-  public void setBackground(String imagePath) {
-    
+  public void setBackground(String imagePath)
+  {
+
     this.setOpaque(false);
     this.background = new ImageIcon(getClass().getResource(imagePath)).getImage();
     repaint();
   }
 
+  private JLabel getScreenshotLabel()
+  {
+    if (screenShotLabel == null)
+    {
+      screenShotLabel = new JLabel();
 
-  private JLabel getScreenshotLabel() {
-    if (screenShotLabel == null) {
-    	screenShotLabel = new JLabel();
-    	
-//    	Image image = new ImageIcon(getClass().getResource(selectedGame.getScreen1())).getImage();
-//    	Image scaledImage = image.getScaledInstance(694, 401, Image.SCALE_SMOOTH);
-//    	screenShotLabel.setIcon(new ImageIcon(scaledImage));
+      //    	Image image = new ImageIcon(getClass().getResource(selectedGame.getScreen1())).getImage();
+      //    	Image scaledImage = image.getScaledInstance(694, 401, Image.SCALE_SMOOTH);
+      //    	screenShotLabel.setIcon(new ImageIcon(scaledImage));
     }
     return screenShotLabel;
   }
-  private TextPanel getTextPanel() {
-    if (textPanel == null) {
-    	textPanel = new TextPanel(model);
+
+  private TextPanel getTextPanel()
+  {
+    if (textPanel == null)
+    {
+      textPanel = new TextPanel(model);
     }
     return textPanel;
   }
-  private CoverPanel getCoverPanel() {
-    if (coverPanel == null) {
-    	coverPanel = new CoverPanel(model, this.mainWindow);
+
+  private CoverPanel getCoverPanel()
+  {
+    if (coverPanel == null)
+    {
+      coverPanel = new CoverPanel(model, this.mainWindow);
     }
     return coverPanel;
   }
-  
+
   public void initialScroll()
   {
     //Scroll one game 

@@ -67,7 +67,7 @@ public class BaseDialog extends JDialog
     return backgroundPanel;
   }
 
-  private JPanel getButtonPanel()
+  protected JPanel getButtonPanel()
   {
     if (buttonPanel == null)
     {

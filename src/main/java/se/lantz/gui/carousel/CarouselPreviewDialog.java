@@ -2,7 +2,12 @@ package se.lantz.gui.carousel;
 
 import java.awt.Dimension;
 import java.awt.Frame;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.beans.Beans;
+
+import javax.swing.JButton;
 
 import se.lantz.gui.BaseDialog;
 import se.lantz.gui.MainWindow;
@@ -15,6 +20,7 @@ public class CarouselPreviewDialog extends BaseDialog
   private MainViewModel uiModel;
   private MainWindow mainWindow;
   private CarouselPreviewModel model;
+  private JButton runGameButton;
 
   public CarouselPreviewDialog(final MainWindow owner, final MainViewModel uiModel)
   {
@@ -22,13 +28,12 @@ public class CarouselPreviewDialog extends BaseDialog
     this.model = new CarouselPreviewModel(uiModel);
     this.uiModel = uiModel;
     this.mainWindow = owner;
-    addContent(getBackgroundPanel());
-    getOkButton().setPreferredSize(null);
-    getOkButton().setText("Close");
-    getCancelButton().setVisible(false);
-    this.setPreferredSize(new Dimension(1400, 802));
+    this.setPreferredSize(new Dimension(1400, 760));
     this.setResizable(false);
     this.setModal(false);
+    addContent(getBackgroundPanel());
+    getButtonPanel().setVisible(false);
+
     if (!Beans.isDesignTime())
     {
       uiModel.addPropertyChangeListener("selectedGamelistView", e -> modelChanged());
@@ -36,7 +41,18 @@ public class CarouselPreviewDialog extends BaseDialog
       //trigger once at startup
       modelChanged();
     }
-    
+  }
+  
+ 
+  private JButton getRunGameButton()
+  {
+    if (runGameButton == null)
+    {
+      runGameButton = new JButton("Run selected game");
+      runGameButton.setPreferredSize(null);
+      
+    }
+    return runGameButton;
   }
   
   private void modelChanged()

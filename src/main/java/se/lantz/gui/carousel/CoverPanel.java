@@ -173,7 +173,7 @@ public class CoverPanel extends JPanel
       gbc_label.fill = GridBagConstraints.BOTH;
       if (i == 0)
       {
-        gbc_label.insets = new Insets(5, 100, 5, 23);
+        gbc_label.insets = new Insets(5, 140, 5, 23);
       }
       else if (i == converCount - 1)
       {
@@ -201,7 +201,7 @@ public class CoverPanel extends JPanel
     return label;
   }
 
-  private void scrollOneGame(boolean right)
+  protected void scrollOneGame(boolean right)
   {
     if (scrolingStopped)
     {

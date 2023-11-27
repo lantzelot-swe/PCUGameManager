@@ -3,6 +3,8 @@ package se.lantz.model.carousel;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.SwingUtilities;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,7 +27,8 @@ public class CarouselPreviewModel extends AbstractModel
   public CarouselPreviewModel(MainViewModel mainModel)
   {
     this.mainModel = mainModel;
-    mainModel.addPropertyChangeListener("selectedGamelistView", e -> reloadCarousel());
+    mainModel.addPropertyChangeListener("selectedGamelistView",
+                                        e -> SwingUtilities.invokeLater(() -> reloadCarousel()));
     mainModel.addPropertyChangeListener("gameSelected", e -> setSelectedGame(mainModel.getCurrentGameDetails()));
     dataList = mainModel.readGameDetailsForCarouselPreview();
     if (dataList.size() < 10)
