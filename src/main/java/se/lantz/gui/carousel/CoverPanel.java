@@ -2,6 +2,7 @@ package se.lantz.gui.carousel;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Graphics;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Image;
@@ -72,6 +73,10 @@ public class CoverPanel extends JPanel
       model.addPropertyChangeListener(CarouselPreviewModel.SELECTED_GAME, e -> {
         reloadScreens();
         updateSelectedBorder();
+      });
+      
+      model.addPropertyChangeListener(CarouselPreviewModel.CLEAR_SELECTION, e -> {
+        clearSelectedBorder();
       });
       //trigger once at startup
       reloadScreens();
@@ -242,9 +247,18 @@ public class CoverPanel extends JPanel
     {
       if (games.indexOf(model.getSelectedGame()) == i)
       {
-        //        logger.debug("Setting selected border to cover nr " + i);
-        ((JLabel) panel.getComponent(i)).setBorder(BorderFactory.createLineBorder(Color.YELLOW, 5));
+        JLabel selectedLabel = (JLabel) panel.getComponent(i);
+        selectedLabel.setBorder(BorderFactory.createLineBorder(Color.YELLOW, 5));
+        loadScreenForBorder(selectedLabel, games.get(i));
       }
+    }
+  }
+  
+  private void clearSelectedBorder()
+  {
+    for (int i = 0; i < panel.getComponentCount(); i++)
+    {
+      ((JLabel) panel.getComponent(i)).setBorder(null);
     }
   }
 
@@ -257,6 +271,26 @@ public class CoverPanel extends JPanel
       BufferedImage image = ImageIO.read(imagefile);
       Image newImage = image.getScaledInstance(125, 175, Image.SCALE_SMOOTH);
       label.setIcon(new ImageIcon(newImage));
+    }
+    catch (IOException e)
+    {
+      (label).setIcon(null);
+    }
+  }
+  
+  private void loadScreenForBorder(JLabel label, GameDetails game)
+  {
+    String filename = game.getCover();
+    File imagefile = new File("./covers/" + filename);
+    try
+    {
+      BufferedImage image = ImageIO.read(imagefile);
+      Image newImage = image.getScaledInstance(125, 175, Image.SCALE_SMOOTH);
+      BufferedImage copyOfImage =
+        new BufferedImage(125, 175, BufferedImage.TYPE_INT_ARGB);
+      Graphics g = copyOfImage.createGraphics();
+      g.drawImage(newImage, 0, 0, null);
+      label.setIcon(new ImageIcon(copyOfImage.getSubimage(5, 5, 115, 165)));
     }
     catch (IOException e)
     {

@@ -3,18 +3,16 @@ package se.lantz.gui.carousel;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.Graphics;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.awt.LayoutManager;
 import java.beans.Beans;
-import java.util.HashMap;
-import java.util.Map;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextPane;
-import javax.swing.border.LineBorder;
+import javax.swing.SwingUtilities;
 import javax.swing.text.MutableAttributeSet;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
@@ -44,7 +42,7 @@ public class TextPanel extends JPanel
     GridBagConstraints gbc_titleLabel = new GridBagConstraints();
     gbc_titleLabel.gridwidth = 2;
     gbc_titleLabel.weightx = 1.0;
-    gbc_titleLabel.insets = new Insets(17, 20, 5, 0);
+    gbc_titleLabel.insets = new Insets(17, 20, 6, 5);
     gbc_titleLabel.anchor = GridBagConstraints.NORTHWEST;
     gbc_titleLabel.fill = GridBagConstraints.HORIZONTAL;
     gbc_titleLabel.gridx = 0;
@@ -93,28 +91,55 @@ public class TextPanel extends JPanel
       selectedGameChanged();
     }
   }
-  
+
   private void selectedGameChanged()
   {
     GameDetails selectedGame = model.getSelectedGame();
     if (selectedGame != null)
     {
-      getTitleLabel().setText(selectedGame.getTitle());
-      getTextPane().setText(selectedGame.getDescription());
-      getAuthorLabel().setText(selectedGame.getAuthor().isEmpty() ? "-" : selectedGame.getAuthor());
-      getComposerLabel().setText(selectedGame.getComposer().isEmpty() ? "-" : selectedGame.getComposer());
-      getGenreLabel().setText(genreMap.get(selectedGame.getGenre()));
-      getYearLabel().setText(selectedGame.getYear() + "");
+      SwingUtilities.invokeLater(() -> {
+        getTitleLabel().setText(truncateText(getTitleLabel(), selectedGame.getTitle(), 600));
+        getTextPane().setText(selectedGame.getDescription());
+        getAuthorLabel().setText(selectedGame.getAuthor().isEmpty()
+          ? "-"
+          : truncateText(getAuthorLabel(), selectedGame.getAuthor(), 460));
+        getComposerLabel().setText(selectedGame.getComposer().isEmpty()
+          ? "-"
+          : truncateText(getComposerLabel(), selectedGame.getComposer(), 460));
+        getGenreLabel().setText(genreMap.get(selectedGame.getGenre()));
+        getYearLabel().setText(selectedGame.getYear() + "");
+      });
+
     }
   }
-  
+
+  private String truncateText(JLabel label, String text, int width)
+  {
+    String returnText = text;
+    Graphics graphics = label.getGraphics();
+    if (graphics != null)
+    {
+      int length = graphics.getFontMetrics().stringWidth(text);
+      while (length > width)
+      {
+        returnText = returnText.substring(0, returnText.length() - 1);
+        length = graphics.getFontMetrics().stringWidth(returnText + "...");
+        if (length <= (width))
+        {
+          returnText = returnText + "...";
+        }
+      }
+    }
+    return returnText;
+  }
+
   private JLabel getTitleLabel()
   {
     if (titleLabel == null)
     {
-      titleLabel = new JLabel("California Games");
+      titleLabel = new JLabel(" ");
       titleLabel.setBackground(Color.ORANGE);
-      titleLabel.setFont(new Font("Microsoft Sans Serif", Font.BOLD, 37));
+      titleLabel.setFont(new Font("Microsoft Sans Serif", Font.BOLD, 36));
     }
     return titleLabel;
   }
@@ -127,10 +152,9 @@ public class TextPanel extends JPanel
       textPane.setForeground(Color.WHITE);
       textPane.setFont(new Font("Verdana", Font.PLAIN, 21));
       textPane.setOpaque(false);
-      String text512 = "In Monty on the run the intrepid coal thief Monty Mole fled to the rocky island of Gibraltar. However, the Intermole agency is on to him, and his only hope of escape is to trek across Europe, collecting enough cash to buy the Greek island of Montos and live there in luxury.This is Monty's third game, and the structure is similar to the previous three. There are 80 screens each representing some area of Europe.There are many items to collect, the most important are Eurocheques for money and airplane tickets.";
-      String textCalGames = "Welcome to California. Hit the beaches, parks and streets, and go for trophies in half-pipe skateboarding, footbag, roller skating, surfing, BMX, bike racing and flying disk throwing. Read the full online instructions on how to compete in the most totally awesome games in the world.";
-        textPane
-        .setText(text512);
+      //      String text512 = "In Monty on the run the intrepid coal thief Monty Mole fled to the rocky island of Gibraltar. However, the Intermole agency is on to him, and his only hope of escape is to trek across Europe, collecting enough cash to buy the Greek island of Montos and live there in luxury.This is Monty's third game, and the structure is similar to the previous three. There are 80 screens each representing some area of Europe.There are many items to collect, the most important are Eurocheques for money and airplane tickets.";
+      //      String textCalGames = "Welcome to California. Hit the beaches, parks and streets, and go for trophies in half-pipe skateboarding, footbag, roller skating, surfing, BMX, bike racing and flying disk throwing. Read the full online instructions on how to compete in the most totally awesome games in the world.";
+      textPane.setText(" ");
       changeLineSpacing(textPane, -0.12f, true);
       textPane.setEditable(false);
       textPane.setFocusable(false);
@@ -138,44 +162,59 @@ public class TextPanel extends JPanel
     }
     return textPane;
   }
-  
+
   /**
    * Select all the text of a <code>JTextPane</code> first and then set the line spacing.
+   * 
    * @param the <code>JTextPane</code> to apply the change
    * @param factor the factor of line spacing. For example, <code>1.0f</code>.
-   * @param replace whether the new <code>AttributeSet</code> should replace the old set. If set to <code>false</code>, will merge with the old one.
+   * @param replace whether the new <code>AttributeSet</code> should replace the old set. If set to <code>false</code>,
+   *          will merge with the old one.
    */
-  private void changeLineSpacing(JTextPane pane, float factor, boolean replace) {
-      pane.selectAll();
-      MutableAttributeSet set = new SimpleAttributeSet(pane.getParagraphAttributes());
-      StyleConstants.setLineSpacing(set, factor);
-      pane.setParagraphAttributes(set, replace);
+  private void changeLineSpacing(JTextPane pane, float factor, boolean replace)
+  {
+    pane.selectAll();
+    MutableAttributeSet set = new SimpleAttributeSet(pane.getParagraphAttributes());
+    StyleConstants.setLineSpacing(set, factor);
+    pane.setParagraphAttributes(set, replace);
   }
-  private JLabel getAuthorLabel() {
-    if (authorLabel == null) {
-    	authorLabel = new JLabel("Epyx Games");
-    	authorLabel.setFont(new Font("Microsoft Sans Serif", Font.BOLD, 22));
+
+  private JLabel getAuthorLabel()
+  {
+    if (authorLabel == null)
+    {
+      authorLabel = new JLabel();
+      authorLabel.setFont(new Font("Microsoft Sans Serif", Font.BOLD, 22));
     }
     return authorLabel;
   }
-  private JLabel getComposerLabel() {
-    if (composerLabel == null) {
-    	composerLabel = new JLabel("Epyx Games testing testing!");
-    	composerLabel.setFont(new Font("Microsoft Sans Serif", Font.BOLD, 22));
+
+  private JLabel getComposerLabel()
+  {
+    if (composerLabel == null)
+    {
+      composerLabel = new JLabel(" ");
+      composerLabel.setFont(new Font("Microsoft Sans Serif", Font.BOLD, 22));
     }
     return composerLabel;
   }
-  private JLabel getGenreLabel() {
-    if (genreLabel == null) {
-    	genreLabel = new JLabel("Shoot'em Up");
-    	genreLabel.setFont(new Font("Microsoft Sans Serif", Font.BOLD, 22));
+
+  private JLabel getGenreLabel()
+  {
+    if (genreLabel == null)
+    {
+      genreLabel = new JLabel(" ");
+      genreLabel.setFont(new Font("Microsoft Sans Serif", Font.BOLD, 22));
     }
     return genreLabel;
   }
-  private JLabel getYearLabel() {
-    if (yearLabel == null) {
-    	yearLabel = new JLabel("1987");
-    	yearLabel.setFont(new Font("Microsoft Sans Serif", Font.BOLD, 22));
+
+  private JLabel getYearLabel()
+  {
+    if (yearLabel == null)
+    {
+      yearLabel = new JLabel(" ");
+      yearLabel.setFont(new Font("Microsoft Sans Serif", Font.BOLD, 22));
     }
     return yearLabel;
   }

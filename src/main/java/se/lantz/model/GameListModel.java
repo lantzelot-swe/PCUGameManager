@@ -88,6 +88,20 @@ public class GameListModel extends DefaultListModel<GameListData>
     notifyChange();
   }
 
+  @Override
+  public void addElement(GameListData gameData)
+  {
+    currentGameList.add(gameData);
+    super.addElement(gameData);
+  }
+
+  @Override
+  public GameListData remove(int index)
+  {
+    currentGameList.remove(index);
+    return super.remove(index);
+  }
+
   public List<GameListData> getCurrentGameList()
   {
     return currentGameList;

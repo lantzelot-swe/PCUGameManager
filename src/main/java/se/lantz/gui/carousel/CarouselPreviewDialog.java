@@ -42,19 +42,18 @@ public class CarouselPreviewDialog extends BaseDialog
       modelChanged();
     }
   }
-  
- 
+
   private JButton getRunGameButton()
   {
     if (runGameButton == null)
     {
       runGameButton = new JButton("Run selected game");
       runGameButton.setPreferredSize(null);
-      
+
     }
     return runGameButton;
   }
-  
+
   private void modelChanged()
   {
     setTitle("Carousel preview - " + uiModel.getSelectedGameView().getName());
@@ -68,7 +67,7 @@ public class CarouselPreviewDialog extends BaseDialog
     }
     return panel;
   }
-  
+
   @Override
   public void setVisible(boolean visible)
   {
@@ -78,4 +77,12 @@ public class CarouselPreviewDialog extends BaseDialog
       getBackgroundPanel().initialScroll();
     }
   }
+
+  @Override
+  public void dispose()
+  {
+    model.dispose();
+    super.dispose();
+  }
+
 }

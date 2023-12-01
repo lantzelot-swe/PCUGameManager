@@ -1,5 +1,6 @@
 package se.lantz.model.carousel;
 
+import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,18 +19,24 @@ public class CarouselPreviewModel extends AbstractModel
   public static final String CLOSE_PREVIEW = "closePreview";
   public static final String SELECTED_GAME = "selectedGame";
   public static final String RELOAD_CAROUSEL = "reloadCarousel";
+  public static final String CLEAR_SELECTION = "clearSelection";
   private MainViewModel mainModel;
   //Keep track of 10 games as "scroll window" and update when scrolling or a new game is selected 
   private List<GameDetails> dataList = new ArrayList<>();
 
   private GameDetails selectedGame = null;
 
+  private PropertyChangeListener selectedGameListViewListener = e -> SwingUtilities.invokeLater(() -> reloadCarousel());
+  private PropertyChangeListener selectedGameListener = e -> setSelectedGame(mainModel.getCurrentGameDetails());
+  private PropertyChangeListener gameSavedListener = e -> gameSaved();
+
   public CarouselPreviewModel(MainViewModel mainModel)
   {
     this.mainModel = mainModel;
-    mainModel.addPropertyChangeListener("selectedGamelistView",
-                                        e -> SwingUtilities.invokeLater(() -> reloadCarousel()));
-    mainModel.addPropertyChangeListener("gameSelected", e -> setSelectedGame(mainModel.getCurrentGameDetails()));
+    mainModel.addPropertyChangeListener("selectedGamelistView", selectedGameListViewListener);
+    mainModel.addPropertyChangeListener("gameSelected", selectedGameListener);
+    mainModel.addPropertyChangeListener("gameSaved", gameSavedListener);
+
     dataList = mainModel.readGameDetailsForCarouselPreview();
     if (dataList.size() < 10)
     {
@@ -44,13 +51,14 @@ public class CarouselPreviewModel extends AbstractModel
 
   private void reloadCarousel()
   {
-    this.dataList = mainModel.readGameDetailsForCarouselPreview();
-    if (dataList.size() < 10)
+
+    if (mainModel.getCurrentGameViewGameCount() < 10)
     {
       this.notifyChange(CLOSE_PREVIEW);
     }
     else
     {
+      this.dataList = mainModel.readGameDetailsForCarouselPreview();
       this.notifyChange(RELOAD_CAROUSEL);
     }
   }
@@ -76,13 +84,13 @@ public class CarouselPreviewModel extends AbstractModel
     int index = dataList.indexOf(selectedGame) - 1;
     return dataList.get(index).getGameId();
   }
-  
+
   public String getGameIdForPageUp()
   {
     int index = dataList.indexOf(selectedGame) - 4;
     return dataList.get(index).getGameId();
   }
-  
+
   public String getGameIdForPageDown()
   {
     int index = dataList.indexOf(selectedGame) + 4;
@@ -92,6 +100,13 @@ public class CarouselPreviewModel extends AbstractModel
   public void setSelectedGame(GameDetails selectedGame)
   {
     logger.debug("setSelectedGame: " + selectedGame);
+    
+    //A new game is added
+    if (selectedGame.getGameId().isEmpty())
+    {
+      this.notifyChange(CLEAR_SELECTION);
+      return;
+    }
     //Update the entire data list
     dataList = mainModel.readGameDetailsForCarouselPreview();
     if (dataList.size() < 10)
@@ -104,4 +119,18 @@ public class CarouselPreviewModel extends AbstractModel
       this.notifyChange(SELECTED_GAME);
     }
   }
+  
+  private void gameSaved()
+  {
+    GameDetails details = mainModel.getCurrentGameDetails();
+    setSelectedGame(details);
+  }
+
+  public void dispose()
+  {
+    mainModel.removePropertyChangeListener("selectedGamelistView", selectedGameListViewListener);
+    mainModel.removePropertyChangeListener("gameSelected", selectedGameListener);
+    mainModel.removePropertyChangeListener("gameSaved", gameSavedListener);
+  }
+
 }

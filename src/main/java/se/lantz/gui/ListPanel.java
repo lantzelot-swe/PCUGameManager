@@ -389,6 +389,9 @@ public class ListPanel extends JPanel
 
   public void setSelectedGameInGameList(String gameId)
   {
+    //Called from Carousel, make sure no filtering is active
+    getFilterTextField().setText("");
+    
     List<GameListData> currentGameList = uiModel.getGameListModel().getCurrentGameList();
     for (int i = 0; i < currentGameList.size(); i++)
     {

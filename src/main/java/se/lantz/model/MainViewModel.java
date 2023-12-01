@@ -349,6 +349,11 @@ public class MainViewModel extends AbstractModel
     List<GameListData> gamesList = dbConnector.fetchGamesByView(gameView);
     return readGameDetailsForExport(worker, gamesList);
   }
+  
+  public int getCurrentGameViewGameCount()
+  {
+    return dbConnector.fetchGamesByView(getSelectedGameView()).size();
+  }
 
   public List<GameDetails> readGameDetailsForCarouselPreview()
   {
@@ -784,6 +789,11 @@ public class MainViewModel extends AbstractModel
 
       //Update db title once done
       infoModel.setTitleFromDb(infoModel.getTitle());
+      //Update currentGameDetails
+      this.currentGameDetails = dbConnector.getGameDetails(selectedData.getGameId());
+      //Update data in list model
+//      this.gameListModel.updateSavedGame(selectedData);
+      this.notifyChange("gameSaved");
       return true;
     }
     return false;
@@ -1082,6 +1092,10 @@ public class MainViewModel extends AbstractModel
         favoritesView.setGameCount(--favoritesCount);
       }
       gameListModel.notifyChange();
+      
+      if (gameViewModel.getSelectedItem().equals(favoritesView)) {
+        this.reloadCurrentGameView();
+      }
     }
     return favoritesCount;
   }

@@ -55,7 +55,7 @@ public class BackgroundPanel extends JPanel
     gbc_coverPanel.gridy = 1;
     add(getCoverPanel(), gbc_coverPanel);
     GridBagConstraints gbc_panel = new GridBagConstraints();
-    gbc_panel.insets = new Insets(27, 37, 22, 10);
+    gbc_panel.insets = new Insets(29, 37, 22, 10);
     gbc_panel.fill = GridBagConstraints.BOTH;
     gbc_panel.anchor = GridBagConstraints.NORTHWEST;
     gbc_panel.gridx = 0;
@@ -69,7 +69,7 @@ public class BackgroundPanel extends JPanel
     gbc_textPanel.gridy = 0;
     add(getTextPanel(), gbc_textPanel);
 
-    setBackground("/se/lantz/carousel/Carousel1400x788-modified.png");
+    setBackground("/se/lantz/carousel/Carousel1400x788.png");
 
     if (!Beans.isDesignTime())
     {
@@ -150,7 +150,7 @@ public class BackgroundPanel extends JPanel
       try
       {
         image = ImageIO.read(imagefile);
-        Image newImage = image.getScaledInstance(694, 401, Image.SCALE_SMOOTH);
+        Image newImage = image.getScaledInstance(695, 402, Image.SCALE_SMOOTH);
         getScreenshotLabel().setIcon(new ImageIcon(newImage));
       }
       catch (IOException e)
