@@ -402,7 +402,8 @@ public class ListPanel extends JPanel
         {
           indexToSelect = uiModel.getGameListModel().getSize() - 1;
         }
-        list.setSelectionInterval(indexToSelect, indexToSelect);
+        list.getSelectionModel().setValueIsAdjusting(false);
+        list.setSelectedIndex(indexToSelect);
         list.ensureIndexIsVisible(indexToSelect);
         break;
       }
