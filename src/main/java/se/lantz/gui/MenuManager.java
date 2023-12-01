@@ -162,7 +162,6 @@ public class MenuManager
   private ScummVMModeInstallManager installScummVMManager;
   private MainWindow mainWindow;
   private int currentFavoritesCount = 10;
-  private CarouselPreviewDialog carouselPreviewDialog;
 
   public MenuManager(final MainViewModel uiModel, MainWindow mainWindow)
   {
@@ -451,7 +450,7 @@ public class MenuManager
     KeyStroke keyStrokeCarouselPreview = KeyStroke.getKeyStroke(KeyEvent.VK_W, InputEvent.CTRL_DOWN_MASK);
     carouselPreviewItem.setAccelerator(keyStrokeCarouselPreview);
     carouselPreviewItem.setMnemonic('W');
-    carouselPreviewItem.addActionListener(e -> showCarouselPreview());
+    carouselPreviewItem.addActionListener(e -> mainWindow.getMainPanel().getListPanel().showCarouselPreview());
     return carouselPreviewItem;
   }
 
@@ -1724,28 +1723,5 @@ public class MenuManager
   void checkForNewPCUAEVersionAtStartup()
   {
     installPCUAEManager.checkForNewVersionAtStartup();
-  }
-
-  private void showCarouselPreview()
-  {
-    if (this.uiModel.getCurrentGameViewGameCount() < 10)
-    {
-      String message = "You can only preview the Carousel for gamelists that contain a minimum of 10 games.";
-      JOptionPane.showMessageDialog(this.mainWindow, message, "Carousel preview", JOptionPane.INFORMATION_MESSAGE);
-    }
-    else
-    {
-      if (carouselPreviewDialog == null || !carouselPreviewDialog.isShowing())
-      {
-        carouselPreviewDialog = new CarouselPreviewDialog(this.mainWindow, this.uiModel);
-        carouselPreviewDialog.pack();
-        carouselPreviewDialog.setLocationRelativeTo(MainWindow.getInstance());
-        carouselPreviewDialog.showDialog();
-      }
-      else
-      {
-        carouselPreviewDialog.requestFocus();
-      }
-    }
   }
 }

@@ -38,6 +38,7 @@ import javax.swing.plaf.basic.ComboPopup;
 
 import org.jdesktop.swingx.JXSearchField;
 
+import se.lantz.gui.carousel.CarouselPreviewDialog;
 import se.lantz.gui.gameview.GameViewManager;
 import se.lantz.model.GameListModel;
 import se.lantz.model.MainViewModel;
@@ -53,6 +54,7 @@ public class ListPanel extends JPanel
   private JComboBox<GameView> listViewComboBox;
   private JPanel viewInfoPanel;
   private JLabel viewInfoLabel;
+  private JButton previewButton;
   private GameViewManager gameViewManager;
   private MainViewModel uiModel;
   private MainPanel mainPanel;
@@ -61,6 +63,8 @@ public class ListPanel extends JPanel
   private boolean delayDetailsUpdate = false;
   private boolean pageButtonPressed = false;
 
+  private CarouselPreviewDialog carouselPreviewDialog;
+  
   private boolean filterEnabled = true;
 
   private boolean isFiltering = false;
@@ -179,6 +183,11 @@ public class ListPanel extends JPanel
     gbc_viewInfoPanel.gridx = 0;
     gbc_viewInfoPanel.gridy = 3;
     add(getViewInfoPanel(), gbc_viewInfoPanel);
+    
+    uiModel.addSaveChangeListener(e -> {
+     
+      previewButton.setEnabled(!uiModel.isNewGameSelected());
+    });
   }
 
   private JPanel getListViewPanel()
@@ -429,6 +438,14 @@ public class ListPanel extends JPanel
       gbc_viewInfoLabel.gridx = 1;
       gbc_viewInfoLabel.gridy = 0;
       viewInfoPanel.add(getViewInfoLabel(), gbc_viewInfoLabel);
+      
+      GridBagConstraints gbc_carouselPreviewButton = new GridBagConstraints();
+      gbc_carouselPreviewButton.weightx = 0.0;
+      gbc_carouselPreviewButton.insets = new Insets(3, 5, 5, 5);
+      gbc_carouselPreviewButton.anchor = GridBagConstraints.WEST;
+      gbc_carouselPreviewButton.gridx = 0;
+      gbc_carouselPreviewButton.gridy = 0;
+      viewInfoPanel.add(getPreviewButton(), gbc_carouselPreviewButton);
     }
     return viewInfoPanel;
   }
@@ -440,6 +457,16 @@ public class ListPanel extends JPanel
       viewInfoLabel = new JLabel("125 of 1000");
     }
     return viewInfoLabel;
+  }
+  
+  private JButton getPreviewButton()
+  {
+    if (previewButton == null)
+    {
+      previewButton = new JButton("Carousel preview");
+      previewButton.addActionListener(e -> showCarouselPreview());
+    }
+    return previewButton;
   }
 
   private JScrollPane getListScrollPane()
@@ -687,14 +714,8 @@ public class ListPanel extends JPanel
   public void toggleFavorite()
   {
     if (!uiModel.isDataChanged())
-    {
-      for (GameListData glData : list.getSelectedValuesList())
-      {
-        if (!glData.isInfoSlot())
-        {
-          uiModel.toggleFavorite(glData);
-        }
-      }
+    {    
+      uiModel.toggleFavorite(list.getSelectedValuesList());
       mainPanel.repaintAfterModifications();
     }
   }
@@ -703,13 +724,7 @@ public class ListPanel extends JPanel
   {
     if (!uiModel.isDataChanged())
     {
-      for (GameListData glData : list.getSelectedValuesList())
-      {
-        if (!glData.isInfoSlot())
-        {
-          uiModel.toggleFavorite2(glData);
-        }
-      }
+      uiModel.toggleFavorite2(list.getSelectedValuesList());
       mainPanel.repaintAfterModifications();
     }
   }
@@ -718,13 +733,7 @@ public class ListPanel extends JPanel
   {
     if (!uiModel.isDataChanged())
     {
-      for (GameListData glData : list.getSelectedValuesList())
-      {
-        if (!glData.isInfoSlot())
-        {
-          uiModel.toggleFavorite3(glData);
-        }
-      }
+      uiModel.toggleFavorite3(list.getSelectedValuesList());
       mainPanel.repaintAfterModifications();
     }
   }
@@ -733,13 +742,7 @@ public class ListPanel extends JPanel
   {
     if (!uiModel.isDataChanged())
     {
-      for (GameListData glData : list.getSelectedValuesList())
-      {
-        if (!glData.isInfoSlot())
-        {
-          uiModel.toggleFavorite4(glData);
-        }
-      }
+      uiModel.toggleFavorite4(list.getSelectedValuesList());
       mainPanel.repaintAfterModifications();
     }
   }
@@ -748,13 +751,7 @@ public class ListPanel extends JPanel
   {
     if (!uiModel.isDataChanged())
     {
-      for (GameListData glData : list.getSelectedValuesList())
-      {
-        if (!glData.isInfoSlot())
-        {
-          uiModel.toggleFavorite5(glData);
-        }
-      }
+      uiModel.toggleFavorite5(list.getSelectedValuesList());
       mainPanel.repaintAfterModifications();
     }
   }
@@ -763,13 +760,7 @@ public class ListPanel extends JPanel
   {
     if (!uiModel.isDataChanged())
     {
-      for (GameListData glData : list.getSelectedValuesList())
-      {
-        if (!glData.isInfoSlot())
-        {
-          uiModel.toggleFavorite6(glData);
-        }
-      }
+      uiModel.toggleFavorite6(list.getSelectedValuesList());
       mainPanel.repaintAfterModifications();
     }
   }
@@ -778,13 +769,7 @@ public class ListPanel extends JPanel
   {
     if (!uiModel.isDataChanged())
     {
-      for (GameListData glData : list.getSelectedValuesList())
-      {
-        if (!glData.isInfoSlot())
-        {
-          uiModel.toggleFavorite7(glData);
-        }
-      }
+      uiModel.toggleFavorite7(list.getSelectedValuesList());
       mainPanel.repaintAfterModifications();
     }
   }
@@ -793,13 +778,7 @@ public class ListPanel extends JPanel
   {
     if (!uiModel.isDataChanged())
     {
-      for (GameListData glData : list.getSelectedValuesList())
-      {
-        if (!glData.isInfoSlot())
-        {
-          uiModel.toggleFavorite8(glData);
-        }
-      }
+      uiModel.toggleFavorite8(list.getSelectedValuesList());
       mainPanel.repaintAfterModifications();
     }
   }
@@ -808,13 +787,7 @@ public class ListPanel extends JPanel
   {
     if (!uiModel.isDataChanged())
     {
-      for (GameListData glData : list.getSelectedValuesList())
-      {
-        if (!glData.isInfoSlot())
-        {
-          uiModel.toggleFavorite9(glData);
-        }
-      }
+      uiModel.toggleFavorite9(list.getSelectedValuesList());
       mainPanel.repaintAfterModifications();
     }
   }
@@ -823,13 +796,7 @@ public class ListPanel extends JPanel
   {
     if (!uiModel.isDataChanged())
     {
-      for (GameListData glData : list.getSelectedValuesList())
-      {
-        if (!glData.isInfoSlot())
-        {
-          uiModel.toggleFavorite10(glData);
-        }
-      }
+      uiModel.toggleFavorite10(list.getSelectedValuesList());
       mainPanel.repaintAfterModifications();
     }
   }
@@ -861,5 +828,28 @@ public class ListPanel extends JPanel
     SwingUtilities.invokeLater(() -> {
       getList().setSelectedValue(selectedData, true);
     });
+  }
+  
+  public void showCarouselPreview()
+  {
+    if (this.uiModel.getCurrentGameViewGameCount() < 10)
+    {
+      String message = "You can only preview the Carousel for gamelists that contain a minimum of 10 games.";
+      JOptionPane.showMessageDialog(MainWindow.getInstance(), message, "Carousel preview", JOptionPane.INFORMATION_MESSAGE);
+    }
+    else
+    {
+      if (carouselPreviewDialog == null || !carouselPreviewDialog.isShowing())
+      {
+        carouselPreviewDialog = new CarouselPreviewDialog(MainWindow.getInstance(), this.uiModel);
+        carouselPreviewDialog.pack();
+        carouselPreviewDialog.setLocationRelativeTo(MainWindow.getInstance());
+        carouselPreviewDialog.showDialog();
+      }
+      else
+      {
+        carouselPreviewDialog.requestFocus();
+      }
+    }
   }
 }

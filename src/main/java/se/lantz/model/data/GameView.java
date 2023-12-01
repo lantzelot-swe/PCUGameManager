@@ -306,6 +306,11 @@ public class GameView implements Comparable
   {
     return data.replaceAll("'", "''");
   }
+  
+  public boolean isFavorite()
+  {
+    return gameViewId < -1;
+  }
 
   public int getGameViewId()
   {

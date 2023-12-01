@@ -37,7 +37,7 @@ public class CarouselPreviewDialog extends BaseDialog
     if (!Beans.isDesignTime())
     {
       uiModel.addPropertyChangeListener("selectedGamelistView", e -> modelChanged());
-      model.addPropertyChangeListener(CarouselPreviewModel.CLOSE_PREVIEW, e -> getOkButton().doClick());
+      model.addPropertyChangeListener(CarouselPreviewModel.CLOSE_PREVIEW, e -> dispose());
       //trigger once at startup
       modelChanged();
     }

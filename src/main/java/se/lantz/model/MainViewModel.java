@@ -9,6 +9,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -349,7 +350,7 @@ public class MainViewModel extends AbstractModel
     List<GameListData> gamesList = dbConnector.fetchGamesByView(gameView);
     return readGameDetailsForExport(worker, gamesList);
   }
-  
+
   public int getCurrentGameViewGameCount()
   {
     return dbConnector.fetchGamesByView(getSelectedGameView()).size();
@@ -361,25 +362,25 @@ public class MainViewModel extends AbstractModel
     GameListData current = this.selectedData;
     List<GameListData> gamesInView = dbConnector.fetchGamesByView(getSelectedGameView());
     int selectedGameIndex = gamesInView.indexOf(current);
-    
+
     if (selectedGameIndex < 0)
     {
       return returnList;
     }
-    
+
     int start = selectedGameIndex - 4;
     int end = selectedGameIndex + 6;
 
-    List<GameListData> subList = new ArrayList<>(
-      gamesInView.subList(start < 0 ? 0 : start, end > (gamesInView.size() - 1) ? gamesInView.size() : end));
+    List<GameListData> subList = new ArrayList<>(gamesInView
+      .subList(start < 0 ? 0 : start, end > (gamesInView.size() - 1) ? gamesInView.size() : end));
 
     //Add to beginning if negative
     for (int i = 0; i < -start; i++)
     {
-      int listIndex = gamesInView.size()- 1 - i;
+      int listIndex = gamesInView.size() - 1 - i;
       subList.add(0, gamesInView.get(listIndex));
     }
-    
+
     //Add at end if larger than list size
     for (int i = 0; i < (end - gamesInView.size()); i++)
     {
@@ -393,7 +394,7 @@ public class MainViewModel extends AbstractModel
     }
     return returnList;
   }
-  
+
   public GameDetails getNextGameDetailsWhenScrolling(boolean scrollingRight)
   {
     GameListData current = this.selectedData;
@@ -403,7 +404,7 @@ public class MainViewModel extends AbstractModel
     if (scrollingRight)
     {
       indexToAdd = selectedGameIndex + 5;
-      if (indexToAdd > gamesInView.size()-1)
+      if (indexToAdd > gamesInView.size() - 1)
       {
         indexToAdd = indexToAdd - gamesInView.size();
       }
@@ -413,7 +414,7 @@ public class MainViewModel extends AbstractModel
       indexToAdd = selectedGameIndex - 4;
       if (indexToAdd < 0)
       {
-        indexToAdd = gamesInView.size()-1 + indexToAdd;
+        indexToAdd = gamesInView.size() - 1 + indexToAdd;
       }
     }
     return dbConnector.getGameDetails(gamesInView.get(indexToAdd).getGameId());
@@ -727,43 +728,43 @@ public class MainViewModel extends AbstractModel
         selectedData.setGameId(currentGameId);
         if (getSelectedGameView().getGameViewId() == GameView.FAVORITES_ID)
         {
-          toggleFavorite(selectedData);
+          toggleFavorite(Arrays.asList(selectedData));
         }
         else if (getSelectedGameView().getGameViewId() == GameView.FAVORITES_2_ID)
         {
-          toggleFavorite2(selectedData);
+          toggleFavorite2(Arrays.asList(selectedData));
         }
         else if (getSelectedGameView().getGameViewId() == GameView.FAVORITES_3_ID)
         {
-          toggleFavorite3(selectedData);
+          toggleFavorite3(Arrays.asList(selectedData));
         }
         else if (getSelectedGameView().getGameViewId() == GameView.FAVORITES_4_ID)
         {
-          toggleFavorite4(selectedData);
+          toggleFavorite4(Arrays.asList(selectedData));
         }
         else if (getSelectedGameView().getGameViewId() == GameView.FAVORITES_5_ID)
         {
-          toggleFavorite5(selectedData);
+          toggleFavorite5(Arrays.asList(selectedData));
         }
         else if (getSelectedGameView().getGameViewId() == GameView.FAVORITES_6_ID)
         {
-          toggleFavorite6(selectedData);
+          toggleFavorite6(Arrays.asList(selectedData));
         }
         else if (getSelectedGameView().getGameViewId() == GameView.FAVORITES_7_ID)
         {
-          toggleFavorite7(selectedData);
+          toggleFavorite7(Arrays.asList(selectedData));
         }
         else if (getSelectedGameView().getGameViewId() == GameView.FAVORITES_8_ID)
         {
-          toggleFavorite8(selectedData);
+          toggleFavorite8(Arrays.asList(selectedData));
         }
         else if (getSelectedGameView().getGameViewId() == GameView.FAVORITES_9_ID)
         {
-          toggleFavorite9(selectedData);
+          toggleFavorite9(Arrays.asList(selectedData));
         }
         else if (getSelectedGameView().getGameViewId() == GameView.FAVORITES_10_ID)
         {
-          toggleFavorite10(selectedData);
+          toggleFavorite10(Arrays.asList(selectedData));
         }
       }
       else
@@ -792,7 +793,7 @@ public class MainViewModel extends AbstractModel
       //Update currentGameDetails
       this.currentGameDetails = dbConnector.getGameDetails(selectedData.getGameId());
       //Update data in list model
-//      this.gameListModel.updateSavedGame(selectedData);
+      //      this.gameListModel.updateSavedGame(selectedData);
       this.notifyChange("gameSaved");
       return true;
     }
@@ -1008,52 +1009,52 @@ public class MainViewModel extends AbstractModel
     }
   }
 
-  public void toggleFavorite(GameListData data)
+  public void toggleFavorite(List<GameListData> data)
   {
     favorites1Count = toggleFavorite(data, 1, favorites1Count, favorites1View);
   }
 
-  public void toggleFavorite2(GameListData data)
+  public void toggleFavorite2(List<GameListData> data)
   {
     favorites2Count = toggleFavorite(data, 2, favorites2Count, favorites2View);
   }
 
-  public void toggleFavorite3(GameListData data)
+  public void toggleFavorite3(List<GameListData> data)
   {
     favorites3Count = toggleFavorite(data, 3, favorites3Count, favorites3View);
   }
 
-  public void toggleFavorite4(GameListData data)
+  public void toggleFavorite4(List<GameListData> data)
   {
     favorites4Count = toggleFavorite(data, 4, favorites4Count, favorites4View);
   }
 
-  public void toggleFavorite5(GameListData data)
+  public void toggleFavorite5(List<GameListData> data)
   {
     favorites5Count = toggleFavorite(data, 5, favorites5Count, favorites5View);
   }
 
-  public void toggleFavorite6(GameListData data)
+  public void toggleFavorite6(List<GameListData> data)
   {
     favorites6Count = toggleFavorite(data, 6, favorites6Count, favorites6View);
   }
 
-  public void toggleFavorite7(GameListData data)
+  public void toggleFavorite7(List<GameListData> data)
   {
     favorites7Count = toggleFavorite(data, 7, favorites7Count, favorites7View);
   }
 
-  public void toggleFavorite8(GameListData data)
+  public void toggleFavorite8(List<GameListData> data)
   {
     favorites8Count = toggleFavorite(data, 8, favorites8Count, favorites8View);
   }
 
-  public void toggleFavorite9(GameListData data)
+  public void toggleFavorite9(List<GameListData> data)
   {
     favorites9Count = toggleFavorite(data, 9, favorites9Count, favorites9View);
   }
 
-  public void toggleFavorite10(GameListData data)
+  public void toggleFavorite10(List<GameListData> data)
   {
     favorites10Count = toggleFavorite(data, 10, favorites10Count, favorites10View);
   }
@@ -1075,25 +1076,33 @@ public class MainViewModel extends AbstractModel
     saveData();
   }
 
-  private int toggleFavorite(GameListData data, int favoritesNumber, int favoritesCount, GameView favoritesView)
+  private int toggleFavorite(List<GameListData> data, int favoritesNumber, int favoritesCount, GameView favoritesView)
   {
-    if (data != null && !data.getGameId().isEmpty())
+    for (GameListData gameListData : data)
     {
-      int previousFavorite = data.getFavorite();
-      dbConnector.toggleFavorite(data.getGameId(), previousFavorite, favoritesNumber);
-      data.toggleFavorite(favoritesNumber);
-      if (data.isFavorite())
+      if (!gameListData.isInfoSlot() && !gameListData.getGameId().isEmpty())
       {
-        favoritesView.setGameCount(++favoritesCount);
-        reduceFavoriteCount(previousFavorite);
+        int previousFavorite = gameListData.getFavorite();
+        dbConnector.toggleFavorite(gameListData.getGameId(), previousFavorite, favoritesNumber);
+        gameListData.toggleFavorite(favoritesNumber);
+        if (gameListData.isFavorite())
+        {
+          favoritesView.setGameCount(++favoritesCount);
+          reduceFavoriteCount(previousFavorite);
+        }
+        else
+        {
+          favoritesView.setGameCount(--favoritesCount);
+        }
+
       }
-      else
-      {
-        favoritesView.setGameCount(--favoritesCount);
-      }
+    }
+    if (!data.isEmpty())
+    {
       gameListModel.notifyChange();
-      
-      if (gameViewModel.getSelectedItem().equals(favoritesView)) {
+
+      if (((GameView) gameViewModel.getSelectedItem()).isFavorite())
+      {
         this.reloadCurrentGameView();
       }
     }
