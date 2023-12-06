@@ -363,7 +363,7 @@ public class MainViewModel extends AbstractModel
     List<GameListData> gamesInView = dbConnector.fetchGamesByView(getSelectedGameView());
     int selectedGameIndex = gamesInView.indexOf(current);
 
-    if (selectedGameIndex < 0)
+    if (selectedGameIndex < 0 || gamesInView.size() < 10)
     {
       return returnList;
     }
