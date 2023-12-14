@@ -171,9 +171,9 @@ public class CoverPanel extends JPanel
     }
   }
 
-  private JLabel getLabel(int index)
+  private GameLabel getLabel(int index)
   {
-    JLabel label = new JLabel();
+    GameLabel label = new GameLabel();
     label.setPreferredSize(new Dimension(125, 175));
     if (index == 4)
     {
@@ -188,6 +188,20 @@ public class CoverPanel extends JPanel
           {
             //trigger run game
             mainWindow.getMainPanel().runCurrentGame();
+          }
+        }
+      });
+    }
+    else
+    {
+      label.addMouseListener(new MouseAdapter()
+      {
+        @Override
+        public void mouseClicked(MouseEvent e)
+        {
+          if (SwingUtilities.isLeftMouseButton(e) && e.getClickCount() == 1)
+          {
+            mainWindow.setSelectedGameInGameList(label.getGameId());
           }
         }
       });
@@ -228,7 +242,7 @@ public class CoverPanel extends JPanel
     for (int i = 0; i < games.size(); i++)
     {
       GameDetails game = games.get(i);
-      loadScreen((JLabel) panel.getComponent(i), game);
+      loadScreen((GameLabel) panel.getComponent(i), game);
     }
     scrollToPosition();
     panel.setVisible(true);
@@ -247,7 +261,7 @@ public class CoverPanel extends JPanel
     {
       if (games.indexOf(model.getSelectedGame()) == i)
       {
-        JLabel selectedLabel = (JLabel) panel.getComponent(i);
+        GameLabel selectedLabel = (GameLabel) panel.getComponent(i);
         selectedLabel.setBorder(BorderFactory.createLineBorder(Color.YELLOW, 5));
         loadScreenForBorder(selectedLabel, games.get(i));
       }
@@ -262,7 +276,7 @@ public class CoverPanel extends JPanel
     }
   }
 
-  private void loadScreen(JLabel label, GameDetails game)
+  private void loadScreen(GameLabel label, GameDetails game)
   {
     String filename = game.getCover();
     File imagefile = new File("./covers/" + filename);
@@ -271,6 +285,7 @@ public class CoverPanel extends JPanel
       BufferedImage image = ImageIO.read(imagefile);
       Image newImage = image.getScaledInstance(125, 175, Image.SCALE_SMOOTH);
       label.setIcon(new ImageIcon(newImage));
+      label.setGameId(game.getGameId());
     }
     catch (IOException e)
     {
@@ -278,7 +293,7 @@ public class CoverPanel extends JPanel
     }
   }
   
-  private void loadScreenForBorder(JLabel label, GameDetails game)
+  private void loadScreenForBorder(GameLabel label, GameDetails game)
   {
     String filename = game.getCover();
     File imagefile = new File("./covers/" + filename);
