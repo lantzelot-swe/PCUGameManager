@@ -1,5 +1,6 @@
 package se.lantz.model;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -13,7 +14,7 @@ import se.lantz.model.data.GameListData;
 
 public class GameListModel extends DefaultListModel<GameListData>
 {
-  private List<GameListData> currentGameList = Collections.emptyList();
+  private List<GameListData> currentGameList = new ArrayList<>();
 
   private List<String> filterPrefixList = Arrays.asList("a:", "c:", "y:", "v:");
 
