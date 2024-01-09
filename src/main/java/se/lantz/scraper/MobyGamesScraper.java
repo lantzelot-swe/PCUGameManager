@@ -314,8 +314,17 @@ public class MobyGamesScraper implements Scraper
         {
           Element musicElement = musicElements.get(0);
           Element musicParent = musicElement.parent();
-
-          value = musicParent.getElementsByTag("a").first().text();
+          if (musicParent.getElementsByTag("a").first() != null)
+          {
+            value = musicParent.getElementsByTag("a").first().text();
+          }
+          else
+          {
+            Element commaListElement = musicParent.getElementsByClass("commaList").first();
+            final List<String> musicList = new ArrayList<>();
+            commaListElement.getElementsByTag("li").forEach(liElement -> musicList.add(liElement.text()));
+            value = String.join(",", musicList);
+          }
         }
       }
     }
@@ -323,7 +332,6 @@ public class MobyGamesScraper implements Scraper
     {
       ExceptionHandler.handleException(e, "Could not scrape composer");
     }
-
     return value;
   }
 
