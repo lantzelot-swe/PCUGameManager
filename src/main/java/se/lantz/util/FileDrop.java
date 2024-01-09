@@ -341,8 +341,22 @@ public class FileDrop
             catch (java.io.IOException io)
             {
               log(out, "FileDrop: IOException - abort:");
-              io.printStackTrace(out);
-              evt.rejectDrop();
+              if (out != null)
+              {
+                io.printStackTrace(out);
+              }
+              else
+              {
+                io.printStackTrace();
+              }
+              try
+              {
+                evt.rejectDrop();
+              }
+              catch (java.awt.dnd.InvalidDnDOperationException idnd)
+              {
+                //Ignore
+              }
             }   // end catch IOException
             catch (java.awt.datatransfer.UnsupportedFlavorException ufe)
             {
