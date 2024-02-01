@@ -26,7 +26,7 @@ public class TypomaticButton extends JButton implements MouseListener
     addMouseListener(this);
   }
 
-  TypomaticButton(String text)
+  public TypomaticButton(String text)
   {
     super(text);
     setBorder(BorderFactory.createEmptyBorder(6, 6, 6, 6));

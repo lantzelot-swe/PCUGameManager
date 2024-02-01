@@ -15,6 +15,7 @@ public class PreferencesModel extends AbstractModel implements CommonInfoModel
   public static final String MANGER_VERSION_CHECK = "checkForManagerVersion";
   public static final String DELETE_OLD_INSTALL_FILES = "deleteOldInstallFiles";
   public static final String CROP_SCREENSHOTS = "cropScreenshotsWhenAdded";
+  public static final String SHOW_CROP_DIALOG_FOR_COVER = "showCropDialogForCover";
   public static final String GENRE = "infoSlotGenre";
   public static final String AUTHOR = "infoSlotAuthor";
   public static final String YEAR = "infoSlotYear";
@@ -43,6 +44,7 @@ public class PreferencesModel extends AbstractModel implements CommonInfoModel
   private boolean checkManagerVersionAtStartup = true;
   private boolean deleteOldInstallfilesAfterDownload = false;
   private boolean cropScreenshots = false;
+  private boolean cropDialogForCover = false;
 
   private String description =
     "For more Info on PCUAE go to https://github.com/CommodoreOS/PCUAE. Main keys: CTRL + F1 for Carousel Gamelist Changer, CTRL + F3 for Carousel Version Changer, CTRL + F5 for Mode Changer (Amiga, Atari, linux etc), CTRL + F7 for PCUAE Options Menu.";
@@ -92,7 +94,7 @@ public class PreferencesModel extends AbstractModel implements CommonInfoModel
     setDeleteOldInstallfilesAfterDownload(Boolean
       .parseBoolean(configuredProperties.getProperty(DELETE_OLD_INSTALL_FILES, "false")));
     setCropScreenshots(Boolean.parseBoolean(configuredProperties.getProperty(CROP_SCREENSHOTS, "false")));
-
+    setShowCropDialogForCover(Boolean.parseBoolean(configuredProperties.getProperty(SHOW_CROP_DIALOG_FOR_COVER, "false")));
     setFav1Alias(configuredProperties.getProperty(FAVORITES_1_ALIAS, fav1Alias));
     setFav2Alias(configuredProperties.getProperty(FAVORITES_2_ALIAS, fav2Alias));
     setFav3Alias(configuredProperties.getProperty(FAVORITES_3_ALIAS, fav3Alias));
@@ -514,6 +516,21 @@ public class PreferencesModel extends AbstractModel implements CommonInfoModel
       notifyChange();
     }
   }
+  
+  public void setShowCropDialogForCover(boolean cropDialogForCover)
+  {
+    boolean old = isShowCropDialogForCover();
+    this.cropDialogForCover = cropDialogForCover;
+    if ((Boolean.compare(old, cropDialogForCover) != 0))
+    {
+      notifyChange();
+    }
+  }
+  
+  public boolean isShowCropDialogForCover()
+  {
+    return cropDialogForCover;
+  }
 
   public void savePreferences()
   {
@@ -535,6 +552,7 @@ public class PreferencesModel extends AbstractModel implements CommonInfoModel
     configuredProperties.put(SAVED_STATES_CAROUSEL, savedStatesCarouselVersion);
     configuredProperties.put(DELETE_OLD_INSTALL_FILES, Boolean.toString(deleteOldInstallfilesAfterDownload));
     configuredProperties.put(CROP_SCREENSHOTS, Boolean.toString(cropScreenshots));
+    configuredProperties.put(SHOW_CROP_DIALOG_FOR_COVER, Boolean.toString(cropDialogForCover));
     configuredProperties.put(FAVORITES_1_ALIAS, fav1Alias);
     configuredProperties.put(FAVORITES_2_ALIAS, fav2Alias);
     configuredProperties.put(FAVORITES_3_ALIAS, fav3Alias);

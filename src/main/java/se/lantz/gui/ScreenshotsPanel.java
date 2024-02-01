@@ -35,6 +35,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import se.lantz.gui.screenshot.EditScreenshotDialog;
+import se.lantz.gui.screenshot.cover.EditCoverDialog;
 import se.lantz.model.InfoModel;
 import se.lantz.model.MainViewModel;
 import se.lantz.util.CustomUndoPlainDocument;
@@ -747,6 +748,21 @@ public class ScreenshotsPanel extends JPanel
                                         "Cover file",
                                         JOptionPane.ERROR_MESSAGE);
           return null;
+        }
+        if (FileManager.isShowCropDialogForCover())
+        {
+          //Show a edit dialog
+          EditCoverDialog dialog = new EditCoverDialog(returnImage);
+          dialog.pack();
+          dialog.setLocationRelativeTo(MainWindow.getInstance());
+          if (dialog.showDialog())
+          {
+            returnImage = dialog.getEditedImage();
+          }
+          else
+          {
+            return null;
+          }
         }
         Image newImage = returnImage.getScaledInstance(130, 200, Image.SCALE_SMOOTH);
         imageLabel.setIcon(new ImageIcon(newImage));

@@ -1,5 +1,6 @@
-package se.lantz.gui.screenshot;
+package se.lantz.gui.screenshot.cover;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
@@ -12,6 +13,9 @@ import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionAdapter;
 import java.awt.image.BufferedImage;
 
 import javax.swing.AbstractAction;
@@ -20,9 +24,11 @@ import javax.swing.InputMap;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.KeyStroke;
-import javax.swing.JCheckBox;
+import javax.swing.SwingConstants;
 
-public class EditScreenshotPanel extends JPanel
+import se.lantz.gui.screenshot.TypomaticButton;
+
+public class EditCoverPanel extends JPanel
 {
   private JLabel imageLabel;
   private JPanel buttonPanel;
@@ -32,36 +38,31 @@ public class EditScreenshotPanel extends JPanel
 
   private int x = 0;
   private int y = 0;
-  
-  private int width = 320;
-  private int height = 200;
+  private int width = 0;
+  private int height = 0;
+
   private TypomaticButton upButton;
   private TypomaticButton downButton;
   private JLabel infoLabel;
-  private JCheckBox largeSizeCheckBox;
 
-  public EditScreenshotPanel()
+  public EditCoverPanel()
   {
     GridBagLayout gridBagLayout = new GridBagLayout();
     setLayout(gridBagLayout);
     GridBagConstraints gbc_infoLabel = new GridBagConstraints();
-    gbc_infoLabel.insets = new Insets(10, 5, 5, 0);
+    gbc_infoLabel.ipady = 10;
+    gbc_infoLabel.fill = GridBagConstraints.BOTH;
+    gbc_infoLabel.insets = new Insets(10, 0, 0, 0);
     gbc_infoLabel.gridx = 0;
     gbc_infoLabel.gridy = 0;
     add(getInfoLabel(), gbc_infoLabel);
     GridBagConstraints gbc_imageLabel = new GridBagConstraints();
-    gbc_imageLabel.fill = GridBagConstraints.BOTH;
     gbc_imageLabel.weighty = 1.0;
-    gbc_imageLabel.insets = new Insets(10, 10, 10, 10);
+    gbc_imageLabel.insets = new Insets(0, 10, 10, 10);
     gbc_imageLabel.weightx = 1.0;
     gbc_imageLabel.gridx = 0;
     gbc_imageLabel.gridy = 1;
     add(getImageLabel(), gbc_imageLabel);
-    GridBagConstraints gbc_largeSizeCheckBox = new GridBagConstraints();
-    gbc_largeSizeCheckBox.insets = new Insets(0, 0, 5, 0);
-    gbc_largeSizeCheckBox.gridx = 0;
-    gbc_largeSizeCheckBox.gridy = 2;
-    add(getLargeSizeCheckBox(), gbc_largeSizeCheckBox);
     GridBagConstraints gbc_buttonPanel = new GridBagConstraints();
     gbc_buttonPanel.anchor = GridBagConstraints.NORTH;
     gbc_buttonPanel.gridx = 0;
@@ -148,6 +149,29 @@ public class EditScreenshotPanel extends JPanel
     if (imageLabel == null)
     {
       imageLabel = new JLabel("");
+      imageLabel.addMouseListener(new MouseAdapter()
+        {
+          @Override
+          public void mousePressed(MouseEvent e)
+          {
+            System.out.println("Mouse pressed!" + e.getPoint());
+            x = e.getX();
+            y = e.getY();
+            width = 0;
+            height = 0;
+            updateLabelIcon();
+          }
+        });
+
+      imageLabel.addMouseMotionListener(new MouseMotionAdapter()
+        {
+          @Override
+          public void mouseDragged(MouseEvent e)
+          {
+            System.out.println("Mouse dragged!" + e.getPoint());
+            mouseDrag(e.getX(), e.getY());
+          }
+        });
     }
     return imageLabel;
   }
@@ -202,13 +226,14 @@ public class EditScreenshotPanel extends JPanel
   public void setImage(BufferedImage image)
   {
     Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-    int screenHeight = (int)screenSize.getHeight();
+    int screenHeight = (int) screenSize.getHeight();
     int heightThreshold = screenHeight - 250;
     //Handle very large images by scaling them down so that the dialog fits on the screen
     if (image.getHeight() > heightThreshold)
     {
       Image scaledImage = image.getScaledInstance(-1, heightThreshold, Image.SCALE_SMOOTH);
-      BufferedImage newBufImage = new BufferedImage(scaledImage.getWidth(null), scaledImage.getHeight(null), BufferedImage.TYPE_INT_ARGB);
+      BufferedImage newBufImage =
+        new BufferedImage(scaledImage.getWidth(null), scaledImage.getHeight(null), BufferedImage.TYPE_INT_ARGB);
       Graphics2D bGr = newBufImage.createGraphics();
       bGr.drawImage(scaledImage, 0, 0, null);
       bGr.dispose();
@@ -218,18 +243,17 @@ public class EditScreenshotPanel extends JPanel
     {
       this.image = image;
     }
-    getLargeSizeCheckBox().setVisible(image.getWidth() > 447 && image.getHeight() > 279);  
-    x = (image.getWidth() - width) / 2;
-    y = ((image.getHeight() - height) / 2) - 1;
+
     updateLabelIcon();
   }
 
   private void updateLabelIcon()
   {
     BufferedImage copyOfImage = new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_INT_ARGB);
-    Graphics g = copyOfImage.createGraphics();
+    Graphics2D g = copyOfImage.createGraphics();
     g.drawImage(image, 0, 0, null);
     g.setColor(Color.red);
+    g.setStroke(new BasicStroke(2));
     g.drawRect(x, y, width, height);
     getImageLabel().setIcon(new ImageIcon(copyOfImage));
   }
@@ -272,58 +296,79 @@ public class EditScreenshotPanel extends JPanel
     }
     return downButton;
   }
-  
+
   public BufferedImage getCroppedImage()
   {
-    int xToUse = x < 0 ? 0 : x;
-    int yToUse = y < 0 ? 0 : y;
-    int widthToUse = width;
-    int heightToUse = height;
-    if ((xToUse + widthToUse) > image.getWidth())
+    if (width < 5 || height < 5)
     {
-      widthToUse = image.getWidth() - xToUse;
+      return image;
     }
-    
-    if ((yToUse + heightToUse) > image.getHeight())
-    {
-      heightToUse = image.getHeight() - yToUse;
-    }
-    
-    BufferedImage newImage = image
-      .getSubimage(xToUse, yToUse, widthToUse, heightToUse);
+    BufferedImage newImage = image.getSubimage(x, y, width, height);
     BufferedImage copyOfImage =
       new BufferedImage(newImage.getWidth(), newImage.getHeight(), BufferedImage.TYPE_INT_ARGB);
     Graphics g = copyOfImage.createGraphics();
     g.drawImage(newImage, 0, 0, null);
     return newImage;
   }
-  private JLabel getInfoLabel() {
-    if (infoLabel == null) {
-    	infoLabel = new JLabel("Move the rectangle to decide where to crop the image");
+
+  private JLabel getInfoLabel()
+  {
+    if (infoLabel == null)
+    {
+      infoLabel =
+        new JLabel("<html>Left-click and drag to mark the area to crop.<br>Move the rectangle with the arrow buttons.</html>");
+      infoLabel.setVerticalAlignment(SwingConstants.TOP);
+      infoLabel.setHorizontalAlignment(SwingConstants.CENTER);
+      infoLabel.addMouseListener(new MouseAdapter()
+        {
+          @Override
+          public void mousePressed(MouseEvent e)
+          {
+            //The image might not be at position 0 if the image is small, compensate for that.
+            x = e.getX() - imageLabel.getLocation().x;
+            if (x < 0)
+            {
+              x = 0;
+            }
+            y = 0;
+            width = 0;
+            height = 0;
+            updateLabelIcon();
+          }
+        });
+
+      infoLabel.addMouseMotionListener(new MouseMotionAdapter()
+        {
+          @Override
+          public void mouseDragged(MouseEvent e)
+          {
+            System.out.println("Mouse dragged on label!" + e.getPoint());
+            int ypos = e.getY();
+
+            if (e.getY() > (infoLabel.getHeight()))
+            {
+              ypos = e.getY() - infoLabel.getHeight();
+              mouseDrag(e.getX(), ypos);
+            }
+          }
+        });
     }
     return infoLabel;
   }
-  private JCheckBox getLargeSizeCheckBox() {
-    if (largeSizeCheckBox == null) {
-    	largeSizeCheckBox = new JCheckBox("Crop to 448x280 (image will be resized)");
-    	largeSizeCheckBox.addActionListener(new ActionListener() {
-    	  public void actionPerformed(ActionEvent e) {
-    	    if (largeSizeCheckBox.isSelected())
-    	    {
-    	      width = 448;
-    	      height = 280;
-    	    }
-    	    else
-    	    {
-    	      width = 320;
-            height = 200;
-    	    }
-    	    x = (image.getWidth() - width) / 2;
-          y = ((image.getHeight() - height) / 2) - 1;
-    	    updateLabelIcon();
-    	  }
-    	});
+
+  private void mouseDrag(int xPos, int yPos)
+  {
+    width = xPos - x;
+    height = yPos - y;
+    if (x + width > image.getWidth())
+    {
+      width = image.getWidth() - x;
     }
-    return largeSizeCheckBox;
+
+    if (y + height > image.getHeight())
+    {
+      height = image.getHeight() - y;
+    }
+    updateLabelIcon();
   }
 }

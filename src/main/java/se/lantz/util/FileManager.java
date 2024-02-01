@@ -85,6 +85,7 @@ public class FileManager
   private static String currentSavedStatesCarouselVersion = "";
   private static String deleteInstallFiles = "";
   private static String cropScreenshots = "";
+  private static String showCropDialogForCover = "";
 
   private MainViewModel model;
   private InfoModel infoModel;
@@ -1275,6 +1276,7 @@ public class FileManager
       currentSavedStatesCarouselVersion = "";
       deleteInstallFiles = "";
       cropScreenshots = "";
+      showCropDialogForCover = "";
       try (OutputStream output = new FileOutputStream("./pcu.properties"))
       {
         // save properties to project root folder
@@ -1366,6 +1368,15 @@ public class FileManager
       cropScreenshots = FileManager.getConfiguredProperties().getProperty(PreferencesModel.CROP_SCREENSHOTS, "false");
     }
     return Boolean.parseBoolean(cropScreenshots);
+  }
+  
+  public static boolean isShowCropDialogForCover()
+  {
+    if (showCropDialogForCover.isEmpty())
+    {
+      showCropDialogForCover = FileManager.getConfiguredProperties().getProperty(PreferencesModel.SHOW_CROP_DIALOG_FOR_COVER, "false");
+    }
+    return Boolean.parseBoolean(showCropDialogForCover);
   }
 
   public static void backupDb(String targetFolderName)

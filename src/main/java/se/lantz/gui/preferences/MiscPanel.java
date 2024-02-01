@@ -26,6 +26,7 @@ public class MiscPanel extends JPanel
   private JCheckBox deleteOldInstallsCheckBox;
   private JPanel screenshotsPanel;
   private JCheckBox cropScreenCheckBox;
+  private JCheckBox cropCoverCheckBox;
 
   public MiscPanel(PreferencesModel model)
   {
@@ -91,7 +92,7 @@ public class MiscPanel extends JPanel
       startupPanel.setLayout(gbl_startupPanel);
       GridBagConstraints gbc_managerVersionCheckBox = new GridBagConstraints();
       gbc_managerVersionCheckBox.weightx = 1.0;
-      gbc_managerVersionCheckBox.insets = new Insets(5, 0, 5, 0);
+      gbc_managerVersionCheckBox.insets = new Insets(5, 0, 0, 0);
       gbc_managerVersionCheckBox.anchor = GridBagConstraints.WEST;
       gbc_managerVersionCheckBox.gridx = 0;
       gbc_managerVersionCheckBox.gridy = 0;
@@ -136,6 +137,7 @@ public class MiscPanel extends JPanel
     getPcuaeVersionCheckBox().setSelected(model.isCheckPCUAEVersionAtStartup());
     getDeleteOldInstallsCheckBox().setSelected(model.isDeleteOldInstallfilesAfterDownload());
     getCropScreenCheckBox().setSelected(model.isCropScreenshots());
+    getCropCoverCheckBox().setSelected(model.isShowCropDialogForCover());
   }
 
   private SaveStatePrefPanel getSaveStatePrefPanel()
@@ -196,18 +198,25 @@ public class MiscPanel extends JPanel
     {
       screenshotsPanel = new JPanel();
       screenshotsPanel
-        .setBorder(new TitledBorder(null, "Screenshots", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+        .setBorder(new TitledBorder(null, "Screenshots & Cover", TitledBorder.LEADING, TitledBorder.TOP, null, null));
       GridBagLayout gbl_screenshotsPanel = new GridBagLayout();
       gbl_screenshotsPanel.columnWidths = new int[] { 0, 0 };
-      gbl_screenshotsPanel.rowHeights = new int[] { 0, 0 };
+      gbl_screenshotsPanel.rowHeights = new int[] { 0, 0, 0 };
       gbl_screenshotsPanel.columnWeights = new double[] { 0.0, Double.MIN_VALUE };
-      gbl_screenshotsPanel.rowWeights = new double[] { 0.0, Double.MIN_VALUE };
+      gbl_screenshotsPanel.rowWeights = new double[] { 0.0, 0.0, Double.MIN_VALUE };
       screenshotsPanel.setLayout(gbl_screenshotsPanel);
       GridBagConstraints gbc_cropScreenCheckBox = new GridBagConstraints();
-      gbc_cropScreenCheckBox.insets = new Insets(5, 0, 5, 5);
+      gbc_cropScreenCheckBox.anchor = GridBagConstraints.NORTHWEST;
+      gbc_cropScreenCheckBox.insets = new Insets(5, 0, 0, 0);
       gbc_cropScreenCheckBox.gridx = 0;
       gbc_cropScreenCheckBox.gridy = 0;
       screenshotsPanel.add(getCropScreenCheckBox(), gbc_cropScreenCheckBox);
+      GridBagConstraints gbc_cropCoverCheckBox = new GridBagConstraints();
+      gbc_cropCoverCheckBox.anchor = GridBagConstraints.NORTHWEST;
+      gbc_cropCoverCheckBox.insets = new Insets(0, 0, 5, 0);
+      gbc_cropCoverCheckBox.gridx = 0;
+      gbc_cropCoverCheckBox.gridy = 1;
+      screenshotsPanel.add(getCropCoverCheckBox(), gbc_cropCoverCheckBox);
     }
     return screenshotsPanel;
   }
@@ -221,5 +230,13 @@ public class MiscPanel extends JPanel
       cropScreenCheckBox.addItemListener((e) -> model.setCropScreenshots(cropScreenCheckBox.isSelected()));
     }
     return cropScreenCheckBox;
+  }
+  private JCheckBox getCropCoverCheckBox() {
+    if (cropCoverCheckBox == null) {
+    	cropCoverCheckBox = new JCheckBox("Show dialog to crop cover when added.");
+    	cropCoverCheckBox.setVerticalTextPosition(SwingConstants.TOP);
+    	cropCoverCheckBox.addItemListener((e) -> model.setShowCropDialogForCover(cropCoverCheckBox.isSelected()));
+    }
+    return cropCoverCheckBox;
   }
 }
