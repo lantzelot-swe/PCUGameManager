@@ -1,6 +1,5 @@
 package se.lantz.gui;
 
-import java.awt.Cursor;
 import java.awt.Desktop;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
@@ -8,7 +7,9 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -23,7 +24,6 @@ import javax.swing.event.HyperlinkEvent;
 
 import se.lantz.gamebase.GamebaseImporter;
 import se.lantz.gui.DeleteDialog.TYPE_OF_DELETE;
-import se.lantz.gui.carousel.CarouselPreviewDialog;
 import se.lantz.gui.dbbackup.BackupProgressDialog;
 import se.lantz.gui.dbbackup.BackupWorker;
 import se.lantz.gui.dbrestore.RestoreDbDialog;
@@ -73,6 +73,7 @@ public class MenuManager
   private JMenu toolsMenu;
   private JMenu pcuaeMenu;
   private JMenu pcuaeModeMenu;
+  private JMenu resourcesMenu;
   private JMenu helpMenu;
 
   private JMenuItem addGameItem;
@@ -162,6 +163,8 @@ public class MenuManager
   private ScummVMModeInstallManager installScummVMManager;
   private MainWindow mainWindow;
   private int currentFavoritesCount = 10;
+  
+  private Map<String, String> resourcesMap = new LinkedHashMap<>();
 
   public MenuManager(final MainViewModel uiModel, MainWindow mainWindow)
   {
@@ -181,7 +184,17 @@ public class MenuManager
     this.installViceManager = new ViceModeInstallManager();
     this.installScummVMManager = new ScummVMModeInstallManager();
     uiModel.setSavedStatesManager(savedStatesManager);
+    setupResourcesMap();
     setupMenues();
+  }
+  
+  private void setupResourcesMap()
+  {
+    resourcesMap.put("mobygames.com", "https://www.mobygames.com/platform/c64/");
+    resourcesMap.put("gb64.com", "https://gb64.com/search.php?h=0");
+    resourcesMap.put("c64.com", "https://www.c64.com/");
+    resourcesMap.put("retrocollector.org", "https://retrocollector.org/");
+    resourcesMap.put("web.archive.org (Vic 20)", "https://web.archive.org/web/20100530121115/http:/www.6502dude.com/cbm/vic20/arma/0to9taps.html");
   }
 
   public void triggerExit()
@@ -251,6 +264,8 @@ public class MenuManager
     pcuaeMenu.add(pcuaeModeMenu);
     pcuaeMenu.addSeparator();
     pcuaeMenu.add(getDeleteInstallFilesItem());
+    
+    setupResourcesMenu();
 
     helpMenu = new JMenu("Help");
     helpMenu.setMnemonic('H');
@@ -259,6 +274,31 @@ public class MenuManager
     helpMenu.addSeparator();
     helpMenu.add(getCheckVersionItem());
     helpMenu.add(getAboutItem());
+  }
+  
+  public void setupResourcesMenu()
+  {
+    resourcesMenu = new JMenu("Online resources");
+    resourcesMenu.setMnemonic('R');
+    resourcesMap.forEach((key, value) -> {
+      resourcesMenu.add(getResourcesItem(key, value));
+    });
+  }
+  
+  private JMenuItem getResourcesItem(String text, String url)
+  {
+    JMenuItem item = new JMenuItem(text);
+    item.addActionListener(e -> {
+      try
+      {
+        Desktop.getDesktop().browse(new URI(url));
+      }
+      catch (IOException | URISyntaxException ex)
+      {
+        ExceptionHandler.handleException(ex, "Could not open default browser");
+      }
+    });
+    return item;
   }
 
   public JMenu setupEditMenu()
@@ -373,6 +413,7 @@ public class MenuManager
     menuList.add(editMenu);
     menuList.add(toolsMenu);
     menuList.add(pcuaeMenu);
+    menuList.add(resourcesMenu);
     menuList.add(helpMenu);
     return menuList;
   }
