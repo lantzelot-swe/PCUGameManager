@@ -2,7 +2,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>se.lantz</groupId>
 	<artifactId>PCUAEManager</artifactId>
-	<version>2.15.3</version>
+	<version>2.16.0</version>
 	<name>PCUAEManager</name>
 	<properties>
 		<project.build.sourceEncoding>Cp1252</project.build.sourceEncoding>
