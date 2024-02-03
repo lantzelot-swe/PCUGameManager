@@ -1374,7 +1374,7 @@ public class FileManager
   {
     if (showCropDialogForCover.isEmpty())
     {
-      showCropDialogForCover = FileManager.getConfiguredProperties().getProperty(PreferencesModel.SHOW_CROP_DIALOG_FOR_COVER, "false");
+      showCropDialogForCover = FileManager.getConfiguredProperties().getProperty(PreferencesModel.SHOW_CROP_DIALOG_FOR_COVER, "true");
     }
     return Boolean.parseBoolean(showCropDialogForCover);
   }

@@ -44,7 +44,7 @@ public class PreferencesModel extends AbstractModel implements CommonInfoModel
   private boolean checkManagerVersionAtStartup = true;
   private boolean deleteOldInstallfilesAfterDownload = false;
   private boolean cropScreenshots = false;
-  private boolean cropDialogForCover = false;
+  private boolean cropDialogForCover = true;
 
   private String description =
     "For more Info on PCUAE go to https://github.com/CommodoreOS/PCUAE. Main keys: CTRL + F1 for Carousel Gamelist Changer, CTRL + F3 for Carousel Version Changer, CTRL + F5 for Mode Changer (Amiga, Atari, linux etc), CTRL + F7 for PCUAE Options Menu.";
@@ -94,7 +94,7 @@ public class PreferencesModel extends AbstractModel implements CommonInfoModel
     setDeleteOldInstallfilesAfterDownload(Boolean
       .parseBoolean(configuredProperties.getProperty(DELETE_OLD_INSTALL_FILES, "false")));
     setCropScreenshots(Boolean.parseBoolean(configuredProperties.getProperty(CROP_SCREENSHOTS, "false")));
-    setShowCropDialogForCover(Boolean.parseBoolean(configuredProperties.getProperty(SHOW_CROP_DIALOG_FOR_COVER, "false")));
+    setShowCropDialogForCover(Boolean.parseBoolean(configuredProperties.getProperty(SHOW_CROP_DIALOG_FOR_COVER, "true")));
     setFav1Alias(configuredProperties.getProperty(FAVORITES_1_ALIAS, fav1Alias));
     setFav2Alias(configuredProperties.getProperty(FAVORITES_2_ALIAS, fav2Alias));
     setFav3Alias(configuredProperties.getProperty(FAVORITES_3_ALIAS, fav3Alias));
