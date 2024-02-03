@@ -10,27 +10,27 @@ import se.lantz.gui.MainWindow;
 
 public class EditCoverDialog extends BaseDialog
 {
-  private EditCoverPanel editScreenPanel;
+  private EditCoverPanel editCoverPanel;
 
-  public EditCoverDialog(BufferedImage originalScreen)
+  public EditCoverDialog(BufferedImage originalCover)
   {
     super(MainWindow.getInstance());
-    setTitle("Edit screenshot");
+    setTitle("Edit cover image");
     JPanel content = new JPanel();
     content.setLayout(new BorderLayout());
-    content.add(getEditScreenshotPanel(), BorderLayout.CENTER);
+    content.add(getEditCoverPanel(), BorderLayout.CENTER);
     addContent(content);
-    getEditScreenshotPanel().setImage(originalScreen);
+    getEditCoverPanel().setImage(originalCover);
     this.setResizable(false);
   }
 
-  private EditCoverPanel getEditScreenshotPanel()
+  private EditCoverPanel getEditCoverPanel()
   {
-    if (editScreenPanel == null)
+    if (editCoverPanel == null)
     {
-      editScreenPanel = new EditCoverPanel();
+      editCoverPanel = new EditCoverPanel();
     }
-    return editScreenPanel;
+    return editCoverPanel;
   }
 
   @Override
@@ -41,6 +41,6 @@ public class EditCoverDialog extends BaseDialog
 
   public BufferedImage getEditedImage()
   {
-    return getEditScreenshotPanel().getCroppedImage();
+    return getEditCoverPanel().getCroppedImage();
   }
 }
