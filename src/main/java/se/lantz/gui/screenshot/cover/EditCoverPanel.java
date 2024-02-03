@@ -19,14 +19,17 @@ import java.awt.event.MouseMotionAdapter;
 import java.awt.image.BufferedImage;
 
 import javax.swing.AbstractAction;
+import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.InputMap;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.KeyStroke;
 import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
 
 import se.lantz.gui.screenshot.TypomaticButton;
+import javax.swing.JButton;
 
 public class EditCoverPanel extends JPanel
 {
@@ -44,6 +47,7 @@ public class EditCoverPanel extends JPanel
   private TypomaticButton upButton;
   private TypomaticButton downButton;
   private JLabel infoLabel;
+  private JButton rotateButton;
 
   public EditCoverPanel()
   {
@@ -64,6 +68,8 @@ public class EditCoverPanel extends JPanel
     gbc_imageLabel.gridy = 1;
     add(getImageLabel(), gbc_imageLabel);
     GridBagConstraints gbc_buttonPanel = new GridBagConstraints();
+    gbc_buttonPanel.fill = GridBagConstraints.HORIZONTAL;
+    gbc_buttonPanel.weightx = 1.0;
     gbc_buttonPanel.anchor = GridBagConstraints.NORTH;
     gbc_buttonPanel.gridx = 0;
     gbc_buttonPanel.gridy = 3;
@@ -154,7 +160,6 @@ public class EditCoverPanel extends JPanel
           @Override
           public void mousePressed(MouseEvent e)
           {
-            System.out.println("Mouse pressed!" + e.getPoint());
             x = e.getX();
             y = e.getY();
             width = 0;
@@ -168,7 +173,6 @@ public class EditCoverPanel extends JPanel
           @Override
           public void mouseDragged(MouseEvent e)
           {
-            System.out.println("Mouse dragged!" + e.getPoint());
             mouseDrag(e.getX(), e.getY());
           }
         });
@@ -181,10 +185,43 @@ public class EditCoverPanel extends JPanel
     if (buttonPanel == null)
     {
       buttonPanel = new JPanel();
-      buttonPanel.add(getLeftButton());
-      buttonPanel.add(getRighButton());
-      buttonPanel.add(getUpButton());
-      buttonPanel.add(getDownButton());
+      GridBagLayout gbl_buttonPanel = new GridBagLayout();
+      gbl_buttonPanel.columnWidths = new int[]{33, 33, 33, 33, 33, 0};
+      gbl_buttonPanel.rowHeights = new int[]{33, 0};
+      gbl_buttonPanel.columnWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
+      gbl_buttonPanel.rowWeights = new double[]{0.0, Double.MIN_VALUE};
+      buttonPanel.setLayout(gbl_buttonPanel);
+      GridBagConstraints gbc_leftButton = new GridBagConstraints();
+      gbc_leftButton.anchor = GridBagConstraints.NORTHWEST;
+      gbc_leftButton.insets = new Insets(5, 10, 0, 0);
+      gbc_leftButton.gridx = 0;
+      gbc_leftButton.gridy = 0;
+      buttonPanel.add(getLeftButton(), gbc_leftButton);
+      GridBagConstraints gbc_righButton = new GridBagConstraints();
+      gbc_righButton.anchor = GridBagConstraints.NORTHWEST;
+      gbc_righButton.insets = new Insets(5, 5, 0, 5);
+      gbc_righButton.gridx = 1;
+      gbc_righButton.gridy = 0;
+      buttonPanel.add(getRighButton(), gbc_righButton);
+      GridBagConstraints gbc_upButton = new GridBagConstraints();
+      gbc_upButton.anchor = GridBagConstraints.NORTHWEST;
+      gbc_upButton.insets = new Insets(5, 5, 0, 5);
+      gbc_upButton.gridx = 2;
+      gbc_upButton.gridy = 0;
+      buttonPanel.add(getUpButton(), gbc_upButton);
+      GridBagConstraints gbc_downButton = new GridBagConstraints();
+      gbc_downButton.anchor = GridBagConstraints.NORTHWEST;
+      gbc_downButton.insets = new Insets(5, 5, 0, 5);
+      gbc_downButton.gridx = 3;
+      gbc_downButton.gridy = 0;
+      buttonPanel.add(getDownButton(), gbc_downButton);
+      GridBagConstraints gbc_rotateButton = new GridBagConstraints();
+      gbc_rotateButton.weightx = 1.0;
+      gbc_rotateButton.insets = new Insets(5, 0, 5, 10);
+      gbc_rotateButton.anchor = GridBagConstraints.NORTHEAST;
+      gbc_rotateButton.gridx = 4;
+      gbc_rotateButton.gridy = 0;
+      buttonPanel.add(getRotateButton(), gbc_rotateButton);
     }
     return buttonPanel;
   }
@@ -342,7 +379,6 @@ public class EditCoverPanel extends JPanel
           @Override
           public void mouseDragged(MouseEvent e)
           {
-            System.out.println("Mouse dragged on label!" + e.getPoint());
             int ypos = e.getY();
 
             if (e.getY() > (infoLabel.getHeight()))
@@ -370,5 +406,40 @@ public class EditCoverPanel extends JPanel
       height = image.getHeight() - y;
     }
     updateLabelIcon();
+  }
+  private JButton getRotateButton() {
+    if (rotateButton == null) {
+    	rotateButton = new JButton("");
+    	rotateButton.setBorder(BorderFactory.createEmptyBorder(6, 6, 6, 6));
+    	rotateButton.setIcon(new ImageIcon(this.getClass().getResource("/se/lantz/rotate.png")));
+    	rotateButton.addActionListener(new ActionListener()
+        {
+          public void actionPerformed(ActionEvent e)
+          {
+            performRotateAction();
+          }
+        });
+    }
+    return rotateButton;
+  }
+  
+  private void performRotateAction()
+  {
+    int width = image.getWidth();
+    int height = image.getHeight();
+
+    BufferedImage dest = new BufferedImage(height, width, image.getType());
+
+    Graphics2D graphics2D = dest.createGraphics();
+    graphics2D.translate((height - width) / 2, (height - width) / 2);
+    graphics2D.rotate(Math.PI / 2, height / 2, width / 2);
+    graphics2D.drawRenderedImage(image, null);
+    this.image = dest;
+    updateLabelIcon();
+    EditCoverDialog dialog = (EditCoverDialog)SwingUtilities.getAncestorOfClass(EditCoverDialog.class, this);
+    if (dialog != null)
+    {
+      dialog.pack();
+    }
   }
 }
