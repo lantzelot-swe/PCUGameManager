@@ -49,7 +49,7 @@ public final class MainWindow extends JFrame
     this.setIconImage(new ImageIcon(getClass().getResource("/se/lantz/FrameIcon.png")).getImage());
     this.setTitle("PCUAE Manager");
     uiModel = new MainViewModel();
-    menuManager = new MenuManager(uiModel, this);
+    menuManager = new MenuManager(uiModel);
     this.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
 
     this.addWindowListener(new java.awt.event.WindowAdapter()
@@ -102,7 +102,7 @@ public final class MainWindow extends JFrame
   public void refreshMenuAndUI()
   {
     getJMenuBar().removeAll();
-    menuManager.setupEditMenu();
+    menuManager.updateEditMenu();
     for (JMenu menu : menuManager.getMenues())
     {
       menuBar.add(menu);

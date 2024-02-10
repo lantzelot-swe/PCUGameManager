@@ -72,6 +72,7 @@ public class MenuManager
   private JMenu exportMenu;
   private JMenu editMenu;
   private JMenu toolsMenu;
+  private JMenu clearFavoritesMenu;
   private JMenu pcuaeMenu;
   private JMenu pcuaeModeMenu;
   private JMenu resourcesMenu;
@@ -164,15 +165,13 @@ public class MenuManager
   private ViceModeInstallManager installViceManager;
   private ScummVMModeInstallManager installScummVMManager;
   private MSXModeInstallManager installMSXManager;
-  private MainWindow mainWindow;
   private int currentFavoritesCount = 10;
-  
+
   private Map<String, String> resourcesMap = new LinkedHashMap<>();
 
-  public MenuManager(final MainViewModel uiModel, MainWindow mainWindow)
+  public MenuManager(final MainViewModel uiModel)
   {
     this.uiModel = uiModel;
-    this.mainWindow = mainWindow;
     this.importManager = new ImportManager(uiModel);
     this.gamebaseImporter = new GamebaseImporter(importManager);
     this.exportManager = new ExportManager(uiModel);
@@ -191,14 +190,15 @@ public class MenuManager
     setupResourcesMap();
     setupMenues();
   }
-  
+
   private void setupResourcesMap()
   {
     resourcesMap.put("mobygames.com", "https://www.mobygames.com/platform/c64/");
     resourcesMap.put("gb64.com", "https://gb64.com/search.php?h=0");
     resourcesMap.put("c64.com", "https://www.c64.com/");
     resourcesMap.put("retrocollector.org", "https://retrocollector.org/");
-    resourcesMap.put("web.archive.org (Vic 20)", "https://web.archive.org/web/20100530121115/http:/www.6502dude.com/cbm/vic20/arma/0to9taps.html");
+    resourcesMap.put("web.archive.org (Vic 20)",
+                     "https://web.archive.org/web/20100530121115/http:/www.6502dude.com/cbm/vic20/arma/0to9taps.html");
   }
 
   public void triggerExit()
@@ -238,7 +238,10 @@ public class MenuManager
     fileMenu.add(getPreferencesMenuItem());
     fileMenu.addSeparator();
     fileMenu.add(getExitItem());
-    setupEditMenu();
+    clearFavoritesMenu = new JMenu("Clear Favorites");
+    editMenu = new JMenu("Edit");
+    editMenu.setMnemonic('E');
+    updateEditMenu();
     toolsMenu = new JMenu("Tools");
     toolsMenu.setMnemonic('T');
     toolsMenu.add(getBackupDbItem());
@@ -248,6 +251,8 @@ public class MenuManager
     toolsMenu.add(getDeleteAllGamesItem());
     toolsMenu.add(getDeleteGamesForViewMenuItem());
     toolsMenu.add(getDeleteAllGameViewsItem());
+    toolsMenu.addSeparator();
+    toolsMenu.add(clearFavoritesMenu);
     toolsMenu.addSeparator();
     toolsMenu.add(getConvertSavedStatesItem());
     toolsMenu.add(getCopySavedStatesToFileLoaderItem());
@@ -271,7 +276,7 @@ public class MenuManager
     pcuaeMenu.add(pcuaeModeMenu);
     pcuaeMenu.addSeparator();
     pcuaeMenu.add(getDeleteInstallFilesItem());
-    
+
     setupResourcesMenu();
 
     helpMenu = new JMenu("Help");
@@ -282,7 +287,7 @@ public class MenuManager
     helpMenu.add(getCheckVersionItem());
     helpMenu.add(getAboutItem());
   }
-  
+
   public void setupResourcesMenu()
   {
     resourcesMenu = new JMenu("Online resources");
@@ -291,7 +296,7 @@ public class MenuManager
       resourcesMenu.add(getResourcesItem(key, value));
     });
   }
-  
+
   private JMenuItem getResourcesItem(String text, String url)
   {
     JMenuItem item = new JMenuItem(text);
@@ -308,11 +313,10 @@ public class MenuManager
     return item;
   }
 
-  public JMenu setupEditMenu()
+  public void updateEditMenu()
   {
+    editMenu.removeAll();
     this.currentFavoritesCount = FileManager.getConfiguredNumberOfFavorites();
-    editMenu = new JMenu("Edit");
-    editMenu.setMnemonic('E');
 
     editMenu.add(getToggleFavorite1Item());
     if (currentFavoritesCount > 1)
@@ -352,47 +356,48 @@ public class MenuManager
       editMenu.add(getToggleFavorite10Item());
     }
     editMenu.addSeparator();
-    editMenu.add(getClearFavorites1Item());
+    editMenu.add(getEditViewTagItem());
+    editMenu.add(getPrimaryJoystickItem());
+
+    //Update the clear favorites menu based on used favorites lists
+    clearFavoritesMenu.removeAll();
+    clearFavoritesMenu.add(getClearFavorites1Item());
     if (currentFavoritesCount > 1)
     {
-      editMenu.add(getClearFavorites2Item());
+      clearFavoritesMenu.add(getClearFavorites2Item());
     }
     if (currentFavoritesCount > 2)
     {
-      editMenu.add(getClearFavorites3Item());
+      clearFavoritesMenu.add(getClearFavorites3Item());
     }
     if (currentFavoritesCount > 3)
     {
-      editMenu.add(getClearFavorites4Item());
+      clearFavoritesMenu.add(getClearFavorites4Item());
     }
     if (currentFavoritesCount > 4)
     {
-      editMenu.add(getClearFavorites5Item());
+      clearFavoritesMenu.add(getClearFavorites5Item());
     }
     if (currentFavoritesCount > 5)
     {
-      editMenu.add(getClearFavorites6Item());
+      clearFavoritesMenu.add(getClearFavorites6Item());
     }
     if (currentFavoritesCount > 6)
     {
-      editMenu.add(getClearFavorites7Item());
+      clearFavoritesMenu.add(getClearFavorites7Item());
     }
     if (currentFavoritesCount > 7)
     {
-      editMenu.add(getClearFavorites8Item());
+      clearFavoritesMenu.add(getClearFavorites8Item());
     }
     if (currentFavoritesCount > 8)
     {
-      editMenu.add(getClearFavorites9Item());
+      clearFavoritesMenu.add(getClearFavorites9Item());
     }
     if (currentFavoritesCount > 9)
     {
-      editMenu.add(getClearFavorites10Item());
+      clearFavoritesMenu.add(getClearFavorites10Item());
     }
-    editMenu.addSeparator();
-    editMenu.add(getEditViewTagItem());
-    editMenu.add(getPrimaryJoystickItem());
-    return editMenu;
   }
 
   public void intialize()
@@ -432,7 +437,7 @@ public class MenuManager
     addGameItem.setAccelerator(keyStrokeToAddGame);
     addGameItem.setMnemonic('A');
 
-    addGameItem.addActionListener(e -> mainWindow.getMainPanel().addNewGame());
+    addGameItem.addActionListener(e -> MainWindow.getInstance().getMainPanel().addNewGame());
     return addGameItem;
   }
 
@@ -443,7 +448,7 @@ public class MenuManager
     addInfoSlotItem.setAccelerator(keyStrokeToAddGame);
     addInfoSlotItem.setMnemonic('I');
 
-    addInfoSlotItem.addActionListener(e -> mainWindow.getMainPanel().addNewInfoSlot());
+    addInfoSlotItem.addActionListener(e -> MainWindow.getInstance().getMainPanel().addNewInfoSlot());
     return addInfoSlotItem;
   }
 
@@ -455,9 +460,9 @@ public class MenuManager
     deleteGameItem.setMnemonic('D');
 
     deleteGameItem.addActionListener(e -> {
-      mainWindow.setWaitCursor(true);
-      mainWindow.getMainPanel().deleteCurrentGame();
-      mainWindow.setWaitCursor(false);
+      MainWindow.getInstance().setWaitCursor(true);
+      MainWindow.getInstance().getMainPanel().deleteCurrentGame();
+      MainWindow.getInstance().setWaitCursor(false);
     });
     return deleteGameItem;
   }
@@ -488,7 +493,7 @@ public class MenuManager
     runGameItem.setAccelerator(keyStrokeToRunGame);
     runGameItem.setMnemonic('R');
 
-    runGameItem.addActionListener(e -> mainWindow.getMainPanel().runCurrentGame());
+    runGameItem.addActionListener(e -> MainWindow.getInstance().getMainPanel().runCurrentGame());
     return runGameItem;
   }
 
@@ -498,7 +503,7 @@ public class MenuManager
     KeyStroke keyStrokeCarouselPreview = KeyStroke.getKeyStroke(KeyEvent.VK_W, InputEvent.CTRL_DOWN_MASK);
     carouselPreviewItem.setAccelerator(keyStrokeCarouselPreview);
     carouselPreviewItem.setMnemonic('W');
-    carouselPreviewItem.addActionListener(e -> mainWindow.getMainPanel().getListPanel().showCarouselPreview());
+    carouselPreviewItem.addActionListener(e -> MainWindow.getInstance().getMainPanel().getListPanel().showCarouselPreview());
     return carouselPreviewItem;
   }
 
@@ -588,7 +593,7 @@ public class MenuManager
     exitItem.addActionListener(e -> {
       if (uiModel.isDataChanged())
       {
-        int value = mainWindow.getMainPanel().showUnsavedChangesDialog();
+        int value = MainWindow.getInstance().getMainPanel().showUnsavedChangesDialog();
         if (value == JOptionPane.YES_OPTION && !uiModel.saveData())
         {
           //Do not exit, save was not successful
@@ -617,312 +622,397 @@ public class MenuManager
 
   private JMenuItem getToggleFavorite1Item()
   {
-    toggleFavorite1Item = new JMenuItem("Add/remove from " + FileManager.getConfiguredFavGameViewName(1));
-    KeyStroke keyStrokeToToggleFav = KeyStroke.getKeyStroke(KeyEvent.VK_F1, InputEvent.CTRL_DOWN_MASK);
-    toggleFavorite1Item.setAccelerator(keyStrokeToToggleFav);
-    toggleFavorite1Item.addActionListener(e -> {
-      mainWindow.setWaitCursor(true);
-      mainWindow.getMainPanel().toggleFavorite();
-      mainWindow.setWaitCursor(false);
-    });
+    if (toggleFavorite1Item == null)
+    {
+      toggleFavorite1Item = new JMenuItem();
+      KeyStroke keyStrokeToToggleFav = KeyStroke.getKeyStroke(KeyEvent.VK_F1, InputEvent.CTRL_DOWN_MASK);
+      toggleFavorite1Item.setAccelerator(keyStrokeToToggleFav);
+      toggleFavorite1Item.addActionListener(e -> {
+        MainWindow.getInstance().setWaitCursor(true);
+        MainWindow.getInstance().getMainPanel().toggleFavorite();
+        MainWindow.getInstance().setWaitCursor(false);
+      });
+    }
+    toggleFavorite1Item.setText("Add/remove from " + FileManager.getConfiguredFavGameViewName(1));
     return toggleFavorite1Item;
   }
 
   private JMenuItem getToggleFavorite2Item()
   {
-    toggleFavorite2Item = new JMenuItem("Add/remove from " + FileManager.getConfiguredFavGameViewName(2));
-    KeyStroke keyStrokeToToggleFav = KeyStroke.getKeyStroke(KeyEvent.VK_F2, InputEvent.CTRL_DOWN_MASK);
-    toggleFavorite2Item.setAccelerator(keyStrokeToToggleFav);
-    toggleFavorite2Item.addActionListener(e -> {
-      mainWindow.setWaitCursor(true);
-      mainWindow.getMainPanel().toggleFavorite2();
-      mainWindow.setWaitCursor(false);
-    });
+    if (toggleFavorite2Item == null)
+    {
+      toggleFavorite2Item = new JMenuItem();
+      KeyStroke keyStrokeToToggleFav = KeyStroke.getKeyStroke(KeyEvent.VK_F2, InputEvent.CTRL_DOWN_MASK);
+      toggleFavorite2Item.setAccelerator(keyStrokeToToggleFav);
+      toggleFavorite2Item.addActionListener(e -> {
+        MainWindow.getInstance().setWaitCursor(true);
+        MainWindow.getInstance().getMainPanel().toggleFavorite2();
+        MainWindow.getInstance().setWaitCursor(false);
+      });
+    }
+    toggleFavorite2Item.setText("Add/remove from " + FileManager.getConfiguredFavGameViewName(2));
     return toggleFavorite2Item;
   }
 
   private JMenuItem getToggleFavorite3Item()
   {
-    toggleFavorite3Item = new JMenuItem("Add/remove from " + FileManager.getConfiguredFavGameViewName(3));
-    KeyStroke keyStrokeToToggleFav = KeyStroke.getKeyStroke(KeyEvent.VK_F3, InputEvent.CTRL_DOWN_MASK);
-    toggleFavorite3Item.setAccelerator(keyStrokeToToggleFav);
-    toggleFavorite3Item.addActionListener(e -> {
-      mainWindow.setWaitCursor(true);
-      mainWindow.getMainPanel().toggleFavorite3();
-      mainWindow.setWaitCursor(false);
-    });
+    if (toggleFavorite3Item == null)
+    {
+      toggleFavorite3Item = new JMenuItem();
+      KeyStroke keyStrokeToToggleFav = KeyStroke.getKeyStroke(KeyEvent.VK_F3, InputEvent.CTRL_DOWN_MASK);
+      toggleFavorite3Item.setAccelerator(keyStrokeToToggleFav);
+      toggleFavorite3Item.addActionListener(e -> {
+        MainWindow.getInstance().setWaitCursor(true);
+        MainWindow.getInstance().getMainPanel().toggleFavorite3();
+        MainWindow.getInstance().setWaitCursor(false);
+      });
+    }
+    toggleFavorite3Item.setText("Add/remove from " + FileManager.getConfiguredFavGameViewName(3));
     return toggleFavorite3Item;
   }
 
   private JMenuItem getToggleFavorite4Item()
   {
-    toggleFavorite4Item = new JMenuItem("Add/remove from " + FileManager.getConfiguredFavGameViewName(4));
-    KeyStroke keyStrokeToToggleFav = KeyStroke.getKeyStroke(KeyEvent.VK_F4, InputEvent.CTRL_DOWN_MASK);
-    toggleFavorite4Item.setAccelerator(keyStrokeToToggleFav);
-    toggleFavorite4Item.addActionListener(e -> {
-      mainWindow.setWaitCursor(true);
-      mainWindow.getMainPanel().toggleFavorite4();
-      mainWindow.setWaitCursor(false);
-    });
+    if (toggleFavorite4Item == null)
+    {
+      toggleFavorite4Item = new JMenuItem();
+      KeyStroke keyStrokeToToggleFav = KeyStroke.getKeyStroke(KeyEvent.VK_F4, InputEvent.CTRL_DOWN_MASK);
+      toggleFavorite4Item.setAccelerator(keyStrokeToToggleFav);
+      toggleFavorite4Item.addActionListener(e -> {
+        MainWindow.getInstance().setWaitCursor(true);
+        MainWindow.getInstance().getMainPanel().toggleFavorite4();
+        MainWindow.getInstance().setWaitCursor(false);
+      });
+    }
+    toggleFavorite4Item.setText("Add/remove from " + FileManager.getConfiguredFavGameViewName(4));
     return toggleFavorite4Item;
   }
 
   private JMenuItem getToggleFavorite5Item()
   {
-    toggleFavorite5Item = new JMenuItem("Add/remove from " + FileManager.getConfiguredFavGameViewName(5));
-    KeyStroke keyStrokeToToggleFav = KeyStroke.getKeyStroke(KeyEvent.VK_F5, InputEvent.CTRL_DOWN_MASK);
-    toggleFavorite5Item.setAccelerator(keyStrokeToToggleFav);
-    toggleFavorite5Item.addActionListener(e -> {
-      mainWindow.setWaitCursor(true);
-      mainWindow.getMainPanel().toggleFavorite5();
-      mainWindow.setWaitCursor(false);
-    });
+    if (toggleFavorite5Item == null)
+    {
+      toggleFavorite5Item = new JMenuItem();
+      KeyStroke keyStrokeToToggleFav = KeyStroke.getKeyStroke(KeyEvent.VK_F5, InputEvent.CTRL_DOWN_MASK);
+      toggleFavorite5Item.setAccelerator(keyStrokeToToggleFav);
+      toggleFavorite5Item.addActionListener(e -> {
+        MainWindow.getInstance().setWaitCursor(true);
+        MainWindow.getInstance().getMainPanel().toggleFavorite5();
+        MainWindow.getInstance().setWaitCursor(false);
+      });
+    }
+    toggleFavorite5Item.setText("Add/remove from " + FileManager.getConfiguredFavGameViewName(5));
     return toggleFavorite5Item;
   }
 
   private JMenuItem getToggleFavorite6Item()
   {
-    toggleFavorite6Item = new JMenuItem("Add/remove from " + FileManager.getConfiguredFavGameViewName(6));
-    KeyStroke keyStrokeToToggleFav = KeyStroke.getKeyStroke(KeyEvent.VK_F6, InputEvent.CTRL_DOWN_MASK);
-    toggleFavorite6Item.setAccelerator(keyStrokeToToggleFav);
-    toggleFavorite6Item.addActionListener(e -> {
-      mainWindow.setWaitCursor(true);
-      mainWindow.getMainPanel().toggleFavorite6();
-      mainWindow.setWaitCursor(false);
-    });
+    if (toggleFavorite6Item == null)
+    {
+      toggleFavorite6Item = new JMenuItem();
+      KeyStroke keyStrokeToToggleFav = KeyStroke.getKeyStroke(KeyEvent.VK_F6, InputEvent.CTRL_DOWN_MASK);
+      toggleFavorite6Item.setAccelerator(keyStrokeToToggleFav);
+      toggleFavorite6Item.addActionListener(e -> {
+        MainWindow.getInstance().setWaitCursor(true);
+        MainWindow.getInstance().getMainPanel().toggleFavorite6();
+        MainWindow.getInstance().setWaitCursor(false);
+      });
+    }
+    toggleFavorite6Item.setText("Add/remove from " + FileManager.getConfiguredFavGameViewName(6));
     return toggleFavorite6Item;
   }
 
   private JMenuItem getToggleFavorite7Item()
   {
-    toggleFavorite7Item = new JMenuItem("Add/remove from " + FileManager.getConfiguredFavGameViewName(7));
-    KeyStroke keyStrokeToToggleFav = KeyStroke.getKeyStroke(KeyEvent.VK_F7, InputEvent.CTRL_DOWN_MASK);
-    toggleFavorite7Item.setAccelerator(keyStrokeToToggleFav);
-    toggleFavorite7Item.addActionListener(e -> {
-      mainWindow.setWaitCursor(true);
-      mainWindow.getMainPanel().toggleFavorite7();
-      mainWindow.setWaitCursor(false);
-    });
+    if (toggleFavorite7Item == null)
+    {
+      toggleFavorite7Item = new JMenuItem();
+      KeyStroke keyStrokeToToggleFav = KeyStroke.getKeyStroke(KeyEvent.VK_F7, InputEvent.CTRL_DOWN_MASK);
+      toggleFavorite7Item.setAccelerator(keyStrokeToToggleFav);
+      toggleFavorite7Item.addActionListener(e -> {
+        MainWindow.getInstance().setWaitCursor(true);
+        MainWindow.getInstance().getMainPanel().toggleFavorite7();
+        MainWindow.getInstance().setWaitCursor(false);
+      });
+    }
+    toggleFavorite7Item.setText("Add/remove from " + FileManager.getConfiguredFavGameViewName(7));
     return toggleFavorite7Item;
   }
 
   private JMenuItem getToggleFavorite8Item()
   {
-    toggleFavorite8Item = new JMenuItem("Add/remove from " + FileManager.getConfiguredFavGameViewName(8));
-    KeyStroke keyStrokeToToggleFav = KeyStroke.getKeyStroke(KeyEvent.VK_F8, InputEvent.CTRL_DOWN_MASK);
-    toggleFavorite8Item.setAccelerator(keyStrokeToToggleFav);
-    toggleFavorite8Item.addActionListener(e -> {
-      mainWindow.setWaitCursor(true);
-      mainWindow.getMainPanel().toggleFavorite8();
-      mainWindow.setWaitCursor(false);
-    });
+    if (toggleFavorite8Item == null)
+    {
+      toggleFavorite8Item = new JMenuItem();
+      KeyStroke keyStrokeToToggleFav = KeyStroke.getKeyStroke(KeyEvent.VK_F8, InputEvent.CTRL_DOWN_MASK);
+      toggleFavorite8Item.setAccelerator(keyStrokeToToggleFav);
+      toggleFavorite8Item.addActionListener(e -> {
+        MainWindow.getInstance().setWaitCursor(true);
+        MainWindow.getInstance().getMainPanel().toggleFavorite8();
+        MainWindow.getInstance().setWaitCursor(false);
+      });
+    }
+    toggleFavorite8Item.setText("Add/remove from " + FileManager.getConfiguredFavGameViewName(8));
     return toggleFavorite8Item;
   }
 
   private JMenuItem getToggleFavorite9Item()
   {
-    toggleFavorite9Item = new JMenuItem("Add/remove from " + FileManager.getConfiguredFavGameViewName(9));
-    KeyStroke keyStrokeToToggleFav = KeyStroke.getKeyStroke(KeyEvent.VK_F9, InputEvent.CTRL_DOWN_MASK);
-    toggleFavorite9Item.setAccelerator(keyStrokeToToggleFav);
-    toggleFavorite9Item.addActionListener(e -> {
-      mainWindow.setWaitCursor(true);
-      mainWindow.getMainPanel().toggleFavorite9();
-      mainWindow.setWaitCursor(false);
-    });
+    if (toggleFavorite9Item == null)
+    {
+      toggleFavorite9Item = new JMenuItem();
+      KeyStroke keyStrokeToToggleFav = KeyStroke.getKeyStroke(KeyEvent.VK_F9, InputEvent.CTRL_DOWN_MASK);
+      toggleFavorite9Item.setAccelerator(keyStrokeToToggleFav);
+      toggleFavorite9Item.addActionListener(e -> {
+        MainWindow.getInstance().setWaitCursor(true);
+        MainWindow.getInstance().getMainPanel().toggleFavorite9();
+        MainWindow.getInstance().setWaitCursor(false);
+      });
+    }
+    toggleFavorite9Item.setText("Add/remove from " + FileManager.getConfiguredFavGameViewName(9));
     return toggleFavorite9Item;
   }
 
   private JMenuItem getToggleFavorite10Item()
   {
-    toggleFavorite10Item = new JMenuItem("Add/remove from " + FileManager.getConfiguredFavGameViewName(10));
-    KeyStroke keyStrokeToToggleFav = KeyStroke.getKeyStroke(KeyEvent.VK_F10, InputEvent.CTRL_DOWN_MASK);
-    toggleFavorite10Item.setAccelerator(keyStrokeToToggleFav);
-    toggleFavorite10Item.addActionListener(e -> {
-      mainWindow.setWaitCursor(true);
-      mainWindow.getMainPanel().toggleFavorite10();
-      mainWindow.setWaitCursor(false);
-    });
+    if (toggleFavorite10Item == null)
+    {
+      toggleFavorite10Item = new JMenuItem();
+      KeyStroke keyStrokeToToggleFav = KeyStroke.getKeyStroke(KeyEvent.VK_F10, InputEvent.CTRL_DOWN_MASK);
+      toggleFavorite10Item.setAccelerator(keyStrokeToToggleFav);
+      toggleFavorite10Item.addActionListener(e -> {
+        MainWindow.getInstance().setWaitCursor(true);
+        MainWindow.getInstance().getMainPanel().toggleFavorite10();
+        MainWindow.getInstance().setWaitCursor(false);
+      });
+    }
+    toggleFavorite10Item.setText("Add/remove from " + FileManager.getConfiguredFavGameViewName(10));
     return toggleFavorite10Item;
   }
 
   private JMenuItem getClearFavorites1Item()
   {
-    clearFavorites1Item = new JMenuItem("Clear " + FileManager.getConfiguredFavGameViewName(1));
-    KeyStroke keyStrokeToClearFav =
-      KeyStroke.getKeyStroke(KeyEvent.VK_F1, InputEvent.CTRL_DOWN_MASK + InputEvent.SHIFT_DOWN_MASK);
-    clearFavorites1Item.setAccelerator(keyStrokeToClearFav);
-    clearFavorites1Item.addActionListener(e -> {
-      clearFavorites(1);
-    });
+    if (clearFavorites1Item == null)
+    {
+      clearFavorites1Item = new JMenuItem();
+      KeyStroke keyStrokeToClearFav =
+        KeyStroke.getKeyStroke(KeyEvent.VK_F1, InputEvent.CTRL_DOWN_MASK + InputEvent.SHIFT_DOWN_MASK);
+      clearFavorites1Item.setAccelerator(keyStrokeToClearFav);
+      clearFavorites1Item.addActionListener(e -> {
+        clearFavorites(1);
+      });
+    }
+    clearFavorites1Item.setText("Clear " + FileManager.getConfiguredFavGameViewName(1));
     return clearFavorites1Item;
   }
 
   private JMenuItem getClearFavorites2Item()
   {
-    clearFavorites2Item = new JMenuItem("Clear " + FileManager.getConfiguredFavGameViewName(2));
-    KeyStroke keyStrokeToClearFav =
-      KeyStroke.getKeyStroke(KeyEvent.VK_F2, InputEvent.CTRL_DOWN_MASK + InputEvent.SHIFT_DOWN_MASK);
-    clearFavorites2Item.setAccelerator(keyStrokeToClearFav);
-    clearFavorites2Item.addActionListener(e -> {
-      clearFavorites(2);
-    });
+    if (clearFavorites2Item == null)
+    {
+      clearFavorites2Item = new JMenuItem();
+      KeyStroke keyStrokeToClearFav =
+        KeyStroke.getKeyStroke(KeyEvent.VK_F2, InputEvent.CTRL_DOWN_MASK + InputEvent.SHIFT_DOWN_MASK);
+      clearFavorites2Item.setAccelerator(keyStrokeToClearFav);
+      clearFavorites2Item.addActionListener(e -> {
+        clearFavorites(2);
+      });
+    }
+    clearFavorites2Item.setText("Clear " + FileManager.getConfiguredFavGameViewName(2));
     return clearFavorites2Item;
   }
 
   private JMenuItem getClearFavorites3Item()
   {
-    clearFavorites3Item = new JMenuItem("Clear " + FileManager.getConfiguredFavGameViewName(3));
-    KeyStroke keyStrokeToClearFav =
-      KeyStroke.getKeyStroke(KeyEvent.VK_F3, InputEvent.CTRL_DOWN_MASK + InputEvent.SHIFT_DOWN_MASK);
-    clearFavorites3Item.setAccelerator(keyStrokeToClearFav);
-    clearFavorites3Item.addActionListener(e -> {
-      clearFavorites(3);
-    });
+    if (clearFavorites3Item == null)
+    {
+      clearFavorites3Item = new JMenuItem();
+      KeyStroke keyStrokeToClearFav =
+        KeyStroke.getKeyStroke(KeyEvent.VK_F3, InputEvent.CTRL_DOWN_MASK + InputEvent.SHIFT_DOWN_MASK);
+      clearFavorites3Item.setAccelerator(keyStrokeToClearFav);
+      clearFavorites3Item.addActionListener(e -> {
+        clearFavorites(3);
+      });
+    }
+    clearFavorites3Item.setText("Clear " + FileManager.getConfiguredFavGameViewName(3));
     return clearFavorites3Item;
   }
 
   private JMenuItem getClearFavorites4Item()
   {
-    clearFavorites4Item = new JMenuItem("Clear " + FileManager.getConfiguredFavGameViewName(4));
-    KeyStroke keyStrokeToClearFav =
-      KeyStroke.getKeyStroke(KeyEvent.VK_F4, InputEvent.CTRL_DOWN_MASK + InputEvent.SHIFT_DOWN_MASK);
-    clearFavorites4Item.setAccelerator(keyStrokeToClearFav);
-    clearFavorites4Item.addActionListener(e -> {
-      clearFavorites(4);
-    });
+    if (clearFavorites4Item == null)
+    {
+      clearFavorites4Item = new JMenuItem();
+      KeyStroke keyStrokeToClearFav =
+        KeyStroke.getKeyStroke(KeyEvent.VK_F4, InputEvent.CTRL_DOWN_MASK + InputEvent.SHIFT_DOWN_MASK);
+      clearFavorites4Item.setAccelerator(keyStrokeToClearFav);
+      clearFavorites4Item.addActionListener(e -> {
+        clearFavorites(4);
+      });
+    }
+    clearFavorites4Item.setText("Clear " + FileManager.getConfiguredFavGameViewName(4));
     return clearFavorites4Item;
   }
 
   private JMenuItem getClearFavorites5Item()
   {
-    clearFavorites5Item = new JMenuItem("Clear " + FileManager.getConfiguredFavGameViewName(5));
-    KeyStroke keyStrokeToClearFav =
-      KeyStroke.getKeyStroke(KeyEvent.VK_F5, InputEvent.CTRL_DOWN_MASK + InputEvent.SHIFT_DOWN_MASK);
-    clearFavorites5Item.setAccelerator(keyStrokeToClearFav);
-    clearFavorites5Item.addActionListener(e -> {
-      clearFavorites(5);
-    });
+    if (clearFavorites5Item == null)
+    {
+      clearFavorites5Item = new JMenuItem();
+      KeyStroke keyStrokeToClearFav =
+        KeyStroke.getKeyStroke(KeyEvent.VK_F5, InputEvent.CTRL_DOWN_MASK + InputEvent.SHIFT_DOWN_MASK);
+      clearFavorites5Item.setAccelerator(keyStrokeToClearFav);
+      clearFavorites5Item.addActionListener(e -> {
+        clearFavorites(5);
+      });
+    }
+    clearFavorites5Item.setText("Clear " + FileManager.getConfiguredFavGameViewName(5));
     return clearFavorites5Item;
   }
 
   private JMenuItem getClearFavorites6Item()
   {
-    clearFavorites6Item = new JMenuItem("Clear " + FileManager.getConfiguredFavGameViewName(6));
-    KeyStroke keyStrokeToClearFav =
-      KeyStroke.getKeyStroke(KeyEvent.VK_F6, InputEvent.CTRL_DOWN_MASK + InputEvent.SHIFT_DOWN_MASK);
-    clearFavorites6Item.setAccelerator(keyStrokeToClearFav);
-    clearFavorites6Item.addActionListener(e -> {
-      clearFavorites(6);
-    });
+    if (clearFavorites6Item == null)
+    {
+      clearFavorites6Item = new JMenuItem();
+      KeyStroke keyStrokeToClearFav =
+        KeyStroke.getKeyStroke(KeyEvent.VK_F6, InputEvent.CTRL_DOWN_MASK + InputEvent.SHIFT_DOWN_MASK);
+      clearFavorites6Item.setAccelerator(keyStrokeToClearFav);
+      clearFavorites6Item.addActionListener(e -> {
+        clearFavorites(6);
+      });
+    }
+    clearFavorites6Item.setText("Clear " + FileManager.getConfiguredFavGameViewName(6));
     return clearFavorites6Item;
   }
 
   private JMenuItem getClearFavorites7Item()
   {
-    clearFavorites7Item = new JMenuItem("Clear " + FileManager.getConfiguredFavGameViewName(7));
-    KeyStroke keyStrokeToClearFav =
-      KeyStroke.getKeyStroke(KeyEvent.VK_F7, InputEvent.CTRL_DOWN_MASK + InputEvent.SHIFT_DOWN_MASK);
-    clearFavorites7Item.setAccelerator(keyStrokeToClearFav);
-    clearFavorites7Item.addActionListener(e -> {
-      clearFavorites(7);
-    });
+    if (clearFavorites7Item == null)
+    {
+      clearFavorites7Item = new JMenuItem();
+      KeyStroke keyStrokeToClearFav =
+        KeyStroke.getKeyStroke(KeyEvent.VK_F7, InputEvent.CTRL_DOWN_MASK + InputEvent.SHIFT_DOWN_MASK);
+      clearFavorites7Item.setAccelerator(keyStrokeToClearFav);
+      clearFavorites7Item.addActionListener(e -> {
+        clearFavorites(7);
+      });
+    }
+    clearFavorites7Item.setText("Clear " + FileManager.getConfiguredFavGameViewName(7));
     return clearFavorites7Item;
   }
 
   private JMenuItem getClearFavorites8Item()
   {
-    clearFavorites8Item = new JMenuItem("Clear " + FileManager.getConfiguredFavGameViewName(8));
-    KeyStroke keyStrokeToClearFav =
-      KeyStroke.getKeyStroke(KeyEvent.VK_F8, InputEvent.CTRL_DOWN_MASK + InputEvent.SHIFT_DOWN_MASK);
-    clearFavorites8Item.setAccelerator(keyStrokeToClearFav);
-    clearFavorites8Item.addActionListener(e -> {
-      clearFavorites(8);
-    });
+    if (clearFavorites8Item == null)
+    {
+      clearFavorites8Item = new JMenuItem();
+      KeyStroke keyStrokeToClearFav =
+        KeyStroke.getKeyStroke(KeyEvent.VK_F8, InputEvent.CTRL_DOWN_MASK + InputEvent.SHIFT_DOWN_MASK);
+      clearFavorites8Item.setAccelerator(keyStrokeToClearFav);
+      clearFavorites8Item.addActionListener(e -> {
+        clearFavorites(8);
+      });
+    }
+    clearFavorites8Item.setText("Clear " + FileManager.getConfiguredFavGameViewName(8));
     return clearFavorites8Item;
   }
 
   private JMenuItem getClearFavorites9Item()
   {
-    clearFavorites9Item = new JMenuItem("Clear " + FileManager.getConfiguredFavGameViewName(9));
-    KeyStroke keyStrokeToClearFav =
-      KeyStroke.getKeyStroke(KeyEvent.VK_F9, InputEvent.CTRL_DOWN_MASK + InputEvent.SHIFT_DOWN_MASK);
-    clearFavorites9Item.setAccelerator(keyStrokeToClearFav);
-    clearFavorites9Item.addActionListener(e -> {
-      clearFavorites(9);
-    });
+    if (clearFavorites9Item == null)
+    {
+      clearFavorites9Item = new JMenuItem();
+      KeyStroke keyStrokeToClearFav =
+        KeyStroke.getKeyStroke(KeyEvent.VK_F9, InputEvent.CTRL_DOWN_MASK + InputEvent.SHIFT_DOWN_MASK);
+      clearFavorites9Item.setAccelerator(keyStrokeToClearFav);
+      clearFavorites9Item.addActionListener(e -> {
+        clearFavorites(9);
+      });
+    }
+    clearFavorites9Item.setText("Clear " + FileManager.getConfiguredFavGameViewName(9));
     return clearFavorites9Item;
   }
 
   private JMenuItem getClearFavorites10Item()
   {
-    clearFavorites10Item = new JMenuItem("Clear " + FileManager.getConfiguredFavGameViewName(10));
-    KeyStroke keyStrokeToClearFav =
-      KeyStroke.getKeyStroke(KeyEvent.VK_F10, InputEvent.CTRL_DOWN_MASK + InputEvent.SHIFT_DOWN_MASK);
-    clearFavorites10Item.setAccelerator(keyStrokeToClearFav);
-    clearFavorites10Item.addActionListener(e -> {
-      clearFavorites(10);
-    });
+    if (clearFavorites10Item == null)
+    {
+      clearFavorites10Item = new JMenuItem();
+      KeyStroke keyStrokeToClearFav =
+        KeyStroke.getKeyStroke(KeyEvent.VK_F10, InputEvent.CTRL_DOWN_MASK + InputEvent.SHIFT_DOWN_MASK);
+      clearFavorites10Item.setAccelerator(keyStrokeToClearFav);
+      clearFavorites10Item.addActionListener(e -> {
+        clearFavorites(10);
+      });
+    }
+    clearFavorites10Item.setText("Clear " + FileManager.getConfiguredFavGameViewName(10));
     return clearFavorites10Item;
   }
 
   private JMenuItem getEditViewTagItem()
   {
-    editViewTagItem = new JMenuItem("Edit view tag...");
-    KeyStroke keyStrokeToToggleFav = KeyStroke.getKeyStroke(KeyEvent.VK_T, InputEvent.CTRL_DOWN_MASK);
-    editViewTagItem.setAccelerator(keyStrokeToToggleFav);
-    editViewTagItem.addActionListener(e -> {
-      if (!mainWindow.getMainPanel().isNoGameSelected())
-      {
-        String initialValue =
-          mainWindow.getMainPanel().isSingleGameSelected() ? uiModel.getInfoModel().getViewTag() : "";
-        String message = mainWindow.getMainPanel().isSingleGameSelected()
-          ? "Enter the view tag to set for " + uiModel.getInfoModel().getTitle()
-          : "Enter the view tag to set for the selected games";
-        String viewTag = JOptionPane.showInputDialog(MainWindow.getInstance(), message, initialValue);
-        if (viewTag != null)
+    if (editViewTagItem == null)
+    {
+      editViewTagItem = new JMenuItem("Edit view tag...");
+      KeyStroke keyStrokeToToggleFav = KeyStroke.getKeyStroke(KeyEvent.VK_T, InputEvent.CTRL_DOWN_MASK);
+      editViewTagItem.setAccelerator(keyStrokeToToggleFav);
+      editViewTagItem.addActionListener(e -> {
+        if (!MainWindow.getInstance().getMainPanel().isNoGameSelected())
         {
-          mainWindow.setWaitCursor(true);
-          mainWindow.getMainPanel().setViewTag(viewTag);
-          mainWindow.setWaitCursor(false);
+          String initialValue =
+            MainWindow.getInstance().getMainPanel().isSingleGameSelected() ? uiModel.getInfoModel().getViewTag() : "";
+          String message = MainWindow.getInstance().getMainPanel().isSingleGameSelected()
+            ? "Enter the view tag to set for " + uiModel.getInfoModel().getTitle()
+            : "Enter the view tag to set for the selected games";
+          String viewTag = JOptionPane.showInputDialog(MainWindow.getInstance(), message, initialValue);
+          if (viewTag != null)
+          {
+            MainWindow.getInstance().setWaitCursor(true);
+            MainWindow.getInstance().getMainPanel().setViewTag(viewTag);
+            MainWindow.getInstance().setWaitCursor(false);
+          }
         }
-      }
-    });
+      });
+    }
     return editViewTagItem;
   }
 
   private JMenuItem getPrimaryJoystickItem()
   {
-
-    editPrimaryJoystickItem = new JMenuItem("Edit primary Joystick...");
-    KeyStroke keyStrokeToEditJoy = KeyStroke.getKeyStroke(KeyEvent.VK_J, InputEvent.CTRL_DOWN_MASK);
-    editPrimaryJoystickItem.setAccelerator(keyStrokeToEditJoy);
-    editPrimaryJoystickItem.addActionListener(e -> {
-      if (!mainWindow.getMainPanel().isNoGameSelected())
-      {
-        PrimaryJoystickDialog dialog = new PrimaryJoystickDialog(MainWindow.getInstance());
-        dialog.pack();
-        dialog.setLocationRelativeTo(this.mainWindow);
-
-        if (dialog.showDialog())
+    if (editPrimaryJoystickItem == null)
+    {
+      editPrimaryJoystickItem = new JMenuItem("Edit primary Joystick...");
+      KeyStroke keyStrokeToEditJoy = KeyStroke.getKeyStroke(KeyEvent.VK_J, InputEvent.CTRL_DOWN_MASK);
+      editPrimaryJoystickItem.setAccelerator(keyStrokeToEditJoy);
+      editPrimaryJoystickItem.addActionListener(e -> {
+        if (!MainWindow.getInstance().getMainPanel().isNoGameSelected())
         {
-          mainWindow.setWaitCursor(true);
-          List<String> selectedGameIds = mainWindow.getMainPanel().getListPanel().getSelectedGameListData().stream()
-            .map(data -> data.getGameId()).collect(Collectors.toList());
+          PrimaryJoystickDialog dialog = new PrimaryJoystickDialog(MainWindow.getInstance());
+          dialog.pack();
+          dialog.setLocationRelativeTo(MainWindow.getInstance());
 
-          uiModel.updatePrimaryJoystickPort(selectedGameIds, dialog.isPort1Primary());
-
-          mainWindow.setWaitCursor(false);
-          JOptionPane.showMessageDialog(MainWindow.getInstance().getMainPanel(),
-                                        "Primary joystick port updated for the selected games.",
-                                        "Primary port",
-                                        JOptionPane.INFORMATION_MESSAGE);
-          if (selectedGameIds.size() == 1)
+          if (dialog.showDialog())
           {
-            MainWindow.getInstance().reloadCurrentGameView();
+            MainWindow.getInstance().setWaitCursor(true);
+            List<String> selectedGameIds = MainWindow.getInstance().getMainPanel().getListPanel().getSelectedGameListData().stream()
+              .map(data -> data.getGameId()).collect(Collectors.toList());
+
+            uiModel.updatePrimaryJoystickPort(selectedGameIds, dialog.isPort1Primary());
+
+            MainWindow.getInstance().setWaitCursor(false);
+            JOptionPane.showMessageDialog(MainWindow.getInstance().getMainPanel(),
+                                          "Primary joystick port updated for the selected games.",
+                                          "Primary port",
+                                          JOptionPane.INFORMATION_MESSAGE);
+            if (selectedGameIds.size() == 1)
+            {
+              MainWindow.getInstance().reloadCurrentGameView();
+            }
           }
         }
-      }
-    });
+      });
+    }
     return editPrimaryJoystickItem;
   }
 
@@ -1101,7 +1191,7 @@ public class MenuManager
     }
     return installViceModeItem;
   }
-  
+
   private JMenuItem getInstallMSXModeItem()
   {
     if (installMSXModeItem == null)
@@ -1112,8 +1202,6 @@ public class MenuManager
     }
     return installMSXModeItem;
   }
-  
-  
 
   private JMenuItem getInstallScummVMModeItem()
   {
@@ -1188,7 +1276,7 @@ public class MenuManager
     aboutItem.addActionListener(e -> {
       AboutDialog dialog = new AboutDialog();
       dialog.pack();
-      dialog.setLocationRelativeTo(this.mainWindow);
+      dialog.setLocationRelativeTo(MainWindow.getInstance());
       dialog.setVisible(true);
     });
     return aboutItem;
@@ -1206,9 +1294,9 @@ public class MenuManager
 
   private void importCarouselGames()
   {
-    ImportOptionsDialog optionsDialog = new ImportOptionsDialog(this.mainWindow, true);
+    ImportOptionsDialog optionsDialog = new ImportOptionsDialog(MainWindow.getInstance(), true);
     optionsDialog.pack();
-    optionsDialog.setLocationRelativeTo(this.mainWindow);
+    optionsDialog.setLocationRelativeTo(MainWindow.getInstance());
     if (optionsDialog.showDialog())
     {
       importManager.setSelectedFolderForCarousels(optionsDialog.getImportDirectory());
@@ -1217,7 +1305,7 @@ public class MenuManager
       importManager.setViewTag(optionsDialog.getViewTag());
       //This will reset the other options if selected
       importManager.setCreateGameViews(optionsDialog.isCreateGameViews());
-      ImportProgressDialog dialog = new ImportProgressDialog(this.mainWindow);
+      ImportProgressDialog dialog = new ImportProgressDialog(MainWindow.getInstance());
       CarouselImportWorker worker = new CarouselImportWorker(importManager, dialog);
       worker.execute();
       dialog.setVisible(true);
@@ -1230,9 +1318,9 @@ public class MenuManager
 
   private void importGamebaseGames()
   {
-    ImportOptionsDialog optionsDialog = new ImportOptionsDialog(this.mainWindow, false);
+    ImportOptionsDialog optionsDialog = new ImportOptionsDialog(MainWindow.getInstance(), false);
     optionsDialog.pack();
-    optionsDialog.setLocationRelativeTo(this.mainWindow);
+    optionsDialog.setLocationRelativeTo(MainWindow.getInstance());
     if (optionsDialog.showDialog(gamebaseImporter))
     {
       //Set selected option in gamebaseImporter from the dialog.
@@ -1243,7 +1331,7 @@ public class MenuManager
         importManager.setAddAsFavorite(optionsDialog.getMarkAsFavorite());
         importManager.setViewTag(optionsDialog.getViewTag());
         importManager.setCreateGameViews(false);
-        ImportProgressDialog dialog = new ImportProgressDialog(this.mainWindow);
+        ImportProgressDialog dialog = new ImportProgressDialog(MainWindow.getInstance());
         GamebaseImportWorker worker = new GamebaseImportWorker(gamebaseImporter, importManager, dialog);
         worker.execute();
         dialog.setVisible(true);
@@ -1255,7 +1343,7 @@ public class MenuManager
       }
       else
       {
-        JOptionPane.showMessageDialog(mainWindow,
+        JOptionPane.showMessageDialog(MainWindow.getInstance(),
                                       "Could not read Paths.ini, see log for details.",
                                       "Error",
                                       JOptionPane.ERROR_MESSAGE);
@@ -1267,12 +1355,12 @@ public class MenuManager
   {
     final ImportSavedStatesDialog importSavedStatesDialog = new ImportSavedStatesDialog(MainWindow.getInstance());
     importSavedStatesDialog.pack();
-    importSavedStatesDialog.setLocationRelativeTo(this.mainWindow);
+    importSavedStatesDialog.setLocationRelativeTo(MainWindow.getInstance());
     if (importSavedStatesDialog.showDialog())
     {
       savedStatesManager.setImportDirectory(importSavedStatesDialog.getTargetDirectory());
       savedStatesManager.setImportOverwrite(importSavedStatesDialog.isImportOverwrite());
-      ImportExportProgressDialog dialog = new ImportExportProgressDialog(this.mainWindow, "Import saved states", true);
+      ImportExportProgressDialog dialog = new ImportExportProgressDialog(MainWindow.getInstance(), "Import saved states", true);
       ImportSavedStatesWorker worker = new ImportSavedStatesWorker(savedStatesManager, dialog);
       worker.execute();
       dialog.setVisible(true);
@@ -1283,12 +1371,12 @@ public class MenuManager
   {
     final ExportSavedStatesDialog exportSavedStatesDialog = new ExportSavedStatesDialog(MainWindow.getInstance());
     exportSavedStatesDialog.pack();
-    exportSavedStatesDialog.setLocationRelativeTo(this.mainWindow);
+    exportSavedStatesDialog.setLocationRelativeTo(MainWindow.getInstance());
     if (exportSavedStatesDialog.showDialog())
     {
       savedStatesManager.setExportDirectory(exportSavedStatesDialog.getTargetDirectory());
       savedStatesManager.setExportOverwrite(exportSavedStatesDialog.isExportOverwrite());
-      ImportExportProgressDialog dialog = new ImportExportProgressDialog(this.mainWindow, "Export saved states", false);
+      ImportExportProgressDialog dialog = new ImportExportProgressDialog(MainWindow.getInstance(), "Export saved states", false);
       ExportSavedStatesWorker worker = new ExportSavedStatesWorker(savedStatesManager, dialog);
       worker.execute();
       dialog.setVisible(true);
@@ -1299,7 +1387,7 @@ public class MenuManager
   {
     final ExportGamesDialog exportSelectionDialog = new ExportGamesDialog(MainWindow.getInstance(), true);
     exportSelectionDialog.pack();
-    exportSelectionDialog.setLocationRelativeTo(this.mainWindow);
+    exportSelectionDialog.setLocationRelativeTo(MainWindow.getInstance());
     if (exportSelectionDialog.showDialog())
     {
       if (exportSelectionDialog.isExportGameViews())
@@ -1310,7 +1398,7 @@ public class MenuManager
           exportManager.setGameViewsToExport(viewList);
           exportManager.setDeleteBeforeExport(exportSelectionDialog.deleteBeforeExport());
           exportManager.setTargetDirectory(exportSelectionDialog.getTargetDirectory());
-          ImportExportProgressDialog dialog = new ImportExportProgressDialog(this.mainWindow, "Export games", false);
+          ImportExportProgressDialog dialog = new ImportExportProgressDialog(MainWindow.getInstance(), "Export games", false);
           ExportWorker worker = new ExportWorker(exportManager, dialog);
           worker.execute();
           dialog.setVisible(true);
@@ -1324,7 +1412,7 @@ public class MenuManager
           exportManager.setGamesToExport(gamesList);
           exportManager.setDeleteBeforeExport(exportSelectionDialog.deleteBeforeExport());
           exportManager.setTargetDirectory(exportSelectionDialog.getTargetDirectory());
-          ImportExportProgressDialog dialog = new ImportExportProgressDialog(this.mainWindow, "Export games", false);
+          ImportExportProgressDialog dialog = new ImportExportProgressDialog(MainWindow.getInstance(), "Export games", false);
           ExportWorker worker = new ExportWorker(exportManager, dialog);
           worker.execute();
           dialog.setVisible(true);
@@ -1337,7 +1425,7 @@ public class MenuManager
   {
     final ExportGamesDialog exportSelectionDialog = new ExportGamesDialog(MainWindow.getInstance(), false);
     exportSelectionDialog.pack();
-    exportSelectionDialog.setLocationRelativeTo(this.mainWindow);
+    exportSelectionDialog.setLocationRelativeTo(MainWindow.getInstance());
     if (exportSelectionDialog.showDialog())
     {
       if (exportSelectionDialog.isExportGameViews())
@@ -1348,7 +1436,7 @@ public class MenuManager
           exportManager.setGameViewsToExport(viewList);
           exportManager.setDeleteBeforeExport(exportSelectionDialog.deleteBeforeExport());
           exportManager.setTargetDirectory(exportSelectionDialog.getTargetDirectory());
-          ImportExportProgressDialog dialog = new ImportExportProgressDialog(this.mainWindow, "Export games", false);
+          ImportExportProgressDialog dialog = new ImportExportProgressDialog(MainWindow.getInstance(), "Export games", false);
           ExportFileLoaderWorker worker = new ExportFileLoaderWorker(exportManager, dialog);
           worker.execute();
           dialog.setVisible(true);
@@ -1362,7 +1450,7 @@ public class MenuManager
           exportManager.setGamesToExport(gamesList);
           exportManager.setDeleteBeforeExport(exportSelectionDialog.deleteBeforeExport());
           exportManager.setTargetDirectory(exportSelectionDialog.getTargetDirectory());
-          ImportExportProgressDialog dialog = new ImportExportProgressDialog(this.mainWindow, "Export games", false);
+          ImportExportProgressDialog dialog = new ImportExportProgressDialog(MainWindow.getInstance(), "Export games", false);
           ExportFileLoaderWorker worker = new ExportFileLoaderWorker(exportManager, dialog);
           worker.execute();
           dialog.setVisible(true);
@@ -1373,7 +1461,7 @@ public class MenuManager
 
   private void editPreferences()
   {
-    PreferencesDialog prefDialog = new PreferencesDialog(this.mainWindow);
+    PreferencesDialog prefDialog = new PreferencesDialog(MainWindow.getInstance());
     prefDialog.pack();
     prefDialog.setLocationRelativeTo(MainWindow.getInstance());
     if (prefDialog.showDialog())
@@ -1390,22 +1478,22 @@ public class MenuManager
 
   private void reloadView()
   {
-    this.mainWindow.reloadCurrentGameView();
+    MainWindow.getInstance().reloadCurrentGameView();
   }
 
   private void reloadAll()
   {
-    this.mainWindow.setWaitCursor(true);
+    MainWindow.getInstance().setWaitCursor(true);
     //Refresh game views
     uiModel.reloadGameViews();
-    this.mainWindow.getMainPanel().getListPanel().clearFilter();
-    this.mainWindow.refreshMenuAndUI();
-    this.mainWindow.setWaitCursor(false);
+    MainWindow.getInstance().getMainPanel().getListPanel().clearFilter();
+    MainWindow.getInstance().refreshMenuAndUI();
+    MainWindow.getInstance().setWaitCursor(false);
   }
 
   private void backupDb()
   {
-    BackupProgressDialog dialog = new BackupProgressDialog(this.mainWindow);
+    BackupProgressDialog dialog = new BackupProgressDialog(MainWindow.getInstance());
     BackupWorker worker = new BackupWorker(backupManager, dialog);
     worker.execute();
     dialog.setVisible(true);
@@ -1415,11 +1503,11 @@ public class MenuManager
   {
     RestoreDbDialog restoreDialog = new RestoreDbDialog(MainWindow.getInstance());
     restoreDialog.pack();
-    restoreDialog.setLocationRelativeTo(this.mainWindow);
+    restoreDialog.setLocationRelativeTo(MainWindow.getInstance());
     if (restoreDialog.showDialog())
     {
       restoreManager.setBackupFolderName(restoreDialog.getSelectedFolder());
-      RestoreProgressDialog progressDialog = new RestoreProgressDialog(this.mainWindow);
+      RestoreProgressDialog progressDialog = new RestoreProgressDialog(MainWindow.getInstance());
       RestoreWorker worker = new RestoreWorker(restoreManager, progressDialog);
       worker.execute();
       progressDialog.setVisible(true);
@@ -1517,7 +1605,7 @@ public class MenuManager
       .getMainPanel(), message, "Validate database", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
     if (option == JOptionPane.YES_OPTION)
     {
-      DbValidationProgressDialog dialog = new DbValidationProgressDialog(this.mainWindow);
+      DbValidationProgressDialog dialog = new DbValidationProgressDialog(MainWindow.getInstance());
       DbValidationWorker worker = new DbValidationWorker(dialog, this.uiModel.getDbConnector());
       worker.execute();
       dialog.setVisible(true);
@@ -1696,7 +1784,7 @@ public class MenuManager
   {
     installScummVMManager.installScummVMMode();
   }
-  
+
   private void installMSXMode()
   {
     installMSXManager.installMSXMode();
@@ -1713,7 +1801,7 @@ public class MenuManager
     if (option == JOptionPane.YES_OPTION)
     {
       installPCUAEManager.deleteAllInstallFiles();
-      JOptionPane.showMessageDialog(this.mainWindow,
+      JOptionPane.showMessageDialog(MainWindow.getInstance(),
                                     "All files deleted.",
                                     "Delete all installation files",
                                     JOptionPane.INFORMATION_MESSAGE);
@@ -1779,7 +1867,7 @@ public class MenuManager
     }
     else
     {
-      JOptionPane.showMessageDialog(this.mainWindow,
+      JOptionPane.showMessageDialog(MainWindow.getInstance(),
                                     "This is the latest version.",
                                     "Version check",
                                     JOptionPane.INFORMATION_MESSAGE);
