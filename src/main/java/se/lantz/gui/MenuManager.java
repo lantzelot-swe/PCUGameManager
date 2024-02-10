@@ -53,6 +53,7 @@ import se.lantz.manager.SavedStatesManager;
 import se.lantz.manager.pcuae.AmigaModeInstallManager;
 import se.lantz.manager.pcuae.AtariModeInstallManager;
 import se.lantz.manager.pcuae.LinuxModeInstallManager;
+import se.lantz.manager.pcuae.MSXModeInstallManager;
 import se.lantz.manager.pcuae.PCUAEInstallManager;
 import se.lantz.manager.pcuae.RetroarchModeInstallManager;
 import se.lantz.manager.pcuae.ScummVMModeInstallManager;
@@ -139,6 +140,7 @@ public class MenuManager
   private JMenuItem installRetroarchModeItem;
   private JMenuItem installViceModeItem;
   private JMenuItem installScummVMModeItem;
+  private JMenuItem installMSXModeItem;
   private JMenuItem deleteInstallFilesItem;
 
   private JMenuItem helpItem;
@@ -161,6 +163,7 @@ public class MenuManager
   private RetroarchModeInstallManager installRetroarchManager;
   private ViceModeInstallManager installViceManager;
   private ScummVMModeInstallManager installScummVMManager;
+  private MSXModeInstallManager installMSXManager;
   private MainWindow mainWindow;
   private int currentFavoritesCount = 10;
   
@@ -183,6 +186,7 @@ public class MenuManager
     this.installRetroarchManager = new RetroarchModeInstallManager();
     this.installViceManager = new ViceModeInstallManager();
     this.installScummVMManager = new ScummVMModeInstallManager();
+    this.installMSXManager = new MSXModeInstallManager();
     uiModel.setSavedStatesManager(savedStatesManager);
     setupResourcesMap();
     setupMenues();
@@ -253,14 +257,17 @@ public class MenuManager
     toolsMenu.addSeparator();
     toolsMenu.add(getPalNtscFixMenuItem());
     pcuaeMenu = new JMenu("PCUAE");
+    pcuaeMenu.setMnemonic('P');
     pcuaeMenu.add(getInstallPCUAEItem());
     pcuaeModeMenu = new JMenu("Mode Packs");
+    pcuaeModeMenu.setMnemonic('M');
     pcuaeModeMenu.add(getInstallAmigaModeItem());
     pcuaeModeMenu.add(getInstallAtariModeItem());
     pcuaeModeMenu.add(getInstallLinuxModeItem());
     pcuaeModeMenu.add(getInstallRetroarchModeItem());
     pcuaeModeMenu.add(getInstallScummVMModeItem());
     pcuaeModeMenu.add(getInstallViceModeItem());
+    pcuaeModeMenu.add(getInstallMSXModeItem());
     pcuaeMenu.add(pcuaeModeMenu);
     pcuaeMenu.addSeparator();
     pcuaeMenu.add(getDeleteInstallFilesItem());
@@ -1045,7 +1052,7 @@ public class MenuManager
     if (installAmigaModeItem == null)
     {
       installAmigaModeItem = new JMenuItem("Install Amiga mode...");
-      installAmigaModeItem.setMnemonic('a');
+      installAmigaModeItem.setMnemonic('A');
       installAmigaModeItem.addActionListener(e -> installAmigaMode());
     }
     return installAmigaModeItem;
@@ -1067,7 +1074,7 @@ public class MenuManager
     if (installLinuxModeItem == null)
     {
       installLinuxModeItem = new JMenuItem("Install Linux mode...");
-      installLinuxModeItem.setMnemonic('l');
+      installLinuxModeItem.setMnemonic('L');
       installLinuxModeItem.addActionListener(e -> installLinuxMode());
     }
     return installLinuxModeItem;
@@ -1078,7 +1085,7 @@ public class MenuManager
     if (installRetroarchModeItem == null)
     {
       installRetroarchModeItem = new JMenuItem("Install Retroarch mode...");
-      installRetroarchModeItem.setMnemonic('r');
+      installRetroarchModeItem.setMnemonic('R');
       installRetroarchModeItem.addActionListener(e -> installRetroarchMode());
     }
     return installRetroarchModeItem;
@@ -1089,11 +1096,24 @@ public class MenuManager
     if (installViceModeItem == null)
     {
       installViceModeItem = new JMenuItem("Install Vice mode...");
-      installViceModeItem.setMnemonic('v');
+      installViceModeItem.setMnemonic('V');
       installViceModeItem.addActionListener(e -> installViceMode());
     }
     return installViceModeItem;
   }
+  
+  private JMenuItem getInstallMSXModeItem()
+  {
+    if (installMSXModeItem == null)
+    {
+      installMSXModeItem = new JMenuItem("Install MSX/Colecovision mode...");
+      installMSXModeItem.setMnemonic('M');
+      installMSXModeItem.addActionListener(e -> installMSXMode());
+    }
+    return installMSXModeItem;
+  }
+  
+  
 
   private JMenuItem getInstallScummVMModeItem()
   {
@@ -1675,6 +1695,11 @@ public class MenuManager
   private void installScummVMMode()
   {
     installScummVMManager.installScummVMMode();
+  }
+  
+  private void installMSXMode()
+  {
+    installMSXManager.installMSXMode();
   }
 
   private void deleteInstallFiles()
