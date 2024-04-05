@@ -359,6 +359,28 @@ public class SavedStatesModel extends AbstractModel
     notifyChange();
   }
   
+  public int getNumberOfAvailableSavedStates()
+  {
+    int availableStates = 0;
+    if (!state1File.isBlank())
+    {
+      availableStates++;
+    }
+    if (!state2File.isBlank())
+    {
+      availableStates++;
+    }
+    if (!state3File.isBlank())
+    {
+      availableStates++;
+    }
+    if (!state4File.isBlank())
+    {
+      availableStates++;
+    }
+    return availableStates;
+  }
+  
   public void resetProperties()
   {
     state1PngFile = "";

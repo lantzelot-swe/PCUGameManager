@@ -592,6 +592,32 @@ public class InfoModel extends AbstractModel implements CommonInfoModel
       notifyChange();
     }
   }
+  
+  public int getNumberOfExtraDisks()
+  {
+    int extraDisks = 0;
+    if (!disk2File.isBlank())
+    {
+      extraDisks++;
+    }
+    if (!disk3File.isBlank())
+    {
+      extraDisks++;
+    }
+    if (!disk4File.isBlank())
+    {
+      extraDisks++;
+    }
+    if (!disk5File.isBlank())
+    {
+      extraDisks++;
+    }
+    if (!disk6File.isBlank())
+    {
+      extraDisks++;
+    }
+    return extraDisks;
+  }
 
   public void updateFileNames()
   {

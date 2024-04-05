@@ -10,6 +10,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
+import java.beans.Beans;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -60,6 +61,8 @@ public class GameDetailsBackgroundPanel extends JPanel
   private SystemPanel systemPanel;
   private SaveStateBackgroundPanel savesBackgroundPanel;
   private ExtraDisksPanel extraDisksPanel;
+  private SystemTabComponent savedStatesTabComponent;
+  private SystemTabComponent extraDisksTabComponent;
   private JPanel buttonPanel;
   private JButton saveButton;
   private ScraperDialog scraperDialog = null;
@@ -105,6 +108,12 @@ public class GameDetailsBackgroundPanel extends JPanel
       saveButton.setEnabled(model.isDataChanged());
       runButton.setEnabled(!model.getInfoModel().getGamesFile().isEmpty());
     });
+    
+    if (!Beans.isDesignTime())
+    {
+      model.getSavedStatesModel().addPropertyChangeListener(e -> updateSystemTabs());
+      model.getInfoModel().addPropertyChangeListener(e -> updateSystemTabs());
+    }
     cursorTimer = new Timer(500, defaultCursorAction);
   }
 
@@ -192,9 +201,33 @@ public class GameDetailsBackgroundPanel extends JPanel
       systemSavesTabbedPane.addTab("System Settings", getSystemPanel());
       systemSavesTabbedPane.addTab("Saved states", getSavesBackgroundPanel());
       systemSavesTabbedPane.addTab("Extra disks", getExtraDisksPanel());
+      
+      systemSavesTabbedPane.setTabComponentAt(1, getSavedStatesTabComponent());
+      systemSavesTabbedPane.setTabComponentAt(2, getExtraDisksTabComponent());
+      
       updateSavedStatesTabTitle();
     }
     return systemSavesTabbedPane;
+  }
+  
+  private SystemTabComponent getSavedStatesTabComponent()
+  {
+    if (savedStatesTabComponent == null)
+    {
+      savedStatesTabComponent = new SystemTabComponent("Saved states");
+      savedStatesTabComponent.setNumber("");
+    }
+    return savedStatesTabComponent;
+  }
+  
+  private SystemTabComponent getExtraDisksTabComponent()
+  {
+    if (extraDisksTabComponent == null)
+    {
+      extraDisksTabComponent = new SystemTabComponent("Extra disks");
+      extraDisksTabComponent.setNumber("");
+    }
+    return extraDisksTabComponent;
   }
 
   protected InfoBackgroundPanel getInfoBackgroundPanel()
@@ -527,5 +560,14 @@ public class GameDetailsBackgroundPanel extends JPanel
     }
     getSystemSavesTabbedPane().setTitleAt(1, title);
     getSavesBackgroundPanel().resetCurrentGameReference();
+  }
+  
+  private void updateSystemTabs()
+  {
+    int availableSavedStates = model.getSavedStatesModel().getNumberOfAvailableSavedStates();
+    getSavedStatesTabComponent().setNumber(availableSavedStates > 0 ? Integer.toString(availableSavedStates) : "");
+    
+    int availableExtraDisks = model.getInfoModel().getNumberOfExtraDisks();
+    getExtraDisksTabComponent().setNumber(availableExtraDisks > 0 ? Integer.toString(availableExtraDisks) : "");
   }
 }
