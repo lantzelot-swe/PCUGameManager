@@ -64,11 +64,13 @@ public class SavedStatesManager
 
   private File exportDir;
   private File importDir;
+  private File fixDir;
 
   private boolean exportOverwrite;
   private boolean importOverwrite;
 
   private int noFilesCopied = 0;
+  private int noSavedStatesFixed = 0;
 
   /**
    * Map holding available saved states with fileName (subfolder) as key and number of saved states available as value
@@ -328,6 +330,11 @@ public class SavedStatesManager
   {
     this.importDir = importDir;
   }
+  
+  public void setFixDirectory(File fixDir)
+  {
+    this.fixDir = fixDir;
+  }
 
   public void setImportOverwrite(boolean importOverwrite)
   {
@@ -498,16 +505,63 @@ public class SavedStatesManager
     //Update model list after import
     model.getGameListModel().notifyChange();
   }
+  
+  public void fixCorruptSavedStates(PublishWorker worker)
+  {
+    noSavedStatesFixed = 0;
+
+    try (Stream<Path> stream = Files.walk(fixDir.toPath().toAbsolutePath()))
+    {
+      stream.forEachOrdered(sourcePath -> {
+        try
+        {
+          if (!isValidSaveStateMtaFilePath(sourcePath))
+          {
+            return;
+          }
+          
+          worker.publishMessage("Fixing " + sourcePath);
+          //Read the mta file and keep track of the time
+          String playTime = readPlayTime(sourcePath);
+          //Copy the template file 
+          FileUtils.copyInputStreamToFile(getClass().getResourceAsStream("/se/lantz/template.mta"), sourcePath.toFile());
+          //Write the time from the old file
+          storePlayTime(sourcePath, playTime);
+          noSavedStatesFixed++;
+        }
+        catch (Exception e)
+        {
+          worker.publishMessage("Could not fix " + sourcePath.toString());
+          ExceptionHandler.logException(e, "Could not fix " + sourcePath.toString());
+        }
+      });
+    }
+    catch (IOException e1)
+    {
+      ExceptionHandler.handleException(e1, "Could not fix saved states files.");
+    }
+  }
 
   private boolean isValidSaveStatePath(Path path)
   {
     PathMatcher matcher = FileSystems.getDefault().getPathMatcher("glob:**.{mta,png,vsz}");
     return matcher.matches(path) || path.toFile().isDirectory();
   }
+  
+  private boolean isValidSaveStateMtaFilePath(Path path)
+  {
+    PathMatcher matcher = FileSystems.getDefault().getPathMatcher("glob:**.{mta}");
+    return matcher.matches(path);
+  }
 
   public int getNumberOfFilesCopied()
   {
     return noFilesCopied;
+  }
+  
+  public int getNumberOfFixedSavedStates()
+  {
+    return noSavedStatesFixed;
   }
 
   public void readSavedStatesAndUpdateMap()

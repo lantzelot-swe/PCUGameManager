@@ -7,16 +7,20 @@ import javax.swing.WindowConstants;
 
 public class ImportExportProgressDialog extends JDialog
 {
+  public enum DIALOGTYPE
+  {
+    IMPORT, EXPORT, FIX
+  }
   private static final long serialVersionUID = 1L;
 
   private ImportExportProgressPanel panel;
 
-  private final boolean isImport;
+  private final DIALOGTYPE type;
 
-  public ImportExportProgressDialog(Frame frame, String title, boolean isImport)
+  public ImportExportProgressDialog(Frame frame, String title, DIALOGTYPE type)
   {
     super(frame, title, true);
-    this.isImport = isImport;
+    this.type = type;
     this.add(getExportProgressPanel());
     setSize(900, 600);
     setLocationRelativeTo(frame);
@@ -31,7 +35,7 @@ public class ImportExportProgressDialog extends JDialog
   
   public void finish()
   {
-    getExportProgressPanel().finish(isImport);
+    getExportProgressPanel().finish(type);
   }
 
   public ImportExportProgressPanel getExportProgressPanel()

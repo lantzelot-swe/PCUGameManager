@@ -10,6 +10,8 @@ import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 
+import se.lantz.gui.exports.ImportExportProgressDialog.DIALOGTYPE;
+
 public class ImportExportProgressPanel extends JPanel
 {
   private JProgressBar progressBar;
@@ -88,7 +90,7 @@ public class ImportExportProgressPanel extends JPanel
     getTextArea().append(infoText);
   }
   
-  public void finish(boolean isImport)
+  public void finish(DIALOGTYPE type)
   {
     getCloseButton().setEnabled(true);
     getProgressBar().setIndeterminate(false);
@@ -96,14 +98,27 @@ public class ImportExportProgressPanel extends JPanel
     //Check for errors
     String text = getTextArea().getText();
     int count = text.length() - text.replace("ERROR:", "").length();
-    if (isImport)
+    switch (type)
+    {
+    case IMPORT:
     {
       getTextArea().append("\nImport ");
+      break;
     }
-    else
+    case EXPORT:
     {
       getTextArea().append("\nExport ");
+      break;
     }
+    case FIX:
+    {
+      getTextArea().append("\nFix ");
+      break;
+    }
+    default:
+      //Do nothing
+    }
+
     if (count > 0)
     {
       getTextArea().append("ended with " + count/6 + " errors. See pcusb.log for details.");

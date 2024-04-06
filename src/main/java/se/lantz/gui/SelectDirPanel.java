@@ -22,6 +22,7 @@ import java.util.stream.Stream;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
@@ -34,7 +35,6 @@ import org.slf4j.LoggerFactory;
 
 import se.lantz.util.ExceptionHandler;
 import se.lantz.util.FileManager;
-import javax.swing.JLabel;
 
 public class SelectDirPanel extends JPanel
 {
@@ -42,7 +42,8 @@ public class SelectDirPanel extends JPanel
 
   public enum Mode
   {
-    CAROUSEL_IMPORT, GB_IMPORT, CAROUSEL_EXPORT, FILELOADER_EXPORT, SAVEDSTATES_IMPORT, SAVEDSTATES_EXPORT
+    CAROUSEL_IMPORT, GB_IMPORT, CAROUSEL_EXPORT, FILELOADER_EXPORT, SAVEDSTATES_IMPORT, SAVEDSTATES_EXPORT,
+    FIX_CORRUPT_SAVEDSTATES
   }
 
   private static final Logger logger = LoggerFactory.getLogger(SelectDirPanel.class);
@@ -52,6 +53,7 @@ public class SelectDirPanel extends JPanel
   private static final String FILELOADER_EXPORT_DIR_PROPERTY = "flexportDir";
   private static final String SAVEDSTATES_IMPORT_DIR_PROPERTY = "savedStatesImportDir";
   private static final String SAVEDSTATES_EXPORT_DIR_PROPERTY = "savedStatesExportDir";
+  private static final String FIX_SAVEDSTATES_DIR_PROPERTY = "fixSavedStatesDir";
   private JTextField dirTextField;
   private JButton selectDirButton;
 
@@ -148,6 +150,17 @@ public class SelectDirPanel extends JPanel
         configuredDir = new File(".").getAbsolutePath();
       }
       break;
+    case FIX_CORRUPT_SAVEDSTATES:
+      configuredDir = getUsbFilePath(true, false);
+      if (configuredDir.isEmpty())
+      {
+        configuredDir = FileManager.getConfiguredProperties().getProperty(FIX_SAVEDSTATES_DIR_PROPERTY);
+      }
+      if (configuredDir == null)
+      {
+        configuredDir = new File(".").getAbsolutePath();
+      }
+      break;
     default:
       break;
     }
@@ -161,7 +174,7 @@ public class SelectDirPanel extends JPanel
     gbc_usbInfoLabel.gridy = 1;
     add(getUsbInfoLabel(), gbc_usbInfoLabel);
   }
-  
+
   private String getUsbFilePath(boolean saveState, boolean fileLoader)
   {
     String usbDir = FileManager.getPCUAEUSBPath(saveState, fileLoader);
@@ -216,6 +229,9 @@ public class SelectDirPanel extends JPanel
               break;
             case SAVEDSTATES_EXPORT:
               selectSavedStatesExportDirectory();
+              break;
+            case FIX_CORRUPT_SAVEDSTATES:
+              selectFixSavedStatesDirectory();
               break;
             default:
               break;
@@ -394,6 +410,31 @@ public class SelectDirPanel extends JPanel
     }
   }
 
+  private void selectFixSavedStatesDirectory()
+  {
+    final JFileChooser fileChooser = new JFileChooser()
+      {
+        @Override
+        protected JDialog createDialog(Component parent) throws HeadlessException
+        {
+          //Set parent to the export dialog
+          JDialog dlg = super.createDialog(SwingUtilities.getAncestorOfClass(JDialog.class, SelectDirPanel.this));
+          return dlg;
+        }
+      };
+    fileChooser.setDialogTitle("Select a directory containing saved states");
+    fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+    fileChooser.setCurrentDirectory(new File(configuredDir));
+    int value = fileChooser.showDialog(this, "OK");
+    if (value == JFileChooser.APPROVE_OPTION)
+    {
+      targetDirectory = fileChooser.getSelectedFile();
+      configuredDir = targetDirectory.toPath().toString();
+      FileManager.getConfiguredProperties().put(FIX_SAVEDSTATES_DIR_PROPERTY, configuredDir);
+      getDirTextField().setText(configuredDir);
+    }
+  }
+
   public File getTargetDirectory()
   {
     return targetDirectory;
@@ -417,7 +458,8 @@ public class SelectDirPanel extends JPanel
       List<Path> foundCarousels = Collections.EMPTY_LIST;
       try (Stream<Path> filePathStream = Files.walk(folder, 1))
       {
-        foundCarousels = filePathStream.filter(Files::isDirectory).filter(dir -> isCarouselFolder(dir)).collect(Collectors.toList());
+        foundCarousels =
+          filePathStream.filter(Files::isDirectory).filter(dir -> isCarouselFolder(dir)).collect(Collectors.toList());
       }
       catch (IOException e)
       {
@@ -425,56 +467,13 @@ public class SelectDirPanel extends JPanel
       }
       return foundCarousels.size() > 0;
     }
-
-//    //Assume a games subfolder is available
-//    Path srcParentFolder = folder.resolve("games");
-//    Path srcCoversFolder = srcParentFolder.resolve("covers");
-//    Path srcGamesFolder = srcParentFolder.resolve("games");
-//    Path srcScreensFolder = srcParentFolder.resolve("screens");
-//
-//    logger.debug("parent folder: {}", srcParentFolder);
-//    logger.debug("covers folder: {}", srcCoversFolder);
-//    logger.debug("games folder: {}", srcGamesFolder);
-//    logger.debug("screens folder: {}", srcScreensFolder);
-//
-//    // Verify that subfolders are available
-//    if (Files.exists(srcParentFolder, LinkOption.NOFOLLOW_LINKS) &&
-//      Files.exists(srcCoversFolder, LinkOption.NOFOLLOW_LINKS) &&
-//      Files.exists(srcGamesFolder, LinkOption.NOFOLLOW_LINKS) &&
-//      Files.exists(srcScreensFolder, LinkOption.NOFOLLOW_LINKS))
-//    {
-//      logger.debug("A valid directory!");
-//
-//      return true;
-//    }
-//    else
-//    {
-//      //Check if there is no games subfolder, but valid structure
-//      srcCoversFolder = folder.resolve("covers");
-//      srcGamesFolder = folder.resolve("games");
-//      srcScreensFolder = folder.resolve("screens");
-//      if (Files.exists(srcCoversFolder, LinkOption.NOFOLLOW_LINKS) &&
-//        Files.exists(srcGamesFolder, LinkOption.NOFOLLOW_LINKS) &&
-//        Files.exists(srcScreensFolder, LinkOption.NOFOLLOW_LINKS))
-//      {
-//        logger.debug("A valid directory!");
-//
-//        return true;
-//      }
-//      else
-//      {
-//        logger.debug("An ivalid directory!");
-//        return false;
-//      }
-//    }
   }
-  
-  
+
   private boolean isCarouselFolder(Path folder)
   {
-   return Files.exists(folder.resolve("covers"), LinkOption.NOFOLLOW_LINKS) &&
-     Files.exists(folder.resolve("screens"), LinkOption.NOFOLLOW_LINKS) &&
-     Files.exists(folder.resolve("games"), LinkOption.NOFOLLOW_LINKS); 
+    return Files.exists(folder.resolve("covers"), LinkOption.NOFOLLOW_LINKS) &&
+      Files.exists(folder.resolve("screens"), LinkOption.NOFOLLOW_LINKS) &&
+      Files.exists(folder.resolve("games"), LinkOption.NOFOLLOW_LINKS);
   }
 
   public void registerGBFileSelectedActionListener(ActionListener listener)
