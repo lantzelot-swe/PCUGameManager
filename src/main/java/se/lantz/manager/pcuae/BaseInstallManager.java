@@ -43,11 +43,12 @@ public abstract class BaseInstallManager implements AWTEventListener
   public static final String INSTALL_FOLDER = "./pcuae-install/";
 
   protected static final String PCUAE_INSTALL_NAME = "pcuae";
-  protected static final String AMIGA_MODE_INSTALL_NAME = "amiga";
-  protected static final String ATARI_MODE_INSTALL_NAME = "atari";
-  protected static final String LINUX_MODE_INSTALL_NAME = "linux";
+  protected static final String PCUAE_MAIN_INSTALL_NAME = "main";
+  protected static final String AMIGA_MODE_INSTALL_NAME = "amiga-mode";
+  protected static final String ATARI_MODE_INSTALL_NAME = "atari-mode";
+  protected static final String LINUX_MODE_INSTALL_NAME = "linux-mode";
   protected static final String RETROARCH_MODE_INSTALL_NAME = "retroarch";
-  protected static final String VICE_MODE_INSTALL_NAME = "vice";
+  protected static final String VICE_MODE_INSTALL_NAME = "vice-mode";
   protected static final String SCUMMVM_MODE_INSTALL_NAME = "scummvm";
   protected static final String MSX_COLECO_MODE_INSTALL_NAME = "msx";
 
@@ -211,7 +212,11 @@ public abstract class BaseInstallManager implements AWTEventListener
 
         for (JsonElement asset : assets)
         {
-          String assetName = asset.getAsJsonObject().get("name").getAsString();
+          String assetName = asset.getAsJsonObject().get("name").getAsString().toLowerCase();
+          if (!assetName.endsWith(".exe"))
+          {
+            continue;
+          }
           switch (assetsName)
           {
           case AMIGA_MODE_INSTALL_NAME:
@@ -263,7 +268,7 @@ public abstract class BaseInstallManager implements AWTEventListener
             }
             break;
           }
-          
+
           case MSX_COLECO_MODE_INSTALL_NAME:
           {
             if (assetName.contains(MSX_COLECO_MODE_INSTALL_NAME))
@@ -276,7 +281,8 @@ public abstract class BaseInstallManager implements AWTEventListener
           {
             if (!(assetName.contains(AMIGA_MODE_INSTALL_NAME) || assetName.contains(ATARI_MODE_INSTALL_NAME) ||
               assetName.contains(LINUX_MODE_INSTALL_NAME) || assetName.contains(RETROARCH_MODE_INSTALL_NAME) ||
-              assetName.contains(VICE_MODE_INSTALL_NAME) || assetName.contains(SCUMMVM_MODE_INSTALL_NAME)))
+              assetName.contains(VICE_MODE_INSTALL_NAME) || assetName.contains(SCUMMVM_MODE_INSTALL_NAME)) &&
+              assetName.contains(PCUAE_MAIN_INSTALL_NAME))
             {
               downloadUrl = asset.getAsJsonObject().get("browser_download_url").getAsString();
             }
