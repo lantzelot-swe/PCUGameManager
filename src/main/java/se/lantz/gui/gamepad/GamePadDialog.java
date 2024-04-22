@@ -14,6 +14,8 @@ public class GamePadDialog extends BaseDialog
   private JTabbedPane tabbedPane;
   private USBControllerBackgroundPanel usbControlerBackroundPanel;
   private TheGamepadBackgroundPanel theGamePadBackroundPanel;
+  private NesBackgroundPanel nesBackroundPanel;
+  private SpeedlinkBackgroundPanel speedlinkBackgroundPanel;
   private JoystickModel model;
   private Dimension dialogSize = new Dimension(660, 810);
 
@@ -22,7 +24,7 @@ public class GamePadDialog extends BaseDialog
     super(owner);
     //Create a separate model so that changes can be cancelled
     this.model = new JoystickModel(model.isPort1());
-    setTitle("Edit THEGamepad/USB Controller configuration");
+    setTitle("Edit USB Controller configuration");
     addContent(getTabbedPane());
     this.setPreferredSize(dialogSize);
     this.setResizable(false);
@@ -47,7 +49,25 @@ public class GamePadDialog extends BaseDialog
     }
     return theGamePadBackroundPanel;
   }
-
+  
+  private NesBackgroundPanel getNesBackroundPanel()
+  {
+    if (nesBackroundPanel == null)
+    {
+      nesBackroundPanel = new NesBackgroundPanel(model);
+    }
+    return nesBackroundPanel;
+  }
+  
+  private SpeedlinkBackgroundPanel getSpeedlinkBackroundPanel()
+  {
+    if (speedlinkBackgroundPanel == null)
+    {
+      speedlinkBackgroundPanel = new SpeedlinkBackgroundPanel(model);
+    }
+    return speedlinkBackgroundPanel;
+  }
+  
   public String getJoyConfigString()
   {
     return this.model.getConfigString();
@@ -59,6 +79,8 @@ public class GamePadDialog extends BaseDialog
     {
       tabbedPane = new JTabbedPane();
       tabbedPane.addTab("THEGamepad", getTheGamepadBackgroundPanel());
+      tabbedPane.addTab("Speedlink Comp. Pro", getSpeedlinkBackroundPanel());
+      tabbedPane.addTab("NES controller", getNesBackroundPanel());
       tabbedPane.addTab("Alternative USB controller", getUSBControllerBackgroundPanel());
     }
     return tabbedPane;

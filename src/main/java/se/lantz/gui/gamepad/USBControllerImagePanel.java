@@ -92,7 +92,7 @@ public class USBControllerImagePanel extends JPanel
     
     Graphics2D graphics2D = (Graphics2D) g;
     graphics2D.setStroke(new BasicStroke(3.0f));
-    graphics2D.setColor(Color.red);
+    graphics2D.setColor(Color.green);
     
     switch (currentButton)
     {
