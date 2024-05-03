@@ -49,7 +49,7 @@ public class CarouselPreviewModel extends AbstractModel
     }
   }
 
-  private void reloadCarousel()
+  public void reloadCarousel()
   {
     logger.debug("RELOAD carousel in preview");
     if (mainModel.getCurrentGameViewGameCount() < 10)

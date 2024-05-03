@@ -1,13 +1,17 @@
 package se.lantz.gui.carousel;
 
 import java.awt.Dimension;
-import java.awt.Frame;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
+import java.awt.event.ActionEvent;
 import java.beans.Beans;
 
+import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.JButton;
+import javax.swing.JComponent;
+import javax.swing.KeyStroke;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import se.lantz.gui.BaseDialog;
 import se.lantz.gui.MainWindow;
@@ -16,11 +20,23 @@ import se.lantz.model.carousel.CarouselPreviewModel;
 
 public class CarouselPreviewDialog extends BaseDialog
 {
+  private static final Logger logger = LoggerFactory.getLogger(CarouselPreviewDialog.class);
+  
   private BackgroundPanel panel;
   private MainViewModel uiModel;
   private MainWindow mainWindow;
   private CarouselPreviewModel model;
   private JButton runGameButton;
+
+  private Action reloadAction = new AbstractAction()
+    {
+      @Override
+      public void actionPerformed(ActionEvent e)
+      {
+        logger.debug("Reloading carousel");
+        model.reloadCarousel();
+      }
+    };
 
   public CarouselPreviewDialog(final MainWindow owner, final MainViewModel uiModel)
   {
@@ -33,6 +49,9 @@ public class CarouselPreviewDialog extends BaseDialog
     this.setModal(false);
     addContent(getBackgroundPanel());
     getButtonPanel().setVisible(false);
+
+    getBackgroundPanel().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("F5"), "reload");
+    getBackgroundPanel().getActionMap().put("reload", reloadAction);
 
     if (!Beans.isDesignTime())
     {

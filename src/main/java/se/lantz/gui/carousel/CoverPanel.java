@@ -72,9 +72,8 @@ public class CoverPanel extends JPanel
     {
       model.addPropertyChangeListener(CarouselPreviewModel.SELECTED_GAME, e -> {
         reloadScreens();
-        updateSelectedBorder();
       });
-      
+
       model.addPropertyChangeListener(CarouselPreviewModel.CLEAR_SELECTION, e -> {
         clearSelectedBorder();
       });
@@ -179,32 +178,32 @@ public class CoverPanel extends JPanel
     {
       label.setBorder(BorderFactory.createLineBorder(Color.YELLOW, 5));
       label.addMouseListener(new MouseAdapter()
-      {
-
-        @Override
-        public void mouseClicked(MouseEvent e)
         {
-          if (SwingUtilities.isLeftMouseButton(e) && e.getClickCount() == 2)
+
+          @Override
+          public void mouseClicked(MouseEvent e)
           {
-            //trigger run game
-            mainWindow.getMainPanel().runCurrentGame();
+            if (SwingUtilities.isLeftMouseButton(e) && e.getClickCount() == 2)
+            {
+              //trigger run game
+              mainWindow.getMainPanel().runCurrentGame();
+            }
           }
-        }
-      });
+        });
     }
     else
     {
       label.addMouseListener(new MouseAdapter()
-      {
-        @Override
-        public void mouseClicked(MouseEvent e)
         {
-          if (SwingUtilities.isLeftMouseButton(e) && e.getClickCount() == 1)
+          @Override
+          public void mouseClicked(MouseEvent e)
           {
-            mainWindow.setSelectedGameInGameList(label.getGameId());
+            if (SwingUtilities.isLeftMouseButton(e) && e.getClickCount() == 1)
+            {
+              mainWindow.setSelectedGameInGameList(label.getGameId());
+            }
           }
-        }
-      });
+        });
     }
     return label;
   }
@@ -218,13 +217,13 @@ public class CoverPanel extends JPanel
       scrolingTimer.start();
     }
   }
-  
+
   protected void pageUpTriggered()
   {
     String gameId = model.getGameIdForPageUp();
     this.mainWindow.setSelectedGameInGameList(gameId);
   }
-  
+
   protected void pageDownTriggered()
   {
     String gameId = model.getGameIdForPageDown();
@@ -246,6 +245,7 @@ public class CoverPanel extends JPanel
     }
     scrollToPosition();
     panel.setVisible(true);
+    updateSelectedBorder();
   }
 
   private void updateSelectedBorder()
@@ -267,7 +267,7 @@ public class CoverPanel extends JPanel
       }
     }
   }
-  
+
   private void clearSelectedBorder()
   {
     for (int i = 0; i < panel.getComponentCount(); i++)
@@ -292,7 +292,7 @@ public class CoverPanel extends JPanel
       (label).setIcon(null);
     }
   }
-  
+
   private void loadScreenForBorder(GameLabel label, GameDetails game)
   {
     String filename = game.getCover();
@@ -301,8 +301,7 @@ public class CoverPanel extends JPanel
     {
       BufferedImage image = ImageIO.read(imagefile);
       Image newImage = image.getScaledInstance(125, 175, Image.SCALE_SMOOTH);
-      BufferedImage copyOfImage =
-        new BufferedImage(125, 175, BufferedImage.TYPE_INT_ARGB);
+      BufferedImage copyOfImage = new BufferedImage(125, 175, BufferedImage.TYPE_INT_ARGB);
       Graphics g = copyOfImage.createGraphics();
       g.drawImage(newImage, 0, 0, null);
       label.setIcon(new ImageIcon(copyOfImage.getSubimage(5, 5, 115, 165)));
