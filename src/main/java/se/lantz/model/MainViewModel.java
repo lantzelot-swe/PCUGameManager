@@ -14,6 +14,7 @@ import java.util.Collections;
 import java.util.List;
 
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.SwingUtilities;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -80,6 +81,9 @@ public class MainViewModel extends AbstractModel
   Scraper scraper = new MobyGamesScraper();
 
   private int numberOfFavoritesViews = 10;
+  
+  private boolean notifyGameListChange = true;
+  private boolean notifyGameSelected = true;
 
   public void setSavedStatesManager(SavedStatesManager savedStatesManager)
   {
@@ -135,6 +139,8 @@ public class MainViewModel extends AbstractModel
 
   private void setupGameViews()
   {
+    notifyGameListChange = false;
+    notifyGameSelected = false;
     numberOfFavoritesViews = FileManager.getConfiguredNumberOfFavorites();
     //Setup game views
     allGameView = new GameView(GameView.ALL_GAMES_ID);
@@ -230,8 +236,11 @@ public class MainViewModel extends AbstractModel
       //Select the last favorites to get count on all (not sure why that works...)
       gameViewModel.setSelectedItem(gameViewModel.getElementAt(gameViewModel.getSize() - 1));
     }
+    //Do with invokeLater since it's used when selecting a game also
+    SwingUtilities.invokeLater(() -> notifyGameSelected = true);   
     //Finish by selecting all games view again
     gameViewModel.setSelectedItem(allGameView);
+    notifyGameListChange = true;
   }
 
   public void reloadGameViews()
@@ -316,8 +325,11 @@ public class MainViewModel extends AbstractModel
       //Trigger a save directly when adding a info slot
       saveData();
     }
-    //Notify that a new game has been selected
-    notifyChange("gameSelected", null, "");
+    if (notifyGameSelected)
+    {
+      //Notify that a new game has been selected
+      notifyChange("gameSelected", null, "");
+    }
   }
 
   public StringBuilder importGameInfo(List<String> rowValues,
@@ -462,7 +474,7 @@ public class MainViewModel extends AbstractModel
   {
     if (gameView == null)
     {
-      //USe all games view if null is passed here
+      //Use all games view if null is passed here
       gameView = allGameView;
     }
     this.selectedGameView = gameView;
@@ -572,7 +584,10 @@ public class MainViewModel extends AbstractModel
       }
     }
     this.disableChangeNotification(false);
-    this.notifyChange("selectedGamelistView", null, null);
+    if (notifyGameListChange)
+    {
+      this.notifyChange("selectedGamelistView", null, null);
+    }
     logger.debug("...done.");
   }
 

@@ -28,8 +28,6 @@ import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
 import javax.swing.ToolTipManager;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
 import javax.swing.event.PopupMenuEvent;
@@ -64,7 +62,7 @@ public class ListPanel extends JPanel
   private boolean pageButtonPressed = false;
 
   private CarouselPreviewDialog carouselPreviewDialog;
-  
+
   private boolean filterEnabled = true;
 
   private boolean isFiltering = false;
@@ -89,58 +87,6 @@ public class ListPanel extends JPanel
         triggerListFiltering();
       }
 
-    };
-  private DocumentListener filterTextFieldListener = new DocumentListener()
-    {
-      @Override
-      public void insertUpdate(DocumentEvent e)
-      {
-        filter();
-      }
-
-      @Override
-      public void removeUpdate(DocumentEvent e)
-      {
-        filter();
-      }
-
-      @Override
-      public void changedUpdate(DocumentEvent e)
-      {
-        filter();
-      }
-
-      private void filter()
-      {
-        if (filterEnabled)
-        {
-          isFiltering = true;
-          GameListModel listModel = uiModel.getGameListModel();
-          GameListData selectedGame = list.getSelectedValue();
-          listModel.clear();
-          String filterText = filterTextField.getText();
-          List<GameListData> filteredList = new ArrayList<>();
-          for (GameListData item : listModel.getCurrentGameList())
-          {
-            if (listModel.filterMatch(item, filterText))
-            {
-              filteredList.add(item);
-            }
-          }
-          //Add all at once (for performance!)
-          listModel.addAll(filteredList);
-          if (filteredList.contains(selectedGame))
-          {
-            list.setSelectedValue(selectedGame, true);
-          }
-          else if (!filteredList.isEmpty())
-          {
-            list.setSelectedIndex(0);
-          }
-          updateViewInfoLabel();
-          isFiltering = false;
-        }
-      }
     };
 
   public ListPanel(final MainPanel mainPanel, final MainViewModel uiModel)
@@ -183,9 +129,9 @@ public class ListPanel extends JPanel
     gbc_viewInfoPanel.gridx = 0;
     gbc_viewInfoPanel.gridy = 3;
     add(getViewInfoPanel(), gbc_viewInfoPanel);
-    
+
     uiModel.addSaveChangeListener(e -> {
-     
+
       previewButton.setEnabled(!uiModel.isNewGameSelected());
     });
   }
@@ -224,12 +170,46 @@ public class ListPanel extends JPanel
     if (filterTextField == null)
     {
       filterTextField = new JXSearchField();
-      filterTextField.getDocument().addDocumentListener(filterTextFieldListener);
       String tooltipText =
         "<html>Type to search on game title in<br>the current gamelist view.<p><br><u>Special tags</u><br><b>a:</b> - match Author<br><b>c:</b> - match Composer<br><b>y:</b> - match Year<br><b>v:</b> - match View tag<br><b>s:</b> - match System config<p><br>Use ',' as separator to<br>match several tags.<p>Example: <i>a:imagine,c:martin galway</i><br></html>";
       filterTextField.setToolTipText(tooltipText);
+      //Add delay to not filter too quickly while typing, for better performance
+      filterTextField.setInstantSearchDelay(350);
+      filterTextField.addActionListener(e -> performFiltering());
     }
     return filterTextField;
+  }
+
+  private void performFiltering()
+  {
+    if (filterEnabled)
+    {
+      isFiltering = true;
+      GameListModel listModel = uiModel.getGameListModel();
+      GameListData selectedGame = list.getSelectedValue();
+      listModel.clear();
+      String filterText = filterTextField.getText();
+      List<GameListData> filteredList = new ArrayList<>();
+      for (GameListData item : listModel.getCurrentGameList())
+      {
+        if (listModel.filterMatch(item, filterText))
+        {
+          filteredList.add(item);
+        }
+      }
+      //Add all at once (for performance!)
+      listModel.addAll(filteredList);
+      if (filteredList.contains(selectedGame))
+      {
+        list.setSelectedValue(selectedGame, true);
+      }
+      else if (!filteredList.isEmpty())
+      {
+        list.setSelectedIndex(0);
+      }
+      updateViewInfoLabel();
+      isFiltering = false;
+    }
   }
 
   public void clearFilter()
@@ -241,7 +221,7 @@ public class ListPanel extends JPanel
   {
     if (!isFiltering)
     {
-      filterTextFieldListener.changedUpdate(null);
+      performFiltering();
     }
   }
 
@@ -400,7 +380,7 @@ public class ListPanel extends JPanel
   {
     //Called from Carousel, make sure no filtering is active
     getFilterTextField().setText("");
-    
+
     List<GameListData> currentGameList = uiModel.getGameListModel().getCurrentGameList();
     for (int i = 0; i < currentGameList.size(); i++)
     {
@@ -438,7 +418,7 @@ public class ListPanel extends JPanel
       gbc_viewInfoLabel.gridx = 1;
       gbc_viewInfoLabel.gridy = 0;
       viewInfoPanel.add(getViewInfoLabel(), gbc_viewInfoLabel);
-      
+
       GridBagConstraints gbc_carouselPreviewButton = new GridBagConstraints();
       gbc_carouselPreviewButton.weightx = 0.0;
       gbc_carouselPreviewButton.insets = new Insets(3, 5, 5, 5);
@@ -458,7 +438,7 @@ public class ListPanel extends JPanel
     }
     return viewInfoLabel;
   }
-  
+
   private JButton getPreviewButton()
   {
     if (previewButton == null)
@@ -646,7 +626,7 @@ public class ListPanel extends JPanel
       list.setCellRenderer(new GameListDataRenderer(uiModel.getSavedStatesManager(),
                                                     getFilterTextField(),
                                                     uiModel.getGameListModel()));
-      //Add listener to filter on changeg
+      //Add listener to filter on changes
       uiModel.getGameListModel().addListDataListener(listDataListener);
       //Remove from tootlipManager to avoid throwing a nullpointer for CTRL+F1
       ToolTipManager.sharedInstance().unregisterComponent(list);
@@ -714,7 +694,7 @@ public class ListPanel extends JPanel
   public void toggleFavorite()
   {
     if (!uiModel.isDataChanged())
-    {    
+    {
       uiModel.toggleFavorite(list.getSelectedValuesList());
       mainPanel.repaintAfterModifications();
     }
@@ -829,13 +809,14 @@ public class ListPanel extends JPanel
       getList().setSelectedValue(selectedData, true);
     });
   }
-  
+
   public void showCarouselPreview()
   {
     if (this.uiModel.getCurrentGameViewGameCount() < 10)
     {
       String message = "You can only preview the Carousel for gamelists that contain a minimum of 10 games.";
-      JOptionPane.showMessageDialog(MainWindow.getInstance(), message, "Carousel preview", JOptionPane.INFORMATION_MESSAGE);
+      JOptionPane
+        .showMessageDialog(MainWindow.getInstance(), message, "Carousel preview", JOptionPane.INFORMATION_MESSAGE);
     }
     else
     {

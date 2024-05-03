@@ -51,7 +51,7 @@ public class CarouselPreviewModel extends AbstractModel
 
   private void reloadCarousel()
   {
-
+    logger.debug("RELOAD carousel in preview");
     if (mainModel.getCurrentGameViewGameCount() < 10)
     {
       this.notifyChange(CLOSE_PREVIEW);
@@ -100,7 +100,7 @@ public class CarouselPreviewModel extends AbstractModel
   public void setSelectedGame(GameDetails selectedGame)
   {
     logger.debug("setSelectedGame: " + selectedGame);
-    
+
     //A new game is added
     if (selectedGame.getGameId().isEmpty())
     {
@@ -119,7 +119,7 @@ public class CarouselPreviewModel extends AbstractModel
       this.notifyChange(SELECTED_GAME);
     }
   }
-  
+
   private void gameSaved()
   {
     GameDetails details = mainModel.getCurrentGameDetails();
@@ -132,5 +132,4 @@ public class CarouselPreviewModel extends AbstractModel
     mainModel.removePropertyChangeListener("gameSelected", selectedGameListener);
     mainModel.removePropertyChangeListener("gameSaved", gameSavedListener);
   }
-
 }
