@@ -42,8 +42,6 @@ public class SavedStatesManager
 {
   private static final Logger logger = LoggerFactory.getLogger(SavedStatesManager.class);
 
-  public static final String SAVES = "./saves/";
-
   private static final String MTA0 = "0.mta";
   private static final String MTA1 = "1.mta";
   private static final String MTA2 = "2.mta";
@@ -111,18 +109,18 @@ public class SavedStatesManager
     //If the game has been renamed, make sure to rename the saves folder also
     String oldFileName = model.getInfoModel().getOldGamesFile();
     String newFileName = model.getInfoModel().getGamesFile();
-    File oldSaveFolder = new File(SAVES + getGameFolderName(oldFileName, model.getInfoModel().getTitle()));
+    File oldSaveFolder = new File(FileManager.SAVES + getGameFolderName(oldFileName, model.getInfoModel().getTitle()));
     if (!oldFileName.equals(newFileName) && oldSaveFolder.exists())
     {
       //Rename old folder to new name
-      oldSaveFolder.renameTo(new File(SAVES +
+      oldSaveFolder.renameTo(new File(FileManager.SAVES +
         getGameFolderName(model.getInfoModel().getGamesFile(), model.getInfoModel().getTitle())));
     }
 
     String fileName = model.getInfoModel().getGamesFile();
     String gameFolderName = getGameFolderName(fileName, model.getInfoModel().getTitle());
     
-    Path saveFolder = new File(SAVES + gameFolderName).toPath();
+    Path saveFolder = new File(FileManager.SAVES + gameFolderName).toPath();
     int numberofSaves = 0;
     //Check which ones are available
     Path mta0Path = saveFolder.resolve(MTA0);
@@ -178,7 +176,7 @@ public class SavedStatesManager
     {
       fileName = fileName.trim();
       //Check if folder is available
-      Path saveFolder = new File(SAVES + fileName).toPath();
+      Path saveFolder = new File(FileManager.SAVES + fileName).toPath();
       if (Files.exists(saveFolder))
       {
         //Check which ones are available
@@ -349,7 +347,7 @@ public class SavedStatesManager
   private void deleteSavedState(SAVESTATE state)
   {
     String fileName = getGameFolderName(model.getInfoModel().getGamesFile(), model.getInfoModel().getTitle());
-    Path saveFolder = new File(SAVES + fileName).toPath();
+    Path saveFolder = new File(FileManager.SAVES + fileName).toPath();
     try
     {
       switch (state)
@@ -399,7 +397,7 @@ public class SavedStatesManager
   public void exportSavedStates(PublishWorker worker)
   {
     noFilesCopied = 0;
-    File saveFolder = new File(SAVES);
+    File saveFolder = new File(FileManager.SAVES);
     try (Stream<Path> stream = Files.walk(saveFolder.toPath().toAbsolutePath()))
     {
       stream.forEachOrdered(sourcePath -> {
@@ -452,7 +450,7 @@ public class SavedStatesManager
   public void importSavedStates(PublishWorker worker)
   {
     noFilesCopied = 0;
-    File saveFolder = new File(SAVES);
+    File saveFolder = new File(FileManager.SAVES);
     try (Stream<Path> stream = Files.walk(importDir.toPath().toAbsolutePath()))
     {
       stream.forEachOrdered(sourcePath -> {
@@ -568,7 +566,7 @@ public class SavedStatesManager
   {
     savedStatesMap.clear();
     //Read all files in the saves folder
-    File saveFolder = new File(SAVES);
+    File saveFolder = new File(FileManager.SAVES);
     try (Stream<Path> stream = Files.walk(saveFolder.toPath().toAbsolutePath(), 1))
     {
       stream.forEachOrdered(sourcePath -> {
@@ -634,7 +632,7 @@ public class SavedStatesManager
       if (!fileName.isEmpty() && fileName.contains(".vsf"))
       {
         //Check if folder is available
-        Path saveFolder = new File(SAVES + getGameFolderName(fileName, model.getInfoModel().getTitle())).toPath();
+        Path saveFolder = new File(FileManager.SAVES + getGameFolderName(fileName, model.getInfoModel().getTitle())).toPath();
         if (Files.exists(saveFolder))
         {
           //Check which ones are available
@@ -654,7 +652,7 @@ public class SavedStatesManager
     String gamesFile = model.getInfoModel().getGamesFile();
     Path gameFilePath = new File(FileManager.GAMES + gamesFile).toPath();
     Path firstSavedStatePath =
-      new File(SAVES + getGameFolderName(gamesFile, model.getInfoModel().getTitle())).toPath().resolve(VSZ0);
+      new File(FileManager.SAVES + getGameFolderName(gamesFile, model.getInfoModel().getTitle())).toPath().resolve(VSZ0);
 
     Path tempFilePath = new File(FileManager.GAMES + "temp.gz").toPath();
     try
@@ -709,7 +707,7 @@ public class SavedStatesManager
 
   public void convertToCarousel152Version()
   {
-    File saveFolder = new File(SAVES);
+    File saveFolder = new File(FileManager.SAVES);
     try (Stream<Path> stream = Files.walk(saveFolder.toPath().toAbsolutePath(), 1))
     {
       stream.forEachOrdered(sourcePath -> {
@@ -798,7 +796,7 @@ public class SavedStatesManager
   {
     //1. look through all folders and try to find a game in the db that matches the file name.
     //2. for all that matches, get the title and copy the existing folder to a folder named as the title 
-    File saveFolder = new File(SAVES);
+    File saveFolder = new File(FileManager.SAVES);
     try (Stream<Path> stream = Files.walk(saveFolder.toPath().toAbsolutePath(), 1))
     {
       List<GameValidationDetails> allGamesDetailsList = this.model.getDbConnector().fetchAllGamesForDbValdation();
@@ -872,7 +870,7 @@ public class SavedStatesManager
 
   public int checkFor132SavedStates()
   {
-    File saveFolder = new File(SAVES);
+    File saveFolder = new File(FileManager.SAVES);
     long returnValue = 0;
     try (Stream<Path> stream = Files.walk(saveFolder.toPath().toAbsolutePath(), 1))
     {
@@ -902,7 +900,7 @@ public class SavedStatesManager
   {
     //1. look through all folders and try to find a game in the db that matches the file name.
     //2. for all that matches, get the title and check so that no folder exists already 
-    File saveFolder = new File(SAVES);
+    File saveFolder = new File(FileManager.SAVES);
     try (Stream<Path> stream = Files.walk(saveFolder.toPath().toAbsolutePath(), 1))
     {
       List<GameValidationDetails> allGamesDetailsList = this.model.getDbConnector().fetchAllGamesForDbValdation();

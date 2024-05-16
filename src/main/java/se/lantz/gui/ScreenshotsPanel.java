@@ -273,7 +273,7 @@ public class ScreenshotsPanel extends JPanel
   {
     if (!filename.isEmpty())
     {
-      File imagefile = new File("./covers/" + filename);
+      File imagefile = new File(FileManager.COVERS + filename);
       try
       {
         BufferedImage image = ImageIO.read(imagefile);
@@ -297,7 +297,7 @@ public class ScreenshotsPanel extends JPanel
     BufferedImage image = null;
     if (!filename.isEmpty())
     {
-      File imagefile = new File("./screens/" + filename);
+      File imagefile = new File(FileManager.SCREENS + filename);
       try
       {
         image = ImageIO.read(imagefile);

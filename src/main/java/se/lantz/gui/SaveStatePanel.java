@@ -314,7 +314,7 @@ public class SaveStatePanel extends JPanel
       String fileName = SavedStatesManager.getGameFolderName(model.getInfoModel().getGamesFile(), model.getInfoModel().getTitle());
       logger.debug(fileName.toString());
 
-      Path saveFolderPath = new File("./saves/" + fileName).toPath();
+      Path saveFolderPath = new File(FileManager.SAVES + fileName).toPath();
       File imagefile = saveFolderPath.resolve(filename).toFile();
       try
       {

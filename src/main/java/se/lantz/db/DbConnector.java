@@ -33,7 +33,7 @@ import se.lantz.util.GameListDataComparator;
 
 public class DbConnector
 {
-  public static final String DB_NAME = "pcusb.db";
+  public static String DB_FILE = "";
   private static final String COMMA = "\",\"";
   // @J-
   private static final String GAMEINFO_SQL =
@@ -78,7 +78,7 @@ public class DbConnector
   Map<String, Integer> duplicateMap = new HashMap<>();
   List<String> addedRowsList = new ArrayList<>();
 
-  public DbConnector()
+  public DbConnector(List<String> dbFolders)
   {
     columnList.add(DbConstants.TITLE);
     columnList.add(DbConstants.YEAR);
@@ -105,17 +105,27 @@ public class DbConnector
     columnList.add(DbConstants.DISK_4);
     columnList.add(DbConstants.DISK_5);
     columnList.add(DbConstants.DISK_6);
-    //Check if database file exists, if not create an empty db.
-    File dbFile = new File("./" + DB_NAME);
-    if (!dbFile.exists())
+    
+    for (String dbFolder : dbFolders)
     {
-      createNewDb();
-      logger.debug("Database missing, new db created.");
+      setCurrentDbFolder(dbFolder);
+      //Check if databases file exists, if not create an empty db.
+      File dbFile = new File("./" + DB_FILE);
+      if (!dbFile.exists())
+      {
+        createNewDb();
+        logger.debug("Database {} missing, new db created.", dbFolder);
+      }
+      //To be backwards compatible with 1.0 db, update if missing
+      addLanguageAndDuplicateColumnsIfMissing();
+      //To be backwards compatible with 2.8.2 db, update if missing
+      addDiskColumnsIfMissing();
     }
-    //To be backwards compatible with 1.0 db, update if missing
-    addLanguageAndDuplicateColumnsIfMissing();
-    //To be backwards compatible with 2.8.2 db, update if missing
-    addDiskColumnsIfMissing();
+  }
+  
+  public static void setCurrentDbFolder(String dbFolder)
+  {
+    DB_FILE = "./databases/" + dbFolder + "/pcusb.db";
   }
 
   private void createNewDb()
@@ -294,7 +304,7 @@ public class DbConnector
     try
     {
       // db parameters
-      String url = "jdbc:sqlite:" + DB_NAME;
+      String url = "jdbc:sqlite:" + DB_FILE;
       // create a connection to the database
       connection = DriverManager.getConnection(url);
 

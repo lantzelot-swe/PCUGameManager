@@ -69,8 +69,8 @@ public class PCUAEManager
       int width = gd.getDisplayMode().getWidth();
       int height = gd.getDisplayMode().getHeight();
 
-      mainWindow.setSize(Math.min(width, 1500), Math.min(height - 40, 825));
-      mainWindow.setMinimumSize(new Dimension(Math.min(width, 1300), Math.min(height - 40, 700)));
+      mainWindow.setSize(Math.min(width, 1500), Math.min(height - 40, 850));
+      mainWindow.setMinimumSize(new Dimension(Math.min(width, 1300), Math.min(height - 40, 725)));
       mainWindow.setLocationRelativeTo(null);
       mainWindow.initialize();
       mainWindow.setVisible(true);

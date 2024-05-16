@@ -1,17 +1,13 @@
 package se.lantz.gui;
 
 import java.awt.BorderLayout;
-import java.awt.event.InputEvent;
-import java.awt.event.KeyEvent;
+import java.util.ArrayList;
 import java.util.List;
 
-import javax.swing.InputMap;
 import javax.swing.JComponent;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
-import javax.swing.KeyStroke;
-import javax.swing.ToolTipManager;
 
 import se.lantz.model.MainViewModel;
 import se.lantz.model.data.GameListData;
@@ -20,21 +16,94 @@ public class MainPanel extends JPanel
 {
   private JSplitPane splitPane;
   private ListPanel listPanel;
+  private DraggableTabbedPane tabbedPane;
 
   private GameDetailsBackgroundPanel gameDetailsBackgroundPanel;
   private final MainViewModel uiModel;
+
+  private int previouslySelectedIndex = 0;
+  private boolean ignoreTabChange = false;
 
   public MainPanel(final MainViewModel uiModel)
   {
     this.uiModel = uiModel;
     setLayout(new BorderLayout(0, 0));
-    add(getSplitPane(), BorderLayout.CENTER);
+    add(getTabbedPane(), BorderLayout.CENTER);
 
     uiModel.addSaveChangeListener(e -> {
       listPanel.checkSaveChangeStatus();
     });
 
-    uiModel.addRequireFieldsListener(e -> showRequiredFieldsDialog((List<String>) e.getNewValue()));
+    uiModel.addRequiredFieldsListener(e -> showRequiredFieldsDialog((List<String>) e.getNewValue()));
+  }
+
+  private DraggableTabbedPane getTabbedPane()
+  {
+    if (tabbedPane == null)
+    {
+      tabbedPane = new DraggableTabbedPane();
+
+      for (int i = 0; i < uiModel.getAvailableDatabases().size(); i++)
+      {
+        if (i == 0)
+        {
+          tabbedPane.addTab(uiModel.getAvailableDatabases().get(i), getNewContentPanel(getSplitPane()));
+        }
+        else
+        {
+          tabbedPane.addTab(uiModel.getAvailableDatabases().get(i), getNewContentPanel(null));
+        }
+      }
+      tabbedPane.addTab(" + ", getNewContentPanel(null));
+
+      //Update previous selected index once a tab is dragged to a new position
+      tabbedPane.addTabDraggedListener(e -> previouslySelectedIndex = e.getID());
+      //Update preferences when the tab structure changes (renamed, deleted, re-arranged)
+      tabbedPane.addTabStructureChangedListener(e -> updateTabOrderPreferences());
+
+      tabbedPane.addChangeListener(e -> {
+        if (!tabbedPane.isDragging())
+        {
+          if (tabbedPane.getSelectedIndex() == uiModel.getAvailableDatabases().size())
+          {
+            ignoreTabChange = true;
+            tabbedPane.setSelectedIndex(previouslySelectedIndex);
+            ignoreTabChange = false;
+            String name = JOptionPane.showInputDialog(this, "Write a new name!");
+            //Create a new empty one!
+            return;
+          }
+          else if (ignoreTabChange)
+          {
+            //Do nothing
+            return;
+          }
+
+          MainWindow.getInstance().setWaitCursor(true);
+          int selectedIndex = tabbedPane.getSelectedIndex();
+
+          ((JPanel) tabbedPane.getComponentAt(previouslySelectedIndex)).removeAll();
+          ((JPanel) tabbedPane.getComponentAt(selectedIndex)).add(getSplitPane(), BorderLayout.CENTER);
+          previouslySelectedIndex = tabbedPane.getSelectedIndex();
+
+          uiModel.setCurrentDatabase(tabbedPane.getTitleAt(selectedIndex));
+          MainWindow.getInstance().setWaitCursor(false);
+          invalidate();
+          repaint();
+        }
+      });
+    }
+    return tabbedPane;
+  }
+
+  private void updateTabOrderPreferences()
+  {
+    List<String> tabTitles = new ArrayList<>();
+    for (int i = 0; i < tabbedPane.getTabCount() - 1; i++)
+    {
+      tabTitles.add(tabbedPane.getTitleAt(i));
+    }
+    uiModel.updateDbTabPreferences(String.join(",", tabTitles));
   }
 
   private JSplitPane getSplitPane()
@@ -47,6 +116,16 @@ public class MainPanel extends JPanel
       splitPane.setResizeWeight(1.0);
     }
     return splitPane;
+  }
+
+  private JPanel getNewContentPanel(JComponent content)
+  {
+    JPanel panel = new JPanel(new BorderLayout());
+    if (content != null)
+    {
+      panel.add(content, BorderLayout.CENTER);
+    }
+    return panel;
   }
 
   public ListPanel getListPanel()
@@ -138,8 +217,8 @@ public class MainPanel extends JPanel
           uiModel.deleteGames(selectedGameListData);
         }
         else
-        {                
-          uiModel.deleteCurrentGame();        
+        {
+          uiModel.deleteCurrentGame();
         }
         //Reload the current view
         reloadCurrentGameView();
@@ -246,17 +325,17 @@ public class MainPanel extends JPanel
   {
     getListPanel().toggleFavorite10();
   }
-  
+
   public void setViewTag(String viewTag)
   {
     getListPanel().setViewTag(viewTag);
   }
-  
+
   public boolean isSingleGameSelected()
   {
     return getListPanel().isSingleGameSelected();
   }
-  
+
   public boolean isNoGameSelected()
   {
     return getListPanel().isNoGameSelected();
@@ -279,12 +358,12 @@ public class MainPanel extends JPanel
   {
     getListPanel().reloadCurrentGameView();
   }
-  
+
   public void updateSavedStatesTabTitle()
   {
     getGameDetailsBackgroundPanel().updateSavedStatesTabTitle();
   }
-  
+
   public void setSelectedGameInGameList(String gameId)
   {
     getListPanel().setSelectedGameInGameList(gameId);

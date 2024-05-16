@@ -69,12 +69,13 @@ public class FileManager
   public static BufferedImage infoSlotC64Cover;
   public static BufferedImage infoSlotVic20Cover;
 
-  public static final String GAMES = "./games/";
-  private static final String SCREENS = "./screens/";
-  private static final String COVERS = "./covers/";
-  private static final String SAVES = "./saves/";
-  private static final String BACKUP = "./backup/";
-  public static final String DISKS = "./extradisks/";
+  private static String currentDbPath = "./";
+  public static String GAMES = "./games/";
+  public static String SCREENS = "./screens/";
+  public static String COVERS = "./covers/";
+  public static String SAVES = "./saves/";
+  private static String BACKUP = "./backup/";
+  public static String DISKS = "./extradisks/";
 
   private static final Path TEMP_PATH = Paths.get("./temp");
   private static final Logger logger = LoggerFactory.getLogger(FileManager.class);
@@ -129,6 +130,17 @@ public class FileManager
   public void setDbConnector(DbConnector ref)
   {
     dbconnector = ref;
+  }
+  
+  public static void setCurrentDbFolder(String dbFolder)
+  {
+    currentDbPath = "./databases/" + dbFolder + "/";
+    GAMES = currentDbPath + "games/";
+    SCREENS = currentDbPath + "screens/";
+    COVERS = currentDbPath + "covers/";
+    SAVES = currentDbPath + "saves/";
+    BACKUP = currentDbPath + "backup/";
+    DISKS = currentDbPath + "extradisks/";
   }
 
   public static InputStream getMissingC64GameFile() throws URISyntaxException
@@ -958,7 +970,7 @@ public class FileManager
       }
       else
       {
-        gamePathString = SavedStatesManager.SAVES +
+        gamePathString = SAVES +
           SavedStatesManager.getGameFolderName(infoModel.getGamesFile(), infoModel.getTitle()) + "/" +
           savedStatesModel.getState1File();
       }
@@ -973,7 +985,7 @@ public class FileManager
       }
       else
       {
-        gamePathString = SavedStatesManager.SAVES +
+        gamePathString = SAVES +
           SavedStatesManager.getGameFolderName(infoModel.getGamesFile(), infoModel.getTitle()) + "/" +
           savedStatesModel.getState2File();
       }
@@ -987,7 +999,7 @@ public class FileManager
       }
       else
       {
-        gamePathString = SavedStatesManager.SAVES +
+        gamePathString = SAVES +
           SavedStatesManager.getGameFolderName(infoModel.getGamesFile(), infoModel.getTitle()) + "/" +
           savedStatesModel.getState3File();
       }
@@ -1001,7 +1013,7 @@ public class FileManager
       }
       else
       {
-        gamePathString = SavedStatesManager.SAVES +
+        gamePathString = SAVES +
           SavedStatesManager.getGameFolderName(infoModel.getGamesFile(), infoModel.getTitle()) + "/" +
           savedStatesModel.getState4File();
       }
@@ -1384,9 +1396,9 @@ public class FileManager
     File outputFolder = new File(BACKUP + "/" + targetFolderName + "/");
     try
     {
-      File dbFile = new File("./" + DbConnector.DB_NAME);
+      File dbFile = new File("./" + DbConnector.DB_FILE);
       Files.createDirectories(outputFolder.toPath());
-      Path targetFile = outputFolder.toPath().resolve(DbConnector.DB_NAME);
+      Path targetFile = outputFolder.toPath().resolve(DbConnector.DB_FILE);
       Files.copy(dbFile.toPath(), targetFile);
     }
     catch (IOException e)
@@ -1574,8 +1586,8 @@ public class FileManager
     File backupFolder = new File(BACKUP + "/" + backupFolderName + "/");
     try
     {
-      Path backupFile = backupFolder.toPath().resolve(DbConnector.DB_NAME);
-      Path dbFile = new File("./" + DbConnector.DB_NAME).toPath();
+      Path backupFile = backupFolder.toPath().resolve(DbConnector.DB_FILE);
+      Path dbFile = new File("./" + DbConnector.DB_FILE).toPath();
       Files.copy(backupFile, dbFile, StandardCopyOption.REPLACE_EXISTING);
     }
     catch (IOException e)
