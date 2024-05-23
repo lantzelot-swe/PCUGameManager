@@ -7,7 +7,9 @@ import java.awt.GraphicsEnvironment;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 
 import javax.swing.SwingUtilities;
 import javax.swing.ToolTipManager;
@@ -45,16 +47,18 @@ public class PCUAEManager
     {
       ExceptionHandler.handleException(e, "Startup failure");
     }
-    
+
     //Make sure all folders are available
     try
     {
-      Files.createDirectories(Paths.get("./screens/"));
-      Files.createDirectories(Paths.get("./covers/"));
-      Files.createDirectories(Paths.get("./games/"));
-      Files.createDirectories(Paths.get("./saves/"));
+      Files.createDirectories(Paths.get("./databases/"));
       Files.createDirectories(Paths.get("./pcuae-install/"));
-      Files.createDirectories(Paths.get("./extradisks/"));
+
+      if (!Files.list(Paths.get("./databases/")).findAny().isPresent() && Paths.get("./games/").toFile().exists())
+      {
+        //Migrate to version 3.x
+        migrateDirectories();
+      }
     }
     catch (IOException e)
     {
@@ -79,7 +83,7 @@ public class PCUAEManager
       if (!FileManager.getPcuVersionFromManifest().isEmpty())
       {
         PreferencesModel prefModel = new PreferencesModel();
-        
+
         if (prefModel.isCheckManagerVersionAtStartup())
         {
           ManagerVersionChecker.fetchLatestVersionFromGithub();
@@ -102,6 +106,25 @@ public class PCUAEManager
         }
       }
     });
+  }
+
+  private static void migrateDirectories()
+  {
+    try
+    {
+      Path mainDb = Paths.get("./databases/MainDb");
+      Files.createDirectories(mainDb);
+      Files.move(Paths.get("./pcusb.db"), mainDb.resolve("pcusb.db"), StandardCopyOption.ATOMIC_MOVE);
+      Files.move(Paths.get("./games/"), mainDb.resolve("games"), StandardCopyOption.ATOMIC_MOVE);
+      Files.move(Paths.get("./screens/"), mainDb.resolve("screens"), StandardCopyOption.ATOMIC_MOVE);
+      Files.move(Paths.get("./covers/"), mainDb.resolve("covers"), StandardCopyOption.ATOMIC_MOVE);
+      Files.move(Paths.get("./saves/"), mainDb.resolve("saves"), StandardCopyOption.ATOMIC_MOVE);
+      Files.move(Paths.get("./extradisks/"), mainDb.resolve("extradisks"), StandardCopyOption.ATOMIC_MOVE);
+    }
+    catch (IOException e)
+    {
+      ExceptionHandler.handleException(e, "Could not move main Db");
+    }
   }
 
 }

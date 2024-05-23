@@ -16,6 +16,7 @@ import javax.swing.JPopupMenu;
 import javax.swing.JSplitPane;
 import javax.swing.SwingUtilities;
 
+import se.lantz.gui.menu.InsetsMenuItem;
 import se.lantz.model.MainViewModel;
 import se.lantz.model.data.GameListData;
 import se.lantz.util.ExceptionHandler;
@@ -40,6 +41,7 @@ public class MainPanel extends JPanel
 
     uiModel.addSaveChangeListener(e -> {
       listPanel.checkSaveChangeStatus();
+      setEnablementOfTabs();
     });
 
     uiModel.addRequiredFieldsListener(e -> showRequiredFieldsDialog((List<String>) e.getNewValue()));
@@ -115,12 +117,15 @@ public class MainPanel extends JPanel
               if (tabNumber > -1 && (tabNumber < tabbedPane.getTabCount() - 1))
               {
                 JPopupMenu menu = new JPopupMenu();
-                JMenuItem renameTabItem = new JMenuItem("Rename database");
+                InsetsMenuItem renameTabItem = new InsetsMenuItem("Rename database");
                 renameTabItem.addActionListener(ev -> renameTab(tabNumber));
-                JMenuItem deleteTabItem = new JMenuItem("Delete database");
-                deleteTabItem.addActionListener(ev -> deleteTab(tabNumber));
                 menu.add(renameTabItem);
-                menu.add(deleteTabItem);
+                if (tabbedPane.getTabCount() > 2)
+                {
+                  InsetsMenuItem deleteTabItem = new InsetsMenuItem("Delete database");
+                  deleteTabItem.addActionListener(ev -> deleteTab(tabNumber)); 
+                  menu.add(deleteTabItem);
+                }
                 menu.show(tabbedPane, e.getX(), e.getY());
               }
             }
@@ -128,6 +133,11 @@ public class MainPanel extends JPanel
         });
     }
     return tabbedPane;
+  }
+  
+  private void setEnablementOfTabs()
+  {
+    tabbedPane.setEnabled(!uiModel.isDataChanged());
   }
 
   private void renameTab(int tabIndex)
@@ -180,7 +190,6 @@ public class MainPanel extends JPanel
 
   private void createNewTab(String name)
   {
-    //TODO: Check name here, do not add one with same name as existing, or null, or empty
     if (name == null || name.isEmpty() || name.isBlank())
     {
       //Do nothing

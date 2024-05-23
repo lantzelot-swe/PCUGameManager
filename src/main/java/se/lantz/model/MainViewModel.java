@@ -111,8 +111,20 @@ public class MainViewModel extends AbstractModel
     {
       ExceptionHandler.handleException(ex, "Could not read databases");
     }
-
-    if (availableDatabases.size() > 0)
+    
+    if (availableDatabases.isEmpty())
+    {
+      try
+      {
+        //We need at least one database. Create a "MainDb" folder with an empty db
+        addTab("MainDb");
+      }
+      catch (IOException e)
+      {
+        ExceptionHandler.handleException(e, "Could not create MainDb");
+      }
+    }
+    else
     {
       //Read preferences for tab order
       Properties configuredProperties = FileManager.getConfiguredProperties();

@@ -1,4 +1,4 @@
-package se.lantz.gui;
+package se.lantz.gui.menu;
 
 import java.awt.Insets;
 
@@ -6,15 +6,15 @@ import javax.swing.Action;
 import javax.swing.Icon;
 import javax.swing.JMenuItem;
 
-public class CustomMenuItem extends JMenuItem
+public class InsetsMenuItem extends JMenuItem
 {
 
-  public CustomMenuItem()
+  public InsetsMenuItem()
   {
     setMargin(new Insets(2, -20, 2, 2));
   }
   
-  public CustomMenuItem(String text)
+  public InsetsMenuItem(String text)
   {
     super(text);
     setMargin(new Insets(2, -20, 2, 2));
