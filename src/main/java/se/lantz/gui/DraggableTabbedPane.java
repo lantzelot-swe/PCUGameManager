@@ -14,10 +14,7 @@ import java.awt.image.BufferedImage;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
-import javax.swing.JMenuItem;
-import javax.swing.JPopupMenu;
 import javax.swing.JTabbedPane;
-import javax.swing.SwingUtilities;
 
 public class DraggableTabbedPane extends JTabbedPane
 {
@@ -32,14 +29,13 @@ public class DraggableTabbedPane extends JTabbedPane
 
   private ActionListener draggedTabListener = null;
   private ActionListener tabStructureChangedListener = null;
+  private boolean removingTab = false;
 
   public DraggableTabbedPane()
   {
     super();
-
     addMouseMotionListener(new MouseMotionAdapter()
       {
-
         public void mouseDragged(MouseEvent e)
         {
 
@@ -165,34 +161,31 @@ public class DraggableTabbedPane extends JTabbedPane
           // Need to repaint
           repaint();
         }
-
-        @Override
-        public void mouseClicked(MouseEvent e)
-        {
-          if (SwingUtilities.isRightMouseButton(e))
-          {
-
-            int tabNumber = getUI().tabForCoordinate(DraggableTabbedPane.this, e.getX(), 10);
-
-            if (tabNumber > -1 && (tabNumber < getTabCount() - 1))
-            {
-              JPopupMenu menu = new JPopupMenu();
-              JMenuItem renameTabItem = new JMenuItem("Rename database");
-              JMenuItem deleteTabItem = new JMenuItem("Delete database");
-              menu.add(renameTabItem);
-              menu.add(deleteTabItem);
-              menu.show(DraggableTabbedPane.this, e.getX(), e.getY());
-            }
-          }
-        }
       });
+  }
+
+  @Override
+  public void removeTabAt(int index)
+  {
+    //Select a proper tab after removing
+    if (getSelectedIndex() == getTabCount() - 2)
+    {
+      this.removingTab = true;
+      super.removeTabAt(index);
+      this.removingTab = false;
+      setSelectedIndex(getTabCount() - 2);
+    }
+    else
+    {
+      super.removeTabAt(index);
+    }
   }
 
   public void addTabDraggedListener(ActionListener listener)
   {
     draggedTabListener = listener;
   }
-  
+
   public void addTabStructureChangedListener(ActionListener listener)
   {
     tabStructureChangedListener = listener;
@@ -205,7 +198,7 @@ public class DraggableTabbedPane extends JTabbedPane
       draggedTabListener.actionPerformed(new ActionEvent(this, tabNumber, "inserted"));
     }
   }
-  
+
   private void notifyTabStructureChangedListener()
   {
     if (tabStructureChangedListener != null)
@@ -217,6 +210,11 @@ public class DraggableTabbedPane extends JTabbedPane
   public boolean isDragging()
   {
     return dragging;
+  }
+
+  public boolean isRemovingTab()
+  {
+    return removingTab;
   }
 
   public int getPreviouslySelectedIndex()

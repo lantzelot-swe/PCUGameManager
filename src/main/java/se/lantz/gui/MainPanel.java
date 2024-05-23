@@ -1,16 +1,24 @@
 package se.lantz.gui;
 
 import java.awt.BorderLayout;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.swing.JComponent;
+import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JSplitPane;
+import javax.swing.SwingUtilities;
 
 import se.lantz.model.MainViewModel;
 import se.lantz.model.data.GameListData;
+import se.lantz.util.ExceptionHandler;
 
 public class MainPanel extends JPanel
 {
@@ -58,11 +66,11 @@ public class MainPanel extends JPanel
 
       //Update previous selected index once a tab is dragged to a new position
       tabbedPane.addTabDraggedListener(e -> previouslySelectedIndex = e.getID());
-      //Update preferences when the tab structure changes (renamed, deleted, re-arranged)
+      //Update preferences when the tab positions changes
       tabbedPane.addTabStructureChangedListener(e -> updateTabOrderPreferences());
 
       tabbedPane.addChangeListener(e -> {
-        if (!tabbedPane.isDragging())
+        if (!tabbedPane.isRemovingTab() && !tabbedPane.isDragging())
         {
           if (tabbedPane.getSelectedIndex() == uiModel.getAvailableDatabases().size())
           {
@@ -70,6 +78,7 @@ public class MainPanel extends JPanel
             tabbedPane.setSelectedIndex(previouslySelectedIndex);
             ignoreTabChange = false;
             String name = JOptionPane.showInputDialog(this, "Write a new name!");
+            createNewTab(name);
             //Create a new empty one!
             return;
           }
@@ -92,8 +101,112 @@ public class MainPanel extends JPanel
           repaint();
         }
       });
+
+      tabbedPane.addMouseListener(new MouseAdapter()
+        {
+
+          @Override
+          public void mouseClicked(MouseEvent e)
+          {
+            if (SwingUtilities.isRightMouseButton(e))
+            {
+              int tabNumber = tabbedPane.getUI().tabForCoordinate(tabbedPane, e.getX(), 10);
+
+              if (tabNumber > -1 && (tabNumber < tabbedPane.getTabCount() - 1))
+              {
+                JPopupMenu menu = new JPopupMenu();
+                JMenuItem renameTabItem = new JMenuItem("Rename database");
+                renameTabItem.addActionListener(ev -> renameTab(tabNumber));
+                JMenuItem deleteTabItem = new JMenuItem("Delete database");
+                deleteTabItem.addActionListener(ev -> deleteTab(tabNumber));
+                menu.add(renameTabItem);
+                menu.add(deleteTabItem);
+                menu.show(tabbedPane, e.getX(), e.getY());
+              }
+            }
+          }
+        });
     }
     return tabbedPane;
+  }
+
+  private void renameTab(int tabIndex)
+  {
+    String oldName = tabbedPane.getTitleAt(tabIndex);
+    String newName = (String) JOptionPane.showInputDialog(this,
+                                                          "Enter new name for \"" + oldName + "\"",
+                                                          "Rename database",
+                                                          JOptionPane.QUESTION_MESSAGE,
+                                                          null,
+                                                          null,
+                                                          oldName);
+    if (newName != null)
+    {
+      try
+      {
+        uiModel.renameTab(oldName, newName);
+        tabbedPane.setTitleAt(tabIndex, newName);
+        updateTabOrderPreferences();
+      }
+      catch (IOException e)
+      {
+        ExceptionHandler.handleException(e, "Could not rename database");
+      }
+    }
+  }
+
+  private void deleteTab(int tabIndex)
+  {
+    String selectedTab = tabbedPane.getTitleAt(tabIndex);
+    int answer = JOptionPane.showConfirmDialog(this,
+                                               "Are you sure you want to delete the " + selectedTab +
+                                                 " database?\nIt will be removed completely from the databases folder.",
+                                               "Delete database",
+                                               JOptionPane.YES_NO_OPTION);
+    if (answer == JOptionPane.YES_OPTION)
+    {
+      try
+      {
+        uiModel.deleteTab(selectedTab);
+        tabbedPane.removeTabAt(tabIndex);
+        updateTabOrderPreferences();
+      }
+      catch (IOException e)
+      {
+        ExceptionHandler.handleException(e, "Could not delete database");
+      }
+    }
+  }
+
+  private void createNewTab(String name)
+  {
+    //TODO: Check name here, do not add one with same name as existing, or null, or empty
+    if (name == null || name.isEmpty() || name.isBlank())
+    {
+      //Do nothing
+      return;
+    }
+    List<String> lowerCaseNames =
+      uiModel.getAvailableDatabases().stream().map(x -> x.toLowerCase()).collect(Collectors.toList());
+    if (lowerCaseNames.contains(name.toLowerCase().trim()))
+    {
+      JOptionPane.showMessageDialog(this,
+                                    "A database with name " + name.trim() + " already exists",
+                                    "Duplicate db name",
+                                    JOptionPane.INFORMATION_MESSAGE);
+      return;
+    }
+    try
+    {
+      uiModel.addTab(name);
+      tabbedPane.insertTab(name, null, getNewContentPanel(null), null, tabbedPane.getTabCount() - 1);
+      tabbedPane.setSelectedIndex(tabbedPane.getTabCount() - 2);
+      updateTabOrderPreferences();
+    }
+    catch (IOException e)
+    {
+      ExceptionHandler.handleException(e, "Could not create database");
+    }
   }
 
   private void updateTabOrderPreferences()

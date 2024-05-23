@@ -33,6 +33,7 @@ import se.lantz.util.GameListDataComparator;
 
 public class DbConnector
 {
+  public static String DB_FILE_NAME = "pcusb.db";
   public static String DB_FILE = "";
   private static final String COMMA = "\",\"";
   // @J-
@@ -105,27 +106,32 @@ public class DbConnector
     columnList.add(DbConstants.DISK_4);
     columnList.add(DbConstants.DISK_5);
     columnList.add(DbConstants.DISK_6);
-    
+
     for (String dbFolder : dbFolders)
     {
       setCurrentDbFolder(dbFolder);
-      //Check if databases file exists, if not create an empty db.
-      File dbFile = new File("./" + DB_FILE);
-      if (!dbFile.exists())
-      {
-        createNewDb();
-        logger.debug("Database {} missing, new db created.", dbFolder);
-      }
-      //To be backwards compatible with 1.0 db, update if missing
-      addLanguageAndDuplicateColumnsIfMissing();
-      //To be backwards compatible with 2.8.2 db, update if missing
-      addDiskColumnsIfMissing();
+      createDbIfMissing(dbFolder);
     }
   }
-  
+
+  public void createDbIfMissing(String folderName)
+  {
+    //Check if databases file exists, if not create an empty db.
+    File dbFile = new File("./" + DB_FILE);
+    if (!dbFile.exists())
+    {
+      createNewDb();
+      logger.debug("Database {} missing, new db created.", folderName);
+    }
+    //To be backwards compatible with 1.0 db, update if missing
+    addLanguageAndDuplicateColumnsIfMissing();
+    //To be backwards compatible with 2.8.2 db, update if missing
+    addDiskColumnsIfMissing();
+  }
+
   public static void setCurrentDbFolder(String dbFolder)
   {
-    DB_FILE = "./databases/" + dbFolder + "/pcusb.db";
+    DB_FILE = "./databases/" + dbFolder + "/" + DB_FILE_NAME;
   }
 
   private void createNewDb()

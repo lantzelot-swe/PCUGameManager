@@ -43,7 +43,7 @@ import se.lantz.util.TextComponentSupport;
 public class MainViewModel extends AbstractModel
 {
   public static final String DB_TAB_ORDER = "dbTabOrder";
-  
+
   private static final Logger logger = LoggerFactory.getLogger(MainViewModel.class);
 
   DbConnector dbConnector;
@@ -111,7 +111,7 @@ public class MainViewModel extends AbstractModel
     {
       ExceptionHandler.handleException(ex, "Could not read databases");
     }
-    
+
     if (availableDatabases.size() > 0)
     {
       //Read preferences for tab order
@@ -120,21 +120,44 @@ public class MainViewModel extends AbstractModel
       if (tabOrder != null)
       {
         List<String> preferencesOrder = Arrays.asList(tabOrder.split("\\s*,\\s*"));
-        
-        Collections.sort(availableDatabases, 
-                         Comparator.comparing(item -> preferencesOrder.indexOf(item)));
+
+        Collections.sort(availableDatabases, Comparator.comparing(item -> preferencesOrder.indexOf(item)));
       }
-      
+
       selectedDatabase = availableDatabases.get(0);
       FileManager.setCurrentDbFolder(selectedDatabase);
       DbConnector.setCurrentDbFolder(selectedDatabase);
-    }  
+    }
   }
-  
+
   public void updateDbTabPreferences(String prefValue)
   {
     Properties configuredProperties = FileManager.getConfiguredProperties();
     configuredProperties.put(DB_TAB_ORDER, prefValue);
+  }
+
+  public void renameTab(String oldName, String newName) throws IOException
+  {
+    Path source = Paths.get("./databases" + "/" + oldName);
+    Files.move(source, source.resolveSibling(newName));
+    selectedDatabase = newName;
+    FileManager.setCurrentDbFolder(selectedDatabase);
+    DbConnector.setCurrentDbFolder(selectedDatabase);
+  }
+
+  public void deleteTab(String dbName) throws IOException
+  {
+    availableDatabases.remove(dbName);
+
+    Path source = Paths.get("./databases" + "/" + dbName);
+
+    Files.walk(source).sorted(Comparator.reverseOrder()).map(Path::toFile).forEach(File::delete);
+  }
+
+  public void addTab(String name) throws IOException
+  {
+    FileManager.createNewDb(name);
+    availableDatabases.add(name);
   }
 
   public void setSavedStatesManager(SavedStatesManager savedStatesManager)
@@ -1329,12 +1352,12 @@ public class MainViewModel extends AbstractModel
   {
     return this.currentGameDetails;
   }
-  
+
   public List<String> getAvailableDatabases()
   {
     return availableDatabases;
   }
-  
+
   public void setCurrentDatabase(String database)
   {
     selectedDatabase = database;

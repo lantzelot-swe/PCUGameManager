@@ -70,11 +70,12 @@ public class FileManager
   public static BufferedImage infoSlotVic20Cover;
 
   private static String currentDbPath = "./";
+  private static String currentDbName = "";
   public static String GAMES = "./games/";
   public static String SCREENS = "./screens/";
   public static String COVERS = "./covers/";
   public static String SAVES = "./saves/";
-  private static String BACKUP = "./backup/";
+  private static final String BACKUP = "./backup/";
   public static String DISKS = "./extradisks/";
 
   private static final Path TEMP_PATH = Paths.get("./temp");
@@ -131,16 +132,33 @@ public class FileManager
   {
     dbconnector = ref;
   }
-  
+
   public static void setCurrentDbFolder(String dbFolder)
   {
+    currentDbName = dbFolder;
     currentDbPath = "./databases/" + dbFolder + "/";
     GAMES = currentDbPath + "games/";
     SCREENS = currentDbPath + "screens/";
     COVERS = currentDbPath + "covers/";
     SAVES = currentDbPath + "saves/";
-    BACKUP = currentDbPath + "backup/";
     DISKS = currentDbPath + "extradisks/";
+  }
+
+  public static void createNewDb(String name) throws IOException
+  {
+    setCurrentDbFolder(name);
+    Files.createDirectories(Paths.get(GAMES));
+    Files.createDirectories(Paths.get(SCREENS));
+    Files.createDirectories(Paths.get(COVERS));
+    Files.createDirectories(Paths.get(SAVES));
+    Files.createDirectories(Paths.get(DISKS));
+    dbconnector.setCurrentDbFolder(name);
+    dbconnector.createDbIfMissing(name);
+  }
+
+  public static String getCurrentDbName()
+  {
+    return currentDbName;
   }
 
   public static InputStream getMissingC64GameFile() throws URISyntaxException
@@ -727,7 +745,7 @@ public class FileManager
     }
     else if (duplicateIndex > 9)
     {
-      newNameString = newNameString + "-" +  duplicateIndex;
+      newNameString = newNameString + "-" + duplicateIndex;
     }
 
     logger.debug("Game title: \"{}\" ---- New fileName: \"{}\"", title, newNameString);
@@ -970,9 +988,8 @@ public class FileManager
       }
       else
       {
-        gamePathString = SAVES +
-          SavedStatesManager.getGameFolderName(infoModel.getGamesFile(), infoModel.getTitle()) + "/" +
-          savedStatesModel.getState1File();
+        gamePathString = SAVES + SavedStatesManager.getGameFolderName(infoModel.getGamesFile(), infoModel.getTitle()) +
+          "/" + savedStatesModel.getState1File();
       }
     }
       break;
@@ -985,9 +1002,8 @@ public class FileManager
       }
       else
       {
-        gamePathString = SAVES +
-          SavedStatesManager.getGameFolderName(infoModel.getGamesFile(), infoModel.getTitle()) + "/" +
-          savedStatesModel.getState2File();
+        gamePathString = SAVES + SavedStatesManager.getGameFolderName(infoModel.getGamesFile(), infoModel.getTitle()) +
+          "/" + savedStatesModel.getState2File();
       }
       break;
     case Save2:
@@ -999,9 +1015,8 @@ public class FileManager
       }
       else
       {
-        gamePathString = SAVES +
-          SavedStatesManager.getGameFolderName(infoModel.getGamesFile(), infoModel.getTitle()) + "/" +
-          savedStatesModel.getState3File();
+        gamePathString = SAVES + SavedStatesManager.getGameFolderName(infoModel.getGamesFile(), infoModel.getTitle()) +
+          "/" + savedStatesModel.getState3File();
       }
       break;
     case Save3:
@@ -1013,9 +1028,8 @@ public class FileManager
       }
       else
       {
-        gamePathString = SAVES +
-          SavedStatesManager.getGameFolderName(infoModel.getGamesFile(), infoModel.getTitle()) + "/" +
-          savedStatesModel.getState4File();
+        gamePathString = SAVES + SavedStatesManager.getGameFolderName(infoModel.getGamesFile(), infoModel.getTitle()) +
+          "/" + savedStatesModel.getState4File();
       }
       break;
     default:
@@ -1381,24 +1395,30 @@ public class FileManager
     }
     return Boolean.parseBoolean(cropScreenshots);
   }
-  
+
   public static boolean isShowCropDialogForCover()
   {
     if (showCropDialogForCover.isEmpty())
     {
-      showCropDialogForCover = FileManager.getConfiguredProperties().getProperty(PreferencesModel.SHOW_CROP_DIALOG_FOR_COVER, "true");
+      showCropDialogForCover =
+        FileManager.getConfiguredProperties().getProperty(PreferencesModel.SHOW_CROP_DIALOG_FOR_COVER, "true");
     }
     return Boolean.parseBoolean(showCropDialogForCover);
   }
 
+  private static String getBackupFolderName(String targetFolderName)
+  {
+    return BACKUP + "/" + targetFolderName + "/";
+  }
+
   public static void backupDb(String targetFolderName)
   {
-    File outputFolder = new File(BACKUP + "/" + targetFolderName + "/");
+    File outputFolder = new File(getBackupFolderName(targetFolderName));
     try
     {
-      File dbFile = new File("./" + DbConnector.DB_FILE);
+      File dbFile = new File(DbConnector.DB_FILE);
       Files.createDirectories(outputFolder.toPath());
-      Path targetFile = outputFolder.toPath().resolve(DbConnector.DB_FILE);
+      Path targetFile = outputFolder.toPath().resolve(DbConnector.DB_FILE_NAME);
       Files.copy(dbFile.toPath(), targetFile);
     }
     catch (IOException e)
@@ -1409,7 +1429,7 @@ public class FileManager
 
   public static void backupScreens(String targetFolderName)
   {
-    File outputFolder = new File(BACKUP + "/" + targetFolderName + "/");
+    File outputFolder = new File(getBackupFolderName(targetFolderName));
     try
     {
       Files.createDirectories(outputFolder.toPath());
@@ -1424,7 +1444,7 @@ public class FileManager
 
   public static void backupCovers(String targetFolderName)
   {
-    File outputFolder = new File(BACKUP + "/" + targetFolderName + "/");
+    File outputFolder = new File(getBackupFolderName(targetFolderName));
     try
     {
       Files.createDirectories(outputFolder.toPath());
@@ -1439,7 +1459,7 @@ public class FileManager
 
   public static void backupGames(String targetFolderName)
   {
-    File outputFolder = new File(BACKUP + "/" + targetFolderName + "/");
+    File outputFolder = new File(getBackupFolderName(targetFolderName));
     try
     {
       Files.createDirectories(outputFolder.toPath());
@@ -1454,7 +1474,7 @@ public class FileManager
 
   public static void backupExtraDisks(String targetFolderName)
   {
-    File outputFolder = new File(BACKUP + "/" + targetFolderName + "/");
+    File outputFolder = new File(getBackupFolderName(targetFolderName));
     try
     {
       Files.createDirectories(outputFolder.toPath());
@@ -1469,7 +1489,7 @@ public class FileManager
 
   public static void backupSaves(String targetFolderName)
   {
-    File outputFolder = new File(BACKUP + "/" + targetFolderName + "/");
+    File outputFolder = new File(getBackupFolderName(targetFolderName));
     try
     {
       Files.createDirectories(outputFolder.toPath());
@@ -1583,10 +1603,10 @@ public class FileManager
 
   public static void restoreDb(String backupFolderName)
   {
-    File backupFolder = new File(BACKUP + "/" + backupFolderName + "/");
+    File backupFolder = new File(getBackupFolderName(backupFolderName));
     try
     {
-      Path backupFile = backupFolder.toPath().resolve(DbConnector.DB_FILE);
+      Path backupFile = backupFolder.toPath().resolve(DbConnector.DB_FILE_NAME);
       Path dbFile = new File("./" + DbConnector.DB_FILE).toPath();
       Files.copy(backupFile, dbFile, StandardCopyOption.REPLACE_EXISTING);
     }
@@ -1598,7 +1618,7 @@ public class FileManager
 
   public static void restoreCovers(String backupFolderName)
   {
-    File backupFolder = new File(BACKUP + "/" + backupFolderName + "/");
+    File backupFolder = new File(getBackupFolderName(backupFolderName));
     try
     {
       File coversDir = new File(COVERS);
@@ -1613,7 +1633,7 @@ public class FileManager
 
   public static void restoreScreens(String backupFolderName)
   {
-    File backupFolder = new File(BACKUP + "/" + backupFolderName + "/");
+    File backupFolder = new File(getBackupFolderName(backupFolderName));
     try
     {
       File screensDir = new File(SCREENS);
@@ -1628,7 +1648,7 @@ public class FileManager
 
   public static void restoreGames(String backupFolderName)
   {
-    File backupFolder = new File(BACKUP + "/" + backupFolderName + "/");
+    File backupFolder = new File(getBackupFolderName(backupFolderName));
     try
     {
       File gamesDir = new File(GAMES);
@@ -1643,7 +1663,7 @@ public class FileManager
 
   public static void restoreExtraDisks(String backupFolderName)
   {
-    File backupFolder = new File(BACKUP + "/" + backupFolderName + "/");
+    File backupFolder = new File(getBackupFolderName(backupFolderName));
     try
     {
       File extradisksDir = new File(DISKS);
@@ -1662,7 +1682,7 @@ public class FileManager
 
   public static void restoreSaves(String backupFolderName)
   {
-    File backupFolder = new File(BACKUP + "/" + backupFolderName + "/");
+    File backupFolder = new File(getBackupFolderName(backupFolderName));
     try
     {
       File savesDir = new File(SAVES);
