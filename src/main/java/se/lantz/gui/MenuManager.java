@@ -16,7 +16,6 @@ import java.util.stream.Collectors;
 
 import javax.swing.JEditorPane;
 import javax.swing.JMenu;
-import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
 import javax.swing.UIManager;
@@ -81,79 +80,79 @@ public class MenuManager
   private JMenu resourcesMenu;
   private JMenu helpMenu;
 
-  private JMenuItem addGameItem;
-  private JMenuItem addInfoSlotItem;
-  private JMenuItem deleteGameItem;
+  private CustomMenuItem addGameItem;
+  private CustomMenuItem addInfoSlotItem;
+  private CustomMenuItem deleteGameItem;
 
-  private JMenuItem preferencesItem;
+  private CustomMenuItem preferencesItem;
 
-  private JMenuItem runGameItem;
-  private JMenuItem importCarouselItem;
-  private JMenuItem importGamebaseItem;
-  private JMenuItem importSavedStatesItem;
-  private JMenuItem exportItem;
-  private JMenuItem exportFLItem;
-  private JMenuItem exportSavedStatesItem;
-  private JMenuItem refreshItem;
-  private JMenuItem refreshAllItem;
+  private CustomMenuItem runGameItem;
+  private CustomMenuItem importCarouselItem;
+  private CustomMenuItem importGamebaseItem;
+  private CustomMenuItem importSavedStatesItem;
+  private CustomMenuItem exportItem;
+  private CustomMenuItem exportFLItem;
+  private CustomMenuItem exportSavedStatesItem;
+  private CustomMenuItem refreshItem;
+  private CustomMenuItem refreshAllItem;
 
-  private JMenuItem carouselPreviewItem;
+  private CustomMenuItem carouselPreviewItem;
 
-  private JMenuItem toggleFavorite1Item;
-  private JMenuItem toggleFavorite2Item;
-  private JMenuItem toggleFavorite3Item;
-  private JMenuItem toggleFavorite4Item;
-  private JMenuItem toggleFavorite5Item;
-  private JMenuItem toggleFavorite6Item;
-  private JMenuItem toggleFavorite7Item;
-  private JMenuItem toggleFavorite8Item;
-  private JMenuItem toggleFavorite9Item;
-  private JMenuItem toggleFavorite10Item;
-  private JMenuItem clearFavorites1Item;
-  private JMenuItem clearFavorites2Item;
-  private JMenuItem clearFavorites3Item;
-  private JMenuItem clearFavorites4Item;
-  private JMenuItem clearFavorites5Item;
-  private JMenuItem clearFavorites6Item;
-  private JMenuItem clearFavorites7Item;
-  private JMenuItem clearFavorites8Item;
-  private JMenuItem clearFavorites9Item;
-  private JMenuItem clearFavorites10Item;
+  private CustomMenuItem toggleFavorite1Item;
+  private CustomMenuItem toggleFavorite2Item;
+  private CustomMenuItem toggleFavorite3Item;
+  private CustomMenuItem toggleFavorite4Item;
+  private CustomMenuItem toggleFavorite5Item;
+  private CustomMenuItem toggleFavorite6Item;
+  private CustomMenuItem toggleFavorite7Item;
+  private CustomMenuItem toggleFavorite8Item;
+  private CustomMenuItem toggleFavorite9Item;
+  private CustomMenuItem toggleFavorite10Item;
+  private CustomMenuItem clearFavorites1Item;
+  private CustomMenuItem clearFavorites2Item;
+  private CustomMenuItem clearFavorites3Item;
+  private CustomMenuItem clearFavorites4Item;
+  private CustomMenuItem clearFavorites5Item;
+  private CustomMenuItem clearFavorites6Item;
+  private CustomMenuItem clearFavorites7Item;
+  private CustomMenuItem clearFavorites8Item;
+  private CustomMenuItem clearFavorites9Item;
+  private CustomMenuItem clearFavorites10Item;
 
-  private JMenuItem editViewTagItem;
-  private JMenuItem editPrimaryJoystickItem;
+  private CustomMenuItem editViewTagItem;
+  private CustomMenuItem editPrimaryJoystickItem;
 
-  private JMenuItem backupDbItem;
-  private JMenuItem restoreDbItem;
-  private JMenuItem deleteAllGamesItem;
-  private JMenuItem deleteGamesForViewItem;
-  private JMenuItem deleteAllGameViewsItem;
+  private CustomMenuItem backupDbItem;
+  private CustomMenuItem restoreDbItem;
+  private CustomMenuItem deleteAllGamesItem;
+  private CustomMenuItem deleteGamesForViewItem;
+  private CustomMenuItem deleteAllGameViewsItem;
 
-  private JMenuItem validateDbItem;
-  private JMenuItem palNtscFixItem;
-  private JMenuItem convertSavedStatesItem;
-  private JMenuItem copySavedStatesItem;
-  private JMenuItem fixCorruptSavedStatesItem;
-  private JMenuItem resetJoystickConfigItem;
-  private JMenuItem enableAccurateDiskItem;
-  private JMenuItem disableAccurateDiskItem;
+  private CustomMenuItem validateDbItem;
+  private CustomMenuItem palNtscFixItem;
+  private CustomMenuItem convertSavedStatesItem;
+  private CustomMenuItem copySavedStatesItem;
+  private CustomMenuItem fixCorruptSavedStatesItem;
+  private CustomMenuItem resetJoystickConfigItem;
+  private CustomMenuItem enableAccurateDiskItem;
+  private CustomMenuItem disableAccurateDiskItem;
 
-  private JMenuItem installPCUAEItem;
-  private JMenuItem installAmigaModeItem;
-  private JMenuItem installAtariModeItem;
-  private JMenuItem installLinuxModeItem;
-  private JMenuItem installRetroarchModeItem;
-  private JMenuItem installViceModeItem;
-  private JMenuItem installScummVMModeItem;
-  private JMenuItem installMSXModeItem;
-  private JMenuItem deleteInstallFilesItem;
+  private CustomMenuItem installPCUAEItem;
+  private CustomMenuItem installAmigaModeItem;
+  private CustomMenuItem installAtariModeItem;
+  private CustomMenuItem installLinuxModeItem;
+  private CustomMenuItem installRetroarchModeItem;
+  private CustomMenuItem installViceModeItem;
+  private CustomMenuItem installScummVMModeItem;
+  private CustomMenuItem installMSXModeItem;
+  private CustomMenuItem deleteInstallFilesItem;
 
-  private JMenuItem helpItem;
-  private JMenuItem pcuaeWikiItem;
-  private JMenuItem aboutItem;
-  private JMenuItem newVersionItem;
+  private CustomMenuItem helpItem;
+  private CustomMenuItem pcuaeWikiItem;
+  private CustomMenuItem aboutItem;
+  private CustomMenuItem newVersionItem;
 
-  private JMenuItem exitItem;
+  private CustomMenuItem exitItem;
   private MainViewModel uiModel;
   private ImportManager importManager;
   private GamebaseImporter gamebaseImporter;
@@ -303,9 +302,9 @@ public class MenuManager
     });
   }
 
-  private JMenuItem getResourcesItem(String text, String url)
+  private CustomMenuItem getResourcesItem(String text, String url)
   {
-    JMenuItem item = new JMenuItem(text);
+    CustomMenuItem item = new CustomMenuItem(text);
     item.addActionListener(e -> {
       try
       {
@@ -436,9 +435,9 @@ public class MenuManager
     return menuList;
   }
 
-  JMenuItem getAddGameMenuItem()
+  CustomMenuItem getAddGameMenuItem()
   {
-    addGameItem = new JMenuItem("Add new game");
+    addGameItem = new CustomMenuItem("Add new game");
     KeyStroke keyStrokeToAddGame = KeyStroke.getKeyStroke(KeyEvent.VK_N, InputEvent.CTRL_DOWN_MASK);
     addGameItem.setAccelerator(keyStrokeToAddGame);
     addGameItem.setMnemonic('A');
@@ -447,9 +446,9 @@ public class MenuManager
     return addGameItem;
   }
 
-  JMenuItem getAddInfoSlotMenuItem()
+  CustomMenuItem getAddInfoSlotMenuItem()
   {
-    addInfoSlotItem = new JMenuItem("Add info slot for current gamelist view");
+    addInfoSlotItem = new CustomMenuItem("Add info slot for current gamelist view");
     KeyStroke keyStrokeToAddGame = KeyStroke.getKeyStroke(KeyEvent.VK_I, InputEvent.CTRL_DOWN_MASK);
     addInfoSlotItem.setAccelerator(keyStrokeToAddGame);
     addInfoSlotItem.setMnemonic('I');
@@ -458,9 +457,9 @@ public class MenuManager
     return addInfoSlotItem;
   }
 
-  JMenuItem getDeleteGameMenuItem()
+  CustomMenuItem getDeleteGameMenuItem()
   {
-    deleteGameItem = new JMenuItem("Delete selected game(s)");
+    deleteGameItem = new CustomMenuItem("Delete selected game(s)");
     KeyStroke keyStrokeToAddGame = KeyStroke.getKeyStroke(KeyEvent.VK_D, InputEvent.CTRL_DOWN_MASK);
     deleteGameItem.setAccelerator(keyStrokeToAddGame);
     deleteGameItem.setMnemonic('D');
@@ -473,9 +472,9 @@ public class MenuManager
     return deleteGameItem;
   }
 
-  JMenuItem getPreferencesMenuItem()
+  CustomMenuItem getPreferencesMenuItem()
   {
-    preferencesItem = new JMenuItem("Preferences...");
+    preferencesItem = new CustomMenuItem("Preferences...");
     KeyStroke keyStrokeToPreferences = KeyStroke.getKeyStroke(KeyEvent.VK_P, InputEvent.CTRL_DOWN_MASK);
     preferencesItem.setAccelerator(keyStrokeToPreferences);
     preferencesItem.setMnemonic('P');
@@ -484,17 +483,17 @@ public class MenuManager
     return preferencesItem;
   }
 
-  JMenuItem getDeleteGamesForViewMenuItem()
+  CustomMenuItem getDeleteGamesForViewMenuItem()
   {
-    deleteGamesForViewItem = new JMenuItem("Delete all games in current gamelist view");
+    deleteGamesForViewItem = new CustomMenuItem("Delete all games in current gamelist view");
     deleteGamesForViewItem.setMnemonic('g');
     deleteGamesForViewItem.addActionListener(e -> deleteAllGamesInView());
     return deleteGamesForViewItem;
   }
 
-  JMenuItem getRunGameMenuItem()
+  CustomMenuItem getRunGameMenuItem()
   {
-    runGameItem = new JMenuItem("Run selected game");
+    runGameItem = new CustomMenuItem("Run selected game");
     KeyStroke keyStrokeToRunGame = KeyStroke.getKeyStroke(KeyEvent.VK_R, InputEvent.CTRL_DOWN_MASK);
     runGameItem.setAccelerator(keyStrokeToRunGame);
     runGameItem.setMnemonic('R');
@@ -503,9 +502,9 @@ public class MenuManager
     return runGameItem;
   }
 
-  JMenuItem getCarouselPreviewMenuItem()
+  CustomMenuItem getCarouselPreviewMenuItem()
   {
-    carouselPreviewItem = new JMenuItem("Carousel preview");
+    carouselPreviewItem = new CustomMenuItem("Carousel preview");
     KeyStroke keyStrokeCarouselPreview = KeyStroke.getKeyStroke(KeyEvent.VK_W, InputEvent.CTRL_DOWN_MASK);
     carouselPreviewItem.setAccelerator(keyStrokeCarouselPreview);
     carouselPreviewItem.setMnemonic('W');
@@ -514,9 +513,9 @@ public class MenuManager
     return carouselPreviewItem;
   }
 
-  private JMenuItem getImportCarouselItem()
+  private CustomMenuItem getImportCarouselItem()
   {
-    importCarouselItem = new JMenuItem("Import Carousel folder...");
+    importCarouselItem = new CustomMenuItem("Import Carousel folder...");
     KeyStroke keyStrokeToImportGames = KeyStroke.getKeyStroke(KeyEvent.VK_I, InputEvent.CTRL_DOWN_MASK);
     importCarouselItem.setAccelerator(keyStrokeToImportGames);
     importCarouselItem.setMnemonic('I');
@@ -524,9 +523,9 @@ public class MenuManager
     return importCarouselItem;
   }
 
-  private JMenuItem getImportGamebaseItem()
+  private CustomMenuItem getImportGamebaseItem()
   {
-    importGamebaseItem = new JMenuItem("Import from Gamebase...");
+    importGamebaseItem = new CustomMenuItem("Import from Gamebase...");
     KeyStroke keyStrokeToImportGames = KeyStroke.getKeyStroke(KeyEvent.VK_G, InputEvent.CTRL_DOWN_MASK);
     importGamebaseItem.setAccelerator(keyStrokeToImportGames);
     importGamebaseItem.setMnemonic('G');
@@ -534,17 +533,17 @@ public class MenuManager
     return importGamebaseItem;
   }
 
-  private JMenuItem getImportSavedStatesItem()
+  private CustomMenuItem getImportSavedStatesItem()
   {
-    importSavedStatesItem = new JMenuItem("Import Saved states...");
+    importSavedStatesItem = new CustomMenuItem("Import Saved states...");
     importSavedStatesItem.setMnemonic('S');
     importSavedStatesItem.addActionListener(e -> importSavedStates());
     return importSavedStatesItem;
   }
 
-  private JMenuItem getExportItem()
+  private CustomMenuItem getExportItem()
   {
-    exportItem = new JMenuItem("Export to Carousel...");
+    exportItem = new CustomMenuItem("Export to Carousel...");
     KeyStroke keyStrokeToExportGames = KeyStroke.getKeyStroke(KeyEvent.VK_E, InputEvent.CTRL_DOWN_MASK);
     exportItem.setAccelerator(keyStrokeToExportGames);
     exportItem.setMnemonic('E');
@@ -552,9 +551,9 @@ public class MenuManager
     return exportItem;
   }
 
-  private JMenuItem getExportFileLoaderItem()
+  private CustomMenuItem getExportFileLoaderItem()
   {
-    exportFLItem = new JMenuItem("Export to File loader...");
+    exportFLItem = new CustomMenuItem("Export to File loader...");
     KeyStroke keyStrokeToExportGames = KeyStroke.getKeyStroke(KeyEvent.VK_L, InputEvent.CTRL_DOWN_MASK);
     exportFLItem.setAccelerator(keyStrokeToExportGames);
     exportFLItem.setMnemonic('L');
@@ -562,17 +561,17 @@ public class MenuManager
     return exportFLItem;
   }
 
-  private JMenuItem getExportSavedStatesItem()
+  private CustomMenuItem getExportSavedStatesItem()
   {
-    exportSavedStatesItem = new JMenuItem("Export Saved states...");
+    exportSavedStatesItem = new CustomMenuItem("Export Saved states...");
     exportSavedStatesItem.setMnemonic('S');
     exportSavedStatesItem.addActionListener(e -> exportSavedStates());
     return exportSavedStatesItem;
   }
 
-  private JMenuItem getRefreshItem()
+  private CustomMenuItem getRefreshItem()
   {
-    refreshItem = new JMenuItem("Reload current gamelist view");
+    refreshItem = new CustomMenuItem("Reload current gamelist view");
     KeyStroke keyStrokeToReloadGameView = KeyStroke.getKeyStroke(KeyEvent.VK_F5, 0);
     refreshItem.setAccelerator(keyStrokeToReloadGameView);
     refreshItem.setMnemonic('C');
@@ -580,9 +579,9 @@ public class MenuManager
     return refreshItem;
   }
 
-  private JMenuItem getRefreshAllItem()
+  private CustomMenuItem getRefreshAllItem()
   {
-    refreshAllItem = new JMenuItem("Reload all gamelist views");
+    refreshAllItem = new CustomMenuItem("Reload all gamelist views");
     KeyStroke keyStrokeToReloadGameViews = KeyStroke.getKeyStroke(KeyEvent.VK_F5, InputEvent.SHIFT_DOWN_MASK);
     refreshAllItem.setAccelerator(keyStrokeToReloadGameViews);
     refreshAllItem.setMnemonic('g');
@@ -590,9 +589,9 @@ public class MenuManager
     return refreshAllItem;
   }
 
-  private JMenuItem getExitItem()
+  private CustomMenuItem getExitItem()
   {
-    exitItem = new JMenuItem("Exit");
+    exitItem = new CustomMenuItem("Exit");
     KeyStroke keyStrokeExit = KeyStroke.getKeyStroke(KeyEvent.VK_F4, InputEvent.ALT_DOWN_MASK);
     exitItem.setAccelerator(keyStrokeExit);
 
@@ -627,11 +626,11 @@ public class MenuManager
     return exitItem;
   }
 
-  private JMenuItem getToggleFavorite1Item()
+  private CustomMenuItem getToggleFavorite1Item()
   {
     if (toggleFavorite1Item == null)
     {
-      toggleFavorite1Item = new JMenuItem();
+      toggleFavorite1Item = new CustomMenuItem();
       KeyStroke keyStrokeToToggleFav = KeyStroke.getKeyStroke(KeyEvent.VK_F1, InputEvent.CTRL_DOWN_MASK);
       toggleFavorite1Item.setAccelerator(keyStrokeToToggleFav);
       toggleFavorite1Item.addActionListener(e -> {
@@ -644,11 +643,11 @@ public class MenuManager
     return toggleFavorite1Item;
   }
 
-  private JMenuItem getToggleFavorite2Item()
+  private CustomMenuItem getToggleFavorite2Item()
   {
     if (toggleFavorite2Item == null)
     {
-      toggleFavorite2Item = new JMenuItem();
+      toggleFavorite2Item = new CustomMenuItem();
       KeyStroke keyStrokeToToggleFav = KeyStroke.getKeyStroke(KeyEvent.VK_F2, InputEvent.CTRL_DOWN_MASK);
       toggleFavorite2Item.setAccelerator(keyStrokeToToggleFav);
       toggleFavorite2Item.addActionListener(e -> {
@@ -661,11 +660,11 @@ public class MenuManager
     return toggleFavorite2Item;
   }
 
-  private JMenuItem getToggleFavorite3Item()
+  private CustomMenuItem getToggleFavorite3Item()
   {
     if (toggleFavorite3Item == null)
     {
-      toggleFavorite3Item = new JMenuItem();
+      toggleFavorite3Item = new CustomMenuItem();
       KeyStroke keyStrokeToToggleFav = KeyStroke.getKeyStroke(KeyEvent.VK_F3, InputEvent.CTRL_DOWN_MASK);
       toggleFavorite3Item.setAccelerator(keyStrokeToToggleFav);
       toggleFavorite3Item.addActionListener(e -> {
@@ -678,11 +677,11 @@ public class MenuManager
     return toggleFavorite3Item;
   }
 
-  private JMenuItem getToggleFavorite4Item()
+  private CustomMenuItem getToggleFavorite4Item()
   {
     if (toggleFavorite4Item == null)
     {
-      toggleFavorite4Item = new JMenuItem();
+      toggleFavorite4Item = new CustomMenuItem();
       KeyStroke keyStrokeToToggleFav = KeyStroke.getKeyStroke(KeyEvent.VK_F4, InputEvent.CTRL_DOWN_MASK);
       toggleFavorite4Item.setAccelerator(keyStrokeToToggleFav);
       toggleFavorite4Item.addActionListener(e -> {
@@ -695,11 +694,11 @@ public class MenuManager
     return toggleFavorite4Item;
   }
 
-  private JMenuItem getToggleFavorite5Item()
+  private CustomMenuItem getToggleFavorite5Item()
   {
     if (toggleFavorite5Item == null)
     {
-      toggleFavorite5Item = new JMenuItem();
+      toggleFavorite5Item = new CustomMenuItem();
       KeyStroke keyStrokeToToggleFav = KeyStroke.getKeyStroke(KeyEvent.VK_F5, InputEvent.CTRL_DOWN_MASK);
       toggleFavorite5Item.setAccelerator(keyStrokeToToggleFav);
       toggleFavorite5Item.addActionListener(e -> {
@@ -712,11 +711,11 @@ public class MenuManager
     return toggleFavorite5Item;
   }
 
-  private JMenuItem getToggleFavorite6Item()
+  private CustomMenuItem getToggleFavorite6Item()
   {
     if (toggleFavorite6Item == null)
     {
-      toggleFavorite6Item = new JMenuItem();
+      toggleFavorite6Item = new CustomMenuItem();
       KeyStroke keyStrokeToToggleFav = KeyStroke.getKeyStroke(KeyEvent.VK_F6, InputEvent.CTRL_DOWN_MASK);
       toggleFavorite6Item.setAccelerator(keyStrokeToToggleFav);
       toggleFavorite6Item.addActionListener(e -> {
@@ -729,11 +728,11 @@ public class MenuManager
     return toggleFavorite6Item;
   }
 
-  private JMenuItem getToggleFavorite7Item()
+  private CustomMenuItem getToggleFavorite7Item()
   {
     if (toggleFavorite7Item == null)
     {
-      toggleFavorite7Item = new JMenuItem();
+      toggleFavorite7Item = new CustomMenuItem();
       KeyStroke keyStrokeToToggleFav = KeyStroke.getKeyStroke(KeyEvent.VK_F7, InputEvent.CTRL_DOWN_MASK);
       toggleFavorite7Item.setAccelerator(keyStrokeToToggleFav);
       toggleFavorite7Item.addActionListener(e -> {
@@ -746,11 +745,11 @@ public class MenuManager
     return toggleFavorite7Item;
   }
 
-  private JMenuItem getToggleFavorite8Item()
+  private CustomMenuItem getToggleFavorite8Item()
   {
     if (toggleFavorite8Item == null)
     {
-      toggleFavorite8Item = new JMenuItem();
+      toggleFavorite8Item = new CustomMenuItem();
       KeyStroke keyStrokeToToggleFav = KeyStroke.getKeyStroke(KeyEvent.VK_F8, InputEvent.CTRL_DOWN_MASK);
       toggleFavorite8Item.setAccelerator(keyStrokeToToggleFav);
       toggleFavorite8Item.addActionListener(e -> {
@@ -763,11 +762,11 @@ public class MenuManager
     return toggleFavorite8Item;
   }
 
-  private JMenuItem getToggleFavorite9Item()
+  private CustomMenuItem getToggleFavorite9Item()
   {
     if (toggleFavorite9Item == null)
     {
-      toggleFavorite9Item = new JMenuItem();
+      toggleFavorite9Item = new CustomMenuItem();
       KeyStroke keyStrokeToToggleFav = KeyStroke.getKeyStroke(KeyEvent.VK_F9, InputEvent.CTRL_DOWN_MASK);
       toggleFavorite9Item.setAccelerator(keyStrokeToToggleFav);
       toggleFavorite9Item.addActionListener(e -> {
@@ -780,11 +779,11 @@ public class MenuManager
     return toggleFavorite9Item;
   }
 
-  private JMenuItem getToggleFavorite10Item()
+  private CustomMenuItem getToggleFavorite10Item()
   {
     if (toggleFavorite10Item == null)
     {
-      toggleFavorite10Item = new JMenuItem();
+      toggleFavorite10Item = new CustomMenuItem();
       KeyStroke keyStrokeToToggleFav = KeyStroke.getKeyStroke(KeyEvent.VK_F10, InputEvent.CTRL_DOWN_MASK);
       toggleFavorite10Item.setAccelerator(keyStrokeToToggleFav);
       toggleFavorite10Item.addActionListener(e -> {
@@ -797,11 +796,11 @@ public class MenuManager
     return toggleFavorite10Item;
   }
 
-  private JMenuItem getClearFavorites1Item()
+  private CustomMenuItem getClearFavorites1Item()
   {
     if (clearFavorites1Item == null)
     {
-      clearFavorites1Item = new JMenuItem();
+      clearFavorites1Item = new CustomMenuItem();
       KeyStroke keyStrokeToClearFav =
         KeyStroke.getKeyStroke(KeyEvent.VK_F1, InputEvent.CTRL_DOWN_MASK + InputEvent.SHIFT_DOWN_MASK);
       clearFavorites1Item.setAccelerator(keyStrokeToClearFav);
@@ -813,11 +812,11 @@ public class MenuManager
     return clearFavorites1Item;
   }
 
-  private JMenuItem getClearFavorites2Item()
+  private CustomMenuItem getClearFavorites2Item()
   {
     if (clearFavorites2Item == null)
     {
-      clearFavorites2Item = new JMenuItem();
+      clearFavorites2Item = new CustomMenuItem();
       KeyStroke keyStrokeToClearFav =
         KeyStroke.getKeyStroke(KeyEvent.VK_F2, InputEvent.CTRL_DOWN_MASK + InputEvent.SHIFT_DOWN_MASK);
       clearFavorites2Item.setAccelerator(keyStrokeToClearFav);
@@ -829,11 +828,11 @@ public class MenuManager
     return clearFavorites2Item;
   }
 
-  private JMenuItem getClearFavorites3Item()
+  private CustomMenuItem getClearFavorites3Item()
   {
     if (clearFavorites3Item == null)
     {
-      clearFavorites3Item = new JMenuItem();
+      clearFavorites3Item = new CustomMenuItem();
       KeyStroke keyStrokeToClearFav =
         KeyStroke.getKeyStroke(KeyEvent.VK_F3, InputEvent.CTRL_DOWN_MASK + InputEvent.SHIFT_DOWN_MASK);
       clearFavorites3Item.setAccelerator(keyStrokeToClearFav);
@@ -845,11 +844,11 @@ public class MenuManager
     return clearFavorites3Item;
   }
 
-  private JMenuItem getClearFavorites4Item()
+  private CustomMenuItem getClearFavorites4Item()
   {
     if (clearFavorites4Item == null)
     {
-      clearFavorites4Item = new JMenuItem();
+      clearFavorites4Item = new CustomMenuItem();
       KeyStroke keyStrokeToClearFav =
         KeyStroke.getKeyStroke(KeyEvent.VK_F4, InputEvent.CTRL_DOWN_MASK + InputEvent.SHIFT_DOWN_MASK);
       clearFavorites4Item.setAccelerator(keyStrokeToClearFav);
@@ -861,11 +860,11 @@ public class MenuManager
     return clearFavorites4Item;
   }
 
-  private JMenuItem getClearFavorites5Item()
+  private CustomMenuItem getClearFavorites5Item()
   {
     if (clearFavorites5Item == null)
     {
-      clearFavorites5Item = new JMenuItem();
+      clearFavorites5Item = new CustomMenuItem();
       KeyStroke keyStrokeToClearFav =
         KeyStroke.getKeyStroke(KeyEvent.VK_F5, InputEvent.CTRL_DOWN_MASK + InputEvent.SHIFT_DOWN_MASK);
       clearFavorites5Item.setAccelerator(keyStrokeToClearFav);
@@ -877,11 +876,11 @@ public class MenuManager
     return clearFavorites5Item;
   }
 
-  private JMenuItem getClearFavorites6Item()
+  private CustomMenuItem getClearFavorites6Item()
   {
     if (clearFavorites6Item == null)
     {
-      clearFavorites6Item = new JMenuItem();
+      clearFavorites6Item = new CustomMenuItem();
       KeyStroke keyStrokeToClearFav =
         KeyStroke.getKeyStroke(KeyEvent.VK_F6, InputEvent.CTRL_DOWN_MASK + InputEvent.SHIFT_DOWN_MASK);
       clearFavorites6Item.setAccelerator(keyStrokeToClearFav);
@@ -893,11 +892,11 @@ public class MenuManager
     return clearFavorites6Item;
   }
 
-  private JMenuItem getClearFavorites7Item()
+  private CustomMenuItem getClearFavorites7Item()
   {
     if (clearFavorites7Item == null)
     {
-      clearFavorites7Item = new JMenuItem();
+      clearFavorites7Item = new CustomMenuItem();
       KeyStroke keyStrokeToClearFav =
         KeyStroke.getKeyStroke(KeyEvent.VK_F7, InputEvent.CTRL_DOWN_MASK + InputEvent.SHIFT_DOWN_MASK);
       clearFavorites7Item.setAccelerator(keyStrokeToClearFav);
@@ -909,11 +908,11 @@ public class MenuManager
     return clearFavorites7Item;
   }
 
-  private JMenuItem getClearFavorites8Item()
+  private CustomMenuItem getClearFavorites8Item()
   {
     if (clearFavorites8Item == null)
     {
-      clearFavorites8Item = new JMenuItem();
+      clearFavorites8Item = new CustomMenuItem();
       KeyStroke keyStrokeToClearFav =
         KeyStroke.getKeyStroke(KeyEvent.VK_F8, InputEvent.CTRL_DOWN_MASK + InputEvent.SHIFT_DOWN_MASK);
       clearFavorites8Item.setAccelerator(keyStrokeToClearFav);
@@ -925,11 +924,11 @@ public class MenuManager
     return clearFavorites8Item;
   }
 
-  private JMenuItem getClearFavorites9Item()
+  private CustomMenuItem getClearFavorites9Item()
   {
     if (clearFavorites9Item == null)
     {
-      clearFavorites9Item = new JMenuItem();
+      clearFavorites9Item = new CustomMenuItem();
       KeyStroke keyStrokeToClearFav =
         KeyStroke.getKeyStroke(KeyEvent.VK_F9, InputEvent.CTRL_DOWN_MASK + InputEvent.SHIFT_DOWN_MASK);
       clearFavorites9Item.setAccelerator(keyStrokeToClearFav);
@@ -941,11 +940,11 @@ public class MenuManager
     return clearFavorites9Item;
   }
 
-  private JMenuItem getClearFavorites10Item()
+  private CustomMenuItem getClearFavorites10Item()
   {
     if (clearFavorites10Item == null)
     {
-      clearFavorites10Item = new JMenuItem();
+      clearFavorites10Item = new CustomMenuItem();
       KeyStroke keyStrokeToClearFav =
         KeyStroke.getKeyStroke(KeyEvent.VK_F10, InputEvent.CTRL_DOWN_MASK + InputEvent.SHIFT_DOWN_MASK);
       clearFavorites10Item.setAccelerator(keyStrokeToClearFav);
@@ -957,11 +956,11 @@ public class MenuManager
     return clearFavorites10Item;
   }
 
-  private JMenuItem getEditViewTagItem()
+  private CustomMenuItem getEditViewTagItem()
   {
     if (editViewTagItem == null)
     {
-      editViewTagItem = new JMenuItem("Edit view tag...");
+      editViewTagItem = new CustomMenuItem("Edit view tag...");
       KeyStroke keyStrokeToToggleFav = KeyStroke.getKeyStroke(KeyEvent.VK_T, InputEvent.CTRL_DOWN_MASK);
       editViewTagItem.setAccelerator(keyStrokeToToggleFav);
       editViewTagItem.addActionListener(e -> {
@@ -985,11 +984,11 @@ public class MenuManager
     return editViewTagItem;
   }
 
-  private JMenuItem getPrimaryJoystickItem()
+  private CustomMenuItem getPrimaryJoystickItem()
   {
     if (editPrimaryJoystickItem == null)
     {
-      editPrimaryJoystickItem = new JMenuItem("Edit primary Joystick...");
+      editPrimaryJoystickItem = new CustomMenuItem("Edit primary Joystick...");
       KeyStroke keyStrokeToEditJoy = KeyStroke.getKeyStroke(KeyEvent.VK_J, InputEvent.CTRL_DOWN_MASK);
       editPrimaryJoystickItem.setAccelerator(keyStrokeToEditJoy);
       editPrimaryJoystickItem.addActionListener(e -> {
@@ -1023,229 +1022,229 @@ public class MenuManager
     return editPrimaryJoystickItem;
   }
 
-  private JMenuItem getBackupDbItem()
+  private CustomMenuItem getBackupDbItem()
   {
-    backupDbItem = new JMenuItem("Backup database");
+    backupDbItem = new CustomMenuItem("Backup database");
     backupDbItem.setMnemonic('b');
     backupDbItem.addActionListener(e -> backupDb());
     return backupDbItem;
   }
 
-  private JMenuItem getRestoreDbItem()
+  private CustomMenuItem getRestoreDbItem()
   {
-    restoreDbItem = new JMenuItem("Restore backup...");
+    restoreDbItem = new CustomMenuItem("Restore backup...");
     restoreDbItem.setMnemonic('r');
     restoreDbItem.addActionListener(e -> restoreDb());
     return restoreDbItem;
   }
 
-  private JMenuItem getDeleteAllGamesItem()
+  private CustomMenuItem getDeleteAllGamesItem()
   {
-    deleteAllGamesItem = new JMenuItem("Delete all games in database");
+    deleteAllGamesItem = new CustomMenuItem("Delete all games in database");
     deleteAllGamesItem.setMnemonic('d');
     deleteAllGamesItem.addActionListener(e -> deleteAllGames());
     return deleteAllGamesItem;
   }
 
-  private JMenuItem getDeleteAllGameViewsItem()
+  private CustomMenuItem getDeleteAllGameViewsItem()
   {
-    deleteAllGameViewsItem = new JMenuItem("Delete all gamelist views in database");
+    deleteAllGameViewsItem = new CustomMenuItem("Delete all gamelist views in database");
     deleteAllGameViewsItem.setMnemonic('l');
     deleteAllGameViewsItem.addActionListener(e -> deleteAllGamelistViews());
     return deleteAllGameViewsItem;
   }
 
-  private JMenuItem getValidateDbItem()
+  private CustomMenuItem getValidateDbItem()
   {
     if (validateDbItem == null)
     {
-      validateDbItem = new JMenuItem("Validate database...");
+      validateDbItem = new CustomMenuItem("Validate database...");
       validateDbItem.setMnemonic('v');
       validateDbItem.addActionListener(e -> validateDb());
     }
     return validateDbItem;
   }
 
-  private JMenuItem getPalNtscFixMenuItem()
+  private CustomMenuItem getPalNtscFixMenuItem()
   {
     if (palNtscFixItem == null)
     {
-      palNtscFixItem = new JMenuItem("Swap game file and first saved state to fix NTSC/PAL issue");
+      palNtscFixItem = new CustomMenuItem("Swap game file and first saved state to fix NTSC/PAL issue");
       palNtscFixItem.setMnemonic('s');
       palNtscFixItem.addActionListener(e -> fixPalNtscIssue());
     }
     return palNtscFixItem;
   }
 
-  private JMenuItem getConvertSavedStatesItem()
+  private CustomMenuItem getConvertSavedStatesItem()
   {
     if (convertSavedStatesItem == null)
     {
-      convertSavedStatesItem = new JMenuItem("Convert Saved states...");
+      convertSavedStatesItem = new CustomMenuItem("Convert Saved states...");
       convertSavedStatesItem.setMnemonic('c');
       convertSavedStatesItem.addActionListener(e -> convertSavedStates());
     }
     return convertSavedStatesItem;
   }
 
-  private JMenuItem getCopySavedStatesToFileLoaderItem()
+  private CustomMenuItem getCopySavedStatesToFileLoaderItem()
   {
 
     if (copySavedStatesItem == null)
     {
-      copySavedStatesItem = new JMenuItem("Copy Saved states to File Loader...");
+      copySavedStatesItem = new CustomMenuItem("Copy Saved states to File Loader...");
       copySavedStatesItem.setMnemonic('f');
       copySavedStatesItem.addActionListener(e -> copySavedStatesFromCarouselToFileLoader());
     }
     return copySavedStatesItem;
   }
 
-  private JMenuItem getFixCorruptSavedStatesItem()
+  private CustomMenuItem getFixCorruptSavedStatesItem()
   {
     if (fixCorruptSavedStatesItem == null)
     {
-      fixCorruptSavedStatesItem = new JMenuItem("Fix corrupt Saved states...");
+      fixCorruptSavedStatesItem = new CustomMenuItem("Fix corrupt Saved states...");
       fixCorruptSavedStatesItem.setMnemonic('o');
       fixCorruptSavedStatesItem.addActionListener(e -> fixCorruptSavedStates());
     }
     return fixCorruptSavedStatesItem;
   }
 
-  private JMenuItem getResetJoystickConfigItem()
+  private CustomMenuItem getResetJoystickConfigItem()
   {
     if (resetJoystickConfigItem == null)
     {
-      resetJoystickConfigItem = new JMenuItem("Reset controller configs for current gamelist view");
+      resetJoystickConfigItem = new CustomMenuItem("Reset controller configs for current gamelist view");
       resetJoystickConfigItem.setMnemonic('j');
       resetJoystickConfigItem.addActionListener(e -> resetControllerConfigs());
     }
     return resetJoystickConfigItem;
   }
 
-  private JMenuItem getEnableAccurateDiskItem()
+  private CustomMenuItem getEnableAccurateDiskItem()
   {
     if (enableAccurateDiskItem == null)
     {
-      enableAccurateDiskItem = new JMenuItem("Enable accurate disk for current gamelist view");
+      enableAccurateDiskItem = new CustomMenuItem("Enable accurate disk for current gamelist view");
       enableAccurateDiskItem.setMnemonic('e');
       enableAccurateDiskItem.addActionListener(e -> enableAccurateDisk());
     }
     return enableAccurateDiskItem;
   }
 
-  private JMenuItem getDisableAccurateDiskItem()
+  private CustomMenuItem getDisableAccurateDiskItem()
   {
     if (disableAccurateDiskItem == null)
     {
-      disableAccurateDiskItem = new JMenuItem("Disable accurate disk for current gamelist view");
+      disableAccurateDiskItem = new CustomMenuItem("Disable accurate disk for current gamelist view");
       disableAccurateDiskItem.setMnemonic('u');
       disableAccurateDiskItem.addActionListener(e -> disableAccurateDisk());
     }
     return disableAccurateDiskItem;
   }
 
-  private JMenuItem getInstallPCUAEItem()
+  private CustomMenuItem getInstallPCUAEItem()
   {
     if (installPCUAEItem == null)
     {
-      installPCUAEItem = new JMenuItem("Install PCUAE to a USB drive...");
+      installPCUAEItem = new CustomMenuItem("Install PCUAE to a USB drive...");
       installPCUAEItem.setMnemonic('i');
       installPCUAEItem.addActionListener(e -> installPCUAE());
     }
     return installPCUAEItem;
   }
 
-  private JMenuItem getInstallAmigaModeItem()
+  private CustomMenuItem getInstallAmigaModeItem()
   {
     if (installAmigaModeItem == null)
     {
-      installAmigaModeItem = new JMenuItem("Install Amiga mode...");
+      installAmigaModeItem = new CustomMenuItem("Install Amiga mode...");
       installAmigaModeItem.setMnemonic('A');
       installAmigaModeItem.addActionListener(e -> installAmigaMode());
     }
     return installAmigaModeItem;
   }
 
-  private JMenuItem getInstallAtariModeItem()
+  private CustomMenuItem getInstallAtariModeItem()
   {
     if (installAtariModeItem == null)
     {
-      installAtariModeItem = new JMenuItem("Install Atari mode...");
+      installAtariModeItem = new CustomMenuItem("Install Atari mode...");
       installAtariModeItem.setMnemonic('t');
       installAtariModeItem.addActionListener(e -> installAtariMode());
     }
     return installAtariModeItem;
   }
 
-  private JMenuItem getInstallLinuxModeItem()
+  private CustomMenuItem getInstallLinuxModeItem()
   {
     if (installLinuxModeItem == null)
     {
-      installLinuxModeItem = new JMenuItem("Install Linux mode...");
+      installLinuxModeItem = new CustomMenuItem("Install Linux mode...");
       installLinuxModeItem.setMnemonic('L');
       installLinuxModeItem.addActionListener(e -> installLinuxMode());
     }
     return installLinuxModeItem;
   }
 
-  private JMenuItem getInstallRetroarchModeItem()
+  private CustomMenuItem getInstallRetroarchModeItem()
   {
     if (installRetroarchModeItem == null)
     {
-      installRetroarchModeItem = new JMenuItem("Install Retroarch mode...");
+      installRetroarchModeItem = new CustomMenuItem("Install Retroarch mode...");
       installRetroarchModeItem.setMnemonic('R');
       installRetroarchModeItem.addActionListener(e -> installRetroarchMode());
     }
     return installRetroarchModeItem;
   }
 
-  private JMenuItem getInstallViceModeItem()
+  private CustomMenuItem getInstallViceModeItem()
   {
     if (installViceModeItem == null)
     {
-      installViceModeItem = new JMenuItem("Install Vice mode...");
+      installViceModeItem = new CustomMenuItem("Install Vice mode...");
       installViceModeItem.setMnemonic('V');
       installViceModeItem.addActionListener(e -> installViceMode());
     }
     return installViceModeItem;
   }
 
-  private JMenuItem getInstallMSXModeItem()
+  private CustomMenuItem getInstallMSXModeItem()
   {
     if (installMSXModeItem == null)
     {
-      installMSXModeItem = new JMenuItem("Install MSX/Colecovision mode...");
+      installMSXModeItem = new CustomMenuItem("Install MSX/Colecovision mode...");
       installMSXModeItem.setMnemonic('M');
       installMSXModeItem.addActionListener(e -> installMSXMode());
     }
     return installMSXModeItem;
   }
 
-  private JMenuItem getInstallScummVMModeItem()
+  private CustomMenuItem getInstallScummVMModeItem()
   {
     if (installScummVMModeItem == null)
     {
-      installScummVMModeItem = new JMenuItem("Install ScummVM mode...");
+      installScummVMModeItem = new CustomMenuItem("Install ScummVM mode...");
       installScummVMModeItem.setMnemonic('s');
       installScummVMModeItem.addActionListener(e -> installScummVMMode());
     }
     return installScummVMModeItem;
   }
 
-  private JMenuItem getDeleteInstallFilesItem()
+  private CustomMenuItem getDeleteInstallFilesItem()
   {
     if (deleteInstallFilesItem == null)
     {
-      deleteInstallFilesItem = new JMenuItem("Delete all installation files in install folder");
+      deleteInstallFilesItem = new CustomMenuItem("Delete all installation files in install folder");
       deleteInstallFilesItem.setMnemonic('d');
       deleteInstallFilesItem.addActionListener(e -> deleteInstallFiles());
     }
     return deleteInstallFilesItem;
   }
 
-  private JMenuItem getHelpItem()
+  private CustomMenuItem getHelpItem()
   {
-    helpItem = new JMenuItem("Help");
+    helpItem = new CustomMenuItem("Help");
     KeyStroke keyStrokeToImportGames = KeyStroke.getKeyStroke(KeyEvent.VK_F1, 0);
     helpItem.setAccelerator(keyStrokeToImportGames);
     helpItem.setMnemonic('h');
@@ -1265,9 +1264,9 @@ public class MenuManager
     return helpItem;
   }
 
-  private JMenuItem getPcuaeWikiItem()
+  private CustomMenuItem getPcuaeWikiItem()
   {
-    pcuaeWikiItem = new JMenuItem("PCUAE wiki");
+    pcuaeWikiItem = new CustomMenuItem("PCUAE wiki");
     KeyStroke keyStrokeToImportGames = KeyStroke.getKeyStroke(KeyEvent.VK_F2, 0);
     pcuaeWikiItem.setAccelerator(keyStrokeToImportGames);
     pcuaeWikiItem.setMnemonic('p');
@@ -1287,9 +1286,9 @@ public class MenuManager
     return pcuaeWikiItem;
   }
 
-  private JMenuItem getAboutItem()
+  private CustomMenuItem getAboutItem()
   {
-    aboutItem = new JMenuItem("About...");
+    aboutItem = new CustomMenuItem("About...");
     aboutItem.setMnemonic('a');
     aboutItem.addActionListener(e -> {
       AboutDialog dialog = new AboutDialog();
@@ -1300,9 +1299,9 @@ public class MenuManager
     return aboutItem;
   }
 
-  private JMenuItem getCheckVersionItem()
+  private CustomMenuItem getCheckVersionItem()
   {
-    newVersionItem = new JMenuItem("Check for updates");
+    newVersionItem = new CustomMenuItem("Check for updates");
     newVersionItem.setMnemonic('c');
     newVersionItem.addActionListener(e -> {
       checkForNewRelease();
