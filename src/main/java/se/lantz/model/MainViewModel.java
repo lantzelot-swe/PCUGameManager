@@ -111,7 +111,7 @@ public class MainViewModel extends AbstractModel
     {
       ExceptionHandler.handleException(ex, "Could not read databases");
     }
-    
+
     if (availableDatabases.isEmpty())
     {
       try
@@ -142,6 +142,16 @@ public class MainViewModel extends AbstractModel
     }
   }
 
+  /**
+   * Used from export dialog
+   * 
+   * @param currentDatabase The current DB in the main instance of the model
+   */
+  public MainViewModel(String currentDatabase)
+  {
+    selectedDatabase = currentDatabase;
+  }
+
   public void updateDbTabPreferences(String prefValue)
   {
     Properties configuredProperties = FileManager.getConfiguredProperties();
@@ -153,6 +163,7 @@ public class MainViewModel extends AbstractModel
     Path source = Paths.get("./databases" + "/" + oldName);
     Files.move(source, source.resolveSibling(newName));
     selectedDatabase = newName;
+    availableDatabases.set(availableDatabases.indexOf(oldName), newName);
     FileManager.setCurrentDbFolder(selectedDatabase);
     DbConnector.setCurrentDbFolder(selectedDatabase);
   }
@@ -1378,5 +1389,11 @@ public class MainViewModel extends AbstractModel
     DbConnector.setCurrentDbFolder(selectedDatabase);
     stateManager.readSavedStatesAndUpdateMap();
     reloadGameViews();
+    this.notifyChange("databaseSelected", null, database);
+  }
+
+  public String getCurrentDatabase()
+  {
+    return selectedDatabase;
   }
 }

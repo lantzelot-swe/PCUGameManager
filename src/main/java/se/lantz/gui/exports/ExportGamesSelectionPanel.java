@@ -50,11 +50,11 @@ public class ExportGamesSelectionPanel extends JPanel
   private JButton exportButton;
   private ExportGameViewsSelectionPanel exportGameViewsSelectionPanel;
 
-  public ExportGamesSelectionPanel(JButton exportButton)
+  public ExportGamesSelectionPanel(JButton exportButton, String selectedDatabase)
   {
     this.exportButton = exportButton;
     exportButton.setEnabled(false);
-    uiModel = new MainViewModel();
+    uiModel = new MainViewModel(selectedDatabase);
     GridBagLayout gridBagLayout = new GridBagLayout();
     setLayout(gridBagLayout);
     GridBagConstraints gbc_listPanel = new GridBagConstraints();

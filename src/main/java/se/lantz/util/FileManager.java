@@ -2117,7 +2117,7 @@ public class FileManager
   public static boolean isValidCompressedDiskFileEnding(String fileName)
   {
     return compressedDiskFilesEndingList.stream()
-      .anyMatch(ending -> StringUtils.containsIgnoreCase(fileName, "." + ending));
+      .anyMatch(ending -> StringUtils.containsIgnoreCase(fileName, "." + ending + "."));
   }
 
   public static List<String> convertAllScreenshotsTo32Bit() throws IOException

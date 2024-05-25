@@ -11,6 +11,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.FileHandler;
 
 import org.apache.commons.io.FilenameUtils;
 
@@ -210,15 +211,15 @@ public class ExportManager
     }
     for (GameDetails gameDetails : gameDetailsList)
     {
-      Path coverPath = Paths.get("./covers/" + gameDetails.getCover());
+      Path coverPath = Paths.get(FileManager.COVERS + gameDetails.getCover());
       Path targetCoverPath = targetPath.resolve("covers/" + gameDetails.getCover());
 
-      Path screens1Path = Paths.get("./screens/" + gameDetails.getScreen1());
+      Path screens1Path = Paths.get(FileManager.SCREENS + gameDetails.getScreen1());
       Path targetScreen1Path = targetPath.resolve("screens/" + gameDetails.getScreen1());
-      Path screens2Path = Paths.get("./screens/" + gameDetails.getScreen2());
+      Path screens2Path = Paths.get(FileManager.SCREENS + gameDetails.getScreen2());
       Path targetScreen2Path = targetPath.resolve("screens/" + gameDetails.getScreen2());
 
-      Path gamePath = Paths.get("./games/" + gameDetails.getGame());
+      Path gamePath = Paths.get(FileManager.GAMES + gameDetails.getGame());
       Path targetGamePath = targetPath.resolve("games/" + gameDetails.getGame());
 
       try
@@ -296,7 +297,7 @@ public class ExportManager
     {
       String gameName = gameDetails.getGame();
 
-      Path gamePath = Paths.get("./games/" + gameName);
+      Path gamePath = Paths.get(FileManager.GAMES + gameName);
       String extension = FilenameUtils.getExtension(gameName);
       boolean zipped = false;
       if (extension.equalsIgnoreCase("gz"))
@@ -363,7 +364,7 @@ public class ExportManager
       Path targetGamePath =
         targetPath.resolve(gameFileNameWithoutExtension + " (disk " + diskIndex + ")_CD." + extension);
 
-      Path extraDiskPath = Paths.get("./extradisks/" + extraDiskName);
+      Path extraDiskPath = Paths.get(FileManager.DISKS + extraDiskName);
 
       try
       {

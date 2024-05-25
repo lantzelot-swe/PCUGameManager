@@ -7,8 +7,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.AbstractAction;
-import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
+import javax.swing.JSeparator;
 import javax.swing.KeyStroke;
 import javax.swing.event.UndoableEditEvent;
 import javax.swing.event.UndoableEditListener;
@@ -18,6 +18,8 @@ import javax.swing.text.TextAction;
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 import javax.swing.undo.UndoManager;
+
+import se.lantz.gui.menu.InsetsMenuItem;
 
 public class TextComponentSupport
 {
@@ -35,7 +37,7 @@ public class TextComponentSupport
   {
     action.putValue(AbstractAction.ACCELERATOR_KEY, KeyStroke.getKeyStroke(key, InputEvent.CTRL_DOWN_MASK));
     action.putValue(AbstractAction.NAME, text);
-    popupMenu.add(new JMenuItem(action));
+    popupMenu.add(new InsetsMenuItem(action));
   }
 
   public static void setupPopupAndUndoable(JTextComponent... components)
@@ -122,9 +124,9 @@ public class TextComponentSupport
     // Create keyboard accelerators for undo/redo actions (Ctrl+Z/Ctrl+Y)
     pTextComponent.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_Z, InputEvent.CTRL_DOWN_MASK), UNDO_ACTION);
     pTextComponent.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_Y, InputEvent.CTRL_DOWN_MASK), REDO_ACTION);
-    popupMenu.addSeparator();
-    popupMenu.add(undoAction);
-    popupMenu.add(redoAction);
+    popupMenu.add(new JSeparator());
+    popupMenu.add(new InsetsMenuItem(undoAction));
+    popupMenu.add(new InsetsMenuItem(redoAction));
   }
 
 }

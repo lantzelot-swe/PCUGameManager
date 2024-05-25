@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import javax.swing.JComponent;
-import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
@@ -79,9 +78,9 @@ public class MainPanel extends JPanel
             ignoreTabChange = true;
             tabbedPane.setSelectedIndex(previouslySelectedIndex);
             ignoreTabChange = false;
-            String name = JOptionPane.showInputDialog(this, "Write a new name!");
+            String name = JOptionPane
+              .showInputDialog(this, "Enter database name", "Create new database", JOptionPane.QUESTION_MESSAGE);
             createNewTab(name);
-            //Create a new empty one!
             return;
           }
           else if (ignoreTabChange)
@@ -123,7 +122,7 @@ public class MainPanel extends JPanel
                 if (tabbedPane.getTabCount() > 2)
                 {
                   InsetsMenuItem deleteTabItem = new InsetsMenuItem("Delete database");
-                  deleteTabItem.addActionListener(ev -> deleteTab(tabNumber)); 
+                  deleteTabItem.addActionListener(ev -> deleteTab(tabNumber));
                   menu.add(deleteTabItem);
                 }
                 menu.show(tabbedPane, e.getX(), e.getY());
@@ -134,7 +133,7 @@ public class MainPanel extends JPanel
     }
     return tabbedPane;
   }
-  
+
   private void setEnablementOfTabs()
   {
     tabbedPane.setEnabled(!uiModel.isDataChanged());
@@ -150,7 +149,7 @@ public class MainPanel extends JPanel
                                                           null,
                                                           null,
                                                           oldName);
-    if (newName != null)
+    if (checkDbName(newName))
     {
       try
       {
@@ -190,10 +189,28 @@ public class MainPanel extends JPanel
 
   private void createNewTab(String name)
   {
+    if (checkDbName(name))
+    {
+      try
+      {
+        uiModel.addTab(name);
+        tabbedPane.insertTab(name, null, getNewContentPanel(null), null, tabbedPane.getTabCount() - 1);
+        tabbedPane.setSelectedIndex(tabbedPane.getTabCount() - 2);
+        updateTabOrderPreferences();
+      }
+      catch (IOException e)
+      {
+        ExceptionHandler.handleException(e, "Could not create database");
+      }
+    }
+  }
+
+  private boolean checkDbName(String name)
+  {
     if (name == null || name.isEmpty() || name.isBlank())
     {
       //Do nothing
-      return;
+      return false;
     }
     List<String> lowerCaseNames =
       uiModel.getAvailableDatabases().stream().map(x -> x.toLowerCase()).collect(Collectors.toList());
@@ -203,19 +220,9 @@ public class MainPanel extends JPanel
                                     "A database with name " + name.trim() + " already exists",
                                     "Duplicate db name",
                                     JOptionPane.INFORMATION_MESSAGE);
-      return;
+      return false;
     }
-    try
-    {
-      uiModel.addTab(name);
-      tabbedPane.insertTab(name, null, getNewContentPanel(null), null, tabbedPane.getTabCount() - 1);
-      tabbedPane.setSelectedIndex(tabbedPane.getTabCount() - 2);
-      updateTabOrderPreferences();
-    }
-    catch (IOException e)
-    {
-      ExceptionHandler.handleException(e, "Could not create database");
-    }
+    return true;
   }
 
   private void updateTabOrderPreferences()

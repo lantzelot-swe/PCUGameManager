@@ -21,7 +21,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.imageio.ImageIO;
-import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 
 import org.apache.commons.io.FileUtils;
@@ -30,6 +29,7 @@ import org.slf4j.LoggerFactory;
 
 import se.lantz.gui.MainWindow;
 import se.lantz.gui.exports.PublishWorker;
+import se.lantz.gui.menu.InsetsMenuItem;
 import se.lantz.model.MainViewModel;
 import se.lantz.model.PreferencesModel;
 import se.lantz.model.SavedStatesModel;
@@ -76,9 +76,9 @@ public class SavedStatesManager
    */
   private Map<String, Integer> savedStatesMap = new HashMap<>();
 
-  private JMenuItem palNtscFixMenuItem;
+  private InsetsMenuItem palNtscFixMenuItem;
 
-  public SavedStatesManager(MainViewModel model, JMenuItem palNtscFixMenuItem)
+  public SavedStatesManager(MainViewModel model, InsetsMenuItem palNtscFixMenuItem)
   {
     this.model = model;
     this.palNtscFixMenuItem = palNtscFixMenuItem;
@@ -119,7 +119,7 @@ public class SavedStatesManager
 
     String fileName = model.getInfoModel().getGamesFile();
     String gameFolderName = getGameFolderName(fileName, model.getInfoModel().getTitle());
-    
+
     Path saveFolder = new File(FileManager.SAVES + gameFolderName).toPath();
     int numberofSaves = 0;
     //Check which ones are available
@@ -328,7 +328,7 @@ public class SavedStatesManager
   {
     this.importDir = importDir;
   }
-  
+
   public void setFixDirectory(File fixDir)
   {
     this.fixDir = fixDir;
@@ -503,7 +503,7 @@ public class SavedStatesManager
     //Update model list after import
     model.getGameListModel().notifyChange();
   }
-  
+
   public void fixCorruptSavedStates(PublishWorker worker)
   {
     noSavedStatesFixed = 0;
@@ -517,12 +517,13 @@ public class SavedStatesManager
           {
             return;
           }
-          
+
           worker.publishMessage("Fixing " + sourcePath);
           //Read the mta file and keep track of the time
           String playTime = readPlayTime(sourcePath);
           //Copy the template file 
-          FileUtils.copyInputStreamToFile(getClass().getResourceAsStream("/se/lantz/template.mta"), sourcePath.toFile());
+          FileUtils.copyInputStreamToFile(getClass().getResourceAsStream("/se/lantz/template.mta"),
+                                          sourcePath.toFile());
           //Write the time from the old file
           storePlayTime(sourcePath, playTime);
           noSavedStatesFixed++;
@@ -545,7 +546,7 @@ public class SavedStatesManager
     PathMatcher matcher = FileSystems.getDefault().getPathMatcher("glob:**.{mta,png,vsz}");
     return matcher.matches(path) || path.toFile().isDirectory();
   }
-  
+
   private boolean isValidSaveStateMtaFilePath(Path path)
   {
     PathMatcher matcher = FileSystems.getDefault().getPathMatcher("glob:**.{mta}");
@@ -556,7 +557,7 @@ public class SavedStatesManager
   {
     return noFilesCopied;
   }
-  
+
   public int getNumberOfFixedSavedStates()
   {
     return noSavedStatesFixed;
@@ -632,7 +633,8 @@ public class SavedStatesManager
       if (!fileName.isEmpty() && fileName.contains(".vsf"))
       {
         //Check if folder is available
-        Path saveFolder = new File(FileManager.SAVES + getGameFolderName(fileName, model.getInfoModel().getTitle())).toPath();
+        Path saveFolder =
+          new File(FileManager.SAVES + getGameFolderName(fileName, model.getInfoModel().getTitle())).toPath();
         if (Files.exists(saveFolder))
         {
           //Check which ones are available
@@ -652,7 +654,8 @@ public class SavedStatesManager
     String gamesFile = model.getInfoModel().getGamesFile();
     Path gameFilePath = new File(FileManager.GAMES + gamesFile).toPath();
     Path firstSavedStatePath =
-      new File(FileManager.SAVES + getGameFolderName(gamesFile, model.getInfoModel().getTitle())).toPath().resolve(VSZ0);
+      new File(FileManager.SAVES + getGameFolderName(gamesFile, model.getInfoModel().getTitle())).toPath()
+        .resolve(VSZ0);
 
     Path tempFilePath = new File(FileManager.GAMES + "temp.gz").toPath();
     try

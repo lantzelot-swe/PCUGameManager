@@ -19,4 +19,10 @@ public class InsetsMenuItem extends JMenuItem
     super(text);
     setMargin(new Insets(2, -20, 2, 2));
   }
+  
+  public InsetsMenuItem(Action action)
+  {
+    super(action);
+    setMargin(new Insets(2, -20, 2, 2));
+  }
 }

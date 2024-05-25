@@ -32,11 +32,13 @@ public class ExportMainPanel extends JPanel
   private ExportGamesSelectionPanel exportGamesSelectionPanel;
   private CardLayout cardLayout = new CardLayout();
   private boolean carouselMode;
+  private String selectedDatabase;
 
-  public ExportMainPanel(JButton exportButton, boolean carouselMode)
+  public ExportMainPanel(JButton exportButton, boolean carouselMode, String selectedDatabase)
   {
     this.exportButton = exportButton;
     this.carouselMode = carouselMode;
+    this.selectedDatabase = selectedDatabase;
     GridBagLayout gridBagLayout = new GridBagLayout();
     setLayout(gridBagLayout);
     GridBagConstraints gbc_optionPanel = new GridBagConstraints();
@@ -183,7 +185,7 @@ public class ExportMainPanel extends JPanel
   {
     if (gameViewsSelectionPanel == null)
     {
-      gameViewsSelectionPanel = new ExportGameViewsSelectionPanel(exportButton);
+      gameViewsSelectionPanel = new ExportGameViewsSelectionPanel(exportButton, selectedDatabase);
     }
     return gameViewsSelectionPanel;
   }
@@ -226,7 +228,7 @@ public class ExportMainPanel extends JPanel
   {
     if (exportGamesSelectionPanel == null)
     {
-      exportGamesSelectionPanel = new ExportGamesSelectionPanel(exportButton);
+      exportGamesSelectionPanel = new ExportGamesSelectionPanel(exportButton, selectedDatabase);
     }
     return exportGamesSelectionPanel;
   }
