@@ -152,6 +152,7 @@ public class MenuManager
 
   private InsetsMenuItem helpItem;
   private InsetsMenuItem pcuaeWikiItem;
+  private InsetsMenuItem versionHistoryItem;
   private InsetsMenuItem aboutItem;
   private InsetsMenuItem newVersionItem;
 
@@ -293,6 +294,7 @@ public class MenuManager
     helpMenu.add(getPcuaeWikiItem());
     helpMenu.add(new JSeparator());
     helpMenu.add(getCheckVersionItem());
+    helpMenu.add(getVersionHistoryItem());
     helpMenu.add(getAboutItem());
   }
 
@@ -1313,6 +1315,26 @@ public class MenuManager
     return newVersionItem;
   }
 
+  private InsetsMenuItem getVersionHistoryItem()
+  {
+    versionHistoryItem = new InsetsMenuItem("Version history");
+    versionHistoryItem.setMnemonic('v');
+    versionHistoryItem.addActionListener(e -> {
+      try
+      {
+        Desktop.getDesktop().browse(new URI("https://github.com/lantzelot-swe/PCUGameManager/releases"));
+      }
+      catch (IOException | URISyntaxException ex)
+      {
+        JOptionPane.showMessageDialog(MainWindow.getInstance(),
+                                      "Could not open Version History",
+                                      "History missing",
+                                      JOptionPane.ERROR_MESSAGE);
+      }
+    });
+    return versionHistoryItem;
+  }
+
   private void importCarouselGames()
   {
     ImportOptionsDialog optionsDialog = new ImportOptionsDialog(MainWindow.getInstance(), true);
@@ -1408,7 +1430,8 @@ public class MenuManager
 
   private void exportGames()
   {
-    final ExportGamesDialog exportSelectionDialog = new ExportGamesDialog(MainWindow.getInstance(), true, uiModel.getCurrentDatabase());
+    final ExportGamesDialog exportSelectionDialog =
+      new ExportGamesDialog(MainWindow.getInstance(), true, uiModel.getCurrentDatabase());
     exportSelectionDialog.pack();
     exportSelectionDialog.setLocationRelativeTo(MainWindow.getInstance());
     if (exportSelectionDialog.showDialog())
@@ -1448,7 +1471,8 @@ public class MenuManager
 
   private void exportGamesToFileLoader()
   {
-    final ExportGamesDialog exportSelectionDialog = new ExportGamesDialog(MainWindow.getInstance(), false, uiModel.getCurrentDatabase());
+    final ExportGamesDialog exportSelectionDialog =
+      new ExportGamesDialog(MainWindow.getInstance(), false, uiModel.getCurrentDatabase());
     exportSelectionDialog.pack();
     exportSelectionDialog.setLocationRelativeTo(MainWindow.getInstance());
     if (exportSelectionDialog.showDialog())
