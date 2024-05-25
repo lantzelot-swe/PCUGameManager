@@ -57,12 +57,16 @@ import se.lantz.manager.RestoreManager;
 import se.lantz.manager.SavedStatesManager;
 import se.lantz.manager.pcuae.AmigaModeInstallManager;
 import se.lantz.manager.pcuae.AtariModeInstallManager;
+import se.lantz.manager.pcuae.DosModeInstallManager;
 import se.lantz.manager.pcuae.LinuxModeInstallManager;
 import se.lantz.manager.pcuae.MSXModeInstallManager;
 import se.lantz.manager.pcuae.PCUAEInstallManager;
+import se.lantz.manager.pcuae.PlaystationModeInstallManager;
 import se.lantz.manager.pcuae.RetroarchModeInstallManager;
 import se.lantz.manager.pcuae.ScummVMModeInstallManager;
+import se.lantz.manager.pcuae.SegaModeInstallManager;
 import se.lantz.manager.pcuae.ViceModeInstallManager;
+import se.lantz.manager.pcuae.ZesaruxModeInstallManager;
 import se.lantz.model.MainViewModel;
 import se.lantz.model.data.GameListData;
 import se.lantz.model.data.GameView;
@@ -148,6 +152,10 @@ public class MenuManager
   private InsetsMenuItem installViceModeItem;
   private InsetsMenuItem installScummVMModeItem;
   private InsetsMenuItem installMSXModeItem;
+  private InsetsMenuItem installDosModeItem;
+  private InsetsMenuItem installSegaModeItem;
+  private InsetsMenuItem installPlaystationModeItem;
+  private InsetsMenuItem installZesaruxModeItem;
   private InsetsMenuItem deleteInstallFilesItem;
 
   private InsetsMenuItem helpItem;
@@ -172,6 +180,10 @@ public class MenuManager
   private ViceModeInstallManager installViceManager;
   private ScummVMModeInstallManager installScummVMManager;
   private MSXModeInstallManager installMSXManager;
+  private DosModeInstallManager installDosManager;
+  private SegaModeInstallManager installSegaManager;
+  private PlaystationModeInstallManager installPlaystationManager;
+  private ZesaruxModeInstallManager installZesaruxManager;
   private int currentFavoritesCount = 10;
 
   private Map<String, String> resourcesMap = new LinkedHashMap<>();
@@ -193,6 +205,10 @@ public class MenuManager
     this.installViceManager = new ViceModeInstallManager();
     this.installScummVMManager = new ScummVMModeInstallManager();
     this.installMSXManager = new MSXModeInstallManager();
+    this.installDosManager = new DosModeInstallManager();
+    this.installSegaManager = new SegaModeInstallManager();
+    this.installPlaystationManager = new PlaystationModeInstallManager();
+    this.installZesaruxManager = new ZesaruxModeInstallManager();
     uiModel.setSavedStatesManager(savedStatesManager);
     setupResourcesMap();
     setupMenues();
@@ -282,6 +298,10 @@ public class MenuManager
     pcuaeModeMenu.add(getInstallScummVMModeItem());
     pcuaeModeMenu.add(getInstallViceModeItem());
     pcuaeModeMenu.add(getInstallMSXModeItem());
+    pcuaeModeMenu.add(getInstallDosModeItem());
+    pcuaeModeMenu.add(getInstallSegaModeItem());
+    pcuaeModeMenu.add(getInstallPlaystationModeItem());
+    pcuaeModeMenu.add(getInstallZesaruxModeItem());
     pcuaeMenu.add(pcuaeModeMenu);
     pcuaeMenu.add(new JSeparator());
     pcuaeMenu.add(getDeleteInstallFilesItem());
@@ -1226,6 +1246,50 @@ public class MenuManager
     return installMSXModeItem;
   }
 
+  private InsetsMenuItem getInstallDosModeItem()
+  {
+    if (installDosModeItem == null)
+    {
+      installDosModeItem = new InsetsMenuItem("Install Dos mode...");
+      installDosModeItem.setMnemonic('D');
+      installDosModeItem.addActionListener(e -> installDosMode());
+    }
+    return installDosModeItem;
+  }
+
+  private InsetsMenuItem getInstallSegaModeItem()
+  {
+    if (installSegaModeItem == null)
+    {
+      installSegaModeItem = new InsetsMenuItem("Install Sega mode...");
+      installSegaModeItem.setMnemonic('e');
+      installSegaModeItem.addActionListener(e -> installSegaMode());
+    }
+    return installSegaModeItem;
+  }
+
+  private InsetsMenuItem getInstallPlaystationModeItem()
+  {
+    if (installPlaystationModeItem == null)
+    {
+      installPlaystationModeItem = new InsetsMenuItem("Install Playstation mode...");
+      installPlaystationModeItem.setMnemonic('y');
+      installPlaystationModeItem.addActionListener(e -> installPlaystationMode());
+    }
+    return installPlaystationModeItem;
+  }
+
+  private InsetsMenuItem getInstallZesaruxModeItem()
+  {
+    if (installZesaruxModeItem == null)
+    {
+      installZesaruxModeItem = new InsetsMenuItem("Install Zesarux mode...");
+      installZesaruxModeItem.setMnemonic('z');
+      installZesaruxModeItem.addActionListener(e -> installZesaruxMode());
+    }
+    return installZesaruxModeItem;
+  }
+
   private InsetsMenuItem getInstallScummVMModeItem()
   {
     if (installScummVMModeItem == null)
@@ -1854,6 +1918,26 @@ public class MenuManager
   private void installMSXMode()
   {
     installMSXManager.installMSXMode();
+  }
+
+  private void installDosMode()
+  {
+    installDosManager.installDosMode();
+  }
+
+  private void installSegaMode()
+  {
+    installSegaManager.installSegaMode();
+  }
+
+  private void installPlaystationMode()
+  {
+    installPlaystationManager.installPlaystationMode();
+  }
+
+  private void installZesaruxMode()
+  {
+    installZesaruxManager.installZesaruxMode();
   }
 
   private void deleteInstallFiles()

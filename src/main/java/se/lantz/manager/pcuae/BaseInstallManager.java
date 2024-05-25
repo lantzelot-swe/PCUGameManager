@@ -52,6 +52,11 @@ public abstract class BaseInstallManager implements AWTEventListener
   protected static final String SCUMMVM_MODE_INSTALL_NAME = "scummvm";
   protected static final String MSX_COLECO_MODE_INSTALL_NAME = "msx";
 
+  protected static final String DOS_MODE_INSTALL_NAME = "dos-mode";
+  protected static final String SEGA_MODE_INSTALL_NAME = "sega-mode";
+  protected static final String PLAYSTATION_MODE_INSTALL_NAME = "playstation-mode";
+  protected static final String ZESARUX_MODE_INSTALL_NAME = "zesarux-mode";
+
   private boolean blockEvents = false;
   protected ExecutorService singleThreadExecutor = Executors.newSingleThreadExecutor();
 
@@ -161,7 +166,9 @@ public abstract class BaseInstallManager implements AWTEventListener
             return !(name.contains(AMIGA_MODE_INSTALL_NAME) || name.contains(ATARI_MODE_INSTALL_NAME) ||
               name.contains(LINUX_MODE_INSTALL_NAME) || name.contains(RETROARCH_MODE_INSTALL_NAME) ||
               name.contains(VICE_MODE_INSTALL_NAME) || name.contains(SCUMMVM_MODE_INSTALL_NAME) ||
-              name.contains(MSX_COLECO_MODE_INSTALL_NAME)) && name.endsWith(".exe");
+              name.contains(MSX_COLECO_MODE_INSTALL_NAME) || name.contains(DOS_MODE_INSTALL_NAME) ||
+              name.contains(SEGA_MODE_INSTALL_NAME) || name.contains(PLAYSTATION_MODE_INSTALL_NAME) ||
+              name.contains(ZESARUX_MODE_INSTALL_NAME)) && name.endsWith(".exe");
           }
           else
           {
@@ -277,11 +284,50 @@ public abstract class BaseInstallManager implements AWTEventListener
             }
             break;
           }
+
+          case DOS_MODE_INSTALL_NAME:
+          {
+            if (assetName.contains(DOS_MODE_INSTALL_NAME))
+            {
+              downloadUrl = asset.getAsJsonObject().get("browser_download_url").getAsString();
+            }
+            break;
+          }
+
+          case SEGA_MODE_INSTALL_NAME:
+          {
+            if (assetName.contains(SEGA_MODE_INSTALL_NAME))
+            {
+              downloadUrl = asset.getAsJsonObject().get("browser_download_url").getAsString();
+            }
+            break;
+          }
+
+          case PLAYSTATION_MODE_INSTALL_NAME:
+          {
+            if (assetName.contains(PLAYSTATION_MODE_INSTALL_NAME))
+            {
+              downloadUrl = asset.getAsJsonObject().get("browser_download_url").getAsString();
+            }
+            break;
+          }
+
+          case ZESARUX_MODE_INSTALL_NAME:
+          {
+            if (assetName.contains(ZESARUX_MODE_INSTALL_NAME))
+            {
+              downloadUrl = asset.getAsJsonObject().get("browser_download_url").getAsString();
+            }
+            break;
+          }
+
           case PCUAE_INSTALL_NAME:
           {
             if (!(assetName.contains(AMIGA_MODE_INSTALL_NAME) || assetName.contains(ATARI_MODE_INSTALL_NAME) ||
               assetName.contains(LINUX_MODE_INSTALL_NAME) || assetName.contains(RETROARCH_MODE_INSTALL_NAME) ||
-              assetName.contains(VICE_MODE_INSTALL_NAME) || assetName.contains(SCUMMVM_MODE_INSTALL_NAME)) &&
+              assetName.contains(VICE_MODE_INSTALL_NAME) || assetName.contains(SCUMMVM_MODE_INSTALL_NAME) ||
+              assetName.contains(DOS_MODE_INSTALL_NAME) || assetName.contains(SEGA_MODE_INSTALL_NAME) ||
+              assetName.contains(PLAYSTATION_MODE_INSTALL_NAME) || assetName.contains(ZESARUX_MODE_INSTALL_NAME)) &&
               assetName.contains(PCUAE_MAIN_INSTALL_NAME))
             {
               downloadUrl = asset.getAsJsonObject().get("browser_download_url").getAsString();
