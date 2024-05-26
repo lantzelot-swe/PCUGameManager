@@ -53,10 +53,21 @@ public class PCUAEManager
     {
       Files.createDirectories(Paths.get("./databases/"));
       Files.createDirectories(Paths.get("./pcuae-install/"));
-
-      if (!Files.list(Paths.get("./databases/")).findAny().isPresent() && Paths.get("./games/").toFile().exists())
+      
+      if (!Files.list(Paths.get("./databases/")).findAny().isPresent())
       {
-        //Migrate to version 3.x
+        //Create a mainDb folder
+        Path mainDb = Paths.get("./databases/MainDb");
+        Files.createDirectories(mainDb.resolve("games"));
+        Files.createDirectories(mainDb.resolve("screens"));
+        Files.createDirectories(mainDb.resolve("covers"));
+        Files.createDirectories(mainDb.resolve("saves"));
+        Files.createDirectories(mainDb.resolve("extradisks"));
+      }
+
+      //Migrate to version 3.x if old structure is available
+      if (Paths.get("./games/").toFile().exists())
+      {
         migrateDirectories();
       }
     }
@@ -113,7 +124,6 @@ public class PCUAEManager
     try
     {
       Path mainDb = Paths.get("./databases/MainDb");
-      Files.createDirectories(mainDb);
       Files.move(Paths.get("./pcusb.db"), mainDb.resolve("pcusb.db"), StandardCopyOption.ATOMIC_MOVE);
       Files.move(Paths.get("./games/"), mainDb.resolve("games"), StandardCopyOption.ATOMIC_MOVE);
       Files.move(Paths.get("./screens/"), mainDb.resolve("screens"), StandardCopyOption.ATOMIC_MOVE);
@@ -126,5 +136,4 @@ public class PCUAEManager
       ExceptionHandler.handleException(e, "Could not move main Db");
     }
   }
-
 }
