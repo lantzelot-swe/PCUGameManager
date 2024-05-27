@@ -176,18 +176,24 @@ public class MainPanel extends JPanel
     {
       try
       {
+        MainWindow.getInstance().setWaitCursor(true);
         uiModel.deleteTab(selectedTab);
         tabbedPane.removeTabAt(tabIndex);
         updateTabOrderPreferences();
       }
       catch (IOException e)
       {
+        MainWindow.getInstance().setWaitCursor(false);
         ExceptionHandler.handleException(e, "Could not delete database");
+      }
+      finally
+      {
+        MainWindow.getInstance().setWaitCursor(false);
       }
     }
   }
 
-  private void createNewTab(String name)
+  public void createNewTab(String name)
   {
     if (checkDbName(name))
     {

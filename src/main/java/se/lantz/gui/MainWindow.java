@@ -150,4 +150,9 @@ public final class MainWindow extends JFrame
   {
     getMainPanel().setSelectedGameInGameList(gameId);
   }
+  
+  public void createNewDatabaseTab(String name)
+  {
+    getMainPanel().createNewTab(name);
+  }
 }

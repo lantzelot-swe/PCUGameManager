@@ -43,7 +43,7 @@ public class SelectDirPanel extends JPanel
   public enum Mode
   {
     CAROUSEL_IMPORT, GB_IMPORT, CAROUSEL_EXPORT, FILELOADER_EXPORT, SAVEDSTATES_IMPORT, SAVEDSTATES_EXPORT,
-    FIX_CORRUPT_SAVEDSTATES
+    FIX_CORRUPT_SAVEDSTATES, DATABASE_IMPORT
   }
 
   private static final Logger logger = LoggerFactory.getLogger(SelectDirPanel.class);
@@ -54,6 +54,7 @@ public class SelectDirPanel extends JPanel
   private static final String SAVEDSTATES_IMPORT_DIR_PROPERTY = "savedStatesImportDir";
   private static final String SAVEDSTATES_EXPORT_DIR_PROPERTY = "savedStatesExportDir";
   private static final String FIX_SAVEDSTATES_DIR_PROPERTY = "fixSavedStatesDir";
+  private static final String DATABASE_IMPORT_DIR_PROPERTY = "dbImportDir";
   private JTextField dirTextField;
   private JButton selectDirButton;
 
@@ -161,6 +162,17 @@ public class SelectDirPanel extends JPanel
         configuredDir = new File(".").getAbsolutePath();
       }
       break;
+    case DATABASE_IMPORT:
+      configuredDir = getUsbFilePath(true, false);
+      if (configuredDir.isEmpty())
+      {
+        configuredDir = FileManager.getConfiguredProperties().getProperty(DATABASE_IMPORT_DIR_PROPERTY);
+      }
+      if (configuredDir == null)
+      {
+        configuredDir = new File(".").getAbsolutePath();
+      }
+      break;
     default:
       break;
     }
@@ -232,6 +244,9 @@ public class SelectDirPanel extends JPanel
               break;
             case FIX_CORRUPT_SAVEDSTATES:
               selectFixSavedStatesDirectory();
+              break;
+            case DATABASE_IMPORT:
+              selectDatabaseImportDirectory();
               break;
             default:
               break;
@@ -433,6 +448,31 @@ public class SelectDirPanel extends JPanel
       FileManager.getConfiguredProperties().put(FIX_SAVEDSTATES_DIR_PROPERTY, configuredDir);
       getDirTextField().setText(configuredDir);
     }
+  }
+  
+  private void selectDatabaseImportDirectory()
+  {
+    final JFileChooser fileChooser = new JFileChooser()
+    {
+      @Override
+      protected JDialog createDialog(Component parent) throws HeadlessException
+      {
+        //Set parent to the export dialog
+        JDialog dlg = super.createDialog(SwingUtilities.getAncestorOfClass(JDialog.class, SelectDirPanel.this));
+        return dlg;
+      }
+    };
+  fileChooser.setDialogTitle("Select the root directory for a PCUAE manager instance");
+  fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+  fileChooser.setCurrentDirectory(new File(configuredDir));
+  int value = fileChooser.showDialog(this, "OK");
+  if (value == JFileChooser.APPROVE_OPTION)
+  {
+    targetDirectory = fileChooser.getSelectedFile();
+    configuredDir = targetDirectory.toPath().toString();
+    FileManager.getConfiguredProperties().put(DATABASE_IMPORT_DIR_PROPERTY, configuredDir);
+    getDirTextField().setText(configuredDir);
+  }
   }
 
   public File getTargetDirectory()

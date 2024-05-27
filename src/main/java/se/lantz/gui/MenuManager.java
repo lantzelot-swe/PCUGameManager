@@ -3,9 +3,15 @@ package se.lantz.gui;
 import java.awt.Desktop;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
+import java.io.File;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -40,6 +46,8 @@ import se.lantz.gui.exports.ImportExportProgressDialog;
 import se.lantz.gui.exports.ImportExportProgressDialog.DIALOGTYPE;
 import se.lantz.gui.imports.CarouselImportWorker;
 import se.lantz.gui.imports.GamebaseImportWorker;
+import se.lantz.gui.imports.ImportDatabaseDialog;
+import se.lantz.gui.imports.ImportDatabaseWorker;
 import se.lantz.gui.imports.ImportOptionsDialog;
 import se.lantz.gui.imports.ImportProgressDialog;
 import se.lantz.gui.imports.ImportSavedStatesDialog;
@@ -95,6 +103,7 @@ public class MenuManager
 
   private InsetsMenuItem runGameItem;
   private InsetsMenuItem importCarouselItem;
+  private InsetsMenuItem importDbItem;
   private InsetsMenuItem importGamebaseItem;
   private InsetsMenuItem importSavedStatesItem;
   private InsetsMenuItem exportItem;
@@ -245,6 +254,7 @@ public class MenuManager
     importMenu.add(getImportCarouselItem());
     importMenu.add(getImportGamebaseItem());
     importMenu.add(getImportSavedStatesItem());
+    importMenu.add(getImportDbItem());
     exportMenu = new InsetsMenu("Export");
     exportMenu.setMnemonic('E');
     exportMenu.add(getExportItem());
@@ -547,6 +557,14 @@ public class MenuManager
     importCarouselItem.setMnemonic('I');
     importCarouselItem.addActionListener(e -> importCarouselGames());
     return importCarouselItem;
+  }
+
+  private InsetsMenuItem getImportDbItem()
+  {
+    importDbItem = new InsetsMenuItem("Import database...");
+    importDbItem.setMnemonic('D');
+    importDbItem.addActionListener(e -> importDatabase());
+    return importDbItem;
   }
 
   private InsetsMenuItem getImportGamebaseItem()
@@ -1423,6 +1441,97 @@ public class MenuManager
     }
   }
 
+  private void importDatabase()
+  {
+    ImportDatabaseDialog optionsDialog = new ImportDatabaseDialog(MainWindow.getInstance());
+    optionsDialog.pack();
+    optionsDialog.setLocationRelativeTo(MainWindow.getInstance());
+    if (optionsDialog.showDialog())
+    {
+      File importDir = optionsDialog.getImportDirectory();
+      //Check if it's a 2.x version or a 3.x version
+      if (Files.exists(importDir.toPath().resolve("games")))
+      {
+        //Version 2.x
+        try
+        {
+          String newDbName = "Imported ";
+          int index = 1;
+          while (uiModel.getAvailableDatabases().contains(newDbName + index))
+          {
+            index++;
+          }
+          newDbName = newDbName + index;
+          Path targetPath = Paths.get("./databases/").resolve(newDbName);
+          copyDb(importDir.toPath(), targetPath, newDbName);
+        }
+        catch (IOException e)
+        {
+          ExceptionHandler.handleException(e, "Could not copy main Db");
+        }
+      }
+      else if (Files.exists(importDir.toPath().resolve("databases")))
+      {
+        //Version 3.x
+        try
+        {
+          String[] directories = importDir.toPath().resolve("databases").toFile().list(new FilenameFilter() {
+            @Override
+            public boolean accept(File current, String name) {
+              return new File(current, name).isDirectory();
+            }
+          });
+          
+          String selectedDbDir = "";
+          
+          if (directories.length == 0)
+          {
+            //No database found          
+          }
+          else if (directories.length == 1)
+          {
+            selectedDbDir = directories[0];
+          }
+          else 
+          {
+            selectedDbDir = (String) JOptionPane.showInputDialog(MainWindow.getInstance(), "Select which database to import:", "Import database", JOptionPane.QUESTION_MESSAGE, null, directories, directories[1]);
+          }
+          
+          if (selectedDbDir != null && !selectedDbDir.isEmpty())
+          {
+            Path sourcePath = importDir.toPath().resolve("databases").resolve(selectedDbDir);
+            Path targetPath = Paths.get("./databases/").resolve(selectedDbDir);
+            if (Files.exists(targetPath))
+            {
+              String newDbName = selectedDbDir + " ";
+              int index = 2;
+              while (uiModel.getAvailableDatabases().contains(newDbName + index))
+              {
+                index++;
+              }
+              selectedDbDir = newDbName + index;
+              targetPath = Paths.get("./databases/").resolve(selectedDbDir);
+            }
+            copyDb(sourcePath, targetPath, selectedDbDir);
+          }      
+        }
+        catch (IOException e)
+        {
+          ExceptionHandler.handleException(e, "Could not copy Db");
+        }    
+      }
+    }
+  }
+  
+  private void copyDb(Path source, Path target, String dbName) throws IOException
+  {
+    ImportExportProgressDialog dialog =
+      new ImportExportProgressDialog(MainWindow.getInstance(), "Import database", DIALOGTYPE.IMPORT);
+    ImportDatabaseWorker worker = new ImportDatabaseWorker(dialog, source, target, dbName);
+    worker.execute();
+    dialog.setVisible(true);
+  }
+
   private void importGamebaseGames()
   {
     ImportOptionsDialog optionsDialog = new ImportOptionsDialog(MainWindow.getInstance(), false);
@@ -1621,6 +1730,11 @@ public class MenuManager
     restoreDialog.setLocationRelativeTo(MainWindow.getInstance());
     if (restoreDialog.showDialog())
     {
+      if (restoreDialog.getSelectedFolder().isEmpty())
+      {
+        return;
+      }
+
       restoreManager.setBackupFolderName(restoreDialog.getSelectedFolder());
       RestoreProgressDialog progressDialog = new RestoreProgressDialog(MainWindow.getInstance());
       RestoreWorker worker = new RestoreWorker(restoreManager, progressDialog);

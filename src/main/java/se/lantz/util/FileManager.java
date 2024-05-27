@@ -1520,7 +1520,7 @@ public class FileManager
       }
     });
   }
-
+  
   public static void deleteAllFolderContent()
   {
     deleteDirContent(new File(COVERS));
