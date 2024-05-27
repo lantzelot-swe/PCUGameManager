@@ -124,12 +124,12 @@ public class PCUAEManager
     try
     {
       Path mainDb = Paths.get("./databases/MainDb");
-      Files.move(Paths.get("./pcusb.db"), mainDb.resolve("pcusb.db"), StandardCopyOption.ATOMIC_MOVE);
-      Files.move(Paths.get("./games/"), mainDb.resolve("games"), StandardCopyOption.ATOMIC_MOVE);
-      Files.move(Paths.get("./screens/"), mainDb.resolve("screens"), StandardCopyOption.ATOMIC_MOVE);
-      Files.move(Paths.get("./covers/"), mainDb.resolve("covers"), StandardCopyOption.ATOMIC_MOVE);
-      Files.move(Paths.get("./saves/"), mainDb.resolve("saves"), StandardCopyOption.ATOMIC_MOVE);
-      Files.move(Paths.get("./extradisks/"), mainDb.resolve("extradisks"), StandardCopyOption.ATOMIC_MOVE);
+      Files.move(Paths.get("./pcusb.db"), mainDb.resolve("pcusb.db"), StandardCopyOption.REPLACE_EXISTING);
+      Files.move(Paths.get("./games/"), mainDb.resolve("games"), StandardCopyOption.REPLACE_EXISTING);
+      Files.move(Paths.get("./screens/"), mainDb.resolve("screens"), StandardCopyOption.REPLACE_EXISTING);
+      Files.move(Paths.get("./covers/"), mainDb.resolve("covers"), StandardCopyOption.REPLACE_EXISTING);
+      Files.move(Paths.get("./saves/"), mainDb.resolve("saves"), StandardCopyOption.REPLACE_EXISTING);
+      Files.move(Paths.get("./extradisks/"), mainDb.resolve("extradisks"), StandardCopyOption.REPLACE_EXISTING);
     }
     catch (IOException e)
     {
