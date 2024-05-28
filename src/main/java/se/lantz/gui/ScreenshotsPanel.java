@@ -23,7 +23,6 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
-import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
@@ -34,6 +33,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import se.lantz.gui.menu.InsetsMenuItem;
 import se.lantz.gui.screenshot.EditScreenshotDialog;
 import se.lantz.gui.screenshot.cover.EditCoverDialog;
 import se.lantz.model.InfoModel;
@@ -273,7 +273,7 @@ public class ScreenshotsPanel extends JPanel
   {
     if (!filename.isEmpty())
     {
-      File imagefile = new File("./covers/" + filename);
+      File imagefile = new File(FileManager.COVERS + filename);
       try
       {
         BufferedImage image = ImageIO.read(imagefile);
@@ -297,7 +297,7 @@ public class ScreenshotsPanel extends JPanel
     BufferedImage image = null;
     if (!filename.isEmpty())
     {
-      File imagefile = new File("./screens/" + filename);
+      File imagefile = new File(FileManager.SCREENS + filename);
       try
       {
         image = ImageIO.read(imagefile);
@@ -657,7 +657,7 @@ public class ScreenshotsPanel extends JPanel
           public void actionPerformed(ActionEvent arg0)
           {
             JPopupMenu menu = new JPopupMenu();
-            JMenuItem autoEditItem = new JMenuItem("Crop automatically to 320x200");
+            InsetsMenuItem autoEditItem = new InsetsMenuItem("Crop automatically to 320x200");
             autoEditItem.addActionListener(e -> {
               BufferedImage croppedImage = FileManager.cropImageTo320x200(currentScreen1Image);
               getScreen1ImageLabel().setIcon(new ImageIcon(croppedImage));
@@ -666,7 +666,7 @@ public class ScreenshotsPanel extends JPanel
             });
             menu.add(autoEditItem);
 
-            JMenuItem manEditItem = new JMenuItem("Crop manually...");
+            InsetsMenuItem manEditItem = new InsetsMenuItem("Crop manually...");
             manEditItem.addActionListener(e -> {
               EditScreenshotDialog dialog = new EditScreenshotDialog(currentScreen1Image);
               dialog.pack();
@@ -700,7 +700,7 @@ public class ScreenshotsPanel extends JPanel
           public void actionPerformed(ActionEvent arg0)
           {
             JPopupMenu menu = new JPopupMenu();
-            JMenuItem autoEditItem = new JMenuItem("Crop automatically to 320x200");
+            InsetsMenuItem autoEditItem = new InsetsMenuItem("Crop automatically to 320x200");
             autoEditItem.addActionListener(e -> {
               BufferedImage croppedImage = FileManager.cropImageTo320x200(currentScreen2Image);
               getScreen2ImageLabel().setIcon(new ImageIcon(croppedImage));
@@ -709,7 +709,7 @@ public class ScreenshotsPanel extends JPanel
             });
             menu.add(autoEditItem);
 
-            JMenuItem manEditItem = new JMenuItem("Crop manually...");
+            InsetsMenuItem manEditItem = new InsetsMenuItem("Crop manually...");
             manEditItem.addActionListener(e -> {
               EditScreenshotDialog dialog = new EditScreenshotDialog(currentScreen2Image);
               dialog.pack();
@@ -814,7 +814,7 @@ public class ScreenshotsPanel extends JPanel
         }
         else
         {
-          setEditButtonVisibility(returnImage, editButton);      
+          setEditButtonVisibility(returnImage, editButton);
         }
         imageLabel.setIcon(new ImageIcon(FileManager.scaleImageTo320x200x32bit(returnImage)));
       }

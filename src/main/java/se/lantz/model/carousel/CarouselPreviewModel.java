@@ -26,14 +26,15 @@ public class CarouselPreviewModel extends AbstractModel
 
   private GameDetails selectedGame = null;
 
-  private PropertyChangeListener selectedGameListViewListener = e -> SwingUtilities.invokeLater(() -> reloadCarousel());
+  private PropertyChangeListener reloadCarouselListener = e -> SwingUtilities.invokeLater(() -> reloadCarousel());
   private PropertyChangeListener selectedGameListener = e -> setSelectedGame(mainModel.getCurrentGameDetails());
   private PropertyChangeListener gameSavedListener = e -> gameSaved();
 
   public CarouselPreviewModel(MainViewModel mainModel)
   {
     this.mainModel = mainModel;
-    mainModel.addPropertyChangeListener("selectedGamelistView", selectedGameListViewListener);
+    mainModel.addPropertyChangeListener("selectedGamelistView", reloadCarouselListener);
+    mainModel.addPropertyChangeListener("databaseSelected", reloadCarouselListener);
     mainModel.addPropertyChangeListener("gameSelected", selectedGameListener);
     mainModel.addPropertyChangeListener("gameSaved", gameSavedListener);
 
@@ -128,7 +129,8 @@ public class CarouselPreviewModel extends AbstractModel
 
   public void dispose()
   {
-    mainModel.removePropertyChangeListener("selectedGamelistView", selectedGameListViewListener);
+    mainModel.removePropertyChangeListener("selectedGamelistView", reloadCarouselListener);
+    mainModel.removePropertyChangeListener("databaseSelected", reloadCarouselListener);
     mainModel.removePropertyChangeListener("gameSelected", selectedGameListener);
     mainModel.removePropertyChangeListener("gameSaved", gameSavedListener);
   }

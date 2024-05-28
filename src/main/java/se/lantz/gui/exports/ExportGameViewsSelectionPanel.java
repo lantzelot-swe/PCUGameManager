@@ -41,10 +41,10 @@ public class ExportGameViewsSelectionPanel extends JPanel
   private JButton exportButton;
   private JLabel infoLabel;
 
-  public ExportGameViewsSelectionPanel(JButton exportButton)
+  public ExportGameViewsSelectionPanel(JButton exportButton, String selectedDatabase)
   {
     this.exportButton = exportButton;
-    uiModel = new MainViewModel();
+    uiModel = new MainViewModel(selectedDatabase);
     if (!Beans.isDesignTime())
     {
       uiModel.initialize();

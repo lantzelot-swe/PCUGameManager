@@ -20,7 +20,6 @@ import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JList;
-import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
@@ -38,6 +37,7 @@ import org.jdesktop.swingx.JXSearchField;
 
 import se.lantz.gui.carousel.CarouselPreviewDialog;
 import se.lantz.gui.gameview.GameViewManager;
+import se.lantz.gui.menu.InsetsMenuItem;
 import se.lantz.model.GameListModel;
 import se.lantz.model.MainViewModel;
 import se.lantz.model.data.GameListData;
@@ -237,24 +237,24 @@ public class ListPanel extends JPanel
           public void actionPerformed(ActionEvent arg0)
           {
             JPopupMenu menu = new JPopupMenu();
-            JMenuItem addItem = new JMenuItem("Add gamelist view...");
+            InsetsMenuItem addItem = new InsetsMenuItem("Add gamelist view...");
             addItem.addActionListener(e -> gameViewManager.openViewEditDialog(new GameView(0)));
             menu.add(addItem);
             int gameListViewId = ((GameView) getListViewComboBox().getSelectedItem()).getGameViewId();
             if (gameListViewId > 0)
             {
-              JMenuItem editItem = new JMenuItem("Edit gamelist view...");
+              InsetsMenuItem editItem = new InsetsMenuItem("Edit gamelist view...");
               editItem.addActionListener(e -> gameViewManager
                 .openViewEditDialog((GameView) getListViewComboBox().getSelectedItem()));
               menu.add(editItem);
-              JMenuItem deleteItem = new JMenuItem("Delete gamelist view...");
+              InsetsMenuItem deleteItem = new InsetsMenuItem("Delete gamelist view...");
               deleteItem
                 .addActionListener(e -> gameViewManager.deleteView((GameView) getListViewComboBox().getSelectedItem()));
               menu.add(deleteItem);
             }
             else if (gameListViewId < -1)
             {
-              JMenuItem renameItem = new JMenuItem("Rename gamelist view...");
+              InsetsMenuItem renameItem = new InsetsMenuItem("Rename gamelist view...");
               renameItem.addActionListener(e -> gameViewManager
                 .renameFavoritesView((GameView) getListViewComboBox().getSelectedItem()));
               menu.add(renameItem);

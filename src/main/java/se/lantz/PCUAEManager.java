@@ -7,7 +7,9 @@ import java.awt.GraphicsEnvironment;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 
 import javax.swing.SwingUtilities;
 import javax.swing.ToolTipManager;
@@ -45,16 +47,29 @@ public class PCUAEManager
     {
       ExceptionHandler.handleException(e, "Startup failure");
     }
-    
+
     //Make sure all folders are available
     try
     {
-      Files.createDirectories(Paths.get("./screens/"));
-      Files.createDirectories(Paths.get("./covers/"));
-      Files.createDirectories(Paths.get("./games/"));
-      Files.createDirectories(Paths.get("./saves/"));
+      Files.createDirectories(Paths.get("./databases/"));
       Files.createDirectories(Paths.get("./pcuae-install/"));
-      Files.createDirectories(Paths.get("./extradisks/"));
+      
+      if (!Files.list(Paths.get("./databases/")).findAny().isPresent())
+      {
+        //Create a mainDb folder
+        Path mainDb = Paths.get("./databases/MainDb");
+        Files.createDirectories(mainDb.resolve("games"));
+        Files.createDirectories(mainDb.resolve("screens"));
+        Files.createDirectories(mainDb.resolve("covers"));
+        Files.createDirectories(mainDb.resolve("saves"));
+        Files.createDirectories(mainDb.resolve("extradisks"));
+      }
+
+      //Migrate to version 3.x if old structure is available
+      if (Paths.get("./games/").toFile().exists())
+      {
+        migrateDirectories();
+      }
     }
     catch (IOException e)
     {
@@ -69,8 +84,8 @@ public class PCUAEManager
       int width = gd.getDisplayMode().getWidth();
       int height = gd.getDisplayMode().getHeight();
 
-      mainWindow.setSize(Math.min(width, 1500), Math.min(height - 40, 825));
-      mainWindow.setMinimumSize(new Dimension(Math.min(width, 1300), Math.min(height - 40, 700)));
+      mainWindow.setSize(Math.min(width, 1500), Math.min(height - 40, 850));
+      mainWindow.setMinimumSize(new Dimension(Math.min(width, 1300), Math.min(height - 40, 725)));
       mainWindow.setLocationRelativeTo(null);
       mainWindow.initialize();
       mainWindow.setVisible(true);
@@ -79,7 +94,7 @@ public class PCUAEManager
       if (!FileManager.getPcuVersionFromManifest().isEmpty())
       {
         PreferencesModel prefModel = new PreferencesModel();
-        
+
         if (prefModel.isCheckManagerVersionAtStartup())
         {
           ManagerVersionChecker.fetchLatestVersionFromGithub();
@@ -104,4 +119,21 @@ public class PCUAEManager
     });
   }
 
+  private static void migrateDirectories()
+  {
+    try
+    {
+      Path mainDb = Paths.get("./databases/MainDb");
+      Files.move(Paths.get("./pcusb.db"), mainDb.resolve("pcusb.db"), StandardCopyOption.REPLACE_EXISTING);
+      Files.move(Paths.get("./games/"), mainDb.resolve("games"), StandardCopyOption.REPLACE_EXISTING);
+      Files.move(Paths.get("./screens/"), mainDb.resolve("screens"), StandardCopyOption.REPLACE_EXISTING);
+      Files.move(Paths.get("./covers/"), mainDb.resolve("covers"), StandardCopyOption.REPLACE_EXISTING);
+      Files.move(Paths.get("./saves/"), mainDb.resolve("saves"), StandardCopyOption.REPLACE_EXISTING);
+      Files.move(Paths.get("./extradisks/"), mainDb.resolve("extradisks"), StandardCopyOption.REPLACE_EXISTING);
+    }
+    catch (IOException e)
+    {
+      ExceptionHandler.handleException(e, "Could not move main Db");
+    }
+  }
 }

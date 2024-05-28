@@ -13,11 +13,13 @@ public class ExportGamesDialog extends BaseDialog
 {
   private ExportMainPanel panel;
   private boolean carouselMode;
+  private String selectedDatabase;
 
-  public ExportGamesDialog(Frame owner, boolean carouselMode)
+  public ExportGamesDialog(Frame owner, boolean carouselMode, String selectedDatabase)
   {
     super(owner);
     this.carouselMode = carouselMode;
+    this.selectedDatabase = selectedDatabase;
     setTitle(carouselMode ? "Export games to carousel" : "Export games to File loader");
     addContent(getExportGamesPanel());
     getOkButton().setText("Export");
@@ -29,7 +31,7 @@ public class ExportGamesDialog extends BaseDialog
   {
     if (panel == null)
     {
-      panel = new ExportMainPanel(getOkButton(), carouselMode);
+      panel = new ExportMainPanel(getOkButton(), carouselMode, selectedDatabase);
     }
     return panel;
   }

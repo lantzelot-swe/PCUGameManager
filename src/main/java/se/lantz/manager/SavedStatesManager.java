@@ -21,7 +21,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.imageio.ImageIO;
-import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 
 import org.apache.commons.io.FileUtils;
@@ -30,6 +29,7 @@ import org.slf4j.LoggerFactory;
 
 import se.lantz.gui.MainWindow;
 import se.lantz.gui.exports.PublishWorker;
+import se.lantz.gui.menu.InsetsMenuItem;
 import se.lantz.model.MainViewModel;
 import se.lantz.model.PreferencesModel;
 import se.lantz.model.SavedStatesModel;
@@ -41,8 +41,6 @@ import se.lantz.util.FileManager;
 public class SavedStatesManager
 {
   private static final Logger logger = LoggerFactory.getLogger(SavedStatesManager.class);
-
-  public static final String SAVES = "./saves/";
 
   private static final String MTA0 = "0.mta";
   private static final String MTA1 = "1.mta";
@@ -78,9 +76,9 @@ public class SavedStatesManager
    */
   private Map<String, Integer> savedStatesMap = new HashMap<>();
 
-  private JMenuItem palNtscFixMenuItem;
+  private InsetsMenuItem palNtscFixMenuItem;
 
-  public SavedStatesManager(MainViewModel model, JMenuItem palNtscFixMenuItem)
+  public SavedStatesManager(MainViewModel model, InsetsMenuItem palNtscFixMenuItem)
   {
     this.model = model;
     this.palNtscFixMenuItem = palNtscFixMenuItem;
@@ -111,18 +109,18 @@ public class SavedStatesManager
     //If the game has been renamed, make sure to rename the saves folder also
     String oldFileName = model.getInfoModel().getOldGamesFile();
     String newFileName = model.getInfoModel().getGamesFile();
-    File oldSaveFolder = new File(SAVES + getGameFolderName(oldFileName, model.getInfoModel().getTitle()));
+    File oldSaveFolder = new File(FileManager.SAVES + getGameFolderName(oldFileName, model.getInfoModel().getTitle()));
     if (!oldFileName.equals(newFileName) && oldSaveFolder.exists())
     {
       //Rename old folder to new name
-      oldSaveFolder.renameTo(new File(SAVES +
+      oldSaveFolder.renameTo(new File(FileManager.SAVES +
         getGameFolderName(model.getInfoModel().getGamesFile(), model.getInfoModel().getTitle())));
     }
 
     String fileName = model.getInfoModel().getGamesFile();
     String gameFolderName = getGameFolderName(fileName, model.getInfoModel().getTitle());
-    
-    Path saveFolder = new File(SAVES + gameFolderName).toPath();
+
+    Path saveFolder = new File(FileManager.SAVES + gameFolderName).toPath();
     int numberofSaves = 0;
     //Check which ones are available
     Path mta0Path = saveFolder.resolve(MTA0);
@@ -178,7 +176,7 @@ public class SavedStatesManager
     {
       fileName = fileName.trim();
       //Check if folder is available
-      Path saveFolder = new File(SAVES + fileName).toPath();
+      Path saveFolder = new File(FileManager.SAVES + fileName).toPath();
       if (Files.exists(saveFolder))
       {
         //Check which ones are available
@@ -330,7 +328,7 @@ public class SavedStatesManager
   {
     this.importDir = importDir;
   }
-  
+
   public void setFixDirectory(File fixDir)
   {
     this.fixDir = fixDir;
@@ -349,7 +347,7 @@ public class SavedStatesManager
   private void deleteSavedState(SAVESTATE state)
   {
     String fileName = getGameFolderName(model.getInfoModel().getGamesFile(), model.getInfoModel().getTitle());
-    Path saveFolder = new File(SAVES + fileName).toPath();
+    Path saveFolder = new File(FileManager.SAVES + fileName).toPath();
     try
     {
       switch (state)
@@ -399,7 +397,7 @@ public class SavedStatesManager
   public void exportSavedStates(PublishWorker worker)
   {
     noFilesCopied = 0;
-    File saveFolder = new File(SAVES);
+    File saveFolder = new File(FileManager.SAVES);
     try (Stream<Path> stream = Files.walk(saveFolder.toPath().toAbsolutePath()))
     {
       stream.forEachOrdered(sourcePath -> {
@@ -452,7 +450,7 @@ public class SavedStatesManager
   public void importSavedStates(PublishWorker worker)
   {
     noFilesCopied = 0;
-    File saveFolder = new File(SAVES);
+    File saveFolder = new File(FileManager.SAVES);
     try (Stream<Path> stream = Files.walk(importDir.toPath().toAbsolutePath()))
     {
       stream.forEachOrdered(sourcePath -> {
@@ -505,7 +503,7 @@ public class SavedStatesManager
     //Update model list after import
     model.getGameListModel().notifyChange();
   }
-  
+
   public void fixCorruptSavedStates(PublishWorker worker)
   {
     noSavedStatesFixed = 0;
@@ -519,12 +517,13 @@ public class SavedStatesManager
           {
             return;
           }
-          
+
           worker.publishMessage("Fixing " + sourcePath);
           //Read the mta file and keep track of the time
           String playTime = readPlayTime(sourcePath);
           //Copy the template file 
-          FileUtils.copyInputStreamToFile(getClass().getResourceAsStream("/se/lantz/template.mta"), sourcePath.toFile());
+          FileUtils.copyInputStreamToFile(getClass().getResourceAsStream("/se/lantz/template.mta"),
+                                          sourcePath.toFile());
           //Write the time from the old file
           storePlayTime(sourcePath, playTime);
           noSavedStatesFixed++;
@@ -547,7 +546,7 @@ public class SavedStatesManager
     PathMatcher matcher = FileSystems.getDefault().getPathMatcher("glob:**.{mta,png,vsz}");
     return matcher.matches(path) || path.toFile().isDirectory();
   }
-  
+
   private boolean isValidSaveStateMtaFilePath(Path path)
   {
     PathMatcher matcher = FileSystems.getDefault().getPathMatcher("glob:**.{mta}");
@@ -558,7 +557,7 @@ public class SavedStatesManager
   {
     return noFilesCopied;
   }
-  
+
   public int getNumberOfFixedSavedStates()
   {
     return noSavedStatesFixed;
@@ -568,7 +567,7 @@ public class SavedStatesManager
   {
     savedStatesMap.clear();
     //Read all files in the saves folder
-    File saveFolder = new File(SAVES);
+    File saveFolder = new File(FileManager.SAVES);
     try (Stream<Path> stream = Files.walk(saveFolder.toPath().toAbsolutePath(), 1))
     {
       stream.forEachOrdered(sourcePath -> {
@@ -634,7 +633,8 @@ public class SavedStatesManager
       if (!fileName.isEmpty() && fileName.contains(".vsf"))
       {
         //Check if folder is available
-        Path saveFolder = new File(SAVES + getGameFolderName(fileName, model.getInfoModel().getTitle())).toPath();
+        Path saveFolder =
+          new File(FileManager.SAVES + getGameFolderName(fileName, model.getInfoModel().getTitle())).toPath();
         if (Files.exists(saveFolder))
         {
           //Check which ones are available
@@ -654,7 +654,8 @@ public class SavedStatesManager
     String gamesFile = model.getInfoModel().getGamesFile();
     Path gameFilePath = new File(FileManager.GAMES + gamesFile).toPath();
     Path firstSavedStatePath =
-      new File(SAVES + getGameFolderName(gamesFile, model.getInfoModel().getTitle())).toPath().resolve(VSZ0);
+      new File(FileManager.SAVES + getGameFolderName(gamesFile, model.getInfoModel().getTitle())).toPath()
+        .resolve(VSZ0);
 
     Path tempFilePath = new File(FileManager.GAMES + "temp.gz").toPath();
     try
@@ -709,7 +710,7 @@ public class SavedStatesManager
 
   public void convertToCarousel152Version()
   {
-    File saveFolder = new File(SAVES);
+    File saveFolder = new File(FileManager.SAVES);
     try (Stream<Path> stream = Files.walk(saveFolder.toPath().toAbsolutePath(), 1))
     {
       stream.forEachOrdered(sourcePath -> {
@@ -798,7 +799,7 @@ public class SavedStatesManager
   {
     //1. look through all folders and try to find a game in the db that matches the file name.
     //2. for all that matches, get the title and copy the existing folder to a folder named as the title 
-    File saveFolder = new File(SAVES);
+    File saveFolder = new File(FileManager.SAVES);
     try (Stream<Path> stream = Files.walk(saveFolder.toPath().toAbsolutePath(), 1))
     {
       List<GameValidationDetails> allGamesDetailsList = this.model.getDbConnector().fetchAllGamesForDbValdation();
@@ -872,7 +873,7 @@ public class SavedStatesManager
 
   public int checkFor132SavedStates()
   {
-    File saveFolder = new File(SAVES);
+    File saveFolder = new File(FileManager.SAVES);
     long returnValue = 0;
     try (Stream<Path> stream = Files.walk(saveFolder.toPath().toAbsolutePath(), 1))
     {
@@ -902,7 +903,7 @@ public class SavedStatesManager
   {
     //1. look through all folders and try to find a game in the db that matches the file name.
     //2. for all that matches, get the title and check so that no folder exists already 
-    File saveFolder = new File(SAVES);
+    File saveFolder = new File(FileManager.SAVES);
     try (Stream<Path> stream = Files.walk(saveFolder.toPath().toAbsolutePath(), 1))
     {
       List<GameValidationDetails> allGamesDetailsList = this.model.getDbConnector().fetchAllGamesForDbValdation();

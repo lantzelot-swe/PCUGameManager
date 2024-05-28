@@ -32,6 +32,7 @@ import org.slf4j.LoggerFactory;
 import se.lantz.gui.MainWindow;
 import se.lantz.model.carousel.CarouselPreviewModel;
 import se.lantz.model.data.GameDetails;
+import se.lantz.util.FileManager;
 
 public class CoverPanel extends JPanel
 {
@@ -279,7 +280,7 @@ public class CoverPanel extends JPanel
   private void loadScreen(GameLabel label, GameDetails game)
   {
     String filename = game.getCover();
-    File imagefile = new File("./covers/" + filename);
+    File imagefile = new File(FileManager.COVERS + filename);
     try
     {
       BufferedImage image = ImageIO.read(imagefile);
@@ -296,7 +297,7 @@ public class CoverPanel extends JPanel
   private void loadScreenForBorder(GameLabel label, GameDetails game)
   {
     String filename = game.getCover();
-    File imagefile = new File("./covers/" + filename);
+    File imagefile = new File(FileManager.COVERS + filename);
     try
     {
       BufferedImage image = ImageIO.read(imagefile);

@@ -842,17 +842,17 @@ public class ImportManager
       logger.debug("RowData = {}", dbRowData);
 
       Path coverPath = srcCoversFolder.resolve(oldCoverName);
-      Path targetCoverPath = Paths.get("./covers/" + coverName);
+      Path targetCoverPath = Paths.get(FileManager.COVERS + coverName);
 
       Path screens1Path = srcScreensFolder.resolve(oldScreen1Name);
-      Path targetScreen1Path = Paths.get("./screens/" + screen1Name);
+      Path targetScreen1Path = Paths.get(FileManager.SCREENS + screen1Name);
 
       Path screens2Path = srcScreensFolder.resolve(oldScreen2Name);
-      Path targetScreen2Path = Paths.get("./screens/" + screen2Name);
+      Path targetScreen2Path = Paths.get(FileManager.SCREENS + screen2Name);
 
       Path gamePath = srcGamesFolder.resolve(oldGameName);
 
-      Path targetGamePath = Paths.get("./games/" + gameName);
+      Path targetGamePath = Paths.get(FileManager.GAMES + gameName);
 
       if (gamebaseImport)
       {
@@ -971,7 +971,7 @@ public class ImportManager
     if (!sourcePath.isEmpty())
     {
       Path diskPath = new File(sourcePath).toPath();
-      Path diskTargetPath = Paths.get("./extradisks/" + targetName);
+      Path diskTargetPath = Paths.get(FileManager.DISKS + targetName);
       worker.publishMessage("Copying extra disk " + index + " from " + diskPath.toString() + " to " +
         diskTargetPath.toString());
       try

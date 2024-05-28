@@ -2,18 +2,18 @@ package se.lantz.manager.pcuae;
 
 import java.io.File;
 
-import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 
 import se.lantz.gui.MainWindow;
+import se.lantz.gui.menu.InsetsMenuItem;
 
 public class PCUAEInstallManager extends BaseInstallManager
 {
   private static final String PRODUCT_NAME = "PCUAE";
 
-  private JMenuItem exportMenuItem;
+  private InsetsMenuItem exportMenuItem;
 
-  public PCUAEInstallManager(JMenuItem exportMenuItem)
+  public PCUAEInstallManager(InsetsMenuItem exportMenuItem)
   {
     this.exportMenuItem = exportMenuItem;
   }

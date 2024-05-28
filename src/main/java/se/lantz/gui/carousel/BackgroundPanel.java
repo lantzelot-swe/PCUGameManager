@@ -24,6 +24,7 @@ import javax.swing.Timer;
 
 import se.lantz.gui.MainWindow;
 import se.lantz.model.carousel.CarouselPreviewModel;
+import se.lantz.util.FileManager;
 
 public class BackgroundPanel extends JPanel
 {
@@ -146,7 +147,7 @@ public class BackgroundPanel extends JPanel
     BufferedImage image = null;
     if (!filename.isEmpty())
     {
-      File imagefile = new File("./screens/" + filename);
+      File imagefile = new File(FileManager.SCREENS + filename);
       try
       {
         image = ImageIO.read(imagefile);

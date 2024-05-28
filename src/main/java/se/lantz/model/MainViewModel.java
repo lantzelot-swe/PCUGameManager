@@ -8,10 +8,18 @@ import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Properties;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.SwingUtilities;
@@ -28,11 +36,14 @@ import se.lantz.model.data.GameListData;
 import se.lantz.model.data.GameView;
 import se.lantz.scraper.MobyGamesScraper;
 import se.lantz.scraper.Scraper;
+import se.lantz.util.ExceptionHandler;
 import se.lantz.util.FileManager;
 import se.lantz.util.TextComponentSupport;
 
 public class MainViewModel extends AbstractModel
 {
+  public static final String DB_TAB_ORDER = "dbTabOrder";
+
   private static final Logger logger = LoggerFactory.getLogger(MainViewModel.class);
 
   DbConnector dbConnector;
@@ -81,9 +92,96 @@ public class MainViewModel extends AbstractModel
   Scraper scraper = new MobyGamesScraper();
 
   private int numberOfFavoritesViews = 10;
-  
+
   private boolean notifyGameListChange = true;
   private boolean notifyGameSelected = true;
+
+  private List<String> availableDatabases = new ArrayList<>();
+  private String selectedDatabase = "Main";
+
+  public MainViewModel()
+  {
+    //Read available databases and preferences for them
+    try (Stream<Path> stream = Files.list(Paths.get("./databases")))
+    {
+      availableDatabases = stream.filter(file -> Files.isDirectory(file)).map(Path::getFileName).map(Path::toString)
+        .collect(Collectors.toList());
+    }
+    catch (IOException ex)
+    {
+      ExceptionHandler.handleException(ex, "Could not read databases");
+    }
+
+    if (availableDatabases.isEmpty())
+    {
+      try
+      {
+        //We need at least one database. Create a "MainDb" folder with an empty db
+        addTab("MainDb");
+      }
+      catch (IOException e)
+      {
+        ExceptionHandler.handleException(e, "Could not create MainDb");
+      }
+    }
+    else
+    {
+      //Read preferences for tab order
+      Properties configuredProperties = FileManager.getConfiguredProperties();
+      String tabOrder = (String) configuredProperties.get(DB_TAB_ORDER);
+      if (tabOrder != null)
+      {
+        List<String> preferencesOrder = Arrays.asList(tabOrder.split("\\s*,\\s*"));
+
+        Collections.sort(availableDatabases, Comparator.comparing(item -> preferencesOrder.indexOf(item)));
+      }
+
+      selectedDatabase = availableDatabases.get(0);
+      FileManager.setCurrentDbFolder(selectedDatabase);
+      DbConnector.setCurrentDbFolder(selectedDatabase);
+    }
+  }
+
+  /**
+   * Used from export dialog
+   * 
+   * @param currentDatabase The current DB in the main instance of the model
+   */
+  public MainViewModel(String currentDatabase)
+  {
+    selectedDatabase = currentDatabase;
+  }
+
+  public void updateDbTabPreferences(String prefValue)
+  {
+    Properties configuredProperties = FileManager.getConfiguredProperties();
+    configuredProperties.put(DB_TAB_ORDER, prefValue);
+  }
+
+  public void renameTab(String oldName, String newName) throws IOException
+  {
+    Path source = Paths.get("./databases" + "/" + oldName);
+    Files.move(source, source.resolveSibling(newName));
+    selectedDatabase = newName;
+    availableDatabases.set(availableDatabases.indexOf(oldName), newName);
+    FileManager.setCurrentDbFolder(selectedDatabase);
+    DbConnector.setCurrentDbFolder(selectedDatabase);
+  }
+
+  public void deleteTab(String dbName) throws IOException
+  {
+    availableDatabases.remove(dbName);
+
+    Path source = Paths.get("./databases" + "/" + dbName);
+
+    Files.walk(source).sorted(Comparator.reverseOrder()).map(Path::toFile).forEach(File::delete);
+  }
+
+  public void addTab(String name) throws IOException
+  {
+    FileManager.createNewDb(name);
+    availableDatabases.add(name);
+  }
 
   public void setSavedStatesManager(SavedStatesManager savedStatesManager)
   {
@@ -98,7 +196,9 @@ public class MainViewModel extends AbstractModel
   public void initialize()
   {
     logger.debug("Creating DBConnector...");
-    dbConnector = new DbConnector();
+    //Pass the selected db here
+    dbConnector = new DbConnector(availableDatabases);
+    DbConnector.setCurrentDbFolder(selectedDatabase);
     logger.debug("...done.");
     setupGameViews();
 
@@ -237,7 +337,7 @@ public class MainViewModel extends AbstractModel
       gameViewModel.setSelectedItem(gameViewModel.getElementAt(gameViewModel.getSize() - 1));
     }
     //Do with invokeLater since it's used when selecting a game also
-    SwingUtilities.invokeLater(() -> notifyGameSelected = true);   
+    SwingUtilities.invokeLater(() -> notifyGameSelected = true);
     //Finish by selecting all games view again
     gameViewModel.setSelectedItem(allGameView);
     notifyGameListChange = true;
@@ -635,7 +735,7 @@ public class MainViewModel extends AbstractModel
     getSavedStatesModel().addPropertyChangeListener(saveChangeListener);
   }
 
-  public void addRequireFieldsListener(PropertyChangeListener requiredFieldsListener)
+  public void addRequiredFieldsListener(PropertyChangeListener requiredFieldsListener)
   {
     this.requiredFieldsListener = requiredFieldsListener;
   }
@@ -1274,5 +1374,26 @@ public class MainViewModel extends AbstractModel
   public GameDetails getCurrentGameDetails()
   {
     return this.currentGameDetails;
+  }
+
+  public List<String> getAvailableDatabases()
+  {
+    return availableDatabases;
+  }
+
+  public void setCurrentDatabase(String database)
+  {
+    selectedDatabase = database;
+    //Update all
+    FileManager.setCurrentDbFolder(selectedDatabase);
+    DbConnector.setCurrentDbFolder(selectedDatabase);
+    stateManager.readSavedStatesAndUpdateMap();
+    reloadGameViews();
+    this.notifyChange("databaseSelected", null, database);
+  }
+
+  public String getCurrentDatabase()
+  {
+    return selectedDatabase;
   }
 }
