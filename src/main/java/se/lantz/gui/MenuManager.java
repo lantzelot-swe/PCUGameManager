@@ -654,6 +654,8 @@ public class MenuManager
           return;
         }
       }
+      //Save current gamelist views to keep track of game count
+      uiModel.saveCurrentGamelistViews();
       //Save properties before exit
       FileManager.storeProperties();
       Future<?> deleteTempFolder = FileManager.deleteTempFolder();
@@ -1435,7 +1437,7 @@ public class MenuManager
       worker.execute();
       dialog.setVisible(true);
       //Refresh game views after import
-      uiModel.reloadGameViews();
+      uiModel.reloadGameViews(true);
       MainWindow.getInstance().selectViewAfterRestore();
       MainWindow.getInstance().repaintAfterModifications();
     }
@@ -1552,7 +1554,7 @@ public class MenuManager
         worker.execute();
         dialog.setVisible(true);
         //Refresh game views after import
-        uiModel.reloadGameViews();
+        uiModel.reloadGameViews(true);
         MainWindow.getInstance().selectViewAfterRestore();
         MainWindow.getInstance().repaintAfterModifications();
         MainWindow.getInstance().refreshMenuAndUI();
@@ -1694,7 +1696,7 @@ public class MenuManager
       //Update favorites menu
       MainWindow.getInstance().refreshMenuAndUI();
       //Refresh game views
-      uiModel.reloadGameViews();
+      uiModel.reloadGameViews(false);
       //Set all games as selected
       uiModel.setSelectedGameView(null);
     }
@@ -1709,7 +1711,7 @@ public class MenuManager
   {
     MainWindow.getInstance().setWaitCursor(true);
     //Refresh game views
-    uiModel.reloadGameViews();
+    uiModel.reloadGameViews(true);
     MainWindow.getInstance().getMainPanel().getListPanel().clearFilter();
     MainWindow.getInstance().refreshMenuAndUI();
     MainWindow.getInstance().setWaitCursor(false);
@@ -1741,7 +1743,7 @@ public class MenuManager
       worker.execute();
       progressDialog.setVisible(true);
       //Trigger a reload of game views
-      uiModel.reloadGameViews();
+      uiModel.reloadGameViews(true);
       MainWindow.getInstance().selectViewAfterRestore();
     }
   }
@@ -1869,7 +1871,7 @@ public class MenuManager
         //Refresh after converting
         MainWindow.getInstance().refreshMenuAndUI();
         //Refresh game views
-        uiModel.reloadGameViews();
+        uiModel.reloadGameViews(false);
         //Set all games as selected
         uiModel.setSelectedGameView(null);
       }
@@ -1914,7 +1916,7 @@ public class MenuManager
         //Refresh after converting
         MainWindow.getInstance().refreshMenuAndUI();
         //Refresh game views
-        uiModel.reloadGameViews();
+        uiModel.reloadGameViews(false);
         //Set all games as selected
         uiModel.setSelectedGameView(null);
       }

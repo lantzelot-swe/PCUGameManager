@@ -127,6 +127,8 @@ public class DbConnector
     addLanguageAndDuplicateColumnsIfMissing();
     //To be backwards compatible with 2.8.2 db, update if missing
     addDiskColumnsIfMissing();
+    //Add file info for gamelist views if missing
+    addFileColumnsForGameViewsIfMissing();
   }
 
   public static void setCurrentDbFolder(String dbFolder)
@@ -298,6 +300,50 @@ public class DbConnector
     catch (SQLException e)
     {
       ExceptionHandler.handleException(e, "Could not update db for Disk columns");
+    }
+  }
+
+  private void addFileColumnsForGameViewsIfMissing()
+  {
+    String tableInfoSql = "PRAGMA table_info(gameview)";
+    String gameCountSql = "ALTER TABLE gameview ADD COLUMN gamecount INTEGER DEFAULT -1;";
+    String fileCountSql = "ALTER TABLE gameview ADD COLUMN filecount INTEGER DEFAULT -1;";
+
+    try (Connection conn = this.connect(); PreparedStatement stmnt = conn.prepareStatement(tableInfoSql);
+      ResultSet rs = stmnt.executeQuery(); Statement gameCountstmnt = conn.createStatement();
+      Statement fileCountstmnt = conn.createStatement())
+    {
+      boolean gameCountAvailable = false;
+      boolean fileCountAvailable = false;
+      while (rs.next())
+      {
+        //Check if one of the language columns are available
+        if (rs.getString("Name").equals("gamecount"))
+        {
+          gameCountAvailable = true;
+        }
+        if (rs.getString("Name").equals("filecount"))
+        {
+          fileCountAvailable = true;
+        }
+      }
+
+      if (!gameCountAvailable)
+      {
+        logger.debug("gamecount column is missing in the database, adding column.");
+        gameCountstmnt.executeUpdate(gameCountSql);
+        logger.debug("gamecount column added.");
+      }
+      if (!fileCountAvailable)
+      {
+        logger.debug("filecount column is missing in the database, adding column.");
+        fileCountstmnt.executeUpdate(fileCountSql);
+        logger.debug("filecount column added.");
+      }
+    }
+    catch (SQLException e)
+    {
+      ExceptionHandler.handleException(e, "Could not update db for gameview columns");
     }
   }
 
@@ -596,6 +642,8 @@ public class DbConnector
       {
         GameView gameView = new GameView(rs.getInt("viewId"));
         gameView.setName(rs.getString("name"));
+        gameView.setGameCount(rs.getInt("gamecount"));
+        gameView.setFileCount(rs.getInt("filecount"));
         //Fetch all filters       
         List<ViewFilter> viewFilters = new ArrayList<>();
 
@@ -626,6 +674,14 @@ public class DbConnector
     return viewList;
   }
 
+  public void saveCurrentGamelistViews(List<GameView> viewList)
+  {
+    for (GameView gameView : viewList)
+    {
+      saveGameView(gameView);
+    }
+  }
+
   /**
    * Creates new db entry for a GameView with gameViewId == 0, or updates an existing entry with the new data.
    * 
@@ -644,15 +700,25 @@ public class DbConnector
     {
       sqlBuilder.append("UPDATE gameview SET name = \"");
       sqlBuilder.append(view.getName());
-      sqlBuilder.append("\" WHERE viewId = ");
+      sqlBuilder.append("\",");
+      sqlBuilder.append("gamecount = ");
+      sqlBuilder.append(view.getGameCount());
+      sqlBuilder.append(",");
+      sqlBuilder.append("filecount = ");
+      sqlBuilder.append(view.getFileCount());
+      sqlBuilder.append(" WHERE viewId = ");
       sqlBuilder.append(view.getGameViewId());
       sqlBuilder.append(";");
     }
     else
     {
-      sqlBuilder.append("INSERT INTO gameview (name) VALUES (\"");
+      sqlBuilder.append("INSERT INTO gameview (name, gamecount, filecount) VALUES (\"");
       sqlBuilder.append(view.getName());
-      sqlBuilder.append("\");");
+      sqlBuilder.append("\",");
+      sqlBuilder.append(view.getGameCount());
+      sqlBuilder.append(",");
+      sqlBuilder.append(view.getFileCount());
+      sqlBuilder.append(");");
     }
     String gameViewsql = sqlBuilder.toString();
     logger.debug("gameViewsql:\n{}", gameViewsql);

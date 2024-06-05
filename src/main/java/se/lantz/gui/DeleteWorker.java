@@ -54,7 +54,7 @@ public class DeleteWorker extends SwingWorker<Void, String>
     if (!typeOfDelete.equals(TYPE_OF_DELETE.VIEW))
     {
       //Trigger a reload of game views
-      model.reloadGameViews();
+      model.reloadGameViews(true);
       MainWindow.getInstance().selectViewAfterRestore();
     }
     MainWindow.getInstance().getMainPanel().repaintAfterModifications();

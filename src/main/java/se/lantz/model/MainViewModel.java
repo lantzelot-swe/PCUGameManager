@@ -98,6 +98,8 @@ public class MainViewModel extends AbstractModel
 
   private List<String> availableDatabases = new ArrayList<>();
   private String selectedDatabase = "Main";
+  
+  private List<GameView> currentGameViewList;
 
   public MainViewModel()
   {
@@ -200,7 +202,7 @@ public class MainViewModel extends AbstractModel
     dbConnector = new DbConnector(availableDatabases);
     DbConnector.setCurrentDbFolder(selectedDatabase);
     logger.debug("...done.");
-    setupGameViews();
+    setupGameViews(false);
 
     joy1Model.setPrimaryChangeListener(e -> joy2Model
       .setPrimaryWithoutListenerNotification(!Boolean.valueOf(e.getActionCommand())));
@@ -237,7 +239,7 @@ public class MainViewModel extends AbstractModel
     stateModel.notifyChange();
   }
 
-  private void setupGameViews()
+  private void setupGameViews(boolean updateGameCount)
   {
     notifyGameListChange = false;
     notifyGameSelected = false;
@@ -320,22 +322,23 @@ public class MainViewModel extends AbstractModel
       favorites10View.setSqlQuery("WHERE Favorite = 10");
       gameViewModel.addElement(favorites10View);
     }
+    
+    //Select the last favorites to get count on all (not sure why that works...)
+    gameViewModel.setSelectedItem(gameViewModel.getElementAt(gameViewModel.getSize() - 1));
 
-    List<GameView> gameViewList = dbConnector.loadGameViews();
-    Collections.sort(gameViewList);
+    currentGameViewList = dbConnector.loadGameViews();
+    Collections.sort(currentGameViewList);
 
-    for (GameView gameView : gameViewList)
+    for (GameView gameView : currentGameViewList)
     {
       gameViewModel.addElement(gameView);
-      //Select each gameview to load all games so that the game count is shown directly (may be a performance issue?)
-      gameViewModel.setSelectedItem(gameView);
+      if (updateGameCount || gameView.getGameCount() < 0)
+      {
+        //Select each gameview to load all games so that the game count is shown directly (may be a performance issue?)
+        gameViewModel.setSelectedItem(gameView);
+      }
     }
 
-    if (gameViewList.isEmpty())
-    {
-      //Select the last favorites to get count on all (not sure why that works...)
-      gameViewModel.setSelectedItem(gameViewModel.getElementAt(gameViewModel.getSize() - 1));
-    }
     //Do with invokeLater since it's used when selecting a game also
     SwingUtilities.invokeLater(() -> notifyGameSelected = true);
     //Finish by selecting all games view again
@@ -343,10 +346,10 @@ public class MainViewModel extends AbstractModel
     notifyGameListChange = true;
   }
 
-  public void reloadGameViews()
+  public void reloadGameViews(boolean updateGameCount)
   {
     gameViewModel.removeAllElements();
-    setupGameViews();
+    setupGameViews(updateGameCount);
   }
 
   public GameListModel getGameListModel()
@@ -1383,13 +1386,21 @@ public class MainViewModel extends AbstractModel
 
   public void setCurrentDatabase(String database)
   {
+    //Save the game count for the current gamelist views when switching database
+    saveCurrentGamelistViews();
+    
     selectedDatabase = database;
     //Update all
     FileManager.setCurrentDbFolder(selectedDatabase);
     DbConnector.setCurrentDbFolder(selectedDatabase);
     stateManager.readSavedStatesAndUpdateMap();
-    reloadGameViews();
+    reloadGameViews(false);
     this.notifyChange("databaseSelected", null, database);
+  }
+  
+  public void saveCurrentGamelistViews()
+  {
+    dbConnector.saveCurrentGamelistViews(currentGameViewList);
   }
 
   public String getCurrentDatabase()
