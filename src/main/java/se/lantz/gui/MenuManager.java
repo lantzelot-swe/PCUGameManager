@@ -71,6 +71,7 @@ import se.lantz.manager.pcuae.MSXModeInstallManager;
 import se.lantz.manager.pcuae.PCUAEInstallManager;
 import se.lantz.manager.pcuae.PlaystationModeInstallManager;
 import se.lantz.manager.pcuae.RetroarchModeInstallManager;
+import se.lantz.manager.pcuae.SNESModeInstallManager;
 import se.lantz.manager.pcuae.ScummVMModeInstallManager;
 import se.lantz.manager.pcuae.SegaModeInstallManager;
 import se.lantz.manager.pcuae.ViceModeInstallManager;
@@ -163,6 +164,7 @@ public class MenuManager
   private InsetsMenuItem installMSXModeItem;
   private InsetsMenuItem installDosModeItem;
   private InsetsMenuItem installSegaModeItem;
+  private InsetsMenuItem installSnesModeItem;
   private InsetsMenuItem installPlaystationModeItem;
   private InsetsMenuItem installZesaruxModeItem;
   private InsetsMenuItem deleteInstallFilesItem;
@@ -191,6 +193,7 @@ public class MenuManager
   private MSXModeInstallManager installMSXManager;
   private DosModeInstallManager installDosManager;
   private SegaModeInstallManager installSegaManager;
+  private SNESModeInstallManager installSnesManager;
   private PlaystationModeInstallManager installPlaystationManager;
   private ZesaruxModeInstallManager installZesaruxManager;
   private int currentFavoritesCount = 10;
@@ -216,6 +219,7 @@ public class MenuManager
     this.installMSXManager = new MSXModeInstallManager();
     this.installDosManager = new DosModeInstallManager();
     this.installSegaManager = new SegaModeInstallManager();
+    this.installSnesManager = new SNESModeInstallManager();
     this.installPlaystationManager = new PlaystationModeInstallManager();
     this.installZesaruxManager = new ZesaruxModeInstallManager();
     uiModel.setSavedStatesManager(savedStatesManager);
@@ -310,6 +314,7 @@ public class MenuManager
     pcuaeModeMenu.add(getInstallMSXModeItem());
     pcuaeModeMenu.add(getInstallDosModeItem());
     pcuaeModeMenu.add(getInstallSegaModeItem());
+    pcuaeModeMenu.add(getInstallSnesModeItem());
     pcuaeModeMenu.add(getInstallPlaystationModeItem());
     pcuaeModeMenu.add(getInstallZesaruxModeItem());
     pcuaeMenu.add(pcuaeModeMenu);
@@ -534,7 +539,7 @@ public class MenuManager
     runGameItem.setAccelerator(keyStrokeToRunGame);
     runGameItem.setMnemonic('R');
 
-    runGameItem.addActionListener(e -> MainWindow.getInstance().getMainPanel().runCurrentGame());
+    runGameItem.addActionListener(e -> MainWindow.getInstance().getMainPanel().runCurrentGame(false));
     return runGameItem;
   }
 
@@ -1286,6 +1291,17 @@ public class MenuManager
       installSegaModeItem.addActionListener(e -> installSegaMode());
     }
     return installSegaModeItem;
+  }
+  
+  private InsetsMenuItem getInstallSnesModeItem()
+  {
+    if (installSnesModeItem == null)
+    {
+      installSnesModeItem = new InsetsMenuItem("Install SNES mode...");
+      installSnesModeItem.setMnemonic('e');
+      installSnesModeItem.addActionListener(e -> installSnesMode());
+    }
+    return installSnesModeItem;
   }
 
   private InsetsMenuItem getInstallPlaystationModeItem()
@@ -2044,6 +2060,11 @@ public class MenuManager
   private void installSegaMode()
   {
     installSegaManager.installSegaMode();
+  }
+  
+  private void installSnesMode()
+  {
+    installSnesManager.installSnesMode();
   }
 
   private void installPlaystationMode()

@@ -43,7 +43,7 @@ public abstract class BaseInstallManager implements AWTEventListener
   public static final String INSTALL_FOLDER = "./pcuae-install/";
 
   protected static final String PCUAE_INSTALL_NAME = "pcuae";
-  protected static final String PCUAE_MAIN_INSTALL_NAME = "main";
+  protected static final String PCUAE_MAIN_INSTALL_NAME = "cbm";
   protected static final String AMIGA_MODE_INSTALL_NAME = "amiga-mode";
   protected static final String ATARI_MODE_INSTALL_NAME = "atari-mode";
   protected static final String LINUX_MODE_INSTALL_NAME = "linux-mode";
@@ -54,6 +54,7 @@ public abstract class BaseInstallManager implements AWTEventListener
 
   protected static final String DOS_MODE_INSTALL_NAME = "dos-mode";
   protected static final String SEGA_MODE_INSTALL_NAME = "sega-mode";
+  protected static final String SNES_MODE_INSTALL_NAME = "snes-mode";
   protected static final String PLAYSTATION_MODE_INSTALL_NAME = "playstation-mode";
   protected static final String ZESARUX_MODE_INSTALL_NAME = "zesarux-mode";
 
@@ -167,8 +168,9 @@ public abstract class BaseInstallManager implements AWTEventListener
               name.contains(LINUX_MODE_INSTALL_NAME) || name.contains(RETROARCH_MODE_INSTALL_NAME) ||
               name.contains(VICE_MODE_INSTALL_NAME) || name.contains(SCUMMVM_MODE_INSTALL_NAME) ||
               name.contains(MSX_COLECO_MODE_INSTALL_NAME) || name.contains(DOS_MODE_INSTALL_NAME) ||
-              name.contains(SEGA_MODE_INSTALL_NAME) || name.contains(PLAYSTATION_MODE_INSTALL_NAME) ||
-              name.contains(ZESARUX_MODE_INSTALL_NAME)) && name.endsWith(".exe");
+              name.contains(SEGA_MODE_INSTALL_NAME) || name.contains(SNES_MODE_INSTALL_NAME) ||
+              name.contains(PLAYSTATION_MODE_INSTALL_NAME) || name.contains(ZESARUX_MODE_INSTALL_NAME)) &&
+              name.endsWith(".exe");
           }
           else
           {
@@ -303,6 +305,15 @@ public abstract class BaseInstallManager implements AWTEventListener
             break;
           }
 
+          case SNES_MODE_INSTALL_NAME:
+          {
+            if (assetName.contains(SNES_MODE_INSTALL_NAME))
+            {
+              downloadUrl = asset.getAsJsonObject().get("browser_download_url").getAsString();
+            }
+            break;
+          }
+
           case PLAYSTATION_MODE_INSTALL_NAME:
           {
             if (assetName.contains(PLAYSTATION_MODE_INSTALL_NAME))
@@ -327,8 +338,8 @@ public abstract class BaseInstallManager implements AWTEventListener
               assetName.contains(LINUX_MODE_INSTALL_NAME) || assetName.contains(RETROARCH_MODE_INSTALL_NAME) ||
               assetName.contains(VICE_MODE_INSTALL_NAME) || assetName.contains(SCUMMVM_MODE_INSTALL_NAME) ||
               assetName.contains(DOS_MODE_INSTALL_NAME) || assetName.contains(SEGA_MODE_INSTALL_NAME) ||
-              assetName.contains(PLAYSTATION_MODE_INSTALL_NAME) || assetName.contains(ZESARUX_MODE_INSTALL_NAME)) &&
-              assetName.contains(PCUAE_MAIN_INSTALL_NAME))
+              assetName.contains(SNES_MODE_INSTALL_NAME) || assetName.contains(PLAYSTATION_MODE_INSTALL_NAME) ||
+              assetName.contains(ZESARUX_MODE_INSTALL_NAME)) && assetName.contains(PCUAE_MAIN_INSTALL_NAME))
             {
               downloadUrl = asset.getAsJsonObject().get("browser_download_url").getAsString();
             }
