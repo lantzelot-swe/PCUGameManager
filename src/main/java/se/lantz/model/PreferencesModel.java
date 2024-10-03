@@ -39,6 +39,13 @@ public class PreferencesModel extends AbstractModel implements CommonInfoModel
   public static final String FAVORITES_8_ALIAS = "GameViewFavoritesName_8";
   public static final String FAVORITES_9_ALIAS = "GameViewFavoritesName_9";
   public static final String FAVORITES_10_ALIAS = "GameViewFavoritesName_10";
+  public static final String LAUNCH_VICE_FULLSCREEN_FROM_MAIN_WINDOW = "launchViceFromMainWindowInFullScreen";
+  public static final String LAUNCH_VICE_FULLSCREEN_FROM_CAROUSEL = "launchViceFromCarouselInFullScreen";
+  public static final String MAIN_WINDOW_PRIMARY_INPUT = "mainWindowPrimaryInput";
+  public static final String MAIN_WINDOW_SECONDARY_INPUT = "mainWindowSecondaryInput";
+  public static final String CAROUSEL_PRIMARY_INPUT = "carouselPrimaryInput";
+  public static final String CAROUSEL_SECONDARY_INPUT = "carouselSecondaryInput";
+  
 
   private boolean checkPCUAEVersionAtStartup = true;
   private boolean checkManagerVersionAtStartup = true;
@@ -72,6 +79,13 @@ public class PreferencesModel extends AbstractModel implements CommonInfoModel
   private String fav9Alias = "";
   private String fav10Alias = "";
 
+  private boolean launchViceFromMainWindowFullScreen = false;
+  private boolean launchViceFromCarouselFullScreen = true;
+  private int mainWindowPrimaryInput = 1;
+  private int mainWindowSecondaryInput = 0;
+  private int carouselPrimaryInput = 1;
+  private int carouselSecondaryInput = 0;
+
   public PreferencesModel()
   {
     Properties configuredProperties = FileManager.getConfiguredProperties();
@@ -94,7 +108,8 @@ public class PreferencesModel extends AbstractModel implements CommonInfoModel
     setDeleteOldInstallfilesAfterDownload(Boolean
       .parseBoolean(configuredProperties.getProperty(DELETE_OLD_INSTALL_FILES, "false")));
     setCropScreenshots(Boolean.parseBoolean(configuredProperties.getProperty(CROP_SCREENSHOTS, "false")));
-    setShowCropDialogForCover(Boolean.parseBoolean(configuredProperties.getProperty(SHOW_CROP_DIALOG_FOR_COVER, "true")));
+    setShowCropDialogForCover(Boolean
+      .parseBoolean(configuredProperties.getProperty(SHOW_CROP_DIALOG_FOR_COVER, "true")));
     setFav1Alias(configuredProperties.getProperty(FAVORITES_1_ALIAS, fav1Alias));
     setFav2Alias(configuredProperties.getProperty(FAVORITES_2_ALIAS, fav2Alias));
     setFav3Alias(configuredProperties.getProperty(FAVORITES_3_ALIAS, fav3Alias));
@@ -105,6 +120,14 @@ public class PreferencesModel extends AbstractModel implements CommonInfoModel
     setFav8Alias(configuredProperties.getProperty(FAVORITES_8_ALIAS, fav8Alias));
     setFav9Alias(configuredProperties.getProperty(FAVORITES_9_ALIAS, fav9Alias));
     setFav10Alias(configuredProperties.getProperty(FAVORITES_10_ALIAS, fav10Alias));
+    setLaunchViceFromMainWindowFullScreen(Boolean
+      .parseBoolean(configuredProperties.getProperty(LAUNCH_VICE_FULLSCREEN_FROM_MAIN_WINDOW, "false")));
+    setLaunchViceFromCarouselFullScreen(Boolean
+      .parseBoolean(configuredProperties.getProperty(LAUNCH_VICE_FULLSCREEN_FROM_CAROUSEL, "true")));
+    setMainWindowPrimaryInput(Integer.parseInt(configuredProperties.getProperty(MAIN_WINDOW_PRIMARY_INPUT, Integer.toString(mainWindowPrimaryInput))));
+    setMainWindowSecondaryInput(Integer.parseInt(configuredProperties.getProperty(MAIN_WINDOW_SECONDARY_INPUT, Integer.toString(mainWindowSecondaryInput))));
+    setCarouselPrimaryInput(Integer.parseInt(configuredProperties.getProperty(CAROUSEL_PRIMARY_INPUT, Integer.toString(carouselPrimaryInput))));
+    setCarouselSecondaryInput(Integer.parseInt(configuredProperties.getProperty(CAROUSEL_SECONDARY_INPUT, Integer.toString(carouselSecondaryInput))));
   }
 
   public boolean isCheckPCUAEVersionAtStartup()
@@ -242,6 +265,66 @@ public class PreferencesModel extends AbstractModel implements CommonInfoModel
     int old = getYear();
     this.year = year;
     if (old != year)
+    {
+      notifyChange();
+    }
+  }
+
+  public int getMainWindowPrimaryInput()
+  {
+    return mainWindowPrimaryInput;
+  }
+
+  public void setMainWindowPrimaryInput(int input)
+  {
+    int old = getMainWindowPrimaryInput();
+    this.mainWindowPrimaryInput = input;
+    if (old != mainWindowPrimaryInput)
+    {
+      notifyChange();
+    }
+  }
+
+  public int getMainWindowSecondaryInput()
+  {
+    return mainWindowSecondaryInput;
+  }
+
+  public void setMainWindowSecondaryInput(int input)
+  {
+    int old = getMainWindowSecondaryInput();
+    this.mainWindowSecondaryInput = input;
+    if (old != mainWindowSecondaryInput)
+    {
+      notifyChange();
+    }
+  }
+
+  public int getCarouselPrimaryInput()
+  {
+    return carouselPrimaryInput;
+  }
+
+  public void setCarouselPrimaryInput(int input)
+  {
+    int old = getCarouselPrimaryInput();
+    this.carouselPrimaryInput = input;
+    if (old != carouselPrimaryInput)
+    {
+      notifyChange();
+    }
+  }
+
+  public int getCarouselSecondaryInput()
+  {
+    return carouselSecondaryInput;
+  }
+
+  public void setCarouselSecondaryInput(int input)
+  {
+    int old = getCarouselSecondaryInput();
+    this.carouselSecondaryInput = input;
+    if (old != carouselSecondaryInput)
     {
       notifyChange();
     }
@@ -516,7 +599,7 @@ public class PreferencesModel extends AbstractModel implements CommonInfoModel
       notifyChange();
     }
   }
-  
+
   public void setShowCropDialogForCover(boolean cropDialogForCover)
   {
     boolean old = isShowCropDialogForCover();
@@ -526,10 +609,40 @@ public class PreferencesModel extends AbstractModel implements CommonInfoModel
       notifyChange();
     }
   }
-  
+
   public boolean isShowCropDialogForCover()
   {
     return cropDialogForCover;
+  }
+
+  public void setLaunchViceFromMainWindowFullScreen(boolean fullscreen)
+  {
+    boolean old = isLaunchViceFromMainWindowFullScreen();
+    this.launchViceFromMainWindowFullScreen = fullscreen;
+    if ((Boolean.compare(old, launchViceFromMainWindowFullScreen) != 0))
+    {
+      notifyChange();
+    }
+  }
+
+  public boolean isLaunchViceFromMainWindowFullScreen()
+  {
+    return launchViceFromMainWindowFullScreen;
+  }
+
+  public void setLaunchViceFromCarouselFullScreen(boolean fullscreen)
+  {
+    boolean old = isLaunchViceFromCarouselFullScreen();
+    this.launchViceFromCarouselFullScreen = fullscreen;
+    if ((Boolean.compare(old, launchViceFromCarouselFullScreen) != 0))
+    {
+      notifyChange();
+    }
+  }
+
+  public boolean isLaunchViceFromCarouselFullScreen()
+  {
+    return launchViceFromCarouselFullScreen;
   }
 
   public void savePreferences()
@@ -563,6 +676,13 @@ public class PreferencesModel extends AbstractModel implements CommonInfoModel
     configuredProperties.put(FAVORITES_8_ALIAS, fav8Alias);
     configuredProperties.put(FAVORITES_9_ALIAS, fav9Alias);
     configuredProperties.put(FAVORITES_10_ALIAS, fav10Alias);
+    configuredProperties.put(LAUNCH_VICE_FULLSCREEN_FROM_MAIN_WINDOW,
+                             Boolean.toString(launchViceFromMainWindowFullScreen));
+    configuredProperties.put(LAUNCH_VICE_FULLSCREEN_FROM_CAROUSEL, Boolean.toString(launchViceFromCarouselFullScreen));
+    configuredProperties.put(MAIN_WINDOW_PRIMARY_INPUT, Integer.toString(mainWindowPrimaryInput));
+    configuredProperties.put(MAIN_WINDOW_SECONDARY_INPUT, Integer.toString(mainWindowSecondaryInput));
+    configuredProperties.put(CAROUSEL_PRIMARY_INPUT, Integer.toString(carouselPrimaryInput));
+    configuredProperties.put(CAROUSEL_SECONDARY_INPUT, Integer.toString(carouselSecondaryInput));
     FileManager.storeProperties();
   }
 }

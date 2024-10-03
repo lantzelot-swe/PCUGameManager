@@ -1,10 +1,14 @@
 package se.lantz.gui;
 
 import java.awt.Dimension;
+import java.awt.GraphicsConfiguration;
+import java.awt.GraphicsDevice;
+import java.awt.GraphicsEnvironment;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.Insets;
+import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
@@ -820,17 +824,43 @@ public class ListPanel extends JPanel
     }
     else
     {
+      GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+      GraphicsDevice[] screenDevices = ge.getScreenDevices();
+      GraphicsDevice mainWindowDevice = MainWindow.getInstance().getGraphicsConfiguration().getDevice();
+      GraphicsDevice secondaryDevice = null;
+      for (GraphicsDevice graphicsDevice : screenDevices)
+      {
+        if (!graphicsDevice.equals(mainWindowDevice))
+        {
+          secondaryDevice = graphicsDevice;
+        }
+      }
+      if (secondaryDevice == null)
+      {
+        secondaryDevice = mainWindowDevice;
+      }
+
+      GraphicsConfiguration[] graphicsConfigurations = secondaryDevice.getConfigurations();
+      Rectangle graphicsBounds = graphicsConfigurations[0].getBounds();
+
       if (carouselPreviewDialog == null || !carouselPreviewDialog.isShowing())
       {
         carouselPreviewDialog = new CarouselPreviewDialog(MainWindow.getInstance(), this.uiModel);
-        carouselPreviewDialog.pack();
-        carouselPreviewDialog.setLocationRelativeTo(MainWindow.getInstance());
+        carouselPreviewDialog.setBounds(graphicsBounds);
         carouselPreviewDialog.showDialog();
       }
       else
       {
         carouselPreviewDialog.requestFocus();
       }
+    }
+  }
+
+  public void hideCarouselPreview()
+  {
+    if (carouselPreviewDialog != null && carouselPreviewDialog.isShowing())
+    {
+      carouselPreviewDialog.dispose();
     }
   }
 }

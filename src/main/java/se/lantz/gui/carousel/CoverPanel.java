@@ -187,7 +187,7 @@ public class CoverPanel extends JPanel
             if (SwingUtilities.isLeftMouseButton(e) && e.getClickCount() == 2)
             {
               //trigger run game
-              mainWindow.getMainPanel().runCurrentGame();
+              model.runCurrentGame();
             }
           }
         });

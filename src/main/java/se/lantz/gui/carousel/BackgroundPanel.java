@@ -1,5 +1,6 @@
 package se.lantz.gui.carousel;
 
+import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -43,7 +44,7 @@ public class BackgroundPanel extends JPanel
   {
     this.mainWindow = mainWindow;
     this.model = model;
-
+    this.setPreferredSize(new Dimension(1385, 721));
     GridBagLayout gridBagLayout = new GridBagLayout();
     setLayout(gridBagLayout);
     GridBagConstraints gbc_coverPanel = new GridBagConstraints();
@@ -87,7 +88,7 @@ public class BackgroundPanel extends JPanel
         @Override
         public void actionPerformed(ActionEvent e)
         {
-          mainWindow.getMainPanel().runCurrentGame();
+          model.runCurrentGame();
         }
       });
 

@@ -13,7 +13,6 @@ import javax.swing.UIManager;
 import javax.swing.event.HyperlinkEvent;
 
 import se.lantz.util.ExceptionHandler;
-import se.lantz.util.ManagerVersionChecker;
 
 public class ManagerDownloadPanel extends JPanel
 {
@@ -41,7 +40,7 @@ public class ManagerDownloadPanel extends JPanel
     {
       editorPane = new JEditorPane("text/html", message);
       editorPane.putClientProperty(JEditorPane.HONOR_DISPLAY_PROPERTIES, Boolean.TRUE);
-      editorPane.setFont(UIManager.getDefaults().getFont("Label.font"));
+      editorPane.setFont(UIManager.getDefaults().getFont("Label.font").deriveFont(12.0f));
       editorPane.setEditable(false);
       editorPane.setOpaque(false);
       editorPane.addHyperlinkListener((hle) -> {

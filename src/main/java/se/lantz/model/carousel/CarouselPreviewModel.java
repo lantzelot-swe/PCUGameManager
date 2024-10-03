@@ -120,6 +120,11 @@ public class CarouselPreviewModel extends AbstractModel
       this.notifyChange(SELECTED_GAME);
     }
   }
+  
+  public void runCurrentGame()
+  {
+    mainModel.runGameInVice(false);
+  }
 
   private void gameSaved()
   {

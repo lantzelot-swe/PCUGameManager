@@ -2,11 +2,17 @@ package se.lantz.gui;
 
 import java.awt.BorderLayout;
 import java.awt.Cursor;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
 
+import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.ImageIcon;
+import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
+import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 
@@ -19,6 +25,19 @@ public final class MainWindow extends JFrame
    * 
    */
   private static final long serialVersionUID = 2359068353897458894L;
+
+  KeyStroke escKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0);
+  Action escAction = new AbstractAction()
+    {
+      private static final long serialVersionUID = 1756396251349970052L;
+
+      @Override
+      public void actionPerformed(ActionEvent e)
+      {
+        //Close carousel preview if open
+        mainPanel.hideCarouselPreviewDialog();
+      }
+    };
 
   private MainPanel mainPanel;
   private JMenuBar menuBar;
@@ -69,6 +88,10 @@ public final class MainWindow extends JFrame
     {
       setTitle("PCUAE Manager v." + versionValue);
     }
+
+    //Register esc as closing the carousel preview if open
+    getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(escKeyStroke, "closeDialog");
+    getRootPane().getActionMap().put("closeDialog", escAction);
   }
 
   public void initialize()
@@ -98,7 +121,7 @@ public final class MainWindow extends JFrame
     }
     return menuBar;
   }
-  
+
   public void refreshMenuAndUI()
   {
     getJMenuBar().removeAll();
@@ -107,7 +130,7 @@ public final class MainWindow extends JFrame
     {
       menuBar.add(menu);
     }
-    
+
     getMainPanel().reloadCurrentGameView();
     getMainPanel().updateSavedStatesTabTitle();
     SwingUtilities.updateComponentTreeUI(this);
@@ -140,17 +163,17 @@ public final class MainWindow extends JFrame
       this.setCursor(defaultCursor);
     }
   }
-  
+
   public void checkForNewPCUAEVersionAtStartup()
   {
     this.menuManager.checkForNewPCUAEVersionAtStartup();
   }
-  
+
   public void setSelectedGameInGameList(String gameId)
   {
     getMainPanel().setSelectedGameInGameList(gameId);
   }
-  
+
   public void createNewDatabaseTab(String name)
   {
     getMainPanel().createNewTab(name);

@@ -103,6 +103,7 @@ public class FileManager
   private static List<String> compressedDiskFilesEndingList = Arrays.asList("d64", "d71", "x64", "g64");
 
   private static DbConnector dbconnector;
+  private Process viceProcess;
   static
   {
     try
@@ -951,7 +952,7 @@ public class FileManager
     return description.replaceAll("-", " ");
   }
 
-  public void runGameInVice()
+  public void runGameInVice(boolean fromMainWindow)
   {
     String gamePathString = "";
     //Use path if available, otherwise the available game in /games.
@@ -964,12 +965,12 @@ public class FileManager
     {
       gamePathString = GAMES + infoModel.getGamesFile();
     }
-    runVice(true, gamePathString, "");
+    runVice(true, gamePathString, "", fromMainWindow);
   }
 
   public void runViceWithoutGame()
   {
-    runVice(false, "", "");
+    runVice(false, "", "", true);
   }
 
   public void runSnapshotInVice(SAVESTATE saveState)
@@ -1041,15 +1042,46 @@ public class FileManager
       attachDiskPath = GAMES + infoModel.getGamesFile();
     }
 
-    runVice(true, gamePathString, attachDiskPath);
+    runVice(true, gamePathString, attachDiskPath, true);
   }
 
-  private void runVice(boolean appendGame, String gamePath, String attachDiskPath)
+  private void runVice(boolean appendGame, String gamePath, String attachDiskPath, boolean fromMainWindow)
   {
+    //Read configured properties
+    boolean openInFullscreen = false;
+    int primaryController = 1;
+    int secondaryController = 0;
+    if (fromMainWindow)
+    {
+      openInFullscreen = Boolean.parseBoolean(getConfiguredProperties().getProperty(PreferencesModel.LAUNCH_VICE_FULLSCREEN_FROM_MAIN_WINDOW, "false"));
+      primaryController = Integer.parseInt(getConfiguredProperties()
+                                           .getProperty(PreferencesModel.MAIN_WINDOW_PRIMARY_INPUT, Integer.toString(1)));
+      secondaryController = Integer.parseInt(getConfiguredProperties()
+                                             .getProperty(PreferencesModel.MAIN_WINDOW_SECONDARY_INPUT, Integer.toString(0)));
+    }
+    else
+    {
+      openInFullscreen = Boolean.parseBoolean(getConfiguredProperties().getProperty(PreferencesModel.LAUNCH_VICE_FULLSCREEN_FROM_CAROUSEL, "true"));
+      primaryController = Integer.parseInt(getConfiguredProperties()
+                                           .getProperty(PreferencesModel.CAROUSEL_PRIMARY_INPUT, Integer.toString(1)));
+      secondaryController = Integer.parseInt(getConfiguredProperties()
+                                             .getProperty(PreferencesModel.CAROUSEL_SECONDARY_INPUT, Integer.toString(0)));
+    }
+    
+    //Kill any running VICE before starting a new one
+    if (viceProcess != null)
+    {
+      viceProcess.destroy();
+      viceProcess = null;
+    }
     StringBuilder command = new StringBuilder();
     if (systemModel.isC64())
     {
       command.append("./vice/x64.exe ");
+      if (openInFullscreen)
+      {
+        command.append("-fullscreen ");
+      }
       //SID config
       command.append("-sidenginemodel ");
       if (systemModel.isSid6581())
@@ -1082,6 +1114,10 @@ public class FileManager
     else
     {
       command.append("./vice/xvic.exe ");
+      if (openInFullscreen)
+      {
+        command.append("-fullscreen ");
+      }
       //ViC 20 memory config
       List<String> memoryFlagsList = new ArrayList<>();
       if (systemModel.isBank0())
@@ -1150,18 +1186,22 @@ public class FileManager
     //Append default joystick port
     if (model.getJoy1Model().isPrimary())
     {
-      command.append("-joydev1 1 ");
+      command.append("-joydev1 ");
+      command.append(primaryController + " ");
       if (systemModel.isC64())
       {
-        command.append("-joydev2 0");
+        command.append("-joydev2 ");
+        command.append(secondaryController);
       }
     }
     else
     {
-      command.append("-joydev1 0 ");
+      command.append("-joydev1 ");
+      command.append(secondaryController + " ");
       if (systemModel.isC64())
       {
-        command.append("-joydev2 1");
+        command.append("-joydev2 ");
+        command.append(primaryController);
       }
     }
     //Attach disk if valid file ending of game file
@@ -1184,7 +1224,12 @@ public class FileManager
     try
     {
       logger.debug("Launching VICE with command: {}", command.toString());
-      Runtime.getRuntime().exec(command.toString());
+      
+      //Split command 
+      String[] arguments =command.toString().split("\\s+");
+      ProcessBuilder processBuilder = new ProcessBuilder(Arrays.asList(arguments));
+      viceProcess = processBuilder.start();
+//      Runtime.getRuntime().exec(command.toString());
     }
     catch (IOException e)
     {

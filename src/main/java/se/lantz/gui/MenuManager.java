@@ -539,7 +539,7 @@ public class MenuManager
     runGameItem.setAccelerator(keyStrokeToRunGame);
     runGameItem.setMnemonic('R');
 
-    runGameItem.addActionListener(e -> MainWindow.getInstance().getMainPanel().runCurrentGame(false));
+    runGameItem.addActionListener(e -> MainWindow.getInstance().getMainPanel().runCurrentGame());
     return runGameItem;
   }
 

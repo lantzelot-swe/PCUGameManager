@@ -11,11 +11,13 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 
+import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import javax.swing.ToolTipManager;
 import javax.swing.UIManager;
 
 import se.lantz.gui.MainWindow;
+import se.lantz.gui.install.JreUpdateDialog;
 import se.lantz.gui.install.ManagerDownloadDialog;
 import se.lantz.model.PreferencesModel;
 import se.lantz.util.ExceptionHandler;
@@ -53,7 +55,8 @@ public class PCUAEManager
     {
       Files.createDirectories(Paths.get("./databases/"));
       Files.createDirectories(Paths.get("./pcuae-install/"));
-      
+      Files.createDirectories(Paths.get("./natives/"));
+
       if (!Files.list(Paths.get("./databases/")).findAny().isPresent())
       {
         //Create a mainDb folder
@@ -89,17 +92,31 @@ public class PCUAEManager
       mainWindow.setLocationRelativeTo(null);
       mainWindow.initialize();
       mainWindow.setVisible(true);
+      
+      //Check JRE version
+      String javaVersion = System.getProperty("java.runtime.version");
+      int majorVersion = Integer.parseInt(javaVersion.substring(0, 2));
+      if (majorVersion < 18)
+      {
+        JreUpdateDialog jreDialog = new JreUpdateDialog(mainWindow);
+        jreDialog.pack();
+        jreDialog.setLocationRelativeTo(MainWindow.getInstance());
+        jreDialog.showDialog();
+        System.exit(0);
+      }
 
       //Check for new versions at startup, but only when running stand-alone, not during development.
       if (!FileManager.getPcuVersionFromManifest().isEmpty())
       {
+        //TODO: Check for content in the natives directory and download the dll files for joystick management if missing
+        
         PreferencesModel prefModel = new PreferencesModel();
 
         if (prefModel.isCheckManagerVersionAtStartup())
         {
           ManagerVersionChecker.fetchLatestVersionFromGithub();
           if (ManagerVersionChecker.isNewVersionAvailable())
-          {
+          {            
             ManagerDownloadDialog dialog = new ManagerDownloadDialog(MainWindow.getInstance());
             dialog.pack();
             dialog.setLocationRelativeTo(MainWindow.getInstance());

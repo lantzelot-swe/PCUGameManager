@@ -503,4 +503,9 @@ public class MainPanel extends JPanel
   {
     getListPanel().setSelectedGameInGameList(gameId);
   }
+  
+  public void hideCarouselPreviewDialog()
+  {
+    getListPanel().hideCarouselPreview();
+  }
 }

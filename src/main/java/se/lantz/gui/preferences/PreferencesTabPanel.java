@@ -23,6 +23,7 @@ public class PreferencesTabPanel extends JPanel
   private JPanel infoSlotBackgroundPanel;
   private JPanel joystickBackgroundPanel;
   private JoystickPanel joystickPanel;
+  private VicePanel vicePanel;
 
   private JoystickModel joyModel;
   private JLabel infoLabel;
@@ -46,6 +47,7 @@ public class PreferencesTabPanel extends JPanel
       tabbedPane.addTab("Favorites", null, getFavPanel(), null);
       tabbedPane.addTab("Controller", null, getJoystickBackgroundPanel(), null);
       tabbedPane.addTab("Infoslot", null, getInfoSlotBackgroundPanel(), null);
+      tabbedPane.addTab("Vice", null, getVicePanel(), null);
     }
     return tabbedPane;
   }
@@ -93,6 +95,15 @@ public class PreferencesTabPanel extends JPanel
       infoSlotBackgroundPanel.add(getInfoSlotPreferencesPanel(), gbc_panel);
     }
     return infoSlotBackgroundPanel;
+  }
+  
+  private VicePanel getVicePanel()
+  {
+    if (vicePanel == null)
+    {
+      vicePanel = new VicePanel(model);
+    }
+    return vicePanel;
   }
 
   private FavoritesPanel getFavPanel()
