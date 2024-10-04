@@ -1,22 +1,18 @@
 <configuration>
-	<appender name="STDOUT"
-		class="ch.qos.logback.core.ConsoleAppender">
+	<appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
 		<encoder>
 			<pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n
 			</pattern>
 		</encoder>
 	</appender>
 
-	<appender name="FILE"
-		class="ch.qos.logback.core.rolling.RollingFileAppender">
+	<appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
 		<file>pcusb.log</file>
-		<rollingPolicy
-			class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
 			<fileNamePattern>pcusb-%d{yyyy-MM-dd}_%i.log</fileNamePattern>
 			<maxHistory>3</maxHistory>
 			<totalSizeCap>30MB</totalSizeCap>
-			<timeBasedFileNamingAndTriggeringPolicy
-				class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+			<timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
 				<!-- or whenever the file size reaches 5MB -->
 				<maxFileSize>5MB</maxFileSize>
 			</timeBasedFileNamingAndTriggeringPolicy>
@@ -25,13 +21,19 @@
 			<pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n
 			</pattern>
 		</encoder>
+		<!-- Only include errors in the file, regardless of loggers below -->
+		<filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+			<level>ERROR</level>
+		</filter>
 	</appender>
 
-	<root level="error">
-		<appender-ref ref="STDOUT" />
+	<root level="ERROR">
 		<appender-ref ref="FILE" />
+		<appender-ref ref="STDOUT" />
 	</root>
 
 	<logger name="se.lantz.model.carousel" level="DEBUG" />
-    <logger name="se.lantz.gui.carousel" level="DEBUG" />
+	<logger name="se.lantz.gui.carousel" level="DEBUG" />
+	<logger name="se.lantz.util.InputController" level="DEBUG" />
+
 </configuration>

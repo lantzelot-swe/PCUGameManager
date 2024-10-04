@@ -18,8 +18,6 @@ public class InputController
 
   private static final float POSITIVE_VALUE = 1.0f;
   private static final float NEGATIVE_VALUE = -1.0f;
-  private static final float OFF_VALUE = -1.5258789E-5f;
-  private static final float OFF_THEC64_VALUE = -0.007827878f;
 
   /* Create an event object for the underlying plugin to populate */
   Event event = new Event();
@@ -67,15 +65,15 @@ public class InputController
               logger.debug("Event detected! right!");
               SwingUtilities.invokeLater(() -> dialog.scrollRight());
             }
-            else if (event.getValue() == OFF_VALUE || event.getValue() == OFF_THEC64_VALUE)
-            {
-              logger.debug("Event detected! stop!");
-              SwingUtilities.invokeLater(() -> dialog.stopScroll());
-            }
             else if (event.getValue() == NEGATIVE_VALUE)
             {
               logger.debug("Event detected! left!");
               SwingUtilities.invokeLater(() -> dialog.scrollLeft());
+            }
+            else
+            {
+              logger.debug("Event detected! stop!");
+              SwingUtilities.invokeLater(() -> dialog.stopScroll());
             }
           }
 
@@ -88,15 +86,15 @@ public class InputController
               SwingUtilities.invokeLater(() -> dialog.scrollDown());
 
             }
-            else if (event.getValue() == OFF_VALUE || event.getValue() == OFF_THEC64_VALUE)
-            {
-              logger.debug("Event detected! stop!");
-              SwingUtilities.invokeLater(() -> dialog.stopScroll());
-            }
             else if (event.getValue() == NEGATIVE_VALUE)
             {
               logger.debug("Event detected! up!");
               SwingUtilities.invokeLater(() -> dialog.scrollUp());
+            }
+            else
+            {
+              logger.debug("Event detected! stop!");
+              SwingUtilities.invokeLater(() -> dialog.stopScroll());
             }
           }
 
@@ -106,6 +104,10 @@ public class InputController
             {
               logger.debug("Event detected! Button pressed!");
               SwingUtilities.invokeLater(() -> dialog.runGame());
+            }
+            else
+            {
+              logger.debug("Event detected! Button Released!");
             }
           }
         }
