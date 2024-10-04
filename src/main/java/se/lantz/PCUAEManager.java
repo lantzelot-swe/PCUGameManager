@@ -108,8 +108,6 @@ public class PCUAEManager
       //Check for new versions at startup, but only when running stand-alone, not during development.
       if (!FileManager.getPcuVersionFromManifest().isEmpty())
       {
-        //TODO: Check for content in the natives directory and download the dll files for joystick management if missing
-        
         PreferencesModel prefModel = new PreferencesModel();
 
         if (prefModel.isCheckManagerVersionAtStartup())
