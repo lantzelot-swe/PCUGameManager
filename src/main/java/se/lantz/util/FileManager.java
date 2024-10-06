@@ -1450,6 +1450,11 @@ public class FileManager
     }
     return Boolean.parseBoolean(showCropDialogForCover);
   }
+  
+  public static boolean isLaunchCarouselPreviewInFullscreen()
+  {
+    return Boolean.parseBoolean(FileManager.getConfiguredProperties().getProperty(PreferencesModel.LAUNCH_CAROUSEL_PREVIEW_FULLSCREEN, "true"));
+  }
 
   private static String getBackupFolderName(String targetFolderName)
   {

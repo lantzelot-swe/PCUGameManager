@@ -46,6 +46,7 @@ import se.lantz.model.GameListModel;
 import se.lantz.model.MainViewModel;
 import se.lantz.model.data.GameListData;
 import se.lantz.model.data.GameView;
+import se.lantz.util.FileManager;
 
 public class ListPanel extends JPanel
 {
@@ -824,29 +825,44 @@ public class ListPanel extends JPanel
     }
     else
     {
-      GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
-      GraphicsDevice[] screenDevices = ge.getScreenDevices();
-      GraphicsDevice mainWindowDevice = MainWindow.getInstance().getGraphicsConfiguration().getDevice();
-      GraphicsDevice secondaryDevice = null;
-      for (GraphicsDevice graphicsDevice : screenDevices)
-      {
-        if (!graphicsDevice.equals(mainWindowDevice))
-        {
-          secondaryDevice = graphicsDevice;
-        }
-      }
-      if (secondaryDevice == null)
-      {
-        secondaryDevice = mainWindowDevice;
-      }
-
-      GraphicsConfiguration[] graphicsConfigurations = secondaryDevice.getConfigurations();
-      Rectangle graphicsBounds = graphicsConfigurations[0].getBounds();
-
       if (carouselPreviewDialog == null || !carouselPreviewDialog.isShowing())
       {
-        carouselPreviewDialog = new CarouselPreviewDialog(MainWindow.getInstance(), this.uiModel);
-        carouselPreviewDialog.setBounds(graphicsBounds);
+        GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+        GraphicsDevice[] screenDevices = ge.getScreenDevices();
+        GraphicsDevice mainWindowDevice = MainWindow.getInstance().getGraphicsConfiguration().getDevice();
+        GraphicsDevice secondaryDevice = null;
+        for (GraphicsDevice graphicsDevice : screenDevices)
+        {
+          if (!graphicsDevice.equals(mainWindowDevice))
+          {
+            secondaryDevice = graphicsDevice;
+          }
+        }
+        if (secondaryDevice == null)
+        {
+          secondaryDevice = mainWindowDevice;
+        }
+
+        GraphicsConfiguration graphicsConfigurations = secondaryDevice.getDefaultConfiguration();
+        Rectangle graphicsBounds = graphicsConfigurations.getBounds();
+
+        if (FileManager.isLaunchCarouselPreviewInFullscreen())
+        {
+          carouselPreviewDialog = new CarouselPreviewDialog(MainWindow.getInstance(), this.uiModel, true);
+          carouselPreviewDialog.setBounds(graphicsBounds);
+          carouselPreviewDialog.setUndecorated(true);
+        }
+        else
+        {
+          carouselPreviewDialog = new CarouselPreviewDialog(MainWindow.getInstance(), this.uiModel, false);
+          carouselPreviewDialog.pack();
+          //Position centred over secondary monitor
+          carouselPreviewDialog
+            .setLocation(((graphicsBounds.width / 2) - (carouselPreviewDialog.getSize().width / 2)) + graphicsBounds.x,
+                         ((graphicsBounds.height / 2) - (carouselPreviewDialog.getSize().height / 2)) +
+                           graphicsBounds.y);
+
+        }
         carouselPreviewDialog.showDialog();
       }
       else

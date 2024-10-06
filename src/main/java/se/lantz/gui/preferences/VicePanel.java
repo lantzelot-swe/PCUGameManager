@@ -16,6 +16,7 @@ public class VicePanel extends JPanel
 {
   private ViceDetailsPanel mainWindowPanel;
   private ViceDetailsPanel carouselPanel;
+  private CarouselPreviewPanel carouselPreviewPanel;
   private PreferencesModel model;
 
   public VicePanel(PreferencesModel model)
@@ -34,12 +35,22 @@ public class VicePanel extends JPanel
     GridBagConstraints gbc_carouselPanel = new GridBagConstraints();
     gbc_carouselPanel.insets = new Insets(5, 5, 0, 5);
     gbc_carouselPanel.anchor = GridBagConstraints.NORTH;
-    gbc_carouselPanel.weighty = 1.0;
+    gbc_carouselPanel.weighty = 0.0;
     gbc_carouselPanel.weightx = 1.0;
     gbc_carouselPanel.fill = GridBagConstraints.HORIZONTAL;
     gbc_carouselPanel.gridx = 0;
     gbc_carouselPanel.gridy = 1;
     add(getCarouselPanel(), gbc_carouselPanel);
+    
+    GridBagConstraints gbc_carouselLaunchPanel = new GridBagConstraints();
+    gbc_carouselLaunchPanel.insets = new Insets(5, 5, 0, 5);
+    gbc_carouselLaunchPanel.anchor = GridBagConstraints.NORTH;
+    gbc_carouselLaunchPanel.weighty = 1.0;
+    gbc_carouselLaunchPanel.weightx = 1.0;
+    gbc_carouselLaunchPanel.fill = GridBagConstraints.HORIZONTAL;
+    gbc_carouselLaunchPanel.gridx = 0;
+    gbc_carouselLaunchPanel.gridy = 2;
+    add(getCarouselLaunchPanel(), gbc_carouselLaunchPanel);
   }
   
   private ViceDetailsPanel getMainWindowPanel()
@@ -73,5 +84,20 @@ public class VicePanel extends JPanel
                                                null));
     }
     return carouselPanel;
+  }
+  
+  private CarouselPreviewPanel getCarouselLaunchPanel()
+  {
+    if (carouselPreviewPanel == null)
+    {
+      carouselPreviewPanel = new CarouselPreviewPanel(model);
+      carouselPreviewPanel.setBorder(new TitledBorder(null,
+                                               "Carousel Preview dialog",
+                                               TitledBorder.LEADING,
+                                               TitledBorder.TOP,
+                                               null,
+                                               null));
+    }
+    return carouselPreviewPanel;
   }
 }

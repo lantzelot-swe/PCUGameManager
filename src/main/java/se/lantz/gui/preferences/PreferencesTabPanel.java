@@ -47,7 +47,7 @@ public class PreferencesTabPanel extends JPanel
       tabbedPane.addTab("Favorites", null, getFavPanel(), null);
       tabbedPane.addTab("Controller", null, getJoystickBackgroundPanel(), null);
       tabbedPane.addTab("Infoslot", null, getInfoSlotBackgroundPanel(), null);
-      tabbedPane.addTab("Vice", null, getVicePanel(), null);
+      tabbedPane.addTab("Vice/Carousel", null, getVicePanel(), null);
     }
     return tabbedPane;
   }

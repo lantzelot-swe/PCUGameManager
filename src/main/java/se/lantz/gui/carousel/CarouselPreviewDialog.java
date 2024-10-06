@@ -63,18 +63,30 @@ public class CarouselPreviewDialog extends BaseDialog
       }
     };
 
-  public CarouselPreviewDialog(final MainWindow owner, final MainViewModel uiModel)
+  private boolean fullscreen;
+
+  public CarouselPreviewDialog(final MainWindow owner, final MainViewModel uiModel, final boolean fullscreen)
   {
     super(owner);
-    this.setUndecorated(true);
+    this.fullscreen = fullscreen;
+    
     this.model = new CarouselPreviewModel(uiModel);
     this.uiModel = uiModel;
     this.mainWindow = owner;
-    this.setPreferredSize(new Dimension(1400, 760));
+    
     this.setResizable(false);
     this.setModal(false);
 
-    addContent(getBackgroundCenterPanel());
+    if (fullscreen)
+    {
+      this.setPreferredSize(new Dimension(1400, 760));
+      addContent(getBackgroundCenterPanel());
+    }
+    else
+    {
+      addContent(getBackgroundPanel());
+    }
+    
     getButtonPanel().setVisible(false);
 
     getBackgroundPanel().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("F5"), "reload");
@@ -96,8 +108,14 @@ public class CarouselPreviewDialog extends BaseDialog
 
   private void modelChanged()
   {
-    //    setTitle("Carousel preview - " + uiModel.getSelectedGameView().getName());
-    gameListInfoLabel.setText("Carousel preview - " + uiModel.getSelectedGameView().getName());
+    if (fullscreen)
+    {
+      gameListInfoLabel.setText("Carousel preview - " + uiModel.getSelectedGameView().getName());
+    }
+    else
+    {
+      setTitle("Carousel preview - " + uiModel.getSelectedGameView().getName());
+    }
   }
 
   private BackgroundPanel getBackgroundPanel()

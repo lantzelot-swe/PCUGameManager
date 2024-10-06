@@ -45,7 +45,7 @@ public class PreferencesModel extends AbstractModel implements CommonInfoModel
   public static final String MAIN_WINDOW_SECONDARY_INPUT = "mainWindowSecondaryInput";
   public static final String CAROUSEL_PRIMARY_INPUT = "carouselPrimaryInput";
   public static final String CAROUSEL_SECONDARY_INPUT = "carouselSecondaryInput";
-  
+  public static final String LAUNCH_CAROUSEL_PREVIEW_FULLSCREEN = "launchCarouselInFullScreen";
 
   private boolean checkPCUAEVersionAtStartup = true;
   private boolean checkManagerVersionAtStartup = true;
@@ -85,6 +85,7 @@ public class PreferencesModel extends AbstractModel implements CommonInfoModel
   private int mainWindowSecondaryInput = 0;
   private int carouselPrimaryInput = 1;
   private int carouselSecondaryInput = 0;
+  private boolean startCarouselInFullscreen = true;
 
   public PreferencesModel()
   {
@@ -124,10 +125,16 @@ public class PreferencesModel extends AbstractModel implements CommonInfoModel
       .parseBoolean(configuredProperties.getProperty(LAUNCH_VICE_FULLSCREEN_FROM_MAIN_WINDOW, "false")));
     setLaunchViceFromCarouselFullScreen(Boolean
       .parseBoolean(configuredProperties.getProperty(LAUNCH_VICE_FULLSCREEN_FROM_CAROUSEL, "true")));
-    setMainWindowPrimaryInput(Integer.parseInt(configuredProperties.getProperty(MAIN_WINDOW_PRIMARY_INPUT, Integer.toString(mainWindowPrimaryInput))));
-    setMainWindowSecondaryInput(Integer.parseInt(configuredProperties.getProperty(MAIN_WINDOW_SECONDARY_INPUT, Integer.toString(mainWindowSecondaryInput))));
-    setCarouselPrimaryInput(Integer.parseInt(configuredProperties.getProperty(CAROUSEL_PRIMARY_INPUT, Integer.toString(carouselPrimaryInput))));
-    setCarouselSecondaryInput(Integer.parseInt(configuredProperties.getProperty(CAROUSEL_SECONDARY_INPUT, Integer.toString(carouselSecondaryInput))));
+    setMainWindowPrimaryInput(Integer
+      .parseInt(configuredProperties.getProperty(MAIN_WINDOW_PRIMARY_INPUT, Integer.toString(mainWindowPrimaryInput))));
+    setMainWindowSecondaryInput(Integer.parseInt(configuredProperties
+      .getProperty(MAIN_WINDOW_SECONDARY_INPUT, Integer.toString(mainWindowSecondaryInput))));
+    setCarouselPrimaryInput(Integer
+      .parseInt(configuredProperties.getProperty(CAROUSEL_PRIMARY_INPUT, Integer.toString(carouselPrimaryInput))));
+    setCarouselSecondaryInput(Integer
+      .parseInt(configuredProperties.getProperty(CAROUSEL_SECONDARY_INPUT, Integer.toString(carouselSecondaryInput))));
+    setStartCarouselInFullscreen(Boolean
+      .parseBoolean(configuredProperties.getProperty(LAUNCH_CAROUSEL_PREVIEW_FULLSCREEN, "true")));
   }
 
   public boolean isCheckPCUAEVersionAtStartup()
@@ -645,6 +652,21 @@ public class PreferencesModel extends AbstractModel implements CommonInfoModel
     return launchViceFromCarouselFullScreen;
   }
 
+  public void setStartCarouselInFullscreen(boolean fullscreen)
+  {
+    boolean old = isStartCarouselInFullscreen();
+    this.startCarouselInFullscreen = fullscreen;
+    if ((Boolean.compare(old, startCarouselInFullscreen) != 0))
+    {
+      notifyChange();
+    }
+  }
+
+  public boolean isStartCarouselInFullscreen()
+  {
+    return startCarouselInFullscreen;
+  }
+
   public void savePreferences()
   {
     Properties configuredProperties = FileManager.getConfiguredProperties();
@@ -683,6 +705,7 @@ public class PreferencesModel extends AbstractModel implements CommonInfoModel
     configuredProperties.put(MAIN_WINDOW_SECONDARY_INPUT, Integer.toString(mainWindowSecondaryInput));
     configuredProperties.put(CAROUSEL_PRIMARY_INPUT, Integer.toString(carouselPrimaryInput));
     configuredProperties.put(CAROUSEL_SECONDARY_INPUT, Integer.toString(carouselSecondaryInput));
+    configuredProperties.put(LAUNCH_CAROUSEL_PREVIEW_FULLSCREEN, Boolean.toString(startCarouselInFullscreen));
     FileManager.storeProperties();
   }
 }
