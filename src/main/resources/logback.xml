@@ -32,8 +32,8 @@
 		<appender-ref ref="STDOUT" />
 	</root>
 
-	<logger name="se.lantz.model.carousel" level="DEBUG" />
+	<!--logger name="se.lantz.model.carousel" level="DEBUG" />
 	<logger name="se.lantz.gui.carousel" level="DEBUG" />
-	<logger name="se.lantz.util.InputController" level="DEBUG" />
+	<logger name="se.lantz.util.InputController" level="DEBUG" /-->
 
 </configuration>
