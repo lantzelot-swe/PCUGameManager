@@ -19,6 +19,8 @@ public class InputController
   private static final float POSITIVE_VALUE = 1.0f;
   private static final float NEGATIVE_VALUE = -1.0f;
 
+  private static final long REPEAT_EVENT_TIME = 350;
+
   /* Create an event object for the underlying plugin to populate */
   Event event = new Event();
   Controller[] controllers;
@@ -43,6 +45,11 @@ public class InputController
 
   private void processEvents()
   {
+    long lastRight = 0L;
+    long lastLeft = 0L;
+    long lastUp = 0L;
+    long lastDown = 0L;
+
     while (poll)
     {
       for (Controller joystick : controllers)
@@ -50,30 +57,37 @@ public class InputController
         joystick.poll();
         /* Get the controllers event queue */
         EventQueue queue = joystick.getEventQueue();
+        //booleans to filter out multiple repeated events for analog joystick adapters
+        boolean buttonPressed = false;
+        boolean rightDetected = false;
+        boolean leftDetected = false;
+        boolean upDetected = false;
+        boolean downDetected = false;
+        boolean stopDetected = false;
 
         /* For each object in the queue */
         while (queue.getNextEvent(event))
         {
           /* Get event component */
           Component comp = event.getComponent();
-          
+
           if (comp.getName().equals("X Axis"))
           {
             logger.debug("value = " + event.getValue());
             if (event.getValue() == POSITIVE_VALUE)
-            {
+            {             
               logger.debug("Event detected! right!");
-              SwingUtilities.invokeLater(() -> dialog.scrollRight());
+              rightDetected = true;
             }
             else if (event.getValue() == NEGATIVE_VALUE)
             {
               logger.debug("Event detected! left!");
-              SwingUtilities.invokeLater(() -> dialog.scrollLeft());
+              leftDetected = true;
             }
             else
             {
               logger.debug("Event detected! stop!");
-              SwingUtilities.invokeLater(() -> dialog.stopScroll());
+              stopDetected = true;
             }
           }
 
@@ -83,18 +97,18 @@ public class InputController
             if (event.getValue() == POSITIVE_VALUE)
             {
               logger.debug("Event detected! down!");
-              SwingUtilities.invokeLater(() -> dialog.scrollDown());
+              downDetected = true;
 
             }
             else if (event.getValue() == NEGATIVE_VALUE)
             {
               logger.debug("Event detected! up!");
-              SwingUtilities.invokeLater(() -> dialog.scrollUp());
+              upDetected = true;
             }
             else
             {
               logger.debug("Event detected! stop!");
-              SwingUtilities.invokeLater(() -> dialog.stopScroll());
+              stopDetected = true;
             }
           }
 
@@ -102,8 +116,8 @@ public class InputController
           {
             if (event.getValue() == POSITIVE_VALUE)
             {
+              buttonPressed = true;
               logger.debug("Event detected! Button pressed!");
-              SwingUtilities.invokeLater(() -> dialog.runGame());
             }
             else
             {
@@ -111,9 +125,50 @@ public class InputController
             }
           }
         }
+
+        //React to detected events, filter out events that occurs within REPEAT_EVENT_TIME
+        if (rightDetected && (System.currentTimeMillis() - lastRight) > REPEAT_EVENT_TIME)
+        {
+          logger.debug("*** scrolling right!");
+          lastRight = System.currentTimeMillis();
+          SwingUtilities.invokeLater(() -> dialog.scrollRight());
+        }
+        if (leftDetected && (System.currentTimeMillis() - lastLeft) > REPEAT_EVENT_TIME)
+        {
+          logger.debug("*** scrolling left!");
+          lastLeft = System.currentTimeMillis();
+          SwingUtilities.invokeLater(() -> dialog.scrollLeft());
+        }
+        if (upDetected && (System.currentTimeMillis() - lastUp) > REPEAT_EVENT_TIME)
+        {
+          logger.debug("*** scrolling Up!");
+          lastUp = System.currentTimeMillis();
+          SwingUtilities.invokeLater(() -> dialog.scrollUp());
+        }
+        if (downDetected && (System.currentTimeMillis() - lastDown) > REPEAT_EVENT_TIME)
+        {
+          logger.debug("*** scrolling Down!");
+          lastDown = System.currentTimeMillis();
+          SwingUtilities.invokeLater(() -> dialog.scrollDown());
+        }
+
+        if (stopDetected)
+        {
+          if (event.getValue() != POSITIVE_VALUE && event.getValue() != NEGATIVE_VALUE)
+          {
+            //Last event was a stop, lets stop
+            SwingUtilities.invokeLater(() -> dialog.stopScroll());
+            logger.debug("*** stop scroll!");
+          }
+        }
+        else if (buttonPressed)
+        {
+          logger.debug("*** Button pressed!");
+          SwingUtilities.invokeLater(() -> dialog.runGame());
+        }
         try
         {
-          Thread.sleep(20); //IS this an OK delay?
+          Thread.sleep(20);
         }
         catch (InterruptedException ex)
         {
