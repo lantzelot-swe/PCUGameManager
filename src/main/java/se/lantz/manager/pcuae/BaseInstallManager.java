@@ -511,8 +511,11 @@ public abstract class BaseInstallManager implements AWTEventListener
 
   protected boolean isNewVersionAvailable(String installName, String gitHubRepo)
   {
+    MainWindow.getInstance().setWaitCursor(true);
     gitHubReleaseInformation = fetchLatestVersionFromGithub(installName, gitHubRepo);
-    return ManagerVersionChecker.isNewer(latestInInstallFolder, gitHubReleaseInformation.getInstallFile());
+    boolean isNewer = ManagerVersionChecker.isNewer(latestInInstallFolder, gitHubReleaseInformation.getInstallFile());
+    MainWindow.getInstance().setWaitCursor(false);
+    return isNewer;
   }
 
   public String getLatestInInstallFolder()
