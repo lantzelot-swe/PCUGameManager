@@ -9,7 +9,6 @@ import java.net.URISyntaxException;
 
 import javax.swing.JEditorPane;
 import javax.swing.JPanel;
-import javax.swing.UIManager;
 import javax.swing.event.HyperlinkEvent;
 
 import se.lantz.util.ExceptionHandler;
@@ -40,7 +39,6 @@ public class ManagerDownloadPanel extends JPanel
     {
       editorPane = new JEditorPane("text/html", message);
       editorPane.putClientProperty(JEditorPane.HONOR_DISPLAY_PROPERTIES, Boolean.TRUE);
-      editorPane.setFont(UIManager.getDefaults().getFont("Label.font").deriveFont(12.0f));
       editorPane.setEditable(false);
       editorPane.setOpaque(false);
       editorPane.addHyperlinkListener((hle) -> {

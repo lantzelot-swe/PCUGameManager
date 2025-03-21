@@ -11,7 +11,6 @@ import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -65,10 +64,12 @@ import se.lantz.manager.RestoreManager;
 import se.lantz.manager.SavedStatesManager;
 import se.lantz.manager.pcuae.AmigaModeInstallManager;
 import se.lantz.manager.pcuae.AtariModeInstallManager;
+import se.lantz.manager.pcuae.CPCModeInstallManager;
 import se.lantz.manager.pcuae.DosModeInstallManager;
 import se.lantz.manager.pcuae.LinuxModeInstallManager;
 import se.lantz.manager.pcuae.MSXModeInstallManager;
 import se.lantz.manager.pcuae.PCUAEInstallManager;
+import se.lantz.manager.pcuae.PCUAEUpdatesInstallManager;
 import se.lantz.manager.pcuae.PlaystationModeInstallManager;
 import se.lantz.manager.pcuae.RetroarchModeInstallManager;
 import se.lantz.manager.pcuae.SNESModeInstallManager;
@@ -155,6 +156,7 @@ public class MenuManager
   private InsetsMenuItem disableAccurateDiskItem;
 
   private InsetsMenuItem installPCUAEItem;
+  private InsetsMenuItem installPCUAEUpdateItem;
   private InsetsMenuItem installAmigaModeItem;
   private InsetsMenuItem installAtariModeItem;
   private InsetsMenuItem installLinuxModeItem;
@@ -164,6 +166,7 @@ public class MenuManager
   private InsetsMenuItem installMSXModeItem;
   private InsetsMenuItem installDosModeItem;
   private InsetsMenuItem installSegaModeItem;
+  private InsetsMenuItem installCPCModeItem;
   private InsetsMenuItem installSnesModeItem;
   private InsetsMenuItem installPlaystationModeItem;
   private InsetsMenuItem installZesaruxModeItem;
@@ -184,6 +187,7 @@ public class MenuManager
   private RestoreManager restoreManager;
   private SavedStatesManager savedStatesManager;
   private PCUAEInstallManager installPCUAEManager;
+  private PCUAEUpdatesInstallManager installPCUAEUpdatesManager;
   private AmigaModeInstallManager installAmigaManager;
   private AtariModeInstallManager installAtariManager;
   private LinuxModeInstallManager installLinuxManager;
@@ -193,6 +197,7 @@ public class MenuManager
   private MSXModeInstallManager installMSXManager;
   private DosModeInstallManager installDosManager;
   private SegaModeInstallManager installSegaManager;
+  private CPCModeInstallManager installCPCManager;
   private SNESModeInstallManager installSnesManager;
   private PlaystationModeInstallManager installPlaystationManager;
   private ZesaruxModeInstallManager installZesaruxManager;
@@ -210,6 +215,7 @@ public class MenuManager
     this.restoreManager = new RestoreManager(uiModel);
     this.savedStatesManager = new SavedStatesManager(uiModel, getPalNtscFixMenuItem());
     this.installPCUAEManager = new PCUAEInstallManager(getExportItem());
+    this.installPCUAEUpdatesManager = new PCUAEUpdatesInstallManager();
     this.installAmigaManager = new AmigaModeInstallManager();
     this.installAtariManager = new AtariModeInstallManager();
     this.installLinuxManager = new LinuxModeInstallManager();
@@ -219,6 +225,7 @@ public class MenuManager
     this.installMSXManager = new MSXModeInstallManager();
     this.installDosManager = new DosModeInstallManager();
     this.installSegaManager = new SegaModeInstallManager();
+    this.installCPCManager = new CPCModeInstallManager();
     this.installSnesManager = new SNESModeInstallManager();
     this.installPlaystationManager = new PlaystationModeInstallManager();
     this.installZesaruxManager = new ZesaruxModeInstallManager();
@@ -303,6 +310,7 @@ public class MenuManager
     pcuaeMenu = new JMenu("PCUAE");
     pcuaeMenu.setMnemonic('P');
     pcuaeMenu.add(getInstallPCUAEItem());
+    pcuaeMenu.add(getInstallPCUAEUpdatesItem());
     pcuaeModeMenu = new InsetsMenu("Mode Packs");
     pcuaeModeMenu.setMnemonic('M');
     pcuaeModeMenu.add(getInstallAmigaModeItem());
@@ -317,6 +325,7 @@ public class MenuManager
     pcuaeModeMenu.add(getInstallSnesModeItem());
     pcuaeModeMenu.add(getInstallPlaystationModeItem());
     pcuaeModeMenu.add(getInstallZesaruxModeItem());
+    pcuaeModeMenu.add(getInstallCPCModeItem());
     pcuaeMenu.add(pcuaeModeMenu);
     pcuaeMenu.add(new JSeparator());
     pcuaeMenu.add(getDeleteInstallFilesItem());
@@ -1204,6 +1213,17 @@ public class MenuManager
     }
     return installPCUAEItem;
   }
+  
+  private InsetsMenuItem getInstallPCUAEUpdatesItem()
+  {
+    if (installPCUAEUpdateItem == null)
+    {
+      installPCUAEUpdateItem = new InsetsMenuItem("Install PCUAE updates to a USB drive...");
+      installPCUAEUpdateItem.setMnemonic('u');
+      installPCUAEUpdateItem.addActionListener(e -> installPCUAEUpdates());
+    }
+    return installPCUAEUpdateItem;
+  }
 
   private InsetsMenuItem getInstallAmigaModeItem()
   {
@@ -1291,6 +1311,17 @@ public class MenuManager
       installSegaModeItem.addActionListener(e -> installSegaMode());
     }
     return installSegaModeItem;
+  }
+  
+  private InsetsMenuItem getInstallCPCModeItem()
+  {
+    if (installCPCModeItem == null)
+    {
+      installCPCModeItem = new InsetsMenuItem("Install CPC mode...");
+      installCPCModeItem.setMnemonic('c');
+      installCPCModeItem.addActionListener(e -> installCPCMode());
+    }
+    return installCPCModeItem;
   }
   
   private InsetsMenuItem getInstallSnesModeItem()
@@ -2016,6 +2047,11 @@ public class MenuManager
   {
     installPCUAEManager.installPCUAE();
   }
+  
+  private void installPCUAEUpdates()
+  {
+    installPCUAEUpdatesManager.installPCUAEUpdates();
+  }
 
   private void installAmigaMode()
   {
@@ -2060,6 +2096,11 @@ public class MenuManager
   private void installSegaMode()
   {
     installSegaManager.installSegaMode();
+  }
+  
+  private void installCPCMode()
+  {
+    installCPCManager.installCPCMode();
   }
   
   private void installSnesMode()

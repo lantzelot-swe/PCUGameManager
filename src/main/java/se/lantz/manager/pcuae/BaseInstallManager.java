@@ -43,6 +43,7 @@ public abstract class BaseInstallManager implements AWTEventListener
   public static final String INSTALL_FOLDER = "./pcuae-install/";
 
   protected static final String PCUAE_INSTALL_NAME = "pcuae";
+  protected static final String PCUAE_UPDATE_INSTALL_NAME = "pcuae-update-cbm";
   protected static final String PCUAE_MAIN_INSTALL_NAME = "cbm";
   protected static final String AMIGA_MODE_INSTALL_NAME = "amiga-mode";
   protected static final String ATARI_MODE_INSTALL_NAME = "atari-mode";
@@ -54,6 +55,7 @@ public abstract class BaseInstallManager implements AWTEventListener
 
   protected static final String DOS_MODE_INSTALL_NAME = "dos-mode";
   protected static final String SEGA_MODE_INSTALL_NAME = "sega-mode";
+  protected static final String CPC_MODE_INSTALL_NAME = "cpc-mode";
   protected static final String SNES_MODE_INSTALL_NAME = "snes-mode";
   protected static final String PLAYSTATION_MODE_INSTALL_NAME = "playstation-mode";
   protected static final String ZESARUX_MODE_INSTALL_NAME = "zesarux-mode";
@@ -168,8 +170,9 @@ public abstract class BaseInstallManager implements AWTEventListener
               name.contains(LINUX_MODE_INSTALL_NAME) || name.contains(RETROARCH_MODE_INSTALL_NAME) ||
               name.contains(VICE_MODE_INSTALL_NAME) || name.contains(SCUMMVM_MODE_INSTALL_NAME) ||
               name.contains(MSX_COLECO_MODE_INSTALL_NAME) || name.contains(DOS_MODE_INSTALL_NAME) ||
-              name.contains(SEGA_MODE_INSTALL_NAME) || name.contains(SNES_MODE_INSTALL_NAME) ||
-              name.contains(PLAYSTATION_MODE_INSTALL_NAME) || name.contains(ZESARUX_MODE_INSTALL_NAME)) &&
+              name.contains(SEGA_MODE_INSTALL_NAME) || name.contains(CPC_MODE_INSTALL_NAME) ||
+              name.contains(SNES_MODE_INSTALL_NAME) || name.contains(PLAYSTATION_MODE_INSTALL_NAME) ||
+              name.contains(ZESARUX_MODE_INSTALL_NAME) || name.contains(PCUAE_UPDATE_INSTALL_NAME)) &&
               name.endsWith(".exe");
           }
           else
@@ -181,15 +184,16 @@ public abstract class BaseInstallManager implements AWTEventListener
     return filter;
   }
 
-  public GithubAssetInformation fetchLatestVersionFromGithub(String assetsName)
+  public GithubAssetInformation fetchLatestVersionFromGithub(String assetsName, String repo)
   {
     GithubAssetInformation githubInfo = new GithubAssetInformation();
     try
     {
-      //TODO: To get all releases, use "https://CommodoreOS@api.github.com/repos/CommodoreOS/PCUAE/releases"-
+      //To get all releases, use "https://CommodoreOS@api.github.com/repos/CommodoreOS/PCUAE/releases"-
       //Get all releases, check which one contains the latest file with assetName (part of the name)
+      String gitRepo = repo != null ? repo : "https://CommodoreOS@api.github.com/repos/CommodoreOS/PCUAE/releases";
 
-      URL url = new URL("https://CommodoreOS@api.github.com/repos/CommodoreOS/PCUAE/releases");
+      URL url = new URL(gitRepo);
 
       HttpURLConnection con = (HttpURLConnection) url.openConnection();
       con.setRequestProperty("accept", "application/vnd.github.v3+json");
@@ -305,6 +309,15 @@ public abstract class BaseInstallManager implements AWTEventListener
             break;
           }
 
+          case CPC_MODE_INSTALL_NAME:
+          {
+            if (assetName.contains(CPC_MODE_INSTALL_NAME))
+            {
+              downloadUrl = asset.getAsJsonObject().get("browser_download_url").getAsString();
+            }
+            break;
+          }
+
           case SNES_MODE_INSTALL_NAME:
           {
             if (assetName.contains(SNES_MODE_INSTALL_NAME))
@@ -332,14 +345,24 @@ public abstract class BaseInstallManager implements AWTEventListener
             break;
           }
 
+          case PCUAE_UPDATE_INSTALL_NAME:
+          {
+            if (assetName.contains(PCUAE_UPDATE_INSTALL_NAME))
+            {
+              downloadUrl = asset.getAsJsonObject().get("browser_download_url").getAsString();
+            }
+            break;
+          }
+
           case PCUAE_INSTALL_NAME:
           {
             if (!(assetName.contains(AMIGA_MODE_INSTALL_NAME) || assetName.contains(ATARI_MODE_INSTALL_NAME) ||
               assetName.contains(LINUX_MODE_INSTALL_NAME) || assetName.contains(RETROARCH_MODE_INSTALL_NAME) ||
               assetName.contains(VICE_MODE_INSTALL_NAME) || assetName.contains(SCUMMVM_MODE_INSTALL_NAME) ||
               assetName.contains(DOS_MODE_INSTALL_NAME) || assetName.contains(SEGA_MODE_INSTALL_NAME) ||
-              assetName.contains(SNES_MODE_INSTALL_NAME) || assetName.contains(PLAYSTATION_MODE_INSTALL_NAME) ||
-              assetName.contains(ZESARUX_MODE_INSTALL_NAME)) && assetName.contains(PCUAE_MAIN_INSTALL_NAME))
+              assetName.contains(CPC_MODE_INSTALL_NAME) || assetName.contains(SNES_MODE_INSTALL_NAME) ||
+              assetName.contains(PLAYSTATION_MODE_INSTALL_NAME) || assetName.contains(ZESARUX_MODE_INSTALL_NAME) ||
+              assetName.contains(PCUAE_UPDATE_INSTALL_NAME)) && assetName.contains(PCUAE_MAIN_INSTALL_NAME))
             {
               downloadUrl = asset.getAsJsonObject().get("browser_download_url").getAsString();
             }
@@ -463,11 +486,18 @@ public abstract class BaseInstallManager implements AWTEventListener
 
   protected void askToInstallExistingVersion(String productName)
   {
-    int value =
-      JOptionPane.showConfirmDialog(MainWindow.getInstance(),
-                                    "Do you want to install " + productName + " (" + latestInInstallFolder + ") now?",
-                                    "Install " + productName,
-                                    JOptionPane.YES_NO_OPTION);
+    askToInstallExistingVersion(productName, false);
+  }
+
+  protected void askToInstallExistingVersion(String productName, boolean isUpdate)
+  {
+    String message = "Do you want to install " + productName + " (" + latestInInstallFolder + ") now?";
+    if (isUpdate)
+    {
+      message = message + "\nMake sure you have the right version of PCUAE installed on the USB stick already.";
+    }
+    int value = JOptionPane
+      .showConfirmDialog(MainWindow.getInstance(), message, "Install " + productName, JOptionPane.YES_NO_OPTION);
     if (value == JOptionPane.YES_OPTION)
     {
       singleThreadExecutor.execute(() -> runAndWaitForInstallation());
@@ -476,7 +506,12 @@ public abstract class BaseInstallManager implements AWTEventListener
 
   protected boolean isNewVersionAvailable(String installName)
   {
-    gitHubReleaseInformation = fetchLatestVersionFromGithub(installName);
+    return isNewVersionAvailable(installName, null);
+  }
+
+  protected boolean isNewVersionAvailable(String installName, String gitHubRepo)
+  {
+    gitHubReleaseInformation = fetchLatestVersionFromGithub(installName, gitHubRepo);
     return ManagerVersionChecker.isNewer(latestInInstallFolder, gitHubReleaseInformation.getInstallFile());
   }
 
@@ -507,11 +542,16 @@ public abstract class BaseInstallManager implements AWTEventListener
     dialog.setLocationRelativeTo(MainWindow.getInstance());
     if (dialog.showDialog())
     {
-      downloadLatestVersion(productName, installName);
+      downloadLatestVersion(productName, installName, false);
     }
   }
 
   protected void askAndStartDownload(String productName, String installName)
+  {
+    askAndStartDownload(productName, installName, false);
+  }
+
+  protected void askAndStartDownload(String productName, String installName, boolean isUpdate)
   {
     PCUAEProductDownloadDialog dialog =
       new PCUAEProductDownloadDialog(latestInInstallFolder.isEmpty(), this, productName, false);
@@ -519,15 +559,15 @@ public abstract class BaseInstallManager implements AWTEventListener
     dialog.setLocationRelativeTo(MainWindow.getInstance());
     if (dialog.showDialog())
     {
-      downloadLatestVersion(productName, installName);
+      downloadLatestVersion(productName, installName, isUpdate);
     }
     else if (!latestInInstallFolder.isEmpty())
     {
-      askToInstallExistingVersion(productName);
+      askToInstallExistingVersion(productName, isUpdate);
     }
   }
 
-  protected void downloadLatestVersion(String productName, String installName)
+  protected void downloadLatestVersion(String productName, String installName, boolean isUpdate)
   {
     DownloadDialog progressDialog =
       new DownloadDialog("Downloading " + productName + " version " + gitHubReleaseInformation.getLatestVersion());
@@ -542,10 +582,16 @@ public abstract class BaseInstallManager implements AWTEventListener
       {
         deleteOldInstallFiles(installName);
       }
-
+      
+      String message = "Download completed, do you want to install " + productName + " " +
+        gitHubReleaseInformation.getLatestVersion() + " now?";
+      message = message + "\n(" + latestInInstallFolder + ")";
+      if (isUpdate)
+      {
+        message = message + "\n\nMake sure you have the right version of PCUAE installed on the USB stick already.";
+      }
       int value = JOptionPane.showConfirmDialog(MainWindow.getInstance(),
-                                                "Download completed, do you want to install " + productName + " " +
-                                                  gitHubReleaseInformation.getLatestVersion() + " now?",
+                                                message,
                                                 "Download Complete",
                                                 JOptionPane.YES_NO_OPTION);
       if (value == JOptionPane.YES_OPTION)
