@@ -34,6 +34,8 @@ public class MobyGamesScraper implements Scraper
 {
   private static final Logger logger = LoggerFactory.getLogger(MobyGamesScraper.class);
 
+  private static final String USER_AGENT = "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:5.0) Gecko/20100101 Firefox/5.0";
+
   //"#main > div.flex.flex-space-between > div.mb > h1"
   private String titleCssQuery = "#main > div.flex.flex-space-between > div.mb > h1";
 
@@ -78,7 +80,8 @@ public class MobyGamesScraper implements Scraper
   public void connect(String url) throws IOException
   {
     this.mobyGamesGameUrl = "";
-    Jsoup.connect(url).method(Connection.Method.GET).execute();
+
+    Jsoup.connect(url).userAgent(USER_AGENT).method(Connection.Method.GET).execute();
     this.mobyGamesGameUrl = url;
     resetFields();
   }
@@ -102,7 +105,8 @@ public class MobyGamesScraper implements Scraper
     Document doc;
     try
     {
-      Connection.Response result = Jsoup.connect(mobyGamesGameUrl).method(Connection.Method.GET).execute();
+      Connection.Response result =
+        Jsoup.connect(mobyGamesGameUrl).userAgent(USER_AGENT).method(Connection.Method.GET).execute();
       doc = result.parse();
 
       if (!checkGameAvailability())
@@ -294,7 +298,7 @@ public class MobyGamesScraper implements Scraper
     try
     {
       Connection.Response result =
-        Jsoup.connect(mobyGamesGameUrl + creditsPath).method(Connection.Method.GET).execute();
+        Jsoup.connect(mobyGamesGameUrl + creditsPath).userAgent(USER_AGENT).method(Connection.Method.GET).execute();
       doc = result.parse();
       //Fetch the right element
       Elements creditsElements = doc.select(creditsTableQuery);
@@ -343,7 +347,7 @@ public class MobyGamesScraper implements Scraper
     try
     {
       Connection.Response result =
-        Jsoup.connect(mobyGamesGameUrl + creditsPath).method(Connection.Method.GET).execute();
+        Jsoup.connect(mobyGamesGameUrl + creditsPath).userAgent(USER_AGENT).method(Connection.Method.GET).execute();
       result.parse();
       available = true;
     }
@@ -377,7 +381,7 @@ public class MobyGamesScraper implements Scraper
     try
     {
       Connection.Response result =
-        Jsoup.connect(mobyGamesGameUrl + screensPath).method(Connection.Method.GET).execute();
+        Jsoup.connect(mobyGamesGameUrl + screensPath).userAgent(USER_AGENT).method(Connection.Method.GET).execute();
       doc = result.parse();
       //Fetch the right element
       Elements coverElements = doc.select(screensCssQuery);
@@ -418,7 +422,8 @@ public class MobyGamesScraper implements Scraper
     Document doc;
     try
     {
-      Connection.Response result = Jsoup.connect(mobyGamesGameUrl + coversPath).method(Connection.Method.GET).execute();
+      Connection.Response result =
+        Jsoup.connect(mobyGamesGameUrl + coversPath).userAgent(USER_AGENT).method(Connection.Method.GET).execute();
       doc = result.parse();
       //Fetch the right element
       Elements coverElements = doc.select(coversCssQuery);
@@ -453,7 +458,7 @@ public class MobyGamesScraper implements Scraper
     Document doc;
     try
     {
-      Connection.Response result = Jsoup.connect(url).method(Connection.Method.GET).execute();
+      Connection.Response result = Jsoup.connect(url).userAgent(USER_AGENT).method(Connection.Method.GET).execute();
       doc = result.parse();
       //Fetch the right element
       Elements coverElements = doc.select(cssQuery);
