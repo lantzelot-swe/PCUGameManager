@@ -211,6 +211,7 @@ public class ListPanel extends JPanel
       else if (!filteredList.isEmpty())
       {
         list.setSelectedIndex(0);
+        list.ensureIndexIsVisible(0);
       }
       updateViewInfoLabel();
       isFiltering = false;
