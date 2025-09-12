@@ -619,7 +619,7 @@ public class SavedStatesManager
   public int getNumberOfSavedStatesForGame(String gameFileName, String title)
   {
     String fileName = getGameFolderName(gameFileName, title).toUpperCase();
-    return savedStatesMap.get(fileName) == null ? 0 : savedStatesMap.get(fileName);
+    return (gameFileName.isEmpty() || savedStatesMap.get(fileName) == null) ? 0 : savedStatesMap.get(fileName);
   }
 
   public void checkEnablementOfPalNtscMenuItem(boolean check)

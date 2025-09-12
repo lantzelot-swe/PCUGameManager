@@ -701,7 +701,7 @@ public class ListPanel extends JPanel
   {
     if (!uiModel.isDataChanged())
     {
-      uiModel.toggleFavorite(list.getSelectedValuesList());
+      uiModel.toggleFavorite(list.getSelectedValuesList(), false);
       mainPanel.repaintAfterModifications();
     }
   }
@@ -710,7 +710,7 @@ public class ListPanel extends JPanel
   {
     if (!uiModel.isDataChanged())
     {
-      uiModel.toggleFavorite2(list.getSelectedValuesList());
+      uiModel.toggleFavorite2(list.getSelectedValuesList(), false);
       mainPanel.repaintAfterModifications();
     }
   }
@@ -719,7 +719,7 @@ public class ListPanel extends JPanel
   {
     if (!uiModel.isDataChanged())
     {
-      uiModel.toggleFavorite3(list.getSelectedValuesList());
+      uiModel.toggleFavorite3(list.getSelectedValuesList(), false);
       mainPanel.repaintAfterModifications();
     }
   }
@@ -728,7 +728,7 @@ public class ListPanel extends JPanel
   {
     if (!uiModel.isDataChanged())
     {
-      uiModel.toggleFavorite4(list.getSelectedValuesList());
+      uiModel.toggleFavorite4(list.getSelectedValuesList(), false);
       mainPanel.repaintAfterModifications();
     }
   }
@@ -737,7 +737,7 @@ public class ListPanel extends JPanel
   {
     if (!uiModel.isDataChanged())
     {
-      uiModel.toggleFavorite5(list.getSelectedValuesList());
+      uiModel.toggleFavorite5(list.getSelectedValuesList(), false);
       mainPanel.repaintAfterModifications();
     }
   }
@@ -746,7 +746,7 @@ public class ListPanel extends JPanel
   {
     if (!uiModel.isDataChanged())
     {
-      uiModel.toggleFavorite6(list.getSelectedValuesList());
+      uiModel.toggleFavorite6(list.getSelectedValuesList(), false);
       mainPanel.repaintAfterModifications();
     }
   }
@@ -755,7 +755,7 @@ public class ListPanel extends JPanel
   {
     if (!uiModel.isDataChanged())
     {
-      uiModel.toggleFavorite7(list.getSelectedValuesList());
+      uiModel.toggleFavorite7(list.getSelectedValuesList(), false);
       mainPanel.repaintAfterModifications();
     }
   }
@@ -764,7 +764,7 @@ public class ListPanel extends JPanel
   {
     if (!uiModel.isDataChanged())
     {
-      uiModel.toggleFavorite8(list.getSelectedValuesList());
+      uiModel.toggleFavorite8(list.getSelectedValuesList(), false);
       mainPanel.repaintAfterModifications();
     }
   }
@@ -773,7 +773,7 @@ public class ListPanel extends JPanel
   {
     if (!uiModel.isDataChanged())
     {
-      uiModel.toggleFavorite9(list.getSelectedValuesList());
+      uiModel.toggleFavorite9(list.getSelectedValuesList(), false);
       mainPanel.repaintAfterModifications();
     }
   }
@@ -782,7 +782,7 @@ public class ListPanel extends JPanel
   {
     if (!uiModel.isDataChanged())
     {
-      uiModel.toggleFavorite10(list.getSelectedValuesList());
+      uiModel.toggleFavorite10(list.getSelectedValuesList(), false);
       mainPanel.repaintAfterModifications();
     }
   }

@@ -846,43 +846,43 @@ public class MainViewModel extends AbstractModel
         selectedData.setGameId(currentGameId);
         if (getSelectedGameView().getGameViewId() == GameView.FAVORITES_ID)
         {
-          toggleFavorite(Arrays.asList(selectedData));
+          toggleFavorite(Arrays.asList(selectedData), true);
         }
         else if (getSelectedGameView().getGameViewId() == GameView.FAVORITES_2_ID)
         {
-          toggleFavorite2(Arrays.asList(selectedData));
+          toggleFavorite2(Arrays.asList(selectedData), true);
         }
         else if (getSelectedGameView().getGameViewId() == GameView.FAVORITES_3_ID)
         {
-          toggleFavorite3(Arrays.asList(selectedData));
+          toggleFavorite3(Arrays.asList(selectedData), true);
         }
         else if (getSelectedGameView().getGameViewId() == GameView.FAVORITES_4_ID)
         {
-          toggleFavorite4(Arrays.asList(selectedData));
+          toggleFavorite4(Arrays.asList(selectedData), true);
         }
         else if (getSelectedGameView().getGameViewId() == GameView.FAVORITES_5_ID)
         {
-          toggleFavorite5(Arrays.asList(selectedData));
+          toggleFavorite5(Arrays.asList(selectedData), true);
         }
         else if (getSelectedGameView().getGameViewId() == GameView.FAVORITES_6_ID)
         {
-          toggleFavorite6(Arrays.asList(selectedData));
+          toggleFavorite6(Arrays.asList(selectedData), true);
         }
         else if (getSelectedGameView().getGameViewId() == GameView.FAVORITES_7_ID)
         {
-          toggleFavorite7(Arrays.asList(selectedData));
+          toggleFavorite7(Arrays.asList(selectedData), true);
         }
         else if (getSelectedGameView().getGameViewId() == GameView.FAVORITES_8_ID)
         {
-          toggleFavorite8(Arrays.asList(selectedData));
+          toggleFavorite8(Arrays.asList(selectedData), true);
         }
         else if (getSelectedGameView().getGameViewId() == GameView.FAVORITES_9_ID)
         {
-          toggleFavorite9(Arrays.asList(selectedData));
+          toggleFavorite9(Arrays.asList(selectedData), true);
         }
         else if (getSelectedGameView().getGameViewId() == GameView.FAVORITES_10_ID)
         {
-          toggleFavorite10(Arrays.asList(selectedData));
+          toggleFavorite10(Arrays.asList(selectedData), true);
         }
       }
       else
@@ -1127,54 +1127,54 @@ public class MainViewModel extends AbstractModel
     }
   }
 
-  public void toggleFavorite(List<GameListData> data)
+  public void toggleFavorite(List<GameListData> data, boolean allowInfoSlot)
   {
-    favorites1Count = toggleFavorite(data, 1, favorites1Count, favorites1View);
+    favorites1Count = toggleFavorite(data, 1, favorites1Count, favorites1View, allowInfoSlot);
   }
 
-  public void toggleFavorite2(List<GameListData> data)
+  public void toggleFavorite2(List<GameListData> data, boolean allowInfoSlot)
   {
-    favorites2Count = toggleFavorite(data, 2, favorites2Count, favorites2View);
+    favorites2Count = toggleFavorite(data, 2, favorites2Count, favorites2View, allowInfoSlot);
   }
 
-  public void toggleFavorite3(List<GameListData> data)
+  public void toggleFavorite3(List<GameListData> data, boolean allowInfoSlot)
   {
-    favorites3Count = toggleFavorite(data, 3, favorites3Count, favorites3View);
+    favorites3Count = toggleFavorite(data, 3, favorites3Count, favorites3View, allowInfoSlot);
   }
 
-  public void toggleFavorite4(List<GameListData> data)
+  public void toggleFavorite4(List<GameListData> data, boolean allowInfoSlot)
   {
-    favorites4Count = toggleFavorite(data, 4, favorites4Count, favorites4View);
+    favorites4Count = toggleFavorite(data, 4, favorites4Count, favorites4View, allowInfoSlot);
   }
 
-  public void toggleFavorite5(List<GameListData> data)
+  public void toggleFavorite5(List<GameListData> data, boolean allowInfoSlot)
   {
-    favorites5Count = toggleFavorite(data, 5, favorites5Count, favorites5View);
+    favorites5Count = toggleFavorite(data, 5, favorites5Count, favorites5View, allowInfoSlot);
   }
 
-  public void toggleFavorite6(List<GameListData> data)
+  public void toggleFavorite6(List<GameListData> data, boolean allowInfoSlot)
   {
-    favorites6Count = toggleFavorite(data, 6, favorites6Count, favorites6View);
+    favorites6Count = toggleFavorite(data, 6, favorites6Count, favorites6View, allowInfoSlot);
   }
 
-  public void toggleFavorite7(List<GameListData> data)
+  public void toggleFavorite7(List<GameListData> data, boolean allowInfoSlot)
   {
-    favorites7Count = toggleFavorite(data, 7, favorites7Count, favorites7View);
+    favorites7Count = toggleFavorite(data, 7, favorites7Count, favorites7View, allowInfoSlot);
   }
 
-  public void toggleFavorite8(List<GameListData> data)
+  public void toggleFavorite8(List<GameListData> data, boolean allowInfoSlot)
   {
-    favorites8Count = toggleFavorite(data, 8, favorites8Count, favorites8View);
+    favorites8Count = toggleFavorite(data, 8, favorites8Count, favorites8View, allowInfoSlot);
   }
 
-  public void toggleFavorite9(List<GameListData> data)
+  public void toggleFavorite9(List<GameListData> data, boolean allowInfoSlot)
   {
-    favorites9Count = toggleFavorite(data, 9, favorites9Count, favorites9View);
+    favorites9Count = toggleFavorite(data, 9, favorites9Count, favorites9View, allowInfoSlot);
   }
 
-  public void toggleFavorite10(List<GameListData> data)
+  public void toggleFavorite10(List<GameListData> data,boolean allowInfoSlot)
   {
-    favorites10Count = toggleFavorite(data, 10, favorites10Count, favorites10View);
+    favorites10Count = toggleFavorite(data, 10, favorites10Count, favorites10View, allowInfoSlot);
   }
 
   public void setViewTag(GameListData data, String viewTag)
@@ -1194,11 +1194,11 @@ public class MainViewModel extends AbstractModel
     saveData();
   }
 
-  private int toggleFavorite(List<GameListData> data, int favoritesNumber, int favoritesCount, GameView favoritesView)
+  private int toggleFavorite(List<GameListData> data, int favoritesNumber, int favoritesCount, GameView favoritesView, boolean allowInfoSlot)
   {
     for (GameListData gameListData : data)
     {
-      if (!gameListData.isInfoSlot() && !gameListData.getGameId().isEmpty())
+      if (allowInfoSlot || (!gameListData.isInfoSlot() && !gameListData.getGameId().isEmpty()))
       {
         int previousFavorite = gameListData.getFavorite();
         dbConnector.toggleFavorite(gameListData.getGameId(), previousFavorite, favoritesNumber);
@@ -1212,7 +1212,6 @@ public class MainViewModel extends AbstractModel
         {
           favoritesView.setGameCount(--favoritesCount);
         }
-
       }
     }
     if (!data.isEmpty())
