@@ -8,6 +8,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.Beans;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.swing.DefaultListModel;
@@ -18,6 +19,7 @@ import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
+import javax.swing.UIManager;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
@@ -26,6 +28,7 @@ import se.lantz.model.data.GameView;
 
 public class ExportGameViewsSelectionPanel extends JPanel
 {
+  private static final int MAX_GAMES = 255;
   private JButton addButton;
   private JButton removeButton;
   private JPanel listPanel;
@@ -40,10 +43,13 @@ public class ExportGameViewsSelectionPanel extends JPanel
   private JLabel countLabel;
   private JButton exportButton;
   private JLabel infoLabel;
+  private JLabel warningLabel;
+  private boolean carouselMode;
 
-  public ExportGameViewsSelectionPanel(JButton exportButton, String selectedDatabase)
+  public ExportGameViewsSelectionPanel(JButton exportButton, String selectedDatabase, boolean carouselMode)
   {
     this.exportButton = exportButton;
+    this.carouselMode = carouselMode;
     uiModel = new MainViewModel(selectedDatabase);
     if (!Beans.isDesignTime())
     {
@@ -84,6 +90,13 @@ public class ExportGameViewsSelectionPanel extends JPanel
     gbc_infoLabel.gridx = 0;
     gbc_infoLabel.gridy = 0;
     add(getInfoLabel(), gbc_infoLabel);
+    GridBagConstraints gbc_warningLabel = new GridBagConstraints();
+    gbc_warningLabel.anchor = GridBagConstraints.NORTHWEST;
+    gbc_warningLabel.gridwidth = 3;
+    gbc_warningLabel.insets = new Insets(0, 10, 5, 10);
+    gbc_warningLabel.gridx = 0;
+    gbc_warningLabel.gridy = 2;
+    add(getWarningLabel(), gbc_warningLabel);
   }
 
   private JPanel getListPanel()
@@ -267,6 +280,18 @@ public class ExportGameViewsSelectionPanel extends JPanel
   private void updateAfterEditingSelectedList()
   {
     getCountLabel().setText(Integer.toString(selectedListModel.getSize()));
+    //Check the size of the gamelist views
+    int maxCount = 0;
+    for (int i = 0; i < selectedListModel.getSize(); i++)
+    {
+      GameView gameView = selectedListModel.get(i);
+      maxCount = gameView.getGameCount();
+      if (maxCount > MAX_GAMES)
+      {
+        break;
+      }
+    }
+    getWarningLabel().setVisible(maxCount > MAX_GAMES);
     setExportButtonEnablement();
   }
   
@@ -298,5 +323,27 @@ public class ExportGameViewsSelectionPanel extends JPanel
     	infoLabel = new JLabel("Select gamelist views to export:");
     }
     return infoLabel;
+  }
+  
+  private JLabel getWarningLabel()
+  {
+    if (warningLabel == null)
+    {
+      String text = "";
+      if (carouselMode)
+      {
+        text = "The game carousel only support " + MAX_GAMES +
+          " games in total. Are you sure you want to export gamelist views that contains more than that?";
+      }
+      else
+      {
+        text = "The file loader folders only support " + MAX_GAMES +
+          " games in total. Are you sure you want to export gamelist views that contains more than that?";
+      }
+      warningLabel = new JLabel(text);
+      warningLabel.setIcon(UIManager.getIcon("OptionPane.warningIcon"));
+      warningLabel.setVisible(false);
+    }
+    return warningLabel;
   }
 }

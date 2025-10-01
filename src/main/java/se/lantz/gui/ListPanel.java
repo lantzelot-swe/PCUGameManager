@@ -31,6 +31,7 @@ import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
 import javax.swing.ToolTipManager;
+import javax.swing.UIManager;
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
 import javax.swing.event.PopupMenuEvent;
@@ -57,6 +58,7 @@ public class ListPanel extends JPanel
   private JComboBox<GameView> listViewComboBox;
   private JPanel viewInfoPanel;
   private JLabel viewInfoLabel;
+  private JLabel tooManyGamesInfoLabel;
   private JButton previewButton;
   private GameViewManager gameViewManager;
   private MainViewModel uiModel;
@@ -166,6 +168,16 @@ public class ListPanel extends JPanel
       gbc_listViewComboBox.gridx = 1;
       gbc_listViewComboBox.gridy = 0;
       listViewPanel.add(getListViewComboBox(), gbc_listViewComboBox);
+      
+      GridBagConstraints gbc_tooManyGamesLabel = new GridBagConstraints();
+      gbc_tooManyGamesLabel.weightx = 1.0;
+      gbc_tooManyGamesLabel.gridwidth = 2;
+      gbc_tooManyGamesLabel.insets = new Insets(2, 5, 2, 5);
+      gbc_tooManyGamesLabel.anchor = GridBagConstraints.WEST;
+      gbc_tooManyGamesLabel.fill = GridBagConstraints.HORIZONTAL;
+      gbc_tooManyGamesLabel.gridx = 0;
+      gbc_tooManyGamesLabel.gridy = 1;
+      listViewPanel.add(getTooManyGamesInfoLabel(), gbc_tooManyGamesLabel);
     }
     return listViewPanel;
   }
@@ -417,12 +429,13 @@ public class ListPanel extends JPanel
       viewInfoPanel = new JPanel();
       GridBagLayout gbl_viewInfoPanel = new GridBagLayout();
       viewInfoPanel.setLayout(gbl_viewInfoPanel);
+      
       GridBagConstraints gbc_viewInfoLabel = new GridBagConstraints();
       gbc_viewInfoLabel.weightx = 1.0;
       gbc_viewInfoLabel.insets = new Insets(0, 0, 5, 5);
       gbc_viewInfoLabel.anchor = GridBagConstraints.EAST;
       gbc_viewInfoLabel.gridx = 1;
-      gbc_viewInfoLabel.gridy = 0;
+      gbc_viewInfoLabel.gridy = 1;
       viewInfoPanel.add(getViewInfoLabel(), gbc_viewInfoLabel);
 
       GridBagConstraints gbc_carouselPreviewButton = new GridBagConstraints();
@@ -430,7 +443,7 @@ public class ListPanel extends JPanel
       gbc_carouselPreviewButton.insets = new Insets(3, 5, 5, 5);
       gbc_carouselPreviewButton.anchor = GridBagConstraints.WEST;
       gbc_carouselPreviewButton.gridx = 0;
-      gbc_carouselPreviewButton.gridy = 0;
+      gbc_carouselPreviewButton.gridy = 1;
       viewInfoPanel.add(getPreviewButton(), gbc_carouselPreviewButton);
     }
     return viewInfoPanel;
@@ -443,6 +456,21 @@ public class ListPanel extends JPanel
       viewInfoLabel = new JLabel("125 of 1000");
     }
     return viewInfoLabel;
+  }
+  
+  private JLabel getTooManyGamesInfoLabel()
+  {
+    if (tooManyGamesInfoLabel == null)
+    {
+      tooManyGamesInfoLabel = new JLabel("<html>The gamelist view contains more than 255 games. Only 255 games can be shown in the carousel or added to a folder in the file loader.</html>");
+      tooManyGamesInfoLabel.setIcon(UIManager.getIcon("OptionPane.warningIcon"));
+    }
+    return tooManyGamesInfoLabel;
+  }
+  
+  private void showTooManyGamesLabel(boolean visible)
+  {
+    getTooManyGamesInfoLabel().setVisible(visible);
   }
 
   private JButton getPreviewButton()
@@ -650,6 +678,7 @@ public class ListPanel extends JPanel
       text = text + " (" + selectedGames + "/" + selectedFileCount + ")";
     }
     getViewInfoLabel().setText(text);
+    showTooManyGamesLabel(uiModel.getSelectedGameView().getGameViewId() != -1 && uiModel.getSelectedGameView().getGameCount() > 255);
   }
 
   private void updateSelectedGame()

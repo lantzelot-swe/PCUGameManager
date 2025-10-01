@@ -185,7 +185,7 @@ public class ExportMainPanel extends JPanel
   {
     if (gameViewsSelectionPanel == null)
     {
-      gameViewsSelectionPanel = new ExportGameViewsSelectionPanel(exportButton, selectedDatabase);
+      gameViewsSelectionPanel = new ExportGameViewsSelectionPanel(exportButton, selectedDatabase, carouselMode);
     }
     return gameViewsSelectionPanel;
   }
@@ -228,7 +228,7 @@ public class ExportMainPanel extends JPanel
   {
     if (exportGamesSelectionPanel == null)
     {
-      exportGamesSelectionPanel = new ExportGamesSelectionPanel(exportButton, selectedDatabase);
+      exportGamesSelectionPanel = new ExportGamesSelectionPanel(exportButton, selectedDatabase, carouselMode);
     }
     return exportGamesSelectionPanel;
   }

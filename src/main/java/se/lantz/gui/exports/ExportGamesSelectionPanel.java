@@ -49,10 +49,12 @@ public class ExportGamesSelectionPanel extends JPanel
   private JLabel countLabel;
   private JButton exportButton;
   private ExportGameViewsSelectionPanel exportGameViewsSelectionPanel;
+  private boolean carouselMode;
 
-  public ExportGamesSelectionPanel(JButton exportButton, String selectedDatabase)
+  public ExportGamesSelectionPanel(JButton exportButton, String selectedDatabase, boolean carouselMode)
   {
     this.exportButton = exportButton;
+    this.carouselMode = carouselMode;
     exportButton.setEnabled(false);
     uiModel = new MainViewModel(selectedDatabase);
     GridBagLayout gridBagLayout = new GridBagLayout();
@@ -121,7 +123,7 @@ public class ExportGamesSelectionPanel extends JPanel
       gbc_listScrollPane.fill = GridBagConstraints.BOTH;
       gbc_listScrollPane.gridx = 0;
       gbc_listScrollPane.gridy = 1;
-      listPanel.setPreferredSize(new Dimension(325, 400));
+      listPanel.setPreferredSize(new Dimension(325, 370));
       listPanel.add(getListScrollPane(), gbc_listScrollPane);
     }
     return listPanel;
@@ -233,7 +235,7 @@ public class ExportGamesSelectionPanel extends JPanel
       gbc_countLabel.anchor = GridBagConstraints.EAST;
       gbc_countLabel.gridx = 0;
       gbc_countLabel.gridy = 1;
-      selectedListPanel.setPreferredSize(new Dimension(325, 400));
+      selectedListPanel.setPreferredSize(new Dimension(325, 370));
       selectedListPanel.add(getCountLabel(), gbc_countLabel);
     }
     return selectedListPanel;
@@ -338,8 +340,18 @@ public class ExportGamesSelectionPanel extends JPanel
   {
     if (warningLabel == null)
     {
-      warningLabel = new JLabel("The game carousel only support " + MAX_GAMES +
-        " games in total. Are you sure you want to export more than that?");
+      String text = "";
+      if (carouselMode)
+      {
+        text = "The game carousel only support " + MAX_GAMES +
+          " games in total. Are you sure you want to export more than that?";
+      }
+      else
+      {
+        text = "The file loader folders only support " + MAX_GAMES +
+          " games in total. Are you sure you want to export more than that?";
+      }
+      warningLabel = new JLabel(text);
       warningLabel.setIcon(UIManager.getIcon("OptionPane.warningIcon"));
       warningLabel.setVisible(false);
     }
