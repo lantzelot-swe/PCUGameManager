@@ -622,6 +622,7 @@ public class ScreenshotsPanel extends JPanel
               {
                 gamesFileUpdated = true;
                 infomodel.setGamesPath(files[0]);
+                MainWindow.getInstance().toFront();
               }
             }
           }

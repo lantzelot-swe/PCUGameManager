@@ -159,6 +159,10 @@ public class InfoPanel extends JPanel
     {
       model.addPropertyChangeListener(e -> modelChanged());
     }
+    //Move focus so that it's possible to press CTRL+S directly after updating the game file
+    model.addPropertyChangeListener("gamesPath", e -> {
+      SwingUtilities.invokeLater(() -> getDescriptionPanel().getDescriptionTextArea().requestFocusInWindow());
+    });
   }
 
   private void modelChanged()

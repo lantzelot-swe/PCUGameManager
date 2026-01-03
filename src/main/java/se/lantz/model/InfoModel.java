@@ -458,7 +458,7 @@ public class InfoModel extends AbstractModel implements CommonInfoModel
 
     if (!Objects.equals(old, gamesPath))
     {
-      notifyChange();
+      notifyChange("gamesPath");
     }
   }
 
