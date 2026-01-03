@@ -325,9 +325,22 @@ public class MobyGamesScraper implements Scraper
           else
           {
             Element commaListElement = musicParent.getElementsByClass("commaList").first();
-            final List<String> musicList = new ArrayList<>();
-            commaListElement.getElementsByTag("li").forEach(liElement -> musicList.add(liElement.text()));
-            value = String.join(",", musicList);
+            if (commaListElement == null)
+            {
+              Elements tdElements = musicParent.getElementsByTag("td");
+              //Get last music element
+              commaListElement = tdElements.get(tdElements.size() -1);
+            }
+            if (commaListElement != null)
+            {
+              final List<String> musicList = new ArrayList<>();
+              commaListElement.getElementsByTag("li").forEach(liElement -> musicList.add(liElement.text()));
+              if (musicList.isEmpty())
+              {
+                musicList.add(commaListElement.text());
+              }
+              value = String.join(",", musicList);
+            }
           }
         }
       }
