@@ -2,10 +2,14 @@ package se.lantz.gui;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Graphics2D;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Image;
 import java.awt.Insets;
+import java.awt.Toolkit;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.DataFlavor;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
@@ -21,6 +25,7 @@ import java.nio.file.PathMatcher;
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -28,6 +33,8 @@ import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JTextField;
 import javax.swing.border.TitledBorder;
+import javax.swing.event.PopupMenuEvent;
+import javax.swing.event.PopupMenuListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import org.slf4j.Logger;
@@ -382,8 +389,40 @@ public class ScreenshotsPanel extends JPanel
             infomodel.setCoverImage(handleCoverFileDrop(files, coverImageLabel));
           }
         });
+      setupPastePopupMenu(coverImageLabel, e -> pasteCoverImageFromClipboard());
     }
     return coverImageLabel;
+  }
+
+  private void setupPastePopupMenu(JComponent component, ActionListener actionForPaste)
+  {
+    JPopupMenu menu = new JPopupMenu();
+    InsetsMenuItem pasteImageItem = new InsetsMenuItem("Paste clipboard image");
+    menu.addPopupMenuListener(new PopupMenuListener()
+      {
+        @Override
+        public void popupMenuWillBecomeVisible(PopupMenuEvent e)
+        {
+          //Check if the clipboard contains an image and change state of the paste item
+          Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+          // Check if the content is an image
+          pasteImageItem.setEnabled(clipboard.isDataFlavorAvailable(DataFlavor.imageFlavor));
+        }
+        @Override
+        public void popupMenuWillBecomeInvisible(PopupMenuEvent e)
+        {
+          //Empty        
+        }
+        @Override
+        public void popupMenuCanceled(PopupMenuEvent e)
+        {
+          //Empty    
+        }
+      });
+
+    pasteImageItem.addActionListener(actionForPaste);
+    menu.add(pasteImageItem);
+    component.setComponentPopupMenu(menu);
   }
 
   private JButton getChangeCoverButton()
@@ -401,6 +440,95 @@ public class ScreenshotsPanel extends JPanel
       changeCoverButton.setMargin(new Insets(1, 3, 1, 3));
     }
     return changeCoverButton;
+  }
+
+  private void pasteCoverImageFromClipboard()
+  {
+    try
+    {
+      // Get the system clipboard
+      Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+      // Check if the content is an image
+      if (clipboard.isDataFlavorAvailable(DataFlavor.imageFlavor))
+      {
+        // Get the image from the clipboard
+        Image image = (Image) clipboard.getData(DataFlavor.imageFlavor);
+        logger.debug("Image transferred successfully: " + image.getWidth(null) + "x" + image.getHeight(null));
+
+        BufferedImage selectedImage = handleCoverBufferedImage(toBufferedImage(image), coverImageLabel);
+        //Update model
+        infomodel.setCoverImage(selectedImage);
+      }
+      else
+      {
+        logger.debug("No image data found in clipboard.");
+      }
+    }
+    catch (Exception e)
+    {
+      logger.error("Can't paste image", e);
+    }
+  }
+
+  private void pasteScreenImageFromClipboard(JLabel imageLabel, JButton editButton, boolean first)
+  {
+    try
+    {
+      // Get the system clipboard
+      Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+
+      // Check if the content is an image
+      if (clipboard.isDataFlavorAvailable(DataFlavor.imageFlavor))
+      {
+        // Get the image from the clipboard
+        Image image = (Image) clipboard.getData(DataFlavor.imageFlavor);
+        logger.debug("Image transferred successfully: " + image.getWidth(null) + "x" + image.getHeight(null));
+
+        BufferedImage selectedImage = handleScreenBufferedImage(toBufferedImage(image), imageLabel, editButton, first);
+        //Update model
+        if (first)
+        {
+          infomodel.setScreen1Image(selectedImage);
+        }
+        else
+        {
+          infomodel.setScreen2Image(selectedImage);
+        }
+      }
+      else
+      {
+        logger.debug("No image data found in clipboard.");
+      }
+    }
+    catch (Exception e)
+    {
+      logger.error("Can't paste image", e);
+    }
+  }
+
+  /**
+   * Converts a given Image into a BufferedImage
+   *
+   * @param img The Image to be converted
+   * @return The converted BufferedImage
+   */
+  public BufferedImage toBufferedImage(Image img)
+  {
+    if (img instanceof BufferedImage)
+    {
+      return (BufferedImage) img;
+    }
+
+    // Create a buffered image with transparency
+    BufferedImage bimage = new BufferedImage(img.getWidth(null), img.getHeight(null), BufferedImage.TYPE_INT_ARGB);
+
+    // Draw the image on to the buffered image
+    Graphics2D bGr = bimage.createGraphics();
+    bGr.drawImage(img, 0, 0, null);
+    bGr.dispose();
+
+    // Return the buffered image
+    return bimage;
   }
 
   private JPanel getScreenshotPanel()
@@ -484,6 +612,8 @@ public class ScreenshotsPanel extends JPanel
             infomodel.setScreen1Image(handleScreenFileDrop(files, screen1ImageLabel, edit1Button, true));
           }
         });
+
+      setupPastePopupMenu(screen1ImageLabel, e -> pasteScreenImageFromClipboard(screen1ImageLabel, edit1Button, true));
     }
     return screen1ImageLabel;
   }
@@ -517,6 +647,7 @@ public class ScreenshotsPanel extends JPanel
             infomodel.setScreen2Image(handleScreenFileDrop(files, screen2ImageLabel, edit2Button, false));
           }
         });
+      setupPastePopupMenu(screen2ImageLabel, e -> pasteScreenImageFromClipboard(screen2ImageLabel, edit2Button, false));
     }
     return screen2ImageLabel;
   }
@@ -741,32 +872,7 @@ public class ScreenshotsPanel extends JPanel
     {
       try
       {
-        returnImage = ImageIO.read(files[0]);
-        if (returnImage == null)
-        {
-          JOptionPane.showMessageDialog(getCoverImageLabel(),
-                                        "Invalid file format, it must be a png, gif, jpeg or bmp file.",
-                                        "Cover file",
-                                        JOptionPane.ERROR_MESSAGE);
-          return null;
-        }
-        if (FileManager.isShowCropDialogForCover())
-        {
-          //Show a edit dialog
-          EditCoverDialog dialog = new EditCoverDialog(returnImage);
-          dialog.pack();
-          dialog.setLocationRelativeTo(MainWindow.getInstance());
-          if (dialog.showDialog())
-          {
-            returnImage = dialog.getEditedImage();
-          }
-          else
-          {
-            return null;
-          }
-        }
-        Image newImage = returnImage.getScaledInstance(130, 200, Image.SCALE_SMOOTH);
-        imageLabel.setIcon(new ImageIcon(newImage));
+        returnImage = handleCoverBufferedImage(ImageIO.read(files[0]), imageLabel);
       }
       catch (IOException e)
       {
@@ -777,6 +883,37 @@ public class ScreenshotsPanel extends JPanel
     return returnImage;
   }
 
+  private BufferedImage handleCoverBufferedImage(BufferedImage image, JLabel imageLabel)
+  {
+    BufferedImage returnImage = image;
+    if (returnImage == null)
+    {
+      JOptionPane.showMessageDialog(getCoverImageLabel(),
+                                    "Invalid file format, it must be a png, gif, jpeg or bmp file.",
+                                    "Cover file",
+                                    JOptionPane.ERROR_MESSAGE);
+      return null;
+    }
+    if (FileManager.isShowCropDialogForCover())
+    {
+      //Show a edit dialog
+      EditCoverDialog dialog = new EditCoverDialog(returnImage);
+      dialog.pack();
+      dialog.setLocationRelativeTo(MainWindow.getInstance());
+      if (dialog.showDialog())
+      {
+        returnImage = dialog.getEditedImage();
+      }
+      else
+      {
+        return null;
+      }
+    }
+    Image newImage = returnImage.getScaledInstance(130, 200, Image.SCALE_SMOOTH);
+    imageLabel.setIcon(new ImageIcon(newImage));
+    return returnImage;
+  }
+
   private BufferedImage handleScreenFileDrop(File[] files, JLabel imageLabel, JButton editButton, boolean first)
   {
     BufferedImage returnImage = null;
@@ -784,40 +921,7 @@ public class ScreenshotsPanel extends JPanel
     {
       try
       {
-        returnImage = ImageIO.read(files[0]);
-        if (returnImage == null)
-        {
-          JOptionPane.showMessageDialog(getScreenshotPanel(),
-                                        "Invalid file format, it must be a png, gif, jpeg or bmp file.",
-                                        "Screenshot file",
-                                        JOptionPane.ERROR_MESSAGE);
-          return null;
-        }
-        if (infomodel.isInfoSlot())
-        {
-          //Ask if text shall be added
-          int value = JOptionPane.showConfirmDialog(getScreenshotPanel(),
-                                                    "Do you want to add the gamelist view name to the screenshot?",
-                                                    "Screenshot file",
-                                                    JOptionPane.YES_NO_OPTION,
-                                                    JOptionPane.INFORMATION_MESSAGE);
-          if (value == JOptionPane.YES_OPTION)
-          {
-            //Make sure the image is of right size before adding text to it
-            returnImage = FileManager.scaleImageTo320x200x32bit(returnImage);
-            model.writeGameViewTextOnScreen(returnImage, first ? Color.yellow : Color.red);
-          }
-        }
-        if (FileManager.isCropScreenshots())
-        {
-          editButton.setVisible(false);
-          returnImage = FileManager.cropImageTo320x200(returnImage);
-        }
-        else
-        {
-          setEditButtonVisibility(returnImage, editButton);
-        }
-        imageLabel.setIcon(new ImageIcon(FileManager.scaleImageTo320x200x32bit(returnImage)));
+        returnImage = handleScreenBufferedImage(ImageIO.read(files[0]), imageLabel, editButton, first);
       }
       catch (IOException e)
       {
@@ -825,6 +929,49 @@ public class ScreenshotsPanel extends JPanel
         imageLabel.setIcon(getMissingScreenshotImageIcon());
       }
     }
+    return returnImage;
+  }
+
+  private BufferedImage handleScreenBufferedImage(BufferedImage image,
+                                                  JLabel imageLabel,
+                                                  JButton editButton,
+                                                  boolean first)
+  {
+    BufferedImage returnImage = image;
+    if (returnImage == null)
+    {
+      JOptionPane.showMessageDialog(getScreenshotPanel(),
+                                    "Invalid file format, it must be a png, gif, jpeg or bmp file.",
+                                    "Screenshot file",
+                                    JOptionPane.ERROR_MESSAGE);
+      return null;
+    }
+
+    if (infomodel.isInfoSlot())
+    {
+      //Ask if text shall be added
+      int value = JOptionPane.showConfirmDialog(getScreenshotPanel(),
+                                                "Do you want to add the gamelist view name to the screenshot?",
+                                                "Screenshot file",
+                                                JOptionPane.YES_NO_OPTION,
+                                                JOptionPane.INFORMATION_MESSAGE);
+      if (value == JOptionPane.YES_OPTION)
+      {
+        //Make sure the image is of right size before adding text to it
+        returnImage = FileManager.scaleImageTo320x200x32bit(returnImage);
+        model.writeGameViewTextOnScreen(returnImage, first ? Color.yellow : Color.red);
+      }
+    }
+    if (FileManager.isCropScreenshots())
+    {
+      editButton.setVisible(false);
+      returnImage = FileManager.cropImageTo320x200(returnImage);
+    }
+    else
+    {
+      setEditButtonVisibility(returnImage, editButton);
+    }
+    imageLabel.setIcon(new ImageIcon(FileManager.scaleImageTo320x200x32bit(returnImage)));
     return returnImage;
   }
 
