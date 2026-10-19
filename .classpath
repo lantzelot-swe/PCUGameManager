@@ -24,7 +24,6 @@
   <classpathentry kind="var" path="M2_REPO/io/github/spannm/ucanaccess/5.2.0/ucanaccess-5.2.0.jar" sourcepath="M2_REPO/io/github/spannm/ucanaccess/5.2.0/ucanaccess-5.2.0-sources.jar"/>
   <classpathentry kind="var" path="M2_REPO/org/hsqldb/hsqldb/2.7.4/hsqldb-2.7.4.jar" sourcepath="M2_REPO/org/hsqldb/hsqldb/2.7.4/hsqldb-2.7.4-sources.jar"/>
   <classpathentry kind="var" path="M2_REPO/io/github/spannm/jackcess/5.2.0/jackcess-5.2.0.jar" sourcepath="M2_REPO/io/github/spannm/jackcess/5.2.0/jackcess-5.2.0-sources.jar"/>
-  <classpathentry kind="var" path="M2_REPO/commons-lang/commons-lang/2.6/commons-lang-2.6.jar" sourcepath="M2_REPO/commons-lang/commons-lang/2.6/commons-lang-2.6-sources.jar"/>
   <classpathentry kind="var" path="M2_REPO/commons-logging/commons-logging/1.1.1/commons-logging-1.1.1.jar" sourcepath="M2_REPO/commons-logging/commons-logging/1.1.1/commons-logging-1.1.1-sources.jar"/>
   <classpathentry kind="var" path="M2_REPO/com/github/junrar/junrar/0.7/junrar-0.7.jar" sourcepath="M2_REPO/com/github/junrar/junrar/0.7/junrar-0.7-sources.jar"/>
   <classpathentry kind="var" path="M2_REPO/commons-logging/commons-logging-api/1.1/commons-logging-api-1.1.jar"/>
