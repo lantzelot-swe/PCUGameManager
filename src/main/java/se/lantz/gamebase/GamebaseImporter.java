@@ -170,7 +170,7 @@ public class GamebaseImporter
       Statement statement = connection.createStatement();
 
       String sql = "SELECT Games.Name, Musicians.Musician, PGenres.ParentGenre, Publishers.Publisher, Games.Filename, Games.ScrnshotFilename, Years.Year, Games.GA_Id, Games.Control, Games.V_PalNTSC, Games.V_TrueDriveEmu, Games.Gemus, Crackers.Cracker\r\n" + 
-        "FROM Crackers INNER JOIN (PGenres INNER JOIN (Years INNER JOIN (Publishers INNER JOIN ((Games INNER JOIN Musicians ON Games.MU_Id = Musicians.MU_Id) INNER JOIN Genres ON Games.GE_Id = Genres.GE_Id) ON Publishers.PU_Id = Games.PU_Id) ON Years.YE_Id = Games.YE_Id) ON PGenres.PG_Id = Genres.PG_Id) ON Crackers.CR_Id = Games.CR_Id\r\n";
+        "FROM Games INNER JOIN Musicians ON Games.MU_Id = Musicians.MU_Id INNER JOIN Genres ON Games.GE_Id = Genres.GE_Id INNER JOIN PGenres ON Genres.PG_Id = PGenres.PG_Id INNER JOIN Publishers ON Games.PU_Id = Publishers.PU_Id INNER JOIN Years ON Games.YE_Id = Years.YE_Id INNER JOIN Crackers ON Games.CR_Id = Crackers.CR_Id\r\n";
       String condition = "";
       switch (selectedOption)
       {
