@@ -2109,7 +2109,7 @@ public class FileManager
       FileHeader fh = getFirstMatchingRarEntry(archive);
       if (fh != null)
       {
-        String fileName = fh.getFileNameString().trim();
+        String fileName = fh.getFileName().trim();
         String extension = FilenameUtils.getExtension(fileName);
         fileName = FilenameUtils.removeExtension(fileName);
         //remove all "." in name ...
@@ -2136,7 +2136,7 @@ public class FileManager
   private static FileHeader getFirstMatchingRarEntry(Archive archive)
   {
     FileHeader fh = archive.nextFileHeader();
-    if (fh != null && !isValidFileEnding(fh.getFileNameString().trim().toLowerCase()))
+    if (fh != null && !isValidFileEnding(fh.getFileName().trim().toLowerCase()))
     {
       fh = getFirstMatchingRarEntry(archive);
     }
