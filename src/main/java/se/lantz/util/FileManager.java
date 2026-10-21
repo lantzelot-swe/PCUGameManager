@@ -38,7 +38,6 @@ import javax.imageio.ImageIO;
 import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -818,7 +817,11 @@ public class FileManager
     if (dotCount > 4)
     {
       //Strip string to only include 4 dots, seems to be a limit there
-      int endIndex = StringUtils.ordinalIndexOf(name, ".", 5);
+      int endIndex = -1;
+      for (int i = 0; i < 5; i++)
+      {
+        endIndex = name.indexOf('.', endIndex + 1);
+      }
       name = name.substring(0, endIndex);
     }
     if (name.endsWith("."))
@@ -2161,13 +2164,13 @@ public class FileManager
     {
       return false;
     }
-    return validDiskFilesEndingList.stream().anyMatch(ending -> StringUtils.containsIgnoreCase(fileName, "." + ending));
+    return validDiskFilesEndingList.stream().anyMatch(ending -> fileName.toLowerCase().contains("." + ending));
   }
 
   public static boolean isValidCompressedDiskFileEnding(String fileName)
   {
     return compressedDiskFilesEndingList.stream()
-      .anyMatch(ending -> StringUtils.containsIgnoreCase(fileName, "." + ending + "."));
+      .anyMatch(ending -> fileName.toLowerCase().contains("." + ending + "."));
   }
 
   public static List<String> convertAllScreenshotsTo32Bit() throws IOException

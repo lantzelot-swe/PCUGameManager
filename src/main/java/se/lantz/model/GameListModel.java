@@ -8,8 +8,6 @@ import java.util.function.BiPredicate;
 
 import javax.swing.DefaultListModel;
 
-import org.apache.commons.lang.math.NumberUtils;
-
 import se.lantz.model.data.GameListData;
 
 public class GameListModel extends DefaultListModel<GameListData>
@@ -55,7 +53,7 @@ public class GameListModel extends DefaultListModel<GameListData>
     else if (filterText.startsWith("y:"))
     {
       String year = filterText.substring(2);
-      found = NumberUtils.isNumber(year) && data.getYear() == Integer.parseInt(year);
+      found = year.matches("\\d{1,4}") && data.getYear() == Integer.parseInt(year);
     }
     else if (filterText.startsWith("v:"))
     {
