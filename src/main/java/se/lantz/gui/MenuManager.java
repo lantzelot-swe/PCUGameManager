@@ -2141,7 +2141,7 @@ public class MenuManager
   {
     String message =
       "<html>Some VICE snapshots of games made for NTSC does not run properly on a PAL machine, and vice versa. You need to start them twice from the carousel." +
-        "<br>See this thread on <a href=\"https://thec64community.online/thread/790/pcuae-problem-starting-games-first\">TheC64 Community forum</a>." +
+        "<br>See this thread on <a href=\"https://thec64community.online/thread/1081/games-simply-opening-classic-screen\">TheC64 Community forum</a>." +
         "<br><br>Do you want to swap the game file with the first saved state and change system type for the selected game?</html>";
 
     JEditorPane infoEditorPane = new JEditorPane("text/html", message);
