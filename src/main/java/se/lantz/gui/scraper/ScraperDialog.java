@@ -49,9 +49,9 @@ public class ScraperDialog extends BaseDialog
     content.setLayout(new BorderLayout());
     cardPanel = new JPanel();
     cardPanel.setLayout(cardLayout);
-    cardPanel.add(getMobyGamesPanel(), MOBY);
     cardPanel.add(getC64comPanel(), C64COM);
     cardPanel.add(getGb64comPanel(), GB64COM);
+    cardPanel.add(getMobyGamesPanel(), MOBY);
     content.add(cardPanel, BorderLayout.CENTER);
     addContent(content);
     content.add(getScraperSelectionPanel(), BorderLayout.NORTH);
@@ -174,7 +174,8 @@ public class ScraperDialog extends BaseDialog
             }
           }
         });
-      scraperComboBox.addItem(WWW_MOBYGAMES_COM);
+      //Removed, the Moby Scraper does not work due to cloudflare protection. Look into this in more detail later.
+      //scraperComboBox.addItem(WWW_MOBYGAMES_COM);
       scraperComboBox.addItem(WWW_GAMEBASE_COM);
       scraperComboBox.addItem(WWW_C64_COM);
     }
