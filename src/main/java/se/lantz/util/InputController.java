@@ -1,12 +1,22 @@
 package se.lantz.util;
 
+import java.lang.reflect.Constructor;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+
 import javax.swing.SwingUtilities;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import net.java.games.input.Component;
+import net.java.games.input.Component.Identifier;
 import net.java.games.input.Controller;
+import net.java.games.input.Controller.Type;
 import net.java.games.input.ControllerEnvironment;
 import net.java.games.input.Event;
 import net.java.games.input.EventQueue;
@@ -23,18 +33,60 @@ public class InputController
 
   /* Create an event object for the underlying plugin to populate */
   Event event = new Event();
-  Controller[] controllers;
+  private static volatile List<Controller> controllers = Collections.synchronizedList(new ArrayList<>());
   private volatile boolean poll = true;
 
   private CarouselPreviewDialog dialog;
 
+  private static ExecutorService threadExecutor = Executors.newSingleThreadExecutor();
+  private Future<String> runningTask;
+
   public InputController(CarouselPreviewDialog dialog)
   {
     this.dialog = dialog;
-    /* Get the available controllers, this includes mouse and keyboards, but that doesn't really matter */
-    controllers = ControllerEnvironment.getDefaultEnvironment().getControllers();
-    Thread thread = new Thread(() -> processEvents(), "Joystick polling thread");
-    thread.start();
+    scanAvailableControllers();
+  }
+
+  /**
+   * Stops the joystick polling thread if running and scans for available controllers. The joystick pooling thread is
+   * started after the scan.
+   */
+  public void scanAvailableControllers()
+  {
+    try
+    {
+      this.poll = false;
+      //Wait for the running task to complete
+      if (runningTask != null)
+      {
+        runningTask.get();
+      }
+      logger.debug("Scan for available controllers...");
+      // Find the default environment constructor (it's package-private)
+      Class<?> clazz = Class.forName("net.java.games.input.DefaultControllerEnvironment");
+      Constructor<?> constructor = clazz.getDeclaredConstructors()[0];
+
+      // Deactivate access control checks to allow instantiation
+      constructor.setAccessible(true);
+
+      // Create a brand new environment instance and fetch updated controllers
+      ControllerEnvironment env = (ControllerEnvironment) constructor.newInstance();
+      controllers.clear();
+      for (Controller controller : env.getControllers())
+      {
+        logger.debug(controller.getName() + ":" + controller.getType());
+        if (controller.getType().equals(Type.STICK) || controller.getType().equals(Type.GAMEPAD))
+        {
+          controllers.add(controller);
+        }
+      }
+      this.poll = true;
+      runningTask = threadExecutor.submit(() -> processEvents(), "");
+    }
+    catch (Exception e)
+    {
+      logger.error("rescan of controllers failed.", e);
+    }
   }
 
   public void stop()
@@ -71,11 +123,13 @@ public class InputController
           /* Get event component */
           Component comp = event.getComponent();
 
-          if (comp.getName().equals("X Axis"))
+          Identifier id = comp.getIdentifier();
+          logger.debug("Comp identifier = " + comp.getIdentifier().getName());
+          if (id == Component.Identifier.Axis.X)
           {
             logger.debug("value = " + event.getValue());
             if (event.getValue() == POSITIVE_VALUE)
-            {             
+            {
               logger.debug("Event detected! right!");
               rightDetected = true;
             }
@@ -91,7 +145,7 @@ public class InputController
             }
           }
 
-          if (comp.getName().equals("Y Axis"))
+          if (id == Component.Identifier.Axis.Y)
           {
             logger.debug("value = " + event.getValue());
             if (event.getValue() == POSITIVE_VALUE)
@@ -112,7 +166,7 @@ public class InputController
             }
           }
 
-          if (comp.getName().contains("Button"))
+          if (id instanceof Component.Identifier.Button)
           {
             if (event.getValue() == POSITIVE_VALUE)
             {
@@ -176,5 +230,6 @@ public class InputController
         }
       }
     }
+    logger.debug("Exiting joystick pooling task.");
   }
 }

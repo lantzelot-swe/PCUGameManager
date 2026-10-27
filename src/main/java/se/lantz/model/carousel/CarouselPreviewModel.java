@@ -131,6 +131,11 @@ public class CarouselPreviewModel extends AbstractModel
     GameDetails details = mainModel.getCurrentGameDetails();
     setSelectedGame(details);
   }
+  
+  public boolean unsavedChangesAvailable()
+  {
+    return mainModel.isDataChanged();
+  }
 
   public void dispose()
   {

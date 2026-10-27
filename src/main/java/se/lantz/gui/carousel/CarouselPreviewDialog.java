@@ -1,6 +1,7 @@
 package se.lantz.gui.carousel;
 
 import java.awt.Color;
+import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
@@ -55,11 +56,26 @@ public class CarouselPreviewDialog extends BaseDialog
 
   private Action reloadAction = new AbstractAction()
     {
+      private final Timer cooldownTimer = new Timer(1000, event -> {
+        // Cooldown finished: Re-enable the action so it can be triggered again
+        setEnabled(true);
+      });
+      {
+        // Configure the timer to only run once per trigger, not loop infinitely
+        cooldownTimer.setRepeats(false);
+      }
+
       @Override
       public void actionPerformed(ActionEvent e)
       {
+        setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+        setEnabled(false);
         logger.debug("Reloading carousel");
         model.reloadCarousel();
+        logger.debug("Rescan of input controllers");
+        inputController.scanAvailableControllers();
+        cooldownTimer.start();
+        setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
       }
     };
 
@@ -69,11 +85,11 @@ public class CarouselPreviewDialog extends BaseDialog
   {
     super(owner);
     this.fullscreen = fullscreen;
-    
+
     this.model = new CarouselPreviewModel(uiModel);
     this.uiModel = uiModel;
     this.mainWindow = owner;
-    
+
     this.setResizable(false);
     this.setModal(false);
 
@@ -85,8 +101,9 @@ public class CarouselPreviewDialog extends BaseDialog
     else
     {
       addContent(getBackgroundPanel());
+      getBackgroundPanel().addMouseWheelListener(e -> getBackgroundPanel().mouseWheelScrolled(e));
     }
-    
+
     getButtonPanel().setVisible(false);
 
     getBackgroundPanel().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("F5"), "reload");
@@ -156,6 +173,8 @@ public class CarouselPreviewDialog extends BaseDialog
     gbc_centerPanel.gridx = 0;
     gbc_centerPanel.gridy = 1;
     centerPanel.add(getBackgroundPanel(), gbc_centerPanel);
+    //Add mouseWheel listener so that scrolling the mouse always work
+    centerPanel.addMouseWheelListener(e -> getBackgroundPanel().mouseWheelScrolled(e));
     return centerPanel;
   }
 
@@ -187,13 +206,13 @@ public class CarouselPreviewDialog extends BaseDialog
   @Override
   public boolean showDialog()
   {
-    inputController = new InputController(this);  
+    inputController = new InputController(this);
     return super.showDialog();
   }
 
   public void scrollRight()
   {
-    if (this.isActive())
+    if (this.isActive() || mainWindow.isActive())
     {
       logger.debug("scrolling right!");
       getBackgroundPanel().getActionMap().get("scrollRight").actionPerformed(new ActionEvent(this, 0, ""));
@@ -203,7 +222,7 @@ public class CarouselPreviewDialog extends BaseDialog
 
   public void scrollUp()
   {
-    if (this.isActive())
+    if (this.isActive() || mainWindow.isActive())
     {
       logger.debug("scrolling up!");
       getBackgroundPanel().getActionMap().get("pageUp").actionPerformed(new ActionEvent(this, 0, ""));
@@ -213,7 +232,7 @@ public class CarouselPreviewDialog extends BaseDialog
 
   public void scrollDown()
   {
-    if (this.isActive())
+    if (this.isActive() || mainWindow.isActive())
     {
       logger.debug("scrolling down!");
       getBackgroundPanel().getActionMap().get("pageDown").actionPerformed(new ActionEvent(this, 0, ""));
@@ -232,7 +251,7 @@ public class CarouselPreviewDialog extends BaseDialog
 
   public void scrollLeft()
   {
-    if (this.isActive())
+    if (this.isActive() || mainWindow.isActive())
     {
       getBackgroundPanel().getActionMap().get("scrollLeft").actionPerformed(new ActionEvent(this, 0, ""));
       scrollLeftTimer.restart();
@@ -241,9 +260,9 @@ public class CarouselPreviewDialog extends BaseDialog
 
   public void runGame()
   {
-    if (this.isActive())
+    if (this.isActive() || mainWindow.isActive())
     {
-      uiModel.runGameInVice(false);
+      getBackgroundPanel().getActionMap().get("runGame").actionPerformed(new ActionEvent(this, 0, ""));
     }
   }
 }

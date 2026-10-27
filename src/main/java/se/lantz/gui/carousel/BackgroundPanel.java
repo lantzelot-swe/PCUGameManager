@@ -9,6 +9,7 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseWheelEvent;
 import java.awt.image.BufferedImage;
 import java.beans.Beans;
 import java.io.File;
@@ -79,16 +80,17 @@ public class BackgroundPanel extends JPanel
       //trigger once at startup
       reloadScreens();
     }
-
-    this.addMouseWheelListener(a -> getCoverPanel().scrollOneGame(a.getWheelRotation() > 0));
-
+    
     this.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "runGame");
     this.getActionMap().put("runGame", new AbstractAction()
       {
         @Override
         public void actionPerformed(ActionEvent e)
         {
-          model.runCurrentGame();
+          if (!model.unsavedChangesAvailable())
+          {
+            model.runCurrentGame();
+          }
         }
       });
 
@@ -98,7 +100,10 @@ public class BackgroundPanel extends JPanel
         @Override
         public void actionPerformed(ActionEvent e)
         {
-          getCoverPanel().scrollOneGame(true);
+          if (!model.unsavedChangesAvailable())
+          {
+            getCoverPanel().scrollOneGame(true);
+          }
         }
       });
 
@@ -108,7 +113,10 @@ public class BackgroundPanel extends JPanel
         @Override
         public void actionPerformed(ActionEvent e)
         {
-          getCoverPanel().scrollOneGame(false);
+          if (!model.unsavedChangesAvailable())
+          {
+            getCoverPanel().scrollOneGame(false);
+          }
         }
       });
     
@@ -118,7 +126,10 @@ public class BackgroundPanel extends JPanel
         @Override
         public void actionPerformed(ActionEvent e)
         {
-          getCoverPanel().pageUpTriggered();
+          if (!model.unsavedChangesAvailable())
+          {
+            getCoverPanel().pageUpTriggered();
+          }
         }
       });
       getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_PAGE_DOWN, 0), "pageDown");
@@ -127,9 +138,17 @@ public class BackgroundPanel extends JPanel
           @Override
           public void actionPerformed(ActionEvent e)
           {
-            getCoverPanel().pageDownTriggered();
+            if (!model.unsavedChangesAvailable())
+            {
+              getCoverPanel().pageDownTriggered();
+            }
           }
         });
+  }
+  
+  public void mouseWheelScrolled(MouseWheelEvent e)
+  {
+    getCoverPanel().scrollOneGame(e.getWheelRotation() > 0);
   }
 
   private void reloadScreens()

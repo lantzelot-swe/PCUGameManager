@@ -398,6 +398,8 @@ public class ListPanel extends JPanel
   {
     //Called from Carousel, make sure no filtering is active
     getFilterTextField().setText("");
+    //Make sure focus is set to the list if the main window is the focus owner.
+    list.requestFocusInWindow();
 
     List<GameListData> currentGameList = uiModel.getGameListModel().getCurrentGameList();
     for (int i = 0; i < currentGameList.size(); i++)
