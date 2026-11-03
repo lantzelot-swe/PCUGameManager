@@ -17,9 +17,9 @@ import javax.swing.ToolTipManager;
 import javax.swing.UIManager;
 
 import se.lantz.gui.MainWindow;
-import se.lantz.gui.carousel.ScaledDialogDemo.ScalingRepaintManager;
 import se.lantz.gui.install.JreUpdateDialog;
 import se.lantz.gui.install.ManagerDownloadDialog;
+import se.lantz.gui.scale.ScalingRepaintManager;
 import se.lantz.model.PreferencesModel;
 import se.lantz.util.ExceptionHandler;
 import se.lantz.util.FileManager;

@@ -10,6 +10,8 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.beans.Beans;
 
 import javax.swing.AbstractAction;
@@ -25,7 +27,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import se.lantz.gui.MainWindow;
-import se.lantz.gui.carousel.ScaledDialogDemo.ScaleLayerUI;
+import se.lantz.gui.scale.ScaleLayerUI;
 import se.lantz.model.MainViewModel;
 import se.lantz.model.carousel.CarouselPreviewModel;
 import se.lantz.util.FileManager;
@@ -96,7 +98,7 @@ public class CarouselPreviewDialog extends JDialog
   KeyStroke zoomInKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_ADD, KeyEvent.CTRL_DOWN_MASK);
   KeyStroke zoomOutKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_SUBTRACT, KeyEvent.CTRL_DOWN_MASK);
 
-  Action escAction = new AbstractAction()
+  Action closeAction = new AbstractAction()
     {
       private static final long serialVersionUID = 1756396251349970052L;
 
@@ -105,6 +107,7 @@ public class CarouselPreviewDialog extends JDialog
       {
         model.updateCarouselZoomLevel(currentZoomLevel);
         setVisible(false);
+        dispose();
       }
     };
 
@@ -143,6 +146,17 @@ public class CarouselPreviewDialog extends JDialog
   public CarouselPreviewDialog(final MainWindow owner, final MainViewModel uiModel, final boolean fullscreen)
   {
     super(owner);
+    this.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
+
+    //Handle closing of the dialog with the "cross"
+    addWindowListener(new WindowAdapter()
+      {
+        @Override
+        public void windowClosing(WindowEvent e)
+        {
+          closeAction.actionPerformed(null);
+        }
+      });
     this.fullscreen = fullscreen;
 
     this.model = new CarouselPreviewModel(uiModel);
@@ -188,7 +202,7 @@ public class CarouselPreviewDialog extends JDialog
 
     //Register esc as closing the window
     getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(escKeyStroke, "closeDialog");
-    getRootPane().getActionMap().put("closeDialog", escAction);
+    getRootPane().getActionMap().put("closeDialog", closeAction);
     //Register zoom actions
     getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(zoomInKeyStroke, "zoomIn");
     getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(zoomOutKeyStroke, "zoomOut");

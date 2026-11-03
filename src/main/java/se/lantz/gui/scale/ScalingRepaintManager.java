@@ -8,7 +8,6 @@ import javax.swing.JLayer;
 import javax.swing.RepaintManager;
 import javax.swing.SwingUtilities;
 
-import se.lantz.gui.carousel.ScaledDialogDemo.ScaleLayerUI;
 
 /**
  * Repaint manager that recalculates dirty regions properly for JLayer components using a ScaleLayerUI.
