@@ -3,6 +3,7 @@ package se.lantz.model.carousel;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 
 import javax.swing.SwingUtilities;
 
@@ -12,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import se.lantz.model.AbstractModel;
 import se.lantz.model.MainViewModel;
 import se.lantz.model.data.GameDetails;
+import se.lantz.util.FileManager;
 
 public class CarouselPreviewModel extends AbstractModel
 {
@@ -30,6 +32,9 @@ public class CarouselPreviewModel extends AbstractModel
   private PropertyChangeListener selectedGameListener = e -> setSelectedGame(mainModel.getCurrentGameDetails());
   private PropertyChangeListener gameSavedListener = e -> gameSaved();
 
+  public static final String CAROUSEL_PREVIEW_ZOOM_LEVEL = "carouselPreviewZoomLevel";
+  private int carouselZoomLevel = 100;
+  
   public CarouselPreviewModel(MainViewModel mainModel)
   {
     this.mainModel = mainModel;
@@ -119,6 +124,12 @@ public class CarouselPreviewModel extends AbstractModel
       this.selectedGame = dataList.get(4);
       this.notifyChange(SELECTED_GAME);
     }
+  }
+  
+  public void updateCarouselZoomLevel(int zoomValue)
+  {
+    Properties configuredProperties = FileManager.getConfiguredProperties();
+    configuredProperties.put(CAROUSEL_PREVIEW_ZOOM_LEVEL, Integer.toString(zoomValue));
   }
   
   public void runCurrentGame()

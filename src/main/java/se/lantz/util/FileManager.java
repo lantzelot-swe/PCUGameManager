@@ -54,6 +54,7 @@ import se.lantz.model.PreferencesModel;
 import se.lantz.model.SavedStatesModel;
 import se.lantz.model.SavedStatesModel.SAVESTATE;
 import se.lantz.model.SystemModel;
+import se.lantz.model.carousel.CarouselPreviewModel;
 import se.lantz.model.data.GameDetails;
 import se.lantz.model.data.GameValidationDetails;
 import se.lantz.model.data.GameView;
@@ -1372,7 +1373,6 @@ public class FileManager
       {
         // load a properties file
         fileProperties.load(input);
-
       }
       catch (IOException ex)
       {
@@ -1457,6 +1457,12 @@ public class FileManager
   public static boolean isLaunchCarouselPreviewInFullscreen()
   {
     return Boolean.parseBoolean(FileManager.getConfiguredProperties().getProperty(PreferencesModel.LAUNCH_CAROUSEL_PREVIEW_FULLSCREEN, "true"));
+  }
+  
+  public static int getCarouselZoomLevel()
+  {
+    return Integer.parseInt(FileManager.getConfiguredProperties()
+                            .getProperty(CarouselPreviewModel.CAROUSEL_PREVIEW_ZOOM_LEVEL, Integer.toString(100)));
   }
 
   private static String getBackupFolderName(String targetFolderName)

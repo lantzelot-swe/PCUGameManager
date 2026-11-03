@@ -11,12 +11,13 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 
-import javax.swing.JOptionPane;
+import javax.swing.RepaintManager;
 import javax.swing.SwingUtilities;
 import javax.swing.ToolTipManager;
 import javax.swing.UIManager;
 
 import se.lantz.gui.MainWindow;
+import se.lantz.gui.carousel.ScaledDialogDemo.ScalingRepaintManager;
 import se.lantz.gui.install.JreUpdateDialog;
 import se.lantz.gui.install.ManagerDownloadDialog;
 import se.lantz.model.PreferencesModel;
@@ -44,6 +45,10 @@ public class PCUAEManager
       GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
       InputStream fontStream = PCUAEManager.class.getResourceAsStream("/se/lantz/C64_Pro-STYLE.ttf");
       ge.registerFont(Font.createFont(Font.TRUETYPE_FONT, fontStream));
+      //Repaint manager that handles scaling of UI:s
+      SwingUtilities.invokeLater(() -> {
+        RepaintManager.setCurrentManager(new ScalingRepaintManager());
+      });
     }
     catch (Exception e)
     {
@@ -92,7 +97,7 @@ public class PCUAEManager
       mainWindow.setLocationRelativeTo(null);
       mainWindow.initialize();
       mainWindow.setVisible(true);
-      
+
       //Check JRE version
       String javaVersion = System.getProperty("java.runtime.version");
       int majorVersion = Integer.parseInt(javaVersion.substring(0, 2));
@@ -114,7 +119,7 @@ public class PCUAEManager
         {
           ManagerVersionChecker.fetchLatestVersionFromGithub();
           if (ManagerVersionChecker.isNewVersionAvailable())
-          {            
+          {
             ManagerDownloadDialog dialog = new ManagerDownloadDialog(MainWindow.getInstance());
             dialog.pack();
             dialog.setLocationRelativeTo(MainWindow.getInstance());

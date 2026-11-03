@@ -111,8 +111,8 @@
 						<!-- path-to-javac -->
 					</executable>
 					<compilerVersion>1.8.0</compilerVersion>
-					<source>14</source>
-					<target>14</target>
+					<source>16</source>
+					<target>16</target>
 				</configuration>
 			</plugin>
 			<plugin>
@@ -169,7 +169,7 @@
 								<!-- <addDependencies>true</addDependencies> -->
 							</classPath>
 							<jre>
-								<minVersion>14</minVersion>
+								<minVersion>16</minVersion>
 								<path>./JRE</path>
 								<opts>
 									<opt>-Djava.library.path="./natives"</opt>
