@@ -301,20 +301,31 @@ public class CarouselPreviewDialog extends JDialog
   {
     inputController = new InputController(this);
     this.setVisible(true);
-
+    GraphicsConfiguration config = getGraphicsConfiguration(); // Ensure you grab your active config
+    double uiScale = config.getDefaultTransform().getScaleX();  // Extracts the scaling factor
     //Calculate max value for zooming in, based on screen size
     DisplayMode mode = getCurrentScreenDisplayMode();
-    int screenWidth = mode.getWidth();
-    int screenHeight = mode.getHeight();
-    double unscaledWidth = 1385.0;
-    double unscaledHeight = 721.0;
-    double widthRatio = screenWidth / unscaledWidth;
-    double heightRatio = screenHeight / unscaledHeight;
-
-    double maxSliderValue = Math.min(widthRatio, heightRatio);
-    this.maxZoomLevel = (int) (maxSliderValue * 100.0);
-    //Set current level if max is smaller than current value.
-    this.currentZoomLevel = Math.min(currentZoomLevel, maxZoomLevel);
+    if (mode != null)
+    {
+      // 1. Convert physical pixel dimensions to logical, unscaled dimensions
+      double logicalScreenWidth = mode.getWidth() / uiScale;
+      double logicalScreenHeight = mode.getHeight() / uiScale;
+      
+      //The size of the carousel image
+      double unscaledWidth = 1385.0;
+      double unscaledHeight = 721.0;
+  
+      // 2. Calculate the ratios based on the unscaled logical dimensions
+      double widthRatio = logicalScreenWidth / unscaledWidth;
+      double heightRatio = logicalScreenHeight / unscaledHeight;
+  
+      double maxZoomValue = Math.min(widthRatio, heightRatio);
+      this.maxZoomLevel = (int) (maxZoomValue * 100.0);
+  
+      //Set current level if max is smaller than current value.
+      this.currentZoomLevel = Math.min(currentZoomLevel, maxZoomLevel);
+      updateScaling();
+    }
   }
 
   public void scrollRight()
