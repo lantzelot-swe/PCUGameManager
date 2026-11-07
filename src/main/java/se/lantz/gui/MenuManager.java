@@ -11,6 +11,7 @@ import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -204,6 +205,7 @@ public class MenuManager
   private int currentFavoritesCount = 10;
 
   private Map<String, String> resourcesMap = new LinkedHashMap<>();
+  private Map<String, String> resourcesSearchUrlMap = new LinkedHashMap<>();
 
   public MenuManager(final MainViewModel uiModel)
   {
@@ -238,10 +240,17 @@ public class MenuManager
   {
     resourcesMap.put("mobygames.com", "https://www.mobygames.com/platform/c64/");
     resourcesMap.put("gb64.com", "https://gb64.com/search.php?h=0");
+    resourcesMap.put("lemon64.com", "https://www.lemon64.com/games/");
     resourcesMap.put("c64.com", "https://www.c64.com/");
     resourcesMap.put("retrocollector.org", "https://retrocollector.org/");
     resourcesMap.put("web.archive.org (Vic 20)",
                      "https://web.archive.org/web/20100530121115/http:/www.6502dude.com/cbm/vic20/arma/0to9taps.html");
+    //Setup the sites that have specific search URL:s for searching on game title
+    resourcesSearchUrlMap.put("https://www.mobygames.com/platform/c64/", "https://www.mobygames.com/search/?q={0}");
+    resourcesSearchUrlMap.put("https://gb64.com/search.php?h=0",
+                              "https://gb64.com/search.php?f=0&t=2&s={0}&b=Go%21&d=18&h=1&a=0");
+    resourcesSearchUrlMap.put("https://www.lemon64.com/games/",
+                              "https://www.lemon64.com/games/list.php?list_title={0}");
   }
 
   public void triggerExit()
@@ -355,9 +364,10 @@ public class MenuManager
   {
     InsetsMenuItem item = new InsetsMenuItem(text);
     item.addActionListener(e -> {
+      String title = uiModel.getCurrentGameDetails().getTitle();
       try
       {
-        Desktop.getDesktop().browse(new URI(url));
+        Desktop.getDesktop().browse(new URI(getSiteUrl(url, title)));
       }
       catch (IOException | URISyntaxException ex)
       {
@@ -365,6 +375,26 @@ public class MenuManager
       }
     });
     return item;
+  }
+
+  private String getSiteUrl(String url, String gameTitle)
+  {
+    //Do not include gamelist views in searches   
+    if (gameTitle.length() > 0 && !uiModel.getCurrentGameDetails().getViewTag().startsWith("GIS:"))
+    {
+      String searchUrl = resourcesSearchUrlMap.get(url);
+      if (searchUrl != null)
+      {
+        //Strip the string from non-alphanumeric chars and use %20 for space
+        String cleanedTitle = gameTitle.replaceAll("[^a-zA-Z0-9 ]", "") // 1. Remove non-alphanumeric (keeps single spaces)
+          .replaceAll(" {2,}", " ")        // 2. Collapse 2 or more spaces into exactly ONE space
+          .replaceAll(" ", "%20");         // 3. Turn all single spaces into %20
+        searchUrl = MessageFormat.format(searchUrl, cleanedTitle);
+        return searchUrl;
+      }
+    }
+    //Use original url, do not search
+    return url;
   }
 
   public void updateEditMenu()
@@ -1213,7 +1243,7 @@ public class MenuManager
     }
     return installPCUAEItem;
   }
-  
+
   private InsetsMenuItem getInstallPCUAEUpdatesItem()
   {
     if (installPCUAEUpdateItem == null)
@@ -1312,7 +1342,7 @@ public class MenuManager
     }
     return installSegaModeItem;
   }
-  
+
   private InsetsMenuItem getInstallCPCModeItem()
   {
     if (installCPCModeItem == null)
@@ -1323,7 +1353,7 @@ public class MenuManager
     }
     return installCPCModeItem;
   }
-  
+
   private InsetsMenuItem getInstallSnesModeItem()
   {
     if (installSnesModeItem == null)
@@ -1524,15 +1554,17 @@ public class MenuManager
         //Version 3.x
         try
         {
-          String[] directories = importDir.toPath().resolve("databases").toFile().list(new FilenameFilter() {
-            @Override
-            public boolean accept(File current, String name) {
-              return new File(current, name).isDirectory();
-            }
-          });
-          
+          String[] directories = importDir.toPath().resolve("databases").toFile().list(new FilenameFilter()
+            {
+              @Override
+              public boolean accept(File current, String name)
+              {
+                return new File(current, name).isDirectory();
+              }
+            });
+
           String selectedDbDir = "";
-          
+
           if (directories.length == 0)
           {
             //No database found          
@@ -1541,11 +1573,17 @@ public class MenuManager
           {
             selectedDbDir = directories[0];
           }
-          else 
+          else
           {
-            selectedDbDir = (String) JOptionPane.showInputDialog(MainWindow.getInstance(), "Select which database to import:", "Import database", JOptionPane.QUESTION_MESSAGE, null, directories, directories[1]);
+            selectedDbDir = (String) JOptionPane.showInputDialog(MainWindow.getInstance(),
+                                                                 "Select which database to import:",
+                                                                 "Import database",
+                                                                 JOptionPane.QUESTION_MESSAGE,
+                                                                 null,
+                                                                 directories,
+                                                                 directories[1]);
           }
-          
+
           if (selectedDbDir != null && !selectedDbDir.isEmpty())
           {
             Path sourcePath = importDir.toPath().resolve("databases").resolve(selectedDbDir);
@@ -1562,16 +1600,16 @@ public class MenuManager
               targetPath = Paths.get("./databases/").resolve(selectedDbDir);
             }
             copyDb(sourcePath, targetPath, selectedDbDir);
-          }      
+          }
         }
         catch (IOException e)
         {
           ExceptionHandler.handleException(e, "Could not copy Db");
-        }    
+        }
       }
     }
   }
-  
+
   private void copyDb(Path source, Path target, String dbName) throws IOException
   {
     ImportExportProgressDialog dialog =
@@ -2047,7 +2085,7 @@ public class MenuManager
   {
     installPCUAEManager.installPCUAE();
   }
-  
+
   private void installPCUAEUpdates()
   {
     installPCUAEUpdatesManager.installPCUAEUpdates();
@@ -2097,12 +2135,12 @@ public class MenuManager
   {
     installSegaManager.installSegaMode();
   }
-  
+
   private void installCPCMode()
   {
     installCPCManager.installCPCMode();
   }
-  
+
   private void installSnesMode()
   {
     installSnesManager.installSnesMode();
