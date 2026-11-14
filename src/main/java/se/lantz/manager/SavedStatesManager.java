@@ -22,6 +22,7 @@ import java.util.stream.Stream;
 
 import javax.imageio.ImageIO;
 import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
 
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
@@ -498,10 +499,13 @@ public class SavedStatesManager
     {
       ExceptionHandler.handleException(e1, "Could not import to saved folder.");
     }
-    //Update saved states map
-    readSavedStatesAndUpdateMap();
-    //Update model list after import
-    model.getGameListModel().notifyChange();
+    //Make sure to update on the EDT
+    SwingUtilities.invokeLater(() -> {
+      //Update saved states map
+      readSavedStatesAndUpdateMap();
+      //Update model list after import
+      model.getGameListModel().notifyChange();
+    });
   }
 
   public void fixCorruptSavedStates(PublishWorker worker)

@@ -1,6 +1,5 @@
 package se.lantz.gui.scraper;
 
-import java.util.Arrays;
 import java.util.List;
 
 import javax.swing.SwingWorker;
