@@ -80,7 +80,10 @@ public class InfoModel extends AbstractModel implements CommonInfoModel
   {
     String old = getTitle();
     //Remove all " since that messes with the SQL
-    this.title = title.replace("\"", "").trim();
+    this.title = title.replaceAll("\"", "").trim();
+    //Map invalid chars to valid ones
+    this.title = title.replaceAll("´", "'").trim();
+    this.title = title.replaceAll("`", "'").trim();
     if (!Objects.equals(old, title))
     {
       notifyChange();

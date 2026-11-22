@@ -732,7 +732,7 @@ public class FileManager
     // All uppercase letters
     // No spaces or special characters, remove them first
     List<Character> forbiddenCharsList =
-      " ,:'ï¿½-.!+*<>()/[]?|".chars().mapToObj(item -> (char) item).collect(Collectors.toList());
+      " ,:'ï¿½-.!+*<>()/[]?|´".chars().mapToObj(item -> (char) item).collect(Collectors.toList());
 
     List<Character> newName =
       title.chars().mapToObj(item -> (char) item).filter(character -> !forbiddenCharsList.contains(character))
@@ -761,7 +761,7 @@ public class FileManager
     String correctedAuthor = author.replace("\\", " ");
     correctedAuthor = author.replace("/", " ");
     List<Character> forbiddenCharsList =
-      ":,'ï¿!+*<>/?|\"".chars().mapToObj(item -> (char) item).collect(Collectors.toList());
+      "´:,'ï¿!+*<>/?|\"".chars().mapToObj(item -> (char) item).collect(Collectors.toList());
 
     List<Character> newName = title.chars().mapToObj(item -> (char) item)
       .filter(character -> !forbiddenCharsList.contains(character)).collect(Collectors.toList());
